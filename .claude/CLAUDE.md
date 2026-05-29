@@ -15,6 +15,8 @@ Goal: explore every field of every packet to write better, more complete event c
 
 **Stack:** C# / .NET 9, Avalonia 11, MVVM (CommunityToolkit.Mvvm)
 
+**Target platforms:** Windows, Linux, macOS (desktop only — no mobile targets)
+
 **Solution:** `AlbionPacketExplorer.sln`
 
 ---
@@ -65,6 +67,36 @@ Format: newline-delimited JSON, one packet per line. Up to 20MB / 100k lines.
 | 57 | EVENT | FarmableObjectInfo | 0=objectId, 1=isReady, 2=itemId, 3=growTime, 5=plantedAt |
 | 45 | REQUEST | ActionOnBuildingStart | 0=buildingObjectId |
 | 46 | REQUEST | ActionOnBuildingEnd | 0=buildingObjectId |
+
+---
+
+## Cross-Platform Rules
+
+Code must run on Windows, Linux, and macOS without modification.
+
+### Paths
+- NEVER string-concatenate paths with `\` or `/` literals — always `Path.Combine()`
+- NEVER hardcode `C:\`, `/home/`, `/Users/` prefixes
+- Use `Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)` for app data dir
+- Use `Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)` for home dir
+
+### Line endings / encoding
+- All source files: LF (enforced by `.gitattributes`)
+- File I/O: always specify `Encoding.UTF8` explicitly; never rely on system default
+
+### Platform-specific APIs
+- `SharpPcap` / `PacketDotNet`: require Npcap (Windows) or libpcap (Linux/macOS) — handle missing lib gracefully, show actionable error message
+- `StorageProvider` (Avalonia): cross-platform file picker — already used, keep it
+- No `Registry`, `WinForms`, `Win32` P/Invoke, or `Microsoft.Win32` anywhere
+- No `System.Drawing` (GDI+) — use Avalonia drawing APIs only
+
+### Conditional logic
+- If platform-specific behavior is unavoidable, use `OperatingSystem.IsWindows()` / `IsLinux()` / `IsMacOS()` — never `RuntimeInformation.IsOSPlatform()` (verbose, same thing)
+- Isolate platform branches to a single method, never scatter across multiple files
+
+### File system
+- Assume case-sensitive FS (Linux) — file names and paths must match exactly
+- Temp/cache dirs: always under `Path.GetTempPath()` or the app data dir above
 
 ---
 

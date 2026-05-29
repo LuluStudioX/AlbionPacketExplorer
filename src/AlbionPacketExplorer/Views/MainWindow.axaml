@@ -5,6 +5,7 @@
         xmlns:views="using:AlbionPacketExplorer.Views"
         x:Class="AlbionPacketExplorer.Views.MainWindow"
         Title="Albion Packet Explorer"
+        Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
         x:DataType="vm:MainViewModel">
 
@@ -33,12 +34,11 @@
                 <ToolTip.Tip>Stop live capture. All captured packets remain visible.</ToolTip.Tip>
             </Button>
             <Separator Width="1" Background="Gray" Margin="4,0" />
-            <Separator Width="1" Background="Gray" Margin="4,0" />
             <CheckBox Content="Resolve Items"
                       IsChecked="{Binding ResolveItemNames}"
                       IsEnabled="{Binding GameDataLoaded}"
                       VerticalAlignment="Center">
-                <ToolTip.Tip>Show item names (UniqueName + EN display name) for numeric param values.&#xA;Requires SAT IndexedItems.json to be present.</ToolTip.Tip>
+                <ToolTip.Tip>Show item names (UniqueName + EN display name) for numeric param values.&#xA;Data fetched from ao-bin-dumps on first launch, cached locally for 7 days.</ToolTip.Tip>
             </CheckBox>
             <Button Content="Save JSON…" Command="{Binding SaveFileCommand}">
                 <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>
