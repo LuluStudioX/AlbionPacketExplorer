@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>AlbionPacketExplorer.PhotonPackageParser</AssemblyName>
+    <RootNamespace>AlbionPacketExplorer.PhotonPackageParser</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Abstractions\AlbionPacketExplorer.Abstractions.csproj" />
+    <ProjectReference Include="..\Protocol18\AlbionPacketExplorer.Protocol18.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+             x:Class="AlbionPacketExplorer.Views.PacketDetailView"
+             x:DataType="vm:PacketDetailViewModel">
+
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top"
+                   Margin="4,4,4,2"
+                   FontWeight="Bold"
+                   Text="{Binding Packet, StringFormat='Packet: {0}', FallbackValue='No packet selected'}" />
+
+        <DataGrid ItemsSource="{Binding Rows}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="Horizontal">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Key"   Binding="{Binding Key}"   Width="50" />
+                <DataGridTextColumn Header="Type"  Binding="{Binding Type}"  Width="100" />
+                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+
+</UserControl>

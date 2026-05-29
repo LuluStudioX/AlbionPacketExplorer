@@ -1,0 +1,113 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+        xmlns:views="using:AlbionPacketExplorer.Views"
+        x:Class="AlbionPacketExplorer.Views.MainWindow"
+        Title="Albion Packet Explorer"
+        Width="1400" Height="900"
+        x:DataType="vm:MainViewModel">
+
+    <DockPanel>
+        <!-- Toolbar -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="6,4">
+            <TextBlock VerticalAlignment="Center" Text="Device:" />
+            <ComboBox ItemsSource="{Binding AvailableDevices}"
+                      SelectedItem="{Binding SelectedDevice}"
+                      DisplayMemberBinding="{Binding DisplayName}"
+                      Width="260"
+                      IsEnabled="{Binding IsCapturing, Converter={x:Static BoolConverters.Not}}">
+                <ToolTip.Tip>Select which network adapter to capture Albion traffic from.</ToolTip.Tip>
+            </ComboBox>
+            <Button Content="Refresh" Command="{Binding RefreshDevicesCommand}">
+                <ToolTip.Tip>Re-scan network adapters.</ToolTip.Tip>
+            </Button>
+            <Button Content="▶ Start Capture"
+                    Command="{Binding StartCaptureCommand}"
+                    Background="#2a7a2a" Foreground="White">
+                <ToolTip.Tip>Start live packet capture. Npcap must be installed. Run as Administrator if capture fails.</ToolTip.Tip>
+            </Button>
+            <Button Content="■ Stop Capture"
+                    Command="{Binding StopCaptureCommand}"
+                    Background="#7a2a2a" Foreground="White">
+                <ToolTip.Tip>Stop live capture. All captured packets remain visible.</ToolTip.Tip>
+            </Button>
+            <Separator Width="1" Background="Gray" Margin="4,0" />
+            <Button Content="Open JSON File…" Command="{Binding OpenFileCommand}">
+                <ToolTip.Tip>Load a packet_sniffer.json file recorded by SAT.&#xA;Default path: %LOCALAPPDATA%\StatisticsAnalysisTool\Instances\...\temp\packet_sniffer.json</ToolTip.Tip>
+            </Button>
+        </StackPanel>
+
+        <!-- Status bar -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical">
+            <ProgressBar Value="{Binding LoadProgress}" Maximum="1"
+                         IsVisible="{Binding IsLoading}" Height="4" />
+            <TextBlock Text="{Binding StatusText}" Margin="8,2" />
+        </StackPanel>
+
+        <!-- Main content: vertical split (top=summary, bottom=list+detail) -->
+        <Grid x:Name="MainGrid" RowDefinitions="320,4,*">
+
+            <!-- TOP: Code Aggregator -->
+            <DockPanel Grid.Row="0">
+                <Border DockPanel.Dock="Top" Background="#1a1a2e" Padding="6,3">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="Event Summary" FontWeight="Bold" VerticalAlignment="Center" />
+                        <Border Background="#333355" CornerRadius="8" Padding="4,1"
+                                ToolTip.Tip="Each row = one packet type (e.g. EVENT 32).&#xA;Count = how many times seen.&#xA;Keys = which param indices were present, with % showing how often across all packets of that type.&#xA;100% = always present (required field). Less = optional/conditional field.&#xA;&#xA;Click a row to filter the packet list below to that type.&#xA;Then click 'Export C# Constructor Stub' to copy a constructor skeleton to clipboard.">
+                            <TextBlock Text="?" FontSize="11" Foreground="#aaaaff" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <views:CodeAggregatorView DataContext="{Binding Aggregator}" />
+            </DockPanel>
+
+            <!-- Horizontal splitter -->
+            <GridSplitter Grid.Row="1"
+                          ResizeDirection="Rows"
+                          Background="#444444"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch" />
+
+            <!-- BOTTOM: Packet List + Detail -->
+            <Grid Grid.Row="2" x:Name="BottomGrid" ColumnDefinitions="2*,4,*">
+
+                <!-- Packet List -->
+                <DockPanel Grid.Column="0">
+                    <Border DockPanel.Dock="Top" Background="#1a2e1a" Padding="6,3">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Packet List" FontWeight="Bold" VerticalAlignment="Center" />
+                            <Border Background="#335533" CornerRadius="8" Padding="4,1"
+                                    ToolTip.Tip="All individual packets matching the current filter.&#xA;Filter is set automatically when you click a row in the Event Summary above.&#xA;You can also type Kind (EVENT/REQUEST/RESPONSE) and Code manually.&#xA;&#xA;Click a packet row to inspect its fields in the detail panel on the right.">
+                                <TextBlock Text="?" FontSize="11" Foreground="#aaffaa" />
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                    <views:PacketListView DataContext="{Binding PacketList}" />
+                </DockPanel>
+
+                <!-- Vertical splitter -->
+                <GridSplitter Grid.Column="1"
+                              ResizeDirection="Columns"
+                              Background="#444444"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch" />
+
+                <!-- Packet Detail -->
+                <DockPanel Grid.Column="2">
+                    <Border DockPanel.Dock="Top" Background="#2e1a1a" Padding="6,3">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="Packet Detail" FontWeight="Bold" VerticalAlignment="Center" />
+                            <Border Background="#553333" CornerRadius="8" Padding="4,1"
+                                    ToolTip.Tip="Key/Type/Value breakdown of the selected packet.&#xA;&#xA;Key = param index (0–255). These map to constructor parameters in SAT.&#xA;Type = wire type (Int16, Int64, String, Byte[], etc.)&#xA;Value = decoded value. Int64 values that look like .NET ticks are shown as DateTime too.&#xA;Byte arrays shown as hex + decimal.">
+                                <TextBlock Text="?" FontSize="11" Foreground="#ffaaaa" />
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                    <views:PacketDetailView DataContext="{Binding PacketDetail}" />
+                </DockPanel>
+
+            </Grid>
+        </Grid>
+    </DockPanel>
+
+</Window>
