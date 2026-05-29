@@ -13,12 +13,28 @@
         <DataGrid ItemsSource="{Binding Rows}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
+                  RowHeight="36"
                   GridLinesVisibility="Horizontal">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Key"      Binding="{Binding Key}"          Width="50" />
-                <DataGridTextColumn Header="Type"     Binding="{Binding Type}"         Width="100" />
-                <DataGridTextColumn Header="Value"    Binding="{Binding Value}"        Width="*" />
-                <DataGridTextColumn Header="Resolved" Binding="{Binding ResolvedName}" Width="200" />
+                <DataGridTextColumn Header="Key"   Binding="{Binding Key}"   Width="50" />
+                <DataGridTextColumn Header="Type"  Binding="{Binding Type}"  Width="100" />
+                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+                <DataGridTemplateColumn Header="Resolved" Width="260">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:ParamRow">
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        VerticalAlignment="Center" Margin="4,0">
+                                <Image Source="{Binding Icon}"
+                                       Width="28" Height="28"
+                                       IsVisible="{Binding HasResolved}"
+                                       RenderOptions.BitmapInterpolationMode="MediumQuality" />
+                                <TextBlock Text="{Binding ResolvedName}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
