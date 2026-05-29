@@ -55,6 +55,7 @@ public partial class MainViewModel : ObservableObject
     public bool GameDataLoaded => _gameData.IsLoaded;
 
     [ObservableProperty] private bool _focusMode;
+    [ObservableProperty] private bool _minimizeToTray;
 
     public string LayoutToggleIcon => FocusMode ? "⊞" : "⊟";
 
@@ -64,13 +65,15 @@ public partial class MainViewModel : ObservableObject
         SaveSettings();
     }
 
+    partial void OnMinimizeToTrayChanged(bool value) => SaveSettings();
+
     [RelayCommand]
     private void ToggleFocusMode() => FocusMode = !FocusMode;
 
     public SettingsViewModel Settings => new(this);
 
     private void SaveSettings() =>
-        AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, FocusMode));
+        AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, FocusMode, MinimizeToTray));
 
     public MainViewModel(IFilePicker filePicker)
     {
@@ -81,6 +84,7 @@ public partial class MainViewModel : ObservableObject
         _packetDetail.ResolveItemNames = saved.ResolveItemNames;
         _packetDetail.ResolveIcons = saved.ResolveIcons;
         FocusMode = saved.FocusMode;
+        MinimizeToTray = saved.MinimizeToTray;
 
         _ = LoadGameDataAsync();
         RefreshDevices();

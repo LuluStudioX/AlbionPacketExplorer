@@ -30,6 +30,12 @@ public partial class SettingsViewModel : ObservableObject
         set => _main.ResolveIcons = value;
     }
 
+    public bool MinimizeToTray
+    {
+        get => _main.MinimizeToTray;
+        set => _main.MinimizeToTray = value;
+    }
+
     public string DataFolderPath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "AlbionPacketExplorer");
@@ -114,6 +120,9 @@ public partial class SettingsViewModel : ObservableObject
                     break;
                 case nameof(MainViewModel.ResolveIcons):
                     OnPropertyChanged(nameof(ResolveIcons));
+                    break;
+                case nameof(MainViewModel.MinimizeToTray):
+                    OnPropertyChanged(nameof(MinimizeToTray));
                     break;
             }
         };
