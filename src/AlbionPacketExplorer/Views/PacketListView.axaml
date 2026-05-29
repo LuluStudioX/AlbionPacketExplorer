@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              x:Class="AlbionPacketExplorer.Views.PacketListView"
              x:DataType="vm:PacketListViewModel">
@@ -10,7 +11,10 @@
             <TextBox Text="{Binding FilterKind}" Width="80" PlaceholderText="EVENT…" />
             <TextBlock VerticalAlignment="Center" Text="Code:" />
             <TextBox Text="{Binding FilterCode}" Width="60" PlaceholderText="32…" />
-            <Button Content="Clear" Command="{Binding ClearFilterCommand}" />
+            <Button Classes="Flat" Command="{Binding ClearFilterCommand}" Padding="8">
+                <ToolTip.Tip>Clear filter</ToolTip.Tip>
+                <PathIcon Data="{x:Static sukiTheme:Icons.BackspaceOutline}" Width="15" Height="15" />
+            </Button>
             <TextBlock VerticalAlignment="Center" Text="{Binding CountText}" Foreground="Gray" />
         </StackPanel>
 
