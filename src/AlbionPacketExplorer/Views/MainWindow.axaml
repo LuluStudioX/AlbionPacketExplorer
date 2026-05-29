@@ -125,7 +125,7 @@
              FOCUS MODE (stacked, full-width detail)
              ═══════════════════════════════════════ -->
         <Grid x:Name="FocusGrid"
-              RowDefinitions="Auto,4,220,4,*"
+              RowDefinitions="160,4,*,4,*"
               IsVisible="{Binding FocusMode}">
 
             <!-- Row 0: Event Summary (collapsible) -->
