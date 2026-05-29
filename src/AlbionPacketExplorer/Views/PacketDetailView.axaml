@@ -29,24 +29,20 @@
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
 
-                <!-- Key column: shows "0  paramName", tooltip shows note if present -->
-                <DataGridTemplateColumn Header="Key" Width="130">
+                <!-- Key column: "0" bold + "paramName" normal, note shown as tooltip on hover -->
+                <DataGridTemplateColumn Header="Key" Width="160">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
-                            <StackPanel Orientation="Horizontal" Spacing="4"
-                                        VerticalAlignment="Center" Margin="4,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        VerticalAlignment="Center" Margin="4,0"
+                                        ToolTip.Tip="{Binding Note}">
                                 <TextBlock Text="{Binding Key}"
                                            FontWeight="SemiBold"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding SchemaName}"
-                                           Foreground="Gray" FontSize="11"
+                                           Foreground="#aaaacc" FontSize="13"
                                            VerticalAlignment="Center"
                                            IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                                <Border Background="#444466" CornerRadius="6" Padding="3,1"
-                                        IsVisible="{Binding HasNote}"
-                                        ToolTip.Tip="{Binding Note}">
-                                    <TextBlock Text="ℹ" FontSize="10" Foreground="#aaaaff" />
-                                </Border>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
