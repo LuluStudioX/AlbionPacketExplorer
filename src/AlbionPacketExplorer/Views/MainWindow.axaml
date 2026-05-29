@@ -39,6 +39,9 @@
             <Button Content="{Binding LayoutToggleIcon}"
                     Command="{Binding ToggleFocusModeCommand}"
                     VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    FontSize="21"
                     Padding="14,8"
                     MinHeight="{Binding $parent[StackPanel].Bounds.Height}">
                 <ToolTip.Tip>Switch between side-by-side (⊞) and stacked (⊟) layout. (F5)</ToolTip.Tip>
