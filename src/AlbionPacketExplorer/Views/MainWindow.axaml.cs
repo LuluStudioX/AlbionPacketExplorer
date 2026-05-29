@@ -108,9 +108,15 @@ public partial class MainWindow : SukiWindow, IFilePicker
 
     private void OnClosing(object? sender, WindowClosingEventArgs e)
     {
-        if (_overviewMainGrid == null || _overviewBottomGrid == null) return;
-        LayoutStore.Save(new LayoutState(
-            _overviewMainGrid.RowDefinitions[0].ActualHeight,
-            _overviewBottomGrid.ColumnDefinitions[0].ActualWidth));
+        if (_overviewMainGrid != null && _overviewBottomGrid != null)
+            LayoutStore.Save(new LayoutState(
+                _overviewMainGrid.RowDefinitions[0].ActualHeight,
+                _overviewBottomGrid.ColumnDefinitions[0].ActualWidth));
+
+        if (DataContext is MainViewModel { MinimizeToTray: true })
+        {
+            e.Cancel = true;
+            Hide();
+        }
     }
 }

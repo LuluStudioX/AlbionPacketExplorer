@@ -15,14 +15,14 @@
         <StackPanel Spacing="4">
             <TextBlock Text="Param name" FontSize="12" Foreground="Gray" />
             <TextBox Text="{Binding ParamName}"
-                     Watermark="e.g. objectId"
+                     PlaceholderText="e.g. objectId"
                      MaxLength="64" />
         </StackPanel>
 
         <StackPanel Spacing="4">
             <TextBlock Text="Note (shown on hover)" FontSize="12" Foreground="Gray" />
             <TextBox Text="{Binding Note}"
-                     Watermark="e.g. .NET ticks, 0=none 1=owner 2=guild"
+                     PlaceholderText="e.g. .NET ticks, 0=none 1=owner 2=guild"
                      MaxLength="256"
                      AcceptsReturn="False" />
         </StackPanel>
