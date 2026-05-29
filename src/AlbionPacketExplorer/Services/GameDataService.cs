@@ -12,6 +12,7 @@ public sealed class GameDataService
         "AlbionPacketExplorer", "items.json");
 
     private Dictionary<int, (string UniqueName, string DisplayName)>? _items;
+    private Dictionary<string, string>? _displayByUniqueName;
 
     public bool IsLoaded => _items != null;
 
@@ -66,15 +67,31 @@ public sealed class GameDataService
             if (entries == null) return;
 
             var dict = new Dictionary<int, (string, string)>(entries.Count);
+            var byName = new Dictionary<string, string>(entries.Count, StringComparer.OrdinalIgnoreCase);
             foreach (var e in entries)
             {
-                if (!int.TryParse(e.Index, out var idx)) continue;
                 var display = e.LocalizedNames?.TryGetValue("EN-US", out var name) == true ? name : e.UniqueName;
-                dict[idx] = (e.UniqueName, display ?? e.UniqueName);
+                var displayName = display ?? e.UniqueName;
+                if (int.TryParse(e.Index, out var idx))
+                    dict[idx] = (e.UniqueName, displayName);
+                if (!string.IsNullOrEmpty(e.UniqueName))
+                    byName[e.UniqueName] = displayName;
             }
             _items = dict;
+            _displayByUniqueName = byName;
         }
         catch { }
+    }
+
+    public bool TryResolveByUniqueName(string uniqueName, out string displayName)
+    {
+        if (_displayByUniqueName != null && _displayByUniqueName.TryGetValue(uniqueName, out var d))
+        {
+            displayName = d;
+            return true;
+        }
+        displayName = string.Empty;
+        return false;
     }
 
     public bool TryResolve(int index, out string uniqueName, out string displayName)
