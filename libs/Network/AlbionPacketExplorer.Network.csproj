@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>AlbionPacketExplorer.Network</AssemblyName>
+    <RootNamespace>AlbionPacketExplorer.Network</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpPcap" Version="6.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Abstractions\AlbionPacketExplorer.Abstractions.csproj" />
+    <ProjectReference Include="..\PhotonPackageParser\AlbionPacketExplorer.PhotonPackageParser.csproj" />
+  </ItemGroup>
+
+</Project>

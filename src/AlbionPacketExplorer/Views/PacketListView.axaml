@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+             x:Class="AlbionPacketExplorer.Views.PacketListView"
+             x:DataType="vm:PacketListViewModel">
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4,4,4,2">
+            <TextBlock VerticalAlignment="Center" Text="Kind:" />
+            <TextBox Text="{Binding FilterKind}" Width="80" Watermark="EVENT…" />
+            <TextBlock VerticalAlignment="Center" Text="Code:" />
+            <TextBox Text="{Binding FilterCode}" Width="60" Watermark="32…" />
+            <Button Content="Clear" Command="{Binding ClearFilterCommand}" />
+            <TextBlock VerticalAlignment="Center" Text="{Binding CountText}" Foreground="Gray" />
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding Packets}"
+                  SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserSortColumns="False"
+                  GridLinesVisibility="Horizontal">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="110" />
+                <DataGridTextColumn Header="Kind"      Binding="{Binding Kind}"     Width="80" />
+                <DataGridTextColumn Header="Code"      Binding="{Binding Code}"     Width="60" />
+                <DataGridTextColumn Header="Keys"      Binding="{Binding KeyCount}" Width="60" />
+                <DataGridTextColumn Header="Params"    Binding="{Binding ParamSummary}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+
+</UserControl>
