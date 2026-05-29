@@ -163,17 +163,14 @@ public partial class PacketDetailViewModel : ObservableObject
 
     private (string resolved, string uniqueName) TryResolveParam(ParamValue pv)
     {
-        int? index = pv.Value switch
+        // String params: value is already a UniqueName (e.g. "T8_LABOURER_HUNTER")
+        if (pv.Type == "String" && pv.Value is string s && !string.IsNullOrEmpty(s))
         {
-            long l when l is >= 1 and <= 50000 => (int)l,
-            int i when i is >= 1 and <= 50000 => i,
-            _ => null
-        };
-
-        if (index == null) return (string.Empty, string.Empty);
-        if (!_gameData.TryResolve(index.Value, out var unique, out var display))
+            if (_gameData.TryResolveByUniqueName(s, out var display))
+                return ($"{s} — {display}", s);
             return (string.Empty, string.Empty);
+        }
 
-        return ($"{unique} — {display}", unique);
+        return (string.Empty, string.Empty);
     }
 }
