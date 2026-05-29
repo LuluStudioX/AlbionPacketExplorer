@@ -4,7 +4,8 @@ namespace AlbionPacketExplorer.Services;
 
 public record AppSettings(
     bool ResolveItemNames = false,
-    bool ResolveIcons = false)
+    bool ResolveIcons = false,
+    bool FocusMode = false)
 {
     public static readonly AppSettings Default = new();
 }

@@ -7,7 +7,8 @@
         Title="Albion Packet Explorer"
         Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
-        x:DataType="vm:MainViewModel">
+        x:DataType="vm:MainViewModel"
+        KeyDown="OnKeyDown">
 
     <DockPanel>
         <!-- Toolbar -->
@@ -35,6 +36,13 @@
             </Button>
             <Separator Width="1" Background="Gray" Margin="4,0" />
             <Button Content="⚙ Settings" Name="SettingsButton" Click="OnSettingsClicked" />
+            <Button Content="{Binding LayoutToggleIcon}"
+                    Command="{Binding ToggleFocusModeCommand}"
+                    VerticalAlignment="Center"
+                    Padding="14,8"
+                    MinHeight="{Binding $parent[StackPanel].Bounds.Height}">
+                <ToolTip.Tip>Switch between side-by-side (⊞) and stacked (⊟) layout. (F5)</ToolTip.Tip>
+            </Button>
             <Separator Width="1" Background="Gray" Margin="4,0" />
             <Button Content="Save JSON…" Command="{Binding SaveFileCommand}">
                 <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>
@@ -51,8 +59,12 @@
             <TextBlock Text="{Binding StatusText}" Margin="8,2" />
         </StackPanel>
 
-        <!-- Main content: vertical split (top=summary, bottom=list+detail) -->
-        <Grid x:Name="MainGrid" RowDefinitions="200,4,*">
+        <!-- ═══════════════════════════════════════
+             OVERVIEW MODE (side-by-side, default)
+             ═══════════════════════════════════════ -->
+        <Grid x:Name="OverviewGrid"
+              RowDefinitions="200,4,*"
+              IsVisible="{Binding FocusMode, Converter={x:Static BoolConverters.Not}}">
 
             <!-- TOP: Code Aggregator -->
             <DockPanel Grid.Row="0" MinHeight="80">
@@ -60,7 +72,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock Text="Event Summary" FontWeight="Bold" VerticalAlignment="Center" />
                         <Border Background="#333355" CornerRadius="8" Padding="4,1"
-                                ToolTip.Tip="Each row = one packet type (e.g. EVENT 32).&#xA;Count = how many times seen.&#xA;Keys = which param indices were present, with % showing how often across all packets of that type.&#xA;100% = always present (required field). Less = optional/conditional field.&#xA;&#xA;Click a row to filter the packet list below to that type.&#xA;Then click 'Export C# Constructor Stub' to copy a constructor skeleton to clipboard.">
+                                ToolTip.Tip="Each row = one packet type (e.g. EVENT 32).&#xA;Count = how many times seen.&#xA;Keys = which param indices were present, with % showing how often.&#xA;100% = always present (required field). Less = optional/conditional.&#xA;&#xA;Click a row to filter the packet list below.">
                             <TextBlock Text="?" FontSize="11" Foreground="#aaaaff" />
                         </Border>
                     </StackPanel>
@@ -68,23 +80,18 @@
                 <views:CodeAggregatorView DataContext="{Binding Aggregator}" />
             </DockPanel>
 
-            <!-- Horizontal splitter -->
-            <GridSplitter Grid.Row="1"
-                          ResizeDirection="Rows"
+            <GridSplitter Grid.Row="1" ResizeDirection="Rows"
                           Background="#444444"
-                          HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch" />
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-            <!-- BOTTOM: Packet List + Detail -->
+            <!-- BOTTOM: Packet List + Detail side by side -->
             <Grid Grid.Row="2" x:Name="BottomGrid" ColumnDefinitions="2*,4,*">
-
-                <!-- Packet List -->
                 <DockPanel Grid.Column="0" MinWidth="200">
                     <Border DockPanel.Dock="Top" Background="#1a2e1a" Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Text="Packet List" FontWeight="Bold" VerticalAlignment="Center" />
                             <Border Background="#335533" CornerRadius="8" Padding="4,1"
-                                    ToolTip.Tip="All individual packets matching the current filter.&#xA;Filter is set automatically when you click a row in the Event Summary above.&#xA;You can also type Kind (EVENT/REQUEST/RESPONSE) and Code manually.&#xA;&#xA;Click a packet row to inspect its fields in the detail panel on the right.">
+                                    ToolTip.Tip="All individual packets matching the current filter.&#xA;Filter is set automatically when you click a row in Event Summary.&#xA;Click a packet row to inspect its fields in the detail panel.">
                                 <TextBlock Text="?" FontSize="11" Foreground="#aaffaa" />
                             </Border>
                         </StackPanel>
@@ -92,29 +99,78 @@
                     <views:PacketListView DataContext="{Binding PacketList}" />
                 </DockPanel>
 
-                <!-- Vertical splitter -->
-                <GridSplitter Grid.Column="1"
-                              ResizeDirection="Columns"
+                <GridSplitter Grid.Column="1" ResizeDirection="Columns"
                               Background="#444444"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch" />
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-                <!-- Packet Detail -->
                 <DockPanel Grid.Column="2" MinWidth="200">
                     <Border DockPanel.Dock="Top" Background="#2e1a1a" Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Text="Packet Detail" FontWeight="Bold" VerticalAlignment="Center" />
                             <Border Background="#553333" CornerRadius="8" Padding="4,1"
-                                    ToolTip.Tip="Key/Type/Value breakdown of the selected packet.&#xA;&#xA;Key = param index (0–255). These map to constructor parameters in SAT.&#xA;Type = wire type (Int16, Int64, String, Byte[], etc.)&#xA;Value = decoded value. Int64 values that look like .NET ticks are shown as DateTime too.&#xA;Byte arrays shown as hex + decimal.">
+                                    ToolTip.Tip="Key/Type/Value breakdown of the selected packet.&#xA;Key = param index (0–255). Type = wire type. Value = decoded value.&#xA;Right-click a row to edit param name/note.">
                                 <TextBlock Text="?" FontSize="11" Foreground="#ffaaaa" />
                             </Border>
                         </StackPanel>
                     </Border>
                     <views:PacketDetailView DataContext="{Binding PacketDetail}" />
                 </DockPanel>
-
             </Grid>
         </Grid>
+
+        <!-- ═══════════════════════════════════════
+             FOCUS MODE (stacked, full-width detail)
+             ═══════════════════════════════════════ -->
+        <Grid x:Name="FocusGrid"
+              RowDefinitions="Auto,4,220,4,*"
+              IsVisible="{Binding FocusMode}">
+
+            <!-- Row 0: Event Summary (collapsible) -->
+            <DockPanel Grid.Row="0">
+                <Border DockPanel.Dock="Top" Background="#1a1a2e" Padding="6,3"
+                        Cursor="Hand" PointerPressed="OnSummaryHeaderPressed">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock x:Name="SummaryCollapseIcon" Text="▼" FontSize="10" VerticalAlignment="Center" Foreground="#aaaaff" />
+                        <TextBlock Text="Event Summary" FontWeight="Bold" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+                <views:CodeAggregatorView x:Name="FocusSummaryContent"
+                                          DataContext="{Binding Aggregator}"
+                                          MaxHeight="160" />
+            </DockPanel>
+
+            <GridSplitter Grid.Row="1" ResizeDirection="Rows"
+                          Background="#444444"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+            <!-- Row 2: Packet List full-width -->
+            <DockPanel Grid.Row="2">
+                <Border DockPanel.Dock="Top" Background="#1a2e1a" Padding="6,3">
+                    <TextBlock Text="Packet List" FontWeight="Bold" VerticalAlignment="Center" />
+                </Border>
+                <views:PacketListView DataContext="{Binding PacketList}" />
+            </DockPanel>
+
+            <GridSplitter Grid.Row="3" ResizeDirection="Rows"
+                          Background="#444444"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+            <!-- Row 4: Packet Detail full-width -->
+            <DockPanel Grid.Row="4">
+                <Border DockPanel.Dock="Top" Background="#2e1a1a" Padding="6,3">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="Packet Detail" FontWeight="Bold" VerticalAlignment="Center" />
+                        <Border Background="#553333" CornerRadius="8" Padding="4,1"
+                                ToolTip.Tip="Right-click a row to edit param name/note.">
+                            <TextBlock Text="?" FontSize="11" Foreground="#ffaaaa" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <views:PacketDetailView DataContext="{Binding PacketDetail}" />
+            </DockPanel>
+
+        </Grid>
+
     </DockPanel>
 
 </suki:SukiWindow>

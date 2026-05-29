@@ -29,6 +29,13 @@
                         Padding="16,10"
                         Click="OnNavClicked"
                         Tag="Paths" />
+                <Button Name="NavSchema"
+                        Content="Schema Export"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="Schema" />
                 <Button Name="NavAbout"
                         Content="About"
                         HorizontalAlignment="Stretch"
@@ -120,6 +127,46 @@
                             <TextBlock Text="{Binding ItemCachePath}"
                                        Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
                                        TextWrapping="Wrap" Opacity="0.8" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Schema Export section -->
+                <StackPanel Name="SectionSchema" Spacing="12" IsVisible="False">
+                    <TextBlock Text="Schema Export" FontSize="18" FontWeight="SemiBold" />
+
+                    <Border Classes="card" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Export merged param schema for an event/request as standalone JSON, ready for SAT PR submission."
+                                       Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+
+                            <Grid ColumnDefinitions="Auto,8,120,8,Auto,8,*">
+                                <TextBlock Grid.Column="0" Text="Kind:" VerticalAlignment="Center" />
+                                <ComboBox Grid.Column="2" SelectedItem="{Binding ExportKind}">
+                                    <ComboBoxItem Content="EVENT" />
+                                    <ComboBoxItem Content="REQUEST" />
+                                    <ComboBoxItem Content="RESPONSE" />
+                                </ComboBox>
+                                <TextBlock Grid.Column="4" Text="Code:" VerticalAlignment="Center" />
+                                <TextBox Grid.Column="6" Text="{Binding ExportCode}"
+                                         Watermark="e.g. 32" MaxLength="5" />
+                            </Grid>
+
+                            <TextBox Text="{Binding ExportPreview}"
+                                     IsReadOnly="True"
+                                     FontFamily="Consolas,Monospace"
+                                     FontSize="11"
+                                     AcceptsReturn="True"
+                                     Height="200"
+                                     TextWrapping="NoWrap"
+                                     Watermark="Enter kind + code above to preview schema…" />
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Content="Copy to Clipboard"
+                                        Command="{Binding CopyExportCommand}" />
+                                <Button Content="Save as JSON File…"
+                                        Command="{Binding SaveExportCommand}" />
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </StackPanel>
