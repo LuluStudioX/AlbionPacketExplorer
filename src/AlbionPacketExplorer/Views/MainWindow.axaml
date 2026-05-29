@@ -7,6 +7,7 @@
         Title="Albion Packet Explorer"
         Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
+        WindowStartupLocation="CenterScreen"
         x:DataType="vm:MainViewModel"
         KeyDown="OnKeyDown">
 
