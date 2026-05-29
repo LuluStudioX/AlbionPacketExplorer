@@ -348,6 +348,34 @@ MANUAL_ENTRIES: dict[str, dict] = {
             "9": {"name": "quantity",         "note": "", "resolveAs": ""},
         }
     },
+    "EVENT:103": {
+        "name": "GuildUpdate",
+        "params": {
+            "0":  {"name": "objectId",        "note": "", "resolveAs": ""},
+            "10": {"name": "guildMemberCount","note": "", "resolveAs": ""},
+            "11": {"name": "timestamp",       "note": ".NET ticks", "resolveAs": ""},
+            "14": {"name": "unknown14",       "note": "", "resolveAs": ""},
+            "15": {"name": "guildName",       "note": "Guild display name", "resolveAs": ""},
+            "16": {"name": "guildTag",        "note": "Guild tag/abbreviation (e.g. HOG)", "resolveAs": ""},
+            "17": {"name": "guildMembers",    "note": "Array of member data", "resolveAs": ""},
+            "19": {"name": "guildData",       "note": "Dictionary of guild properties", "resolveAs": ""},
+            "20": {"name": "unknown20",       "note": "", "resolveAs": ""},
+            "21": {"name": "unknown21",       "note": "", "resolveAs": ""},
+            "22": {"name": "unknown22",       "note": "", "resolveAs": ""},
+            "23": {"name": "unknown23",       "note": "", "resolveAs": ""},
+            "24": {"name": "silver",          "note": "Silver amount (FixPoint internal)", "resolveAs": ""},
+            "25": {"name": "unknown25",       "note": "", "resolveAs": ""},
+            "26": {"name": "unknown26",       "note": "Float/percentage value", "resolveAs": ""},
+            "27": {"name": "timestamp2",      "note": ".NET ticks", "resolveAs": ""},
+            "28": {"name": "guildBanner",     "note": "Guild banner UniqueName (e.g. GUILD_FINDER_BANNER_24)", "resolveAs": ""},
+            "29": {"name": "unknown29",       "note": "", "resolveAs": ""},
+            "31": {"name": "unknown31",       "note": "", "resolveAs": ""},
+            "32": {"name": "hideoutLocation", "note": "Hideout location string (HIDEOUT@id@guid)", "resolveAs": ""},
+            "33": {"name": "timestamp3",      "note": ".NET ticks", "resolveAs": ""},
+            "34": {"name": "allianceName",    "note": "Alliance display name", "resolveAs": ""},
+            "37": {"name": "timestamp4",      "note": ".NET ticks", "resolveAs": ""},
+        }
+    },
     "REQUEST:46": {
         "name": "ActionOnBuildingEnd",
         "params": {

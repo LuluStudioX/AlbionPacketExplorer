@@ -28,11 +28,11 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="110" />
-                <DataGridTextColumn Header="Kind"      Binding="{Binding Kind}"     Width="80" />
-                <DataGridTextColumn Header="Code"      Binding="{Binding Code}"      Width="60" />
-                <DataGridTextColumn Header="Name"      Binding="{Binding EventName}" Width="200" />
-                <DataGridTextColumn Header="Keys"      Binding="{Binding KeyCount}"  Width="60" />
+                <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="100" />
+                <DataGridTextColumn Header="Kind"      Binding="{Binding Kind}"        Width="90" />
+                <DataGridTextColumn Header="Code"      Binding="{Binding Code}"        Width="55" />
+                <DataGridTextColumn Header="Name"      Binding="{Binding EventName}"   Width="220" />
+                <DataGridTextColumn Header="# Keys"    Binding="{Binding KeyCount}"    Width="60" />
                 <DataGridTextColumn Header="Params"    Binding="{Binding ParamSummary}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
