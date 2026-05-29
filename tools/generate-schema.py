@@ -376,6 +376,25 @@ def main():
     schema.update(MANUAL_ENTRIES)
     print(f"Seeded {len(MANUAL_ENTRIES)} manual entries")
 
+    # Seed skeleton entries for ALL known event and op codes (name only, no params)
+    # Manual entries above already have params — skeletons fill the rest
+    for name, code in sorted(event_codes.items(), key=lambda x: x[1]):
+        key = f"EVENT:{code}"
+        if key not in schema:
+            schema[key] = {"name": name, "params": {}}
+        elif not schema[key].get("name"):
+            schema[key]["name"] = name
+
+    for name, code in sorted(op_codes.items(), key=lambda x: x[1]):
+        for kind in ("REQUEST", "RESPONSE"):
+            key = f"{kind}:{code}"
+            if key not in schema:
+                schema[key] = {"name": name, "params": {}}
+            elif not schema[key].get("name"):
+                schema[key]["name"] = name
+
+    print(f"After skeleton seed: {len(schema)} entries")
+
     # Auto-extract from SAT handler files
     handler_dirs = [
         sat_root / "src/StatisticsAnalysisTool/Network/Handler",
