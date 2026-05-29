@@ -12,6 +12,7 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly IFilePicker _filePicker;
     private readonly GameDataService _gameData = new();
+    private readonly IconCacheService _iconCache = new();
 
     [ObservableProperty] private CodeAggregatorViewModel _aggregator = new();
     [ObservableProperty] private PacketListViewModel _packetList = new();
@@ -39,7 +40,7 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(IFilePicker filePicker)
     {
         _filePicker = filePicker;
-        _packetDetail = new PacketDetailViewModel(_gameData);
+        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache);
         _ = LoadGameDataAsync();
         RefreshDevices();
 
