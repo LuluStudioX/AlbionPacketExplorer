@@ -2,7 +2,11 @@ using System.Text.Json;
 
 namespace AlbionPacketExplorer.Services;
 
-public record LayoutState(double TopPanelHeight, double LeftPanelWidth)
+public record LayoutState(
+    double TopPanelHeight,
+    double LeftPanelWidth,
+    double FocusTopHeight = 160,
+    double FocusMidHeight = 220)
 {
     public static readonly LayoutState Default = new(320, 900);
 }
