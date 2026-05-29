@@ -32,23 +32,41 @@ public partial class MainViewModel : ObservableObject
     public bool ResolveItemNames
     {
         get => _packetDetail.ResolveItemNames;
-        set => _packetDetail.ResolveItemNames = value;
+        set
+        {
+            _packetDetail.ResolveItemNames = value;
+            OnPropertyChanged();
+            SaveSettings();
+        }
     }
 
     public bool ResolveIcons
     {
         get => _packetDetail.ResolveIcons;
-        set => _packetDetail.ResolveIcons = value;
+        set
+        {
+            _packetDetail.ResolveIcons = value;
+            OnPropertyChanged();
+            SaveSettings();
+        }
     }
 
     public bool GameDataLoaded => _gameData.IsLoaded;
 
     public SettingsViewModel Settings => new(this);
 
+    private void SaveSettings() =>
+        AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons));
+
     public MainViewModel(IFilePicker filePicker)
     {
         _filePicker = filePicker;
         _packetDetail = new PacketDetailViewModel(_gameData, _iconCache);
+
+        var saved = AppSettingsStore.Load();
+        _packetDetail.ResolveItemNames = saved.ResolveItemNames;
+        _packetDetail.ResolveIcons = saved.ResolveIcons;
+
         _ = LoadGameDataAsync();
         RefreshDevices();
 

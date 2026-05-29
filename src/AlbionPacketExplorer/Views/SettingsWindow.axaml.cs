@@ -8,6 +8,7 @@ namespace AlbionPacketExplorer.Views;
 public partial class SettingsWindow : SukiWindow
 {
     private StackPanel? _sectionDisplay;
+    private StackPanel? _sectionPaths;
     private StackPanel? _sectionAbout;
 
     public SettingsWindow(SettingsViewModel vm)
@@ -17,6 +18,7 @@ public partial class SettingsWindow : SukiWindow
         Loaded += (_, _) =>
         {
             _sectionDisplay = this.FindControl<StackPanel>("SectionDisplay");
+            _sectionPaths   = this.FindControl<StackPanel>("SectionPaths");
             _sectionAbout   = this.FindControl<StackPanel>("SectionAbout");
         };
     }
@@ -27,6 +29,7 @@ public partial class SettingsWindow : SukiWindow
         var tag = btn.Tag as string;
 
         if (_sectionDisplay != null) _sectionDisplay.IsVisible = tag == "Display";
+        if (_sectionPaths   != null) _sectionPaths.IsVisible   = tag == "Paths";
         if (_sectionAbout   != null) _sectionAbout.IsVisible   = tag == "About";
     }
 }
