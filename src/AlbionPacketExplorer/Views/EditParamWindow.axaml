@@ -1,11 +1,12 @@
-<Window xmlns="https://github.com/avaloniaui"
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
         xmlns:vm="using:AlbionPacketExplorer.ViewModels"
         x:Class="AlbionPacketExplorer.Views.EditParamWindow"
         x:DataType="vm:EditParamViewModel"
         Title="{Binding Title}"
-        Width="420" Height="260"
-        MinWidth="320" MinHeight="220"
+        Width="420" Height="340"
+        MinWidth="320" MinHeight="340"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
@@ -45,4 +46,4 @@
         </StackPanel>
 
     </StackPanel>
-</Window>
+</suki:SukiWindow>

@@ -138,8 +138,7 @@
                     </StackPanel>
                 </Border>
                 <views:CodeAggregatorView x:Name="FocusSummaryContent"
-                                          DataContext="{Binding Aggregator}"
-                                          MaxHeight="160" />
+                                          DataContext="{Binding Aggregator}" />
             </DockPanel>
 
             <GridSplitter Grid.Row="1" ResizeDirection="Rows"

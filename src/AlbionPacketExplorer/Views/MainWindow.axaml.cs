@@ -63,6 +63,7 @@ public partial class MainWindow : SukiWindow, IFilePicker
             vm.Aggregator.Clipboard = clipboard;
             vm.PacketList.Clipboard = clipboard;
             vm.PacketDetail.Clipboard = clipboard;
+            vm.PacketDetail.EditParamRequested += OnEditParamRequested;
         }
 
         var layout = LayoutStore.Load();
@@ -88,6 +89,12 @@ public partial class MainWindow : SukiWindow, IFilePicker
         var icon = this.FindControl<TextBlock>("SummaryCollapseIcon");
         if (content != null) content.IsVisible = !_summaryCollapsed;
         if (icon != null) icon.Text = _summaryCollapsed ? "▶" : "▼";
+    }
+
+    private void OnEditParamRequested(EditParamViewModel vm)
+    {
+        var win = new EditParamWindow(vm);
+        win.Show(this);
     }
 
     private SettingsWindow? _settingsWindow;
