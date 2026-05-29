@@ -16,6 +16,7 @@
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserSortColumns="True"
+                  CanUserResizeColumns="True"
                   GridLinesVisibility="Horizontal">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Kind"  Binding="{Binding Kind}"       Width="80" />

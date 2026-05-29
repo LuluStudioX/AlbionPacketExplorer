@@ -19,6 +19,7 @@
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserSortColumns="False"
+                  CanUserResizeColumns="True"
                   GridLinesVisibility="Horizontal">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="110" />
