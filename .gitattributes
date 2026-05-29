@@ -1,0 +1,17 @@
+# Normalize line endings to LF in the repo; checkout as CRLF on Windows
+* text=auto eol=lf
+*.cs text eol=lf
+*.axaml text eol=lf
+*.csproj text eol=lf
+*.slnx text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+
+# Binaries
+*.png binary
+*.ico binary
+*.dll binary
+*.exe binary
