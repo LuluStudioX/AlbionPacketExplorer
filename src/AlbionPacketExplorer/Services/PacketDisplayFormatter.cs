@@ -60,6 +60,18 @@ public static class PacketDisplayFormatter
     {
         var hex = string.Join(" ", bytes.Select(b => b is long lb ? lb.ToString("X2") : "??"));
         var dec = string.Join(", ", bytes.Select(b => b?.ToString() ?? "?"));
+
+        if (bytes.Count == 16)
+        {
+            try
+            {
+                var raw = bytes.Select(b => b is long lb ? (byte)lb : (byte)0).ToArray();
+                var guid = new Guid(raw);
+                return $"{guid} [{hex}]";
+            }
+            catch { }
+        }
+
         return $"[{hex}] ({dec})";
     }
 
