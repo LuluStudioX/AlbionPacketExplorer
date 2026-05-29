@@ -7,9 +7,9 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4,4,4,2">
             <TextBlock VerticalAlignment="Center" Text="Kind:" />
-            <TextBox Text="{Binding FilterKind}" Width="80" Watermark="EVENT…" />
+            <TextBox Text="{Binding FilterKind}" Width="80" PlaceholderText="EVENT…" />
             <TextBlock VerticalAlignment="Center" Text="Code:" />
-            <TextBox Text="{Binding FilterCode}" Width="60" Watermark="32…" />
+            <TextBox Text="{Binding FilterCode}" Width="60" PlaceholderText="32…" />
             <Button Content="Clear" Command="{Binding ClearFilterCommand}" />
             <TextBlock VerticalAlignment="Center" Text="{Binding CountText}" Foreground="Gray" />
         </StackPanel>
