@@ -11,10 +11,12 @@ namespace AlbionPacketExplorer.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IFilePicker _filePicker;
+    private readonly GameDataService _gameData = new();
 
     [ObservableProperty] private CodeAggregatorViewModel _aggregator = new();
     [ObservableProperty] private PacketListViewModel _packetList = new();
-    [ObservableProperty] private PacketDetailViewModel _packetDetail = new();
+    private PacketDetailViewModel _packetDetail = null!;
+    public PacketDetailViewModel PacketDetail => _packetDetail;
     [ObservableProperty] private double _loadProgress;
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _isCapturing;
@@ -26,9 +28,19 @@ public partial class MainViewModel : ObservableObject
     private readonly List<PacketEntry> _capturedPackets = [];
     private readonly List<PacketEntry> _allPackets = [];
 
+    public bool ResolveItemNames
+    {
+        get => _packetDetail.ResolveItemNames;
+        set => _packetDetail.ResolveItemNames = value;
+    }
+
+    public bool GameDataLoaded => _gameData.IsLoaded;
+
     public MainViewModel(IFilePicker filePicker)
     {
         _filePicker = filePicker;
+        _packetDetail = new PacketDetailViewModel(_gameData);
+        _ = LoadGameDataAsync();
         RefreshDevices();
 
         Aggregator.PropertyChanged += (_, args) =>
@@ -42,6 +54,14 @@ public partial class MainViewModel : ObservableObject
             if (args.PropertyName == nameof(PacketListViewModel.SelectedPacket))
                 PacketDetail.Packet = PacketList.SelectedPacket;
         };
+    }
+
+    private async Task LoadGameDataAsync()
+    {
+        await _gameData.LoadAsync();
+        OnPropertyChanged(nameof(GameDataLoaded));
+        if (_gameData.IsLoaded)
+            StatusText = "Game data loaded. Item resolution available.";
     }
 
     [RelayCommand]
