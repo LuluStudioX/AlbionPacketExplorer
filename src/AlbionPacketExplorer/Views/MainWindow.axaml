@@ -34,27 +34,7 @@
                 <ToolTip.Tip>Stop live capture. All captured packets remain visible.</ToolTip.Tip>
             </Button>
             <Separator Width="1" Background="Gray" Margin="4,0" />
-            <Button Content="⚙ Settings" Name="SettingsButton">
-                <Button.Flyout>
-                    <Flyout Placement="BottomEdgeAlignedLeft">
-                        <Border Padding="12,10" MinWidth="240">
-                            <StackPanel Spacing="10">
-                                <TextBlock Text="Display" FontWeight="SemiBold" Foreground="Gray" FontSize="11" />
-                                <CheckBox Content="Resolve Item Names"
-                                          IsChecked="{Binding ResolveItemNames}"
-                                          IsEnabled="{Binding GameDataLoaded}">
-                                    <ToolTip.Tip>Show item UniqueName + EN display name for numeric param values.&#xA;Data fetched from ao-bin-dumps on first launch, cached locally for 7 days.</ToolTip.Tip>
-                                </CheckBox>
-                                <CheckBox Content="Resolve Item Icons"
-                                          IsChecked="{Binding ResolveIcons}"
-                                          IsEnabled="{Binding GameDataLoaded}">
-                                    <ToolTip.Tip>Show item icons in the Packet Detail panel.&#xA;Icons fetched from render.albiononline.com and cached to disk permanently.</ToolTip.Tip>
-                                </CheckBox>
-                            </StackPanel>
-                        </Border>
-                    </Flyout>
-                </Button.Flyout>
-            </Button>
+            <Button Content="⚙ Settings" Name="SettingsButton" Click="OnSettingsClicked" />
             <Separator Width="1" Background="Gray" Margin="4,0" />
             <Button Content="Save JSON…" Command="{Binding SaveFileCommand}">
                 <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>

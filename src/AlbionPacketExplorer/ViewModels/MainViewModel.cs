@@ -43,6 +43,8 @@ public partial class MainViewModel : ObservableObject
 
     public bool GameDataLoaded => _gameData.IsLoaded;
 
+    public SettingsViewModel Settings => new(this);
+
     public MainViewModel(IFilePicker filePicker)
     {
         _filePicker = filePicker;

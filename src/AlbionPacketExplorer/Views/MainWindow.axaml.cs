@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using AlbionPacketExplorer.Services;
 using AlbionPacketExplorer.ViewModels;
@@ -69,6 +70,22 @@ public partial class MainWindow : SukiWindow, IFilePicker
 
         if (_bottomGrid != null)
             _bottomGrid.ColumnDefinitions[0] = new ColumnDefinition(layout.LeftPanelWidth, GridUnitType.Pixel);
+    }
+
+    private SettingsWindow? _settingsWindow;
+
+    private void OnSettingsClicked(object? sender, RoutedEventArgs e)
+    {
+        if (_settingsWindow != null)
+        {
+            _settingsWindow.Activate();
+            return;
+        }
+
+        var vm = (MainViewModel)DataContext!;
+        _settingsWindow = new SettingsWindow(new SettingsViewModel(vm));
+        _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+        _settingsWindow.Show(this);
     }
 
     private void OnClosing(object? sender, WindowClosingEventArgs e)
