@@ -11,7 +11,9 @@ public partial class SettingsWindow : SukiWindow
     private StackPanel? _sectionDisplay;
     private StackPanel? _sectionPaths;
     private StackPanel? _sectionSchema;
+    private StackPanel? _sectionTheme;
     private StackPanel? _sectionAbout;
+    private Button? _activeNavButton;
 
     public SettingsWindow(SettingsViewModel vm)
     {
@@ -24,8 +26,21 @@ public partial class SettingsWindow : SukiWindow
             _sectionDisplay = this.FindControl<StackPanel>("SectionDisplay");
             _sectionPaths   = this.FindControl<StackPanel>("SectionPaths");
             _sectionSchema  = this.FindControl<StackPanel>("SectionSchema");
+            _sectionTheme   = this.FindControl<StackPanel>("SectionTheme");
             _sectionAbout   = this.FindControl<StackPanel>("SectionAbout");
+
+            // Highlight Display as default active
+            var defaultBtn = this.FindControl<Button>("NavDisplay");
+            if (defaultBtn != null) SetActiveNav(defaultBtn);
         };
+    }
+
+    private void SetActiveNav(Button btn)
+    {
+        if (_activeNavButton != null)
+            _activeNavButton.Classes.Remove("Accent");
+        _activeNavButton = btn;
+        btn.Classes.Add("Accent");
     }
 
     private void OnNavClicked(object? sender, RoutedEventArgs e)
@@ -35,7 +50,9 @@ public partial class SettingsWindow : SukiWindow
         if (_sectionDisplay != null) _sectionDisplay.IsVisible = tag == "Display";
         if (_sectionPaths   != null) _sectionPaths.IsVisible   = tag == "Paths";
         if (_sectionSchema  != null) _sectionSchema.IsVisible  = tag == "Schema";
+        if (_sectionTheme   != null) _sectionTheme.IsVisible   = tag == "Theme";
         if (_sectionAbout   != null) _sectionAbout.IsVisible   = tag == "About";
+        SetActiveNav(btn);
     }
 
     private async void OnSaveExportRequested(string suggestedName, string content)
