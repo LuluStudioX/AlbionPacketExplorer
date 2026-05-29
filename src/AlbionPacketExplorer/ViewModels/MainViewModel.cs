@@ -58,10 +58,8 @@ public partial class MainViewModel : ObservableObject
 
     private async Task LoadGameDataAsync()
     {
-        await _gameData.LoadAsync();
+        await _gameData.LoadAsync(msg => StatusText = msg);
         OnPropertyChanged(nameof(GameDataLoaded));
-        if (_gameData.IsLoaded)
-            StatusText = "Game data loaded. Item resolution available.";
     }
 
     [RelayCommand]
