@@ -12,6 +12,7 @@ public partial class MainWindow : SukiWindow, IFilePicker
 {
     private Grid? _overviewMainGrid;
     private Grid? _overviewBottomGrid;
+    private Grid? _focusGrid;
     private bool _summaryCollapsed;
 
     public MainWindow()
@@ -56,6 +57,7 @@ public partial class MainWindow : SukiWindow, IFilePicker
     {
         _overviewMainGrid = this.FindControl<Grid>("OverviewGrid");
         _overviewBottomGrid = this.FindControl<Grid>("BottomGrid");
+        _focusGrid = this.FindControl<Grid>("FocusGrid");
 
         if (DataContext is MainViewModel vm)
         {
@@ -71,6 +73,11 @@ public partial class MainWindow : SukiWindow, IFilePicker
             _overviewMainGrid.RowDefinitions[0] = new RowDefinition(layout.TopPanelHeight, GridUnitType.Pixel);
         if (_overviewBottomGrid != null)
             _overviewBottomGrid.ColumnDefinitions[0] = new ColumnDefinition(layout.LeftPanelWidth, GridUnitType.Pixel);
+        if (_focusGrid != null)
+        {
+            _focusGrid.RowDefinitions[0] = new RowDefinition(layout.FocusTopHeight, GridUnitType.Pixel);
+            _focusGrid.RowDefinitions[2] = new RowDefinition(layout.FocusMidHeight, GridUnitType.Pixel);
+        }
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -115,10 +122,14 @@ public partial class MainWindow : SukiWindow, IFilePicker
 
     private void OnClosing(object? sender, WindowClosingEventArgs e)
     {
-        if (_overviewMainGrid != null && _overviewBottomGrid != null)
-            LayoutStore.Save(new LayoutState(
-                _overviewMainGrid.RowDefinitions[0].ActualHeight,
-                _overviewBottomGrid.ColumnDefinitions[0].ActualWidth));
+        var focusTop = _focusGrid?.RowDefinitions[0].ActualHeight ?? 160;
+        var focusMid = _focusGrid?.RowDefinitions[2].ActualHeight ?? 220;
+
+        LayoutStore.Save(new LayoutState(
+            _overviewMainGrid?.RowDefinitions[0].ActualHeight ?? 320,
+            _overviewBottomGrid?.ColumnDefinitions[0].ActualWidth ?? 900,
+            focusTop,
+            focusMid));
 
         if (DataContext is MainViewModel { MinimizeToTray: true })
         {
