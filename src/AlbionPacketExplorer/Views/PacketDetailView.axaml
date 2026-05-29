@@ -11,11 +11,20 @@
                    Text="{Binding Packet, StringFormat='Packet: {0}', FallbackValue='No packet selected'}" />
 
         <DataGrid ItemsSource="{Binding Rows}"
+                  SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserResizeColumns="True"
                   RowHeight="36"
                   GridLinesVisibility="Horizontal">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Value"   Command="{Binding CopyValueCommand}" />
+                    <MenuItem Header="Copy Row"     Command="{Binding CopyRowCommand}" />
+                    <Separator />
+                    <MenuItem Header="Copy All Rows" Command="{Binding CopyAllRowsCommand}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Key"   Binding="{Binding Key}"   Width="50" />
                 <DataGridTextColumn Header="Type"  Binding="{Binding Type}"  Width="100" />
