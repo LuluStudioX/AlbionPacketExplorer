@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using AlbionPacketExplorer.Services;
@@ -9,8 +10,9 @@ namespace AlbionPacketExplorer.Views;
 
 public partial class MainWindow : SukiWindow, IFilePicker
 {
-    private Grid? _mainGrid;
-    private Grid? _bottomGrid;
+    private Grid? _overviewMainGrid;
+    private Grid? _overviewBottomGrid;
+    private bool _summaryCollapsed;
 
     public MainWindow()
     {
@@ -52,8 +54,8 @@ public partial class MainWindow : SukiWindow, IFilePicker
 
     private void OnLoaded(object? sender, EventArgs e)
     {
-        _mainGrid = this.FindControl<Grid>("MainGrid");
-        _bottomGrid = this.FindControl<Grid>("BottomGrid");
+        _overviewMainGrid = this.FindControl<Grid>("OverviewGrid");
+        _overviewBottomGrid = this.FindControl<Grid>("BottomGrid");
 
         if (DataContext is MainViewModel vm)
         {
@@ -64,12 +66,28 @@ public partial class MainWindow : SukiWindow, IFilePicker
         }
 
         var layout = LayoutStore.Load();
+        if (_overviewMainGrid != null)
+            _overviewMainGrid.RowDefinitions[0] = new RowDefinition(layout.TopPanelHeight, GridUnitType.Pixel);
+        if (_overviewBottomGrid != null)
+            _overviewBottomGrid.ColumnDefinitions[0] = new ColumnDefinition(layout.LeftPanelWidth, GridUnitType.Pixel);
+    }
 
-        if (_mainGrid != null)
-            _mainGrid.RowDefinitions[0] = new RowDefinition(layout.TopPanelHeight, GridUnitType.Pixel);
+    private void OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.F5 && DataContext is MainViewModel vm)
+        {
+            vm.ToggleFocusModeCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
 
-        if (_bottomGrid != null)
-            _bottomGrid.ColumnDefinitions[0] = new ColumnDefinition(layout.LeftPanelWidth, GridUnitType.Pixel);
+    private void OnSummaryHeaderPressed(object? sender, PointerPressedEventArgs e)
+    {
+        _summaryCollapsed = !_summaryCollapsed;
+        var content = this.FindControl<Control>("FocusSummaryContent");
+        var icon = this.FindControl<TextBlock>("SummaryCollapseIcon");
+        if (content != null) content.IsVisible = !_summaryCollapsed;
+        if (icon != null) icon.Text = _summaryCollapsed ? "▶" : "▼";
     }
 
     private SettingsWindow? _settingsWindow;
@@ -90,10 +108,9 @@ public partial class MainWindow : SukiWindow, IFilePicker
 
     private void OnClosing(object? sender, WindowClosingEventArgs e)
     {
-        if (_mainGrid == null || _bottomGrid == null) return;
-
+        if (_overviewMainGrid == null || _overviewBottomGrid == null) return;
         LayoutStore.Save(new LayoutState(
-            _mainGrid.RowDefinitions[0].ActualHeight,
-            _bottomGrid.ColumnDefinitions[0].ActualWidth));
+            _overviewMainGrid.RowDefinitions[0].ActualHeight,
+            _overviewBottomGrid.ColumnDefinitions[0].ActualWidth));
     }
 }

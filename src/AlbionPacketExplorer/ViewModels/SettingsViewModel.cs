@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -60,6 +61,42 @@ public partial class SettingsViewModel : ObservableObject
                 Process.Start("xdg-open", path);
         }
         catch { }
+    }
+
+    // Schema export
+    [ObservableProperty] private string _exportKind = "EVENT";
+    [ObservableProperty] private string _exportCode = string.Empty;
+    [ObservableProperty] private string _exportPreview = string.Empty;
+
+    partial void OnExportKindChanged(string value) => RefreshPreview();
+    partial void OnExportCodeChanged(string value) => RefreshPreview();
+
+    private void RefreshPreview()
+    {
+        if (!int.TryParse(ExportCode, out var code)) { ExportPreview = string.Empty; return; }
+        ExportPreview = _main.Schema.ExportEventSchema(ExportKind, code);
+    }
+
+    [RelayCommand]
+    private async Task CopyExportAsync()
+    {
+        if (string.IsNullOrEmpty(ExportPreview)) return;
+        if (_clipboard != null)
+            await _clipboard.SetTextAsync(ExportPreview);
+    }
+
+    public void SetClipboard(IClipboard? clipboard) => _clipboard = clipboard;
+    private IClipboard? _clipboard;
+
+    public event Action<string, string>? SaveExportRequested;
+
+    [RelayCommand]
+    private void SaveExport()
+    {
+        if (string.IsNullOrEmpty(ExportPreview)) return;
+        var kind = ExportKind.ToUpperInvariant();
+        var code = ExportCode;
+        SaveExportRequested?.Invoke($"{kind}_{code}_schema.json", ExportPreview);
     }
 
     public SettingsViewModel(MainViewModel main)
