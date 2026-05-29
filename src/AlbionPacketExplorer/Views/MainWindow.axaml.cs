@@ -2,10 +2,11 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using AlbionPacketExplorer.Services;
 using AlbionPacketExplorer.ViewModels;
+using SukiUI.Controls;
 
 namespace AlbionPacketExplorer.Views;
 
-public partial class MainWindow : Window, IFilePicker
+public partial class MainWindow : SukiWindow, IFilePicker
 {
     private Grid? _mainGrid;
     private Grid? _bottomGrid;
