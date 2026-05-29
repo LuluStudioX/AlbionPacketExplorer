@@ -73,6 +73,19 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="Close button hides to system tray" FontWeight="SemiBold" />
+                                <TextBlock Text="Clicking X hides the window instead of closing. Use tray icon to show or exit."
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding MinimizeToTray}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
                                 <TextBlock Text="Resolve Item Icons" FontWeight="SemiBold" />
                                 <TextBlock Text="Show item icons in the Packet Detail panel."
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
@@ -149,7 +162,7 @@
                                 </ComboBox>
                                 <TextBlock Grid.Column="4" Text="Code:" VerticalAlignment="Center" />
                                 <TextBox Grid.Column="6" Text="{Binding ExportCode}"
-                                         Watermark="e.g. 32" MaxLength="5" />
+                                         PlaceholderText="e.g. 32" MaxLength="5" />
                             </Grid>
 
                             <TextBox Text="{Binding ExportPreview}"
@@ -159,7 +172,7 @@
                                      AcceptsReturn="True"
                                      Height="200"
                                      TextWrapping="NoWrap"
-                                     Watermark="Enter kind + code above to preview schema…" />
+                                     PlaceholderText="Enter kind + code above to preview schema…" />
 
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <Button Content="Copy to Clipboard"
