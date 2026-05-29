@@ -1,5 +1,8 @@
+using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace AlbionPacketExplorer.ViewModels;
 
@@ -9,7 +12,7 @@ public partial class SettingsViewModel : ObservableObject
 
     public string Version { get; } =
         "v" + (Assembly.GetExecutingAssembly()
-            .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion ?? "unknown");
 
     public bool GameDataLoaded => _main.GameDataLoaded;
@@ -26,13 +29,56 @@ public partial class SettingsViewModel : ObservableObject
         set => _main.ResolveIcons = value;
     }
 
+    public string DataFolderPath { get; } = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "AlbionPacketExplorer");
+
+    public string SatPacketSnifferPath { get; } = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        @"StatisticsAnalysisTool\Instances");
+
+    public string ItemCachePath { get; } = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "AlbionPacketExplorer", "items.json");
+
+    [RelayCommand]
+    private void OpenDataFolder() => OpenInExplorer(DataFolderPath);
+
+    [RelayCommand]
+    private void OpenSatFolder() => OpenInExplorer(SatPacketSnifferPath);
+
+    private static void OpenInExplorer(string path)
+    {
+        try
+        {
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                Process.Start("explorer.exe", path);
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                Process.Start("open", path);
+            else
+                Process.Start("xdg-open", path);
+        }
+        catch { }
+    }
+
     public SettingsViewModel(MainViewModel main)
     {
         _main = main;
         _main.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(MainViewModel.GameDataLoaded))
-                OnPropertyChanged(nameof(GameDataLoaded));
+            switch (e.PropertyName)
+            {
+                case nameof(MainViewModel.GameDataLoaded):
+                    OnPropertyChanged(nameof(GameDataLoaded));
+                    break;
+                case nameof(MainViewModel.ResolveItemNames):
+                    OnPropertyChanged(nameof(ResolveItemNames));
+                    break;
+                case nameof(MainViewModel.ResolveIcons):
+                    OnPropertyChanged(nameof(ResolveIcons));
+                    break;
+            }
         };
     }
 }

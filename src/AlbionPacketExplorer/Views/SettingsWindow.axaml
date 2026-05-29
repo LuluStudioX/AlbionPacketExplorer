@@ -22,6 +22,13 @@
                         Padding="16,10"
                         Click="OnNavClicked"
                         Tag="Display" />
+                <Button Name="NavPaths"
+                        Content="Paths"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="Paths" />
                 <Button Name="NavAbout"
                         Content="About"
                         HorizontalAlignment="Stretch"
@@ -70,6 +77,50 @@
                                          IsEnabled="{Binding GameDataLoaded}"
                                          VerticalAlignment="Center" Margin="20,0,0,0" />
                         </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Paths section -->
+                <StackPanel Name="SectionPaths" Spacing="12" IsVisible="False">
+                    <TextBlock Text="Paths" FontSize="18" FontWeight="SemiBold" />
+
+                    <Border Classes="card" Padding="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="App Data Folder" FontWeight="SemiBold" />
+                            <TextBlock Text="Settings, layout and item cache are stored here."
+                                       Foreground="Gray" FontSize="12" />
+                            <TextBlock Text="{Binding DataFolderPath}"
+                                       Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
+                                       TextWrapping="Wrap" Opacity="0.8" />
+                            <Button Content="Open in Explorer"
+                                    Command="{Binding OpenDataFolderCommand}"
+                                    Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="SAT Instances Folder" FontWeight="SemiBold" />
+                            <TextBlock Text="packet_sniffer.json files are inside one of the instance subfolders."
+                                       Foreground="Gray" FontSize="12" />
+                            <TextBlock Text="{Binding SatPacketSnifferPath}"
+                                       Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
+                                       TextWrapping="Wrap" Opacity="0.8" />
+                            <Button Content="Open in Explorer"
+                                    Command="{Binding OpenSatFolderCommand}"
+                                    Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Item Name Cache" FontWeight="SemiBold" />
+                            <TextBlock Text="Fetched from ao-bin-dumps, refreshed every 7 days."
+                                       Foreground="Gray" FontSize="12" />
+                            <TextBlock Text="{Binding ItemCachePath}"
+                                       Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
+                                       TextWrapping="Wrap" Opacity="0.8" />
+                        </StackPanel>
                     </Border>
                 </StackPanel>
 
