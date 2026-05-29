@@ -1,11 +1,24 @@
+using AlbionPacketExplorer.Abstractions;
 using AlbionPacketExplorer.Models;
+using AlbionPacketExplorer.Network.Handlers;
 using AlbionPacketExplorer.PhotonPackageParser;
 
 namespace AlbionPacketExplorer.Services;
 
-public sealed class RawAlbionParser : PhotonParser
+public sealed class RawAlbionParser : PhotonParser, IPhotonReceiver
 {
     public event Action<PacketEntry>? PacketReceived;
+
+    private AlbionNetworkParser? _handlerParser;
+
+    public void AttachHandlers(AlbionNetworkParser handlerParser)
+        => _handlerParser = handlerParser;
+
+    public new void ReceivePacket(byte[] payload)
+    {
+        base.ReceivePacket(payload);
+        _handlerParser?.ReceivePacket(payload);
+    }
 
     protected override void OnEvent(byte code, Dictionary<byte, object> parameters)
     {
@@ -33,7 +46,6 @@ public sealed class RawAlbionParser : PhotonParser
         var @params = new Dictionary<string, ParamValue>(parameters.Count);
         foreach (var (k, v) in parameters)
             @params[k.ToString()] = new ParamValue(GetTypeName(v), v);
-
         return new PacketEntry(DateTime.UtcNow, kind, code, @params);
     }
 
@@ -41,7 +53,7 @@ public sealed class RawAlbionParser : PhotonParser
     {
         if (!parameters.TryGetValue(key, out var v)) return -1;
         try { return checked((short)Convert.ToInt32(v, System.Globalization.CultureInfo.InvariantCulture)); }
-        catch (Exception) { return -1; }
+        catch { return -1; }
     }
 
     private static string GetTypeName(object? v) => v switch
