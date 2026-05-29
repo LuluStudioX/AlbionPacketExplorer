@@ -35,6 +35,12 @@ public partial class MainViewModel : ObservableObject
         set => _packetDetail.ResolveItemNames = value;
     }
 
+    public bool ResolveIcons
+    {
+        get => _packetDetail.ResolveIcons;
+        set => _packetDetail.ResolveIcons = value;
+    }
+
     public bool GameDataLoaded => _gameData.IsLoaded;
 
     public MainViewModel(IFilePicker filePicker)
