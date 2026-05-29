@@ -1,4 +1,5 @@
 using AlbionPacketExplorer.Models;
+using AlbionPacketExplorer.Network;
 using AlbionPacketExplorer.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,6 +12,7 @@ public record PacketRow(PacketEntry Packet)
     public DateTime Timestamp => Packet.Timestamp;
     public string Kind => Packet.Kind;
     public int Code => Packet.Code;
+    public string EventName => PacketNameResolver.Resolve(Packet.Kind, Packet.Code);
     public int KeyCount => Packet.KeyCount;
     public string ParamSummary => PacketDisplayFormatter.FormatParamSummary(Packet);
 }
