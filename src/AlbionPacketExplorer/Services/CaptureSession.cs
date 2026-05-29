@@ -1,5 +1,6 @@
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Network;
+using AlbionPacketExplorer.Network.Handlers;
 using Avalonia.Threading;
 
 namespace AlbionPacketExplorer.Services;
@@ -11,6 +12,8 @@ public sealed class CaptureSession : IDisposable
 
     private LiveCaptureProvider? _provider;
     private RawAlbionParser? _parser;
+
+    public AlbionHandlerRegistry Handlers { get; } = new();
 
     public bool IsRunning => _provider?.IsRunning ?? false;
 
@@ -24,6 +27,7 @@ public sealed class CaptureSession : IDisposable
     {
         _parser = new RawAlbionParser();
         _parser.PacketReceived += OnParserPacketReceived;
+        _parser.AttachHandlers(Handlers.BuildParser());
 
         _provider = new LiveCaptureProvider(_parser, deviceName, msg =>
             Dispatcher.UIThread.Post(() => _onLog(msg)));
