@@ -54,12 +54,20 @@ public partial class CodeAggregatorViewModel : ObservableObject
         await Clipboard.SetTextAsync(ConstructorExporter.Export(SelectedCode));
     }
 
+    [RelayCommand(CanExecute = nameof(CanExport))]
+    private async Task CopyKeySummaryAsync()
+    {
+        if (SelectedRow == null || Clipboard == null) return;
+        await Clipboard.SetTextAsync(SelectedRow.KeySummary);
+    }
+
     private bool CanExport() => SelectedCode != null;
 
     partial void OnSelectedRowChanged(CodeStatsRow? value)
     {
         OnPropertyChanged(nameof(SelectedCode));
         ExportCommand.NotifyCanExecuteChanged();
+        CopyKeySummaryCommand.NotifyCanExecuteChanged();
     }
 
     private CodeStats GetOrCreateStats(string kind, int code)

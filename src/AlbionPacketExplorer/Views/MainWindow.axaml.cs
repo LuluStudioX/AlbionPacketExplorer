@@ -54,6 +54,14 @@ public partial class MainWindow : SukiWindow, IFilePicker
         _mainGrid = this.FindControl<Grid>("MainGrid");
         _bottomGrid = this.FindControl<Grid>("BottomGrid");
 
+        if (DataContext is MainViewModel vm)
+        {
+            var clipboard = Clipboard;
+            vm.Aggregator.Clipboard = clipboard;
+            vm.PacketList.Clipboard = clipboard;
+            vm.PacketDetail.Clipboard = clipboard;
+        }
+
         var layout = LayoutStore.Load();
 
         if (_mainGrid != null)
