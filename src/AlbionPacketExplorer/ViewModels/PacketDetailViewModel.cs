@@ -12,10 +12,14 @@ namespace AlbionPacketExplorer.ViewModels;
 public sealed class ParamRow : ObservableObject
 {
     public string Key { get; }
+    public string SchemaName { get; }
+    public string KeyDisplay => string.IsNullOrEmpty(SchemaName) ? Key : $"{Key}  {SchemaName}";
     public string Type { get; }
     public string Value { get; }
     public string ResolvedName { get; }
     public string UniqueName { get; }
+    public string Note { get; }
+    public bool HasNote => !string.IsNullOrEmpty(Note);
 
     private Bitmap? _icon;
     public Bitmap? Icon
@@ -26,13 +30,16 @@ public sealed class ParamRow : ObservableObject
 
     public bool HasResolved => !string.IsNullOrEmpty(ResolvedName);
 
-    public ParamRow(string key, string type, string value, string resolvedName, string uniqueName)
+    public ParamRow(string key, string schemaName, string type, string value,
+                    string resolvedName, string uniqueName, string note)
     {
         Key = key;
+        SchemaName = schemaName;
         Type = type;
         Value = value;
         ResolvedName = resolvedName;
         UniqueName = uniqueName;
+        Note = note;
     }
 }
 
@@ -40,6 +47,7 @@ public partial class PacketDetailViewModel : ObservableObject
 {
     private readonly GameDataService _gameData;
     private readonly IconCacheService _icons;
+    private readonly PacketSchemaService _schema;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
@@ -50,10 +58,11 @@ public partial class PacketDetailViewModel : ObservableObject
 
     public IClipboard? Clipboard { get; set; }
 
-    public PacketDetailViewModel(GameDataService gameData, IconCacheService icons)
+    public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema)
     {
         _gameData = gameData;
         _icons = icons;
+        _schema = schema;
     }
 
     partial void OnPacketChanged(PacketEntry? value) => RebuildRows();
@@ -79,11 +88,22 @@ public partial class PacketDetailViewModel : ObservableObject
         foreach (var (key, pv) in Packet.Params.OrderBy(p => int.TryParse(p.Key, out var n) ? n : 999))
         {
             var formatted = PacketDisplayFormatter.FormatParamValue(pv);
-            var (resolved, uniqueName) = ResolveItemNames && _gameData.IsLoaded
-                ? TryResolveParam(pv)
-                : (string.Empty, string.Empty);
+            var paramSchema = _schema.GetParam(Packet.Kind, Packet.Code, key);
+            var schemaName = paramSchema?.Name ?? string.Empty;
+            var note = paramSchema?.Note ?? string.Empty;
+            var resolveAs = paramSchema?.ResolveAs ?? string.Empty;
 
-            var row = new ParamRow(key, pv.Type, formatted, resolved, uniqueName);
+            var (resolved, uniqueName) = (string.Empty, string.Empty);
+            if (ResolveItemNames && _gameData.IsLoaded)
+            {
+                // Schema-declared itemIndex resolution (correct) takes priority
+                if (resolveAs == "itemIndex")
+                    (resolved, uniqueName) = TryResolveByIndex(pv);
+                else
+                    (resolved, uniqueName) = TryResolveParam(pv);
+            }
+
+            var row = new ParamRow(key, schemaName, pv.Type, formatted, resolved, uniqueName, note);
             Rows.Add(row);
 
             if (ResolveIcons && !string.IsNullOrEmpty(uniqueName))
@@ -124,6 +144,23 @@ public partial class PacketDetailViewModel : ObservableObject
             }
             catch { }
         }
+    }
+
+    public event Action<EditParamViewModel>? EditParamRequested;
+
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private void EditParam()
+    {
+        if (SelectedRow == null || Packet == null) return;
+        var existing = _schema.GetParam(Packet.Kind, Packet.Code, SelectedRow.Key);
+        var vm = new EditParamViewModel(
+            _schema,
+            Packet.Kind, Packet.Code, SelectedRow.Key,
+            existing?.Name ?? string.Empty,
+            existing?.Note ?? string.Empty,
+            existing?.ResolveAs ?? string.Empty,
+            () => RebuildRows());
+        EditParamRequested?.Invoke(vm);
     }
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
@@ -168,9 +205,21 @@ public partial class PacketDetailViewModel : ObservableObject
         {
             if (_gameData.TryResolveByUniqueName(s, out var display))
                 return ($"{s} — {display}", s);
-            return (string.Empty, string.Empty);
         }
-
         return (string.Empty, string.Empty);
+    }
+
+    private (string resolved, string uniqueName) TryResolveByIndex(ParamValue pv)
+    {
+        int? index = pv.Value switch
+        {
+            long l when l is >= 1 and <= 50000 => (int)l,
+            int i when i is >= 1 and <= 50000 => i,
+            _ => null
+        };
+        if (index == null) return (string.Empty, string.Empty);
+        if (!_gameData.TryResolve(index.Value, out var unique, out var display))
+            return (string.Empty, string.Empty);
+        return ($"{unique} — {display}", unique);
     }
 }

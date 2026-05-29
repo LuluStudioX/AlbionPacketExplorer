@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+        x:Class="AlbionPacketExplorer.Views.EditParamWindow"
+        x:DataType="vm:EditParamViewModel"
+        Title="{Binding Title}"
+        Width="420" Height="260"
+        MinWidth="320" MinHeight="220"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="14">
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="Param name" FontSize="12" Foreground="Gray" />
+            <TextBox Text="{Binding ParamName}"
+                     Watermark="e.g. objectId"
+                     MaxLength="64" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="Note (shown on hover)" FontSize="12" Foreground="Gray" />
+            <TextBox Text="{Binding Note}"
+                     Watermark="e.g. .NET ticks, 0=none 1=owner 2=guild"
+                     MaxLength="256"
+                     AcceptsReturn="False" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="Resolve as" FontSize="12" Foreground="Gray" />
+            <ComboBox SelectedItem="{Binding ResolveAs}" HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="" />
+                <ComboBoxItem Content="itemIndex" />
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,6,0,0">
+            <Button Content="Clear override"
+                    Command="{Binding ClearOverrideCommand}"
+                    Foreground="Gray" />
+            <Button Content="Save"
+                    Command="{Binding SaveCommand}"
+                    Background="#2a5a2a" Foreground="White" />
+        </StackPanel>
+
+    </StackPanel>
+</Window>

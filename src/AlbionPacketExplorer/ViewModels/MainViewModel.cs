@@ -13,6 +13,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IFilePicker _filePicker;
     private readonly GameDataService _gameData = new();
     private readonly IconCacheService _iconCache = new();
+    private readonly PacketSchemaService _schema = new();
 
     [ObservableProperty] private CodeAggregatorViewModel _aggregator = new();
     [ObservableProperty] private PacketListViewModel _packetList = new();
@@ -61,7 +62,7 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(IFilePicker filePicker)
     {
         _filePicker = filePicker;
-        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache);
+        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema);
 
         var saved = AppSettingsStore.Load();
         _packetDetail.ResolveItemNames = saved.ResolveItemNames;
@@ -83,8 +84,11 @@ public partial class MainViewModel : ObservableObject
         };
     }
 
+    public PacketSchemaService Schema => _schema;
+
     private async Task LoadGameDataAsync()
     {
+        await _schema.LoadAsync();
         await _gameData.LoadAsync(msg => StatusText = msg);
         OnPropertyChanged(nameof(GameDataLoaded));
     }
