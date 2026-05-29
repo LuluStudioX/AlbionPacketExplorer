@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Network;
 using AlbionPacketExplorer.Services;
@@ -23,6 +24,7 @@ public partial class MainViewModel : ObservableObject
 
     private CaptureSession? _session;
     private readonly List<PacketEntry> _capturedPackets = [];
+    private readonly List<PacketEntry> _allPackets = [];
 
     public MainViewModel(IFilePicker filePicker)
     {
@@ -107,6 +109,39 @@ public partial class MainViewModel : ObservableObject
 
     private bool CanOpenFile() => !IsLoading && !IsCapturing;
 
+    [RelayCommand(CanExecute = nameof(CanSaveFile))]
+    private async Task SaveFileAsync()
+    {
+        var suggested = $"packets_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+        var path = await _filePicker.PickSaveJsonFileAsync(suggested);
+        if (path == null) return;
+
+        try
+        {
+            var opts = new JsonSerializerOptions { WriteIndented = true };
+            var payload = _allPackets.Select(p => new
+            {
+                ts = p.Timestamp,
+                kind = p.Kind,
+                code = p.Code,
+                @params = p.Params.ToDictionary(
+                    kv => kv.Key,
+                    kv => new { type = kv.Value.Type, value = kv.Value.Value })
+            });
+
+            await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+            await JsonSerializer.SerializeAsync(stream, payload, opts);
+
+            StatusText = $"Saved {_allPackets.Count:N0} packets to {Path.GetFileName(path)}";
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Save failed: {ex.Message}";
+        }
+    }
+
+    private bool CanSaveFile() => !IsLoading && _allPackets.Count > 0;
+
     public async Task LoadFileAsync(string path)
     {
         IsLoading = true;
@@ -127,7 +162,9 @@ public partial class MainViewModel : ObservableObject
             }
 
             Aggregator.Flush();
+            _allPackets.AddRange(loaded);
             PacketList.SetSource(loaded);
+            SaveFileCommand.NotifyCanExecuteChanged();
             StatusText = $"Loaded {loaded.Count:N0} packets from {Path.GetFileName(path)}";
         }
         catch (Exception ex)
@@ -146,6 +183,7 @@ public partial class MainViewModel : ObservableObject
     private void OnLivePacket(PacketEntry packet)
     {
         _capturedPackets.Add(packet);
+        _allPackets.Add(packet);
         Aggregator.Ingest(packet);
         PacketList.AddLivePacket(packet);
 
@@ -156,6 +194,7 @@ public partial class MainViewModel : ObservableObject
     private void ResetData()
     {
         _capturedPackets.Clear();
+        _allPackets.Clear();
         Aggregator.Reset();
         PacketList.SetSource([]);
         PacketDetail.Packet = null;
@@ -171,6 +210,7 @@ public partial class MainViewModel : ObservableObject
     {
         OpenFileCommand.NotifyCanExecuteChanged();
         StartCaptureCommand.NotifyCanExecuteChanged();
+        SaveFileCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnIsCapturingChanged(bool value)
@@ -178,5 +218,6 @@ public partial class MainViewModel : ObservableObject
         OpenFileCommand.NotifyCanExecuteChanged();
         StartCaptureCommand.NotifyCanExecuteChanged();
         StopCaptureCommand.NotifyCanExecuteChanged();
+        SaveFileCommand.NotifyCanExecuteChanged();
     }
 }
