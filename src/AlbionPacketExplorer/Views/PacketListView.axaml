@@ -21,6 +21,12 @@
                   CanUserSortColumns="False"
                   CanUserResizeColumns="True"
                   GridLinesVisibility="Horizontal">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Params"   Command="{Binding CopyParamSummaryCommand}" />
+                    <MenuItem Header="Copy as JSON"  Command="{Binding CopyAsJsonCommand}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="110" />
                 <DataGridTextColumn Header="Kind"      Binding="{Binding Kind}"     Width="80" />

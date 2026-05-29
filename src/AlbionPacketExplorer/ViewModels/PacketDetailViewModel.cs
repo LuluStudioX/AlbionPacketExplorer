@@ -1,8 +1,10 @@
+using Avalonia.Input.Platform;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 
 namespace AlbionPacketExplorer.ViewModels;
@@ -44,6 +46,9 @@ public partial class PacketDetailViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<ParamRow> _rows = [];
     [ObservableProperty] private bool _resolveItemNames;
     [ObservableProperty] private bool _resolveIcons;
+    [ObservableProperty] private ParamRow? _selectedRow;
+
+    public IClipboard? Clipboard { get; set; }
 
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons)
     {
@@ -119,6 +124,41 @@ public partial class PacketDetailViewModel : ObservableObject
             }
             catch { }
         }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private async Task CopyValueAsync()
+    {
+        if (SelectedRow == null || Clipboard == null) return;
+        await Clipboard.SetTextAsync(SelectedRow.Value);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private async Task CopyRowAsync()
+    {
+        if (SelectedRow == null || Clipboard == null) return;
+        var text = string.IsNullOrEmpty(SelectedRow.ResolvedName)
+            ? $"{SelectedRow.Key}\t{SelectedRow.Type}\t{SelectedRow.Value}"
+            : $"{SelectedRow.Key}\t{SelectedRow.Type}\t{SelectedRow.Value}\t{SelectedRow.ResolvedName}";
+        await Clipboard.SetTextAsync(text);
+    }
+
+    [RelayCommand]
+    private async Task CopyAllRowsAsync()
+    {
+        if (Clipboard == null) return;
+        var lines = Rows.Select(r => string.IsNullOrEmpty(r.ResolvedName)
+            ? $"{r.Key}\t{r.Type}\t{r.Value}"
+            : $"{r.Key}\t{r.Type}\t{r.Value}\t{r.ResolvedName}");
+        await Clipboard.SetTextAsync(string.Join("\n", lines));
+    }
+
+    private bool CanCopyRow() => SelectedRow != null;
+
+    partial void OnSelectedRowChanged(ParamRow? value)
+    {
+        CopyValueCommand.NotifyCanExecuteChanged();
+        CopyRowCommand.NotifyCanExecuteChanged();
     }
 
     private (string resolved, string uniqueName) TryResolveParam(ParamValue pv)

@@ -18,6 +18,12 @@
                   CanUserSortColumns="True"
                   CanUserResizeColumns="True"
                   GridLinesVisibility="Horizontal">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Keys Summary"          Command="{Binding CopyKeySummaryCommand}" />
+                    <MenuItem Header="Export C# Constructor Stub" Command="{Binding ExportCommand}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Kind"  Binding="{Binding Kind}"       Width="80" />
                 <DataGridTextColumn Header="Code"  Binding="{Binding Code}"       Width="60" />

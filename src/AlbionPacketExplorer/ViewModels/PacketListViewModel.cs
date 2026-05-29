@@ -1,3 +1,4 @@
+using Avalonia.Input.Platform;
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Network;
 using AlbionPacketExplorer.Services;
@@ -40,6 +41,7 @@ public partial class PacketListViewModel : ObservableObject
     [ObservableProperty] private PacketRow? _selectedRow;
 
     public PacketEntry? SelectedPacket => SelectedRow?.Packet;
+    public IClipboard? Clipboard { get; set; }
 
     public string FilterKind
     {
@@ -87,7 +89,36 @@ public partial class PacketListViewModel : ObservableObject
         ApplyFilter();
     }
 
-    partial void OnSelectedRowChanged(PacketRow? value) => OnPropertyChanged(nameof(SelectedPacket));
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private async Task CopyParamSummaryAsync()
+    {
+        if (SelectedRow == null || Clipboard == null) return;
+        await Clipboard.SetTextAsync(SelectedRow.ParamSummary);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private async Task CopyAsJsonAsync()
+    {
+        if (SelectedRow == null || Clipboard == null) return;
+        var p = SelectedRow.Packet;
+        var json = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            ts = p.Timestamp,
+            kind = p.Kind,
+            code = p.Code,
+            @params = p.Params.ToDictionary(kv => kv.Key, kv => new { type = kv.Value.Type, value = kv.Value.Value })
+        }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        await Clipboard.SetTextAsync(json);
+    }
+
+    private bool CanCopyRow() => SelectedRow != null;
+
+    partial void OnSelectedRowChanged(PacketRow? value)
+    {
+        OnPropertyChanged(nameof(SelectedPacket));
+        CopyParamSummaryCommand.NotifyCanExecuteChanged();
+        CopyAsJsonCommand.NotifyCanExecuteChanged();
+    }
 
     private void ApplyFilter()
     {
