@@ -15,9 +15,10 @@
                   IsReadOnly="True"
                   GridLinesVisibility="Horizontal">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Key"   Binding="{Binding Key}"   Width="50" />
-                <DataGridTextColumn Header="Type"  Binding="{Binding Type}"  Width="100" />
-                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+                <DataGridTextColumn Header="Key"      Binding="{Binding Key}"          Width="50" />
+                <DataGridTextColumn Header="Type"     Binding="{Binding Type}"         Width="100" />
+                <DataGridTextColumn Header="Value"    Binding="{Binding Value}"        Width="*" />
+                <DataGridTextColumn Header="Resolved" Binding="{Binding ResolvedName}" Width="200" />
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
