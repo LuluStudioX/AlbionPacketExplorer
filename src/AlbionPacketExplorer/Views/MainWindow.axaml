@@ -62,10 +62,10 @@
         </StackPanel>
 
         <!-- Main content: vertical split (top=summary, bottom=list+detail) -->
-        <Grid x:Name="MainGrid" RowDefinitions="320,4,*">
+        <Grid x:Name="MainGrid" RowDefinitions="200,4,*">
 
             <!-- TOP: Code Aggregator -->
-            <DockPanel Grid.Row="0">
+            <DockPanel Grid.Row="0" MinHeight="80">
                 <Border DockPanel.Dock="Top" Background="#1a1a2e" Padding="6,3">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock Text="Event Summary" FontWeight="Bold" VerticalAlignment="Center" />
@@ -89,7 +89,7 @@
             <Grid Grid.Row="2" x:Name="BottomGrid" ColumnDefinitions="2*,4,*">
 
                 <!-- Packet List -->
-                <DockPanel Grid.Column="0">
+                <DockPanel Grid.Column="0" MinWidth="200">
                     <Border DockPanel.Dock="Top" Background="#1a2e1a" Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Text="Packet List" FontWeight="Bold" VerticalAlignment="Center" />
@@ -110,7 +110,7 @@
                               VerticalAlignment="Stretch" />
 
                 <!-- Packet Detail -->
-                <DockPanel Grid.Column="2">
+                <DockPanel Grid.Column="2" MinWidth="200">
                     <Border DockPanel.Dock="Top" Background="#2e1a1a" Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Text="Packet Detail" FontWeight="Bold" VerticalAlignment="Center" />

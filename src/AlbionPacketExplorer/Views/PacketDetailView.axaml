@@ -13,6 +13,7 @@
         <DataGrid ItemsSource="{Binding Rows}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
+                  CanUserResizeColumns="True"
                   RowHeight="36"
                   GridLinesVisibility="Horizontal">
             <DataGrid.Columns>
