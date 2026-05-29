@@ -34,6 +34,21 @@ public partial class MainWindow : SukiWindow, IFilePicker
         return files.Count > 0 ? files[0].TryGetLocalPath() : null;
     }
 
+    public async Task<string?> PickSaveJsonFileAsync(string suggestedName)
+    {
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save packets as JSON",
+            SuggestedFileName = suggestedName,
+            DefaultExtension = "json",
+            FileTypeChoices =
+            [
+                new FilePickerFileType("JSON files") { Patterns = ["*.json"] }
+            ]
+        });
+        return file?.TryGetLocalPath();
+    }
+
     private void OnLoaded(object? sender, EventArgs e)
     {
         _mainGrid = this.FindControl<Grid>("MainGrid");
