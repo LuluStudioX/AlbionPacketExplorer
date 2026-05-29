@@ -9,8 +9,14 @@
         Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
         WindowStartupLocation="CenterScreen"
+        BackgroundAnimationEnabled="True"
+        BackgroundTransitionsEnabled="True"
         x:DataType="vm:MainViewModel"
         KeyDown="OnKeyDown">
+
+    <suki:SukiWindow.Hosts>
+        <suki:SukiToastHost Manager="{Binding ToastManager}" />
+    </suki:SukiWindow.Hosts>
 
     <DockPanel>
         <!-- Toolbar -->
@@ -76,10 +82,20 @@
         </StackPanel>
 
         <!-- Status bar -->
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical">
-            <ProgressBar Value="{Binding LoadProgress}" Maximum="1"
-                         IsVisible="{Binding IsLoading}" Height="4" />
-            <TextBlock Text="{Binding StatusText}" Margin="8,2" />
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Spacing="0">
+            <suki:InfoBar Title=""
+                          Message="{Binding StatusText}"
+                          IsOpen="True"
+                          IsClosable="False"
+                          Severity="Information"
+                          Padding="8,4"
+                          FontSize="12" />
+            <Grid IsVisible="{Binding IsLoading}" Height="28">
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <suki:Loading LoadingStyle="Glow" Width="18" Height="18" />
+                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" FontSize="12" />
+                </StackPanel>
+            </Grid>
         </StackPanel>
 
         <!-- ═══════════════════════════════════════

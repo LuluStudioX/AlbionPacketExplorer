@@ -7,8 +7,10 @@
                 x:DataType="vm:SettingsViewModel"
                 Title="Settings"
                 Icon="/Assets/app-icon.ico"
-                Width="660" Height="500"
-                MinWidth="480" MinHeight="360"
+                Width="680"
+                MinWidth="500" MinHeight="400"
+                MaxHeight="700"
+                SizeToContent="Height"
                 CanResize="True">
 
     <Grid ColumnDefinitions="180,*">
@@ -16,7 +18,7 @@
         <!-- Left nav -->
         <Border Grid.Column="0" Background="#0d0d1a" Padding="0,8">
             <StackPanel Spacing="2">
-                <Button Name="NavDisplay" Classes="Flat"
+                <Button Name="NavDisplay"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="16,10"
@@ -27,7 +29,7 @@
                         <TextBlock Text="Display" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
-                <Button Name="NavPaths" Classes="Flat"
+                <Button Name="NavPaths"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="16,10"
@@ -38,7 +40,7 @@
                         <TextBlock Text="Paths" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
-                <Button Name="NavSchema" Classes="Flat"
+                <Button Name="NavSchema"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="16,10"
@@ -49,7 +51,18 @@
                         <TextBlock Text="Schema Export" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
-                <Button Name="NavAbout" Classes="Flat"
+                <Button Name="NavTheme"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="Theme">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{x:Static sukiTheme:Icons.Star}" Width="14" Height="14" />
+                        <TextBlock Text="Theme" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Name="NavAbout"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="16,10"
@@ -64,7 +77,7 @@
         </Border>
 
         <!-- Right content -->
-        <ScrollViewer Grid.Column="1" Padding="20,16">
+        <ScrollViewer Grid.Column="1" Padding="20,16,20,24">
             <StackPanel Spacing="16">
 
                 <!-- Display section -->
@@ -211,6 +224,64 @@
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Theme section -->
+                <StackPanel Name="SectionTheme" Spacing="12" IsVisible="False">
+                    <TextBlock Text="Theme" FontSize="18" FontWeight="SemiBold" />
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="Dark Mode" FontWeight="SemiBold" />
+                                <TextBlock Text="Switch between dark and light base theme."
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding IsDarkMode}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Color Theme" FontWeight="SemiBold" />
+                            <TextBlock Text="Pick a color accent for the UI."
+                                       Foreground="Gray" FontSize="12" />
+                            <ListBox ItemsSource="{Binding AvailableThemes}"
+                                     SelectedItem="{Binding SelectedTheme}"
+                                     SelectionMode="Single">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="80" Height="36" CornerRadius="6" Margin="4"
+                                                Background="{Binding PrimaryBrush}">
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="White"
+                                                       FontSize="12" FontWeight="SemiBold" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Background Style" FontWeight="SemiBold" />
+                            <TextBlock Text="Animated background effect for the main window."
+                                       Foreground="Gray" FontSize="12" />
+                            <ComboBox ItemsSource="{Binding AvailableBackgroundStyles}"
+                                      SelectedItem="{Binding BackgroundStyle}"
+                                      HorizontalAlignment="Stretch" />
                         </StackPanel>
                     </Border>
                 </StackPanel>

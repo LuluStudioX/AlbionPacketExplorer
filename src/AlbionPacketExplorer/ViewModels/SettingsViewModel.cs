@@ -2,8 +2,12 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Avalonia.Input.Platform;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SukiUI;
+using SukiUI.Enums;
+using SukiUI.Models;
 
 namespace AlbionPacketExplorer.ViewModels;
 
@@ -105,9 +109,52 @@ public partial class SettingsViewModel : ObservableObject
         SaveExportRequested?.Invoke($"{kind}_{code}_schema.json", ExportPreview);
     }
 
+    // Theme
+    private readonly SukiTheme _theme = SukiTheme.GetInstance();
+
+    public IReadOnlyList<SukiColorTheme> AvailableThemes => _theme.ColorThemes;
+
+    public bool IsDarkMode
+    {
+        get => _theme.ActiveBaseTheme == ThemeVariant.Dark;
+        set
+        {
+            _theme.ChangeBaseTheme(value ? ThemeVariant.Dark : ThemeVariant.Light);
+            OnPropertyChanged();
+        }
+    }
+
+    public SukiColorTheme? SelectedTheme
+    {
+        get => _theme.ActiveColorTheme;
+        set
+        {
+            if (value != null) _theme.ChangeColorTheme(value);
+            OnPropertyChanged();
+        }
+    }
+
+    public SukiBackgroundStyle BackgroundStyle
+    {
+        get => _main.BackgroundStyle;
+        set
+        {
+            _main.BackgroundStyle = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public IReadOnlyList<SukiBackgroundStyle> AvailableBackgroundStyles { get; } =
+        Enum.GetValues<SukiBackgroundStyle>().ToList();
+
+    [RelayCommand]
+    private void ToggleDarkMode() => IsDarkMode = !IsDarkMode;
+
     public SettingsViewModel(MainViewModel main)
     {
         _main = main;
+        _theme.OnBaseThemeChanged += _ => OnPropertyChanged(nameof(IsDarkMode));
+        _theme.OnColorThemeChanged += _ => OnPropertyChanged(nameof(SelectedTheme));
         _main.PropertyChanged += (_, e) =>
         {
             switch (e.PropertyName)
@@ -123,6 +170,9 @@ public partial class SettingsViewModel : ObservableObject
                     break;
                 case nameof(MainViewModel.MinimizeToTray):
                     OnPropertyChanged(nameof(MinimizeToTray));
+                    break;
+                case nameof(MainViewModel.BackgroundStyle):
+                    OnPropertyChanged(nameof(BackgroundStyle));
                     break;
             }
         };

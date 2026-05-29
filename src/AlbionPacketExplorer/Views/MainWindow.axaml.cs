@@ -5,6 +5,10 @@ using Avalonia.Platform.Storage;
 using AlbionPacketExplorer.Services;
 using AlbionPacketExplorer.ViewModels;
 using SukiUI.Controls;
+using SukiUI.Toasts;
+using System.ComponentModel;
+using System.Linq;
+using Avalonia.VisualTree;
 
 namespace AlbionPacketExplorer.Views;
 
@@ -15,10 +19,10 @@ public partial class MainWindow : SukiWindow, IFilePicker
     private Grid? _focusGrid;
     private bool _summaryCollapsed;
 
-    public MainWindow()
+    public MainWindow(ISukiToastManager toastManager)
     {
         InitializeComponent();
-        DataContext = new MainViewModel(this);
+        DataContext = new MainViewModel(this, toastManager);
         Loaded += OnLoaded;
         Closing += OnClosing;
     }
@@ -66,6 +70,8 @@ public partial class MainWindow : SukiWindow, IFilePicker
             vm.PacketList.Clipboard = clipboard;
             vm.PacketDetail.Clipboard = clipboard;
             vm.PacketDetail.EditParamRequested += OnEditParamRequested;
+            vm.PropertyChanged += OnMainViewModelPropertyChanged;
+            BackgroundStyle = vm.BackgroundStyle;
         }
 
         var layout = LayoutStore.Load();
@@ -96,6 +102,18 @@ public partial class MainWindow : SukiWindow, IFilePicker
         var icon = this.FindControl<TextBlock>("SummaryCollapseIcon");
         if (content != null) content.IsVisible = !_summaryCollapsed;
         if (icon != null) icon.Text = _summaryCollapsed ? "▶" : "▼";
+    }
+
+    private void OnMainViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.BackgroundStyle) && sender is MainViewModel vm)
+        {
+            BackgroundStyle = vm.BackgroundStyle;
+            var host = this.GetVisualDescendants().OfType<SukiUI.Controls.SukiMainHost>().FirstOrDefault();
+            if (host != null) host.BackgroundStyle = vm.BackgroundStyle;
+            var bg = this.GetVisualDescendants().OfType<SukiUI.Controls.SukiBackground>().FirstOrDefault();
+            if (bg != null) bg.Style = vm.BackgroundStyle;
+        }
     }
 
     private void OnEditParamRequested(EditParamViewModel vm)
