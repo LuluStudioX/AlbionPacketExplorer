@@ -38,7 +38,13 @@
                       IsChecked="{Binding ResolveItemNames}"
                       IsEnabled="{Binding GameDataLoaded}"
                       VerticalAlignment="Center">
-                <ToolTip.Tip>Show item names (UniqueName + EN display name) for numeric param values.&#xA;Data fetched from ao-bin-dumps on first launch, cached locally for 7 days.</ToolTip.Tip>
+                <ToolTip.Tip>Show item UniqueName + EN display name for numeric param values.&#xA;Data fetched from ao-bin-dumps on first launch, cached locally for 7 days.</ToolTip.Tip>
+            </CheckBox>
+            <CheckBox Content="Resolve Icons"
+                      IsChecked="{Binding ResolveIcons}"
+                      IsEnabled="{Binding GameDataLoaded}"
+                      VerticalAlignment="Center">
+                <ToolTip.Tip>Show item icons in the Packet Detail panel.&#xA;Icons fetched from render.albiononline.com and cached to disk permanently.</ToolTip.Tip>
             </CheckBox>
             <Button Content="Save JSON…" Command="{Binding SaveFileCommand}">
                 <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>

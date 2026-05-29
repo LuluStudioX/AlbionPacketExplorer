@@ -43,6 +43,7 @@ public partial class PacketDetailViewModel : ObservableObject
     [ObservableProperty] private PacketEntry? _packet;
     [ObservableProperty] private ObservableCollection<ParamRow> _rows = [];
     [ObservableProperty] private bool _resolveItemNames;
+    [ObservableProperty] private bool _resolveIcons;
 
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons)
     {
@@ -52,6 +53,13 @@ public partial class PacketDetailViewModel : ObservableObject
 
     partial void OnPacketChanged(PacketEntry? value) => RebuildRows();
     partial void OnResolveItemNamesChanged(bool value) => RebuildRows();
+    partial void OnResolveIconsChanged(bool value)
+    {
+        if (value)
+            TriggerIconLoad();
+        else
+            ClearIcons();
+    }
 
     private void RebuildRows()
     {
@@ -61,7 +69,6 @@ public partial class PacketDetailViewModel : ObservableObject
         Rows.Clear();
         if (Packet == null) return;
 
-        var token = _iconCts.Token;
         var rowsToLoad = new List<ParamRow>();
 
         foreach (var (key, pv) in Packet.Params.OrderBy(p => int.TryParse(p.Key, out var n) ? n : 999))
@@ -74,12 +81,29 @@ public partial class PacketDetailViewModel : ObservableObject
             var row = new ParamRow(key, pv.Type, formatted, resolved, uniqueName);
             Rows.Add(row);
 
-            if (ResolveItemNames && !string.IsNullOrEmpty(uniqueName))
+            if (ResolveIcons && !string.IsNullOrEmpty(uniqueName))
                 rowsToLoad.Add(row);
         }
 
         if (rowsToLoad.Count > 0)
-            _ = LoadIconsAsync(rowsToLoad, token);
+            _ = LoadIconsAsync(rowsToLoad, _iconCts.Token);
+    }
+
+    private void TriggerIconLoad()
+    {
+        _iconCts.Cancel();
+        _iconCts = new CancellationTokenSource();
+
+        var rowsToLoad = Rows.Where(r => !string.IsNullOrEmpty(r.UniqueName) && r.Icon == null).ToList();
+        if (rowsToLoad.Count > 0)
+            _ = LoadIconsAsync(rowsToLoad, _iconCts.Token);
+    }
+
+    private void ClearIcons()
+    {
+        _iconCts.Cancel();
+        foreach (var row in Rows)
+            row.Icon = null;
     }
 
     private async Task LoadIconsAsync(List<ParamRow> rows, CancellationToken token)
