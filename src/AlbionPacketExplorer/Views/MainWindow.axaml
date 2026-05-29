@@ -1,6 +1,7 @@
 <suki:SukiWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+        xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
         xmlns:vm="using:AlbionPacketExplorer.ViewModels"
         xmlns:views="using:AlbionPacketExplorer.Views"
         x:Class="AlbionPacketExplorer.Views.MainWindow"
@@ -13,46 +14,64 @@
 
     <DockPanel>
         <!-- Toolbar -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="6,4">
-            <TextBlock VerticalAlignment="Center" Text="Device:" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4" Margin="6,4">
             <ComboBox ItemsSource="{Binding AvailableDevices}"
                       SelectedItem="{Binding SelectedDevice}"
                       DisplayMemberBinding="{Binding DisplayName}"
-                      Width="260"
+                      Width="240"
                       IsEnabled="{Binding IsCapturing, Converter={x:Static BoolConverters.Not}}">
-                <ToolTip.Tip>Select which network adapter to capture Albion traffic from.</ToolTip.Tip>
+                <ToolTip.Tip>Select network adapter to capture Albion traffic from.</ToolTip.Tip>
             </ComboBox>
-            <Button Content="Refresh" Command="{Binding RefreshDevicesCommand}">
+
+            <Button Classes="Flat" Command="{Binding RefreshDevicesCommand}" Padding="8">
                 <ToolTip.Tip>Re-scan network adapters.</ToolTip.Tip>
+                <PathIcon Data="{x:Static sukiTheme:Icons.Refresh}" Width="16" Height="16" />
             </Button>
-            <Button Content="▶ Start Capture"
-                    Command="{Binding StartCaptureCommand}"
-                    Background="#2a7a2a" Foreground="White">
+
+            <Button Classes="Flat Success" Command="{Binding StartCaptureCommand}" Padding="10,8">
                 <ToolTip.Tip>Start live packet capture. Npcap must be installed. Run as Administrator if capture fails.</ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{x:Static sukiTheme:Icons.Login}" Width="15" Height="15" />
+                    <TextBlock Text="Capture" VerticalAlignment="Center" />
+                </StackPanel>
             </Button>
-            <Button Content="■ Stop Capture"
-                    Command="{Binding StopCaptureCommand}"
-                    Background="#7a2a2a" Foreground="White">
+
+            <Button Classes="Flat Danger" Command="{Binding StopCaptureCommand}" Padding="10,8">
                 <ToolTip.Tip>Stop live capture. All captured packets remain visible.</ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{x:Static sukiTheme:Icons.Logout}" Width="15" Height="15" />
+                    <TextBlock Text="Stop" VerticalAlignment="Center" />
+                </StackPanel>
             </Button>
+
             <Separator Width="1" Background="Gray" Margin="4,0" />
-            <Button Content="⚙ Settings" Name="SettingsButton" Click="OnSettingsClicked" />
-            <Button Content="{Binding LayoutToggleIcon}"
-                    Command="{Binding ToggleFocusModeCommand}"
-                    VerticalAlignment="Center"
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    FontSize="21"
-                    Padding="14,8"
-                    MinHeight="{Binding $parent[StackPanel].Bounds.Height}">
-                <ToolTip.Tip>Switch between side-by-side (⊞) and stacked (⊟) layout. (F5)</ToolTip.Tip>
+
+            <Button Classes="Flat" Name="SettingsButton" Click="OnSettingsClicked" Padding="8">
+                <ToolTip.Tip>Open settings.</ToolTip.Tip>
+                <PathIcon Data="{x:Static sukiTheme:Icons.Menu}" Width="16" Height="16" />
             </Button>
+
+            <Button Classes="Flat" Command="{Binding ToggleFocusModeCommand}" Padding="8">
+                <ToolTip.Tip>Switch between side-by-side and stacked layout. (F5)</ToolTip.Tip>
+                <PathIcon Data="{x:Static sukiTheme:Icons.KeyboardCaps}" Width="16" Height="16" />
+            </Button>
+
             <Separator Width="1" Background="Gray" Margin="4,0" />
-            <Button Content="Save JSON…" Command="{Binding SaveFileCommand}">
+
+            <Button Classes="Flat" Command="{Binding SaveFileCommand}" Padding="10,8">
                 <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="15" Height="15" />
+                    <TextBlock Text="Save JSON" VerticalAlignment="Center" />
+                </StackPanel>
             </Button>
-            <Button Content="Open JSON File…" Command="{Binding OpenFileCommand}">
+
+            <Button Classes="Flat" Command="{Binding OpenFileCommand}" Padding="10,8">
                 <ToolTip.Tip>Load a packet_sniffer.json file recorded by SAT.&#xA;Default path: %LOCALAPPDATA%\StatisticsAnalysisTool\Instances\...\temp\packet_sniffer.json</ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{x:Static sukiTheme:Icons.FileOpen}" Width="15" Height="15" />
+                    <TextBlock Text="Open JSON" VerticalAlignment="Center" />
+                </StackPanel>
             </Button>
         </StackPanel>
 

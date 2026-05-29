@@ -1,15 +1,21 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              x:Class="AlbionPacketExplorer.Views.CodeAggregatorView"
              x:DataType="vm:CodeAggregatorViewModel">
 
     <DockPanel>
         <Button DockPanel.Dock="Bottom"
-                Content="Export C# Constructor Stub"
+                Classes="Flat"
                 Margin="4"
                 Command="{Binding ExportCommand}"
-                IsEnabled="{Binding SelectedRow, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                IsEnabled="{Binding SelectedRow, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="14" Height="14" />
+                <TextBlock Text="Export C# Constructor Stub" VerticalAlignment="Center" />
+            </StackPanel>
+        </Button>
 
         <DataGrid ItemsSource="{Binding CodeStats}"
                   SelectedItem="{Binding SelectedRow, Mode=TwoWay}"

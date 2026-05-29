@@ -1,6 +1,7 @@
 <suki:SukiWindow xmlns="https://github.com/avaloniaui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
                 xmlns:vm="using:AlbionPacketExplorer.ViewModels"
                 x:Class="AlbionPacketExplorer.Views.SettingsWindow"
                 x:DataType="vm:SettingsViewModel"
@@ -15,34 +16,50 @@
         <!-- Left nav -->
         <Border Grid.Column="0" Background="#0d0d1a" Padding="0,8">
             <StackPanel Spacing="2">
-                <Button Name="NavDisplay"
-                        Content="Display"
+                <Button Name="NavDisplay" Classes="Flat"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="16,10"
                         Click="OnNavClicked"
-                        Tag="Display" />
-                <Button Name="NavPaths"
-                        Content="Paths"
+                        Tag="Display">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{x:Static sukiTheme:Icons.Star}" Width="14" Height="14" />
+                        <TextBlock Text="Display" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Name="NavPaths" Classes="Flat"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="16,10"
                         Click="OnNavClicked"
-                        Tag="Paths" />
-                <Button Name="NavSchema"
-                        Content="Schema Export"
+                        Tag="Paths">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{x:Static sukiTheme:Icons.FileOpen}" Width="14" Height="14" />
+                        <TextBlock Text="Paths" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Name="NavSchema" Classes="Flat"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="16,10"
                         Click="OnNavClicked"
-                        Tag="Schema" />
-                <Button Name="NavAbout"
-                        Content="About"
+                        Tag="Schema">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="14" Height="14" />
+                        <TextBlock Text="Schema Export" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Name="NavAbout" Classes="Flat"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="16,10"
                         Click="OnNavClicked"
-                        Tag="About" />
+                        Tag="About">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{x:Static sukiTheme:Icons.CircleInformation}" Width="14" Height="14" />
+                        <TextBlock Text="About" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Border>
 
@@ -112,9 +129,12 @@
                             <TextBlock Text="{Binding DataFolderPath}"
                                        Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
                                        TextWrapping="Wrap" Opacity="0.8" />
-                            <Button Content="Open in Explorer"
-                                    Command="{Binding OpenDataFolderCommand}"
-                                    Margin="0,4,0,0" />
+                            <Button Classes="Flat" Command="{Binding OpenDataFolderCommand}" Margin="0,4,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="14" Height="14" />
+                                    <TextBlock Text="Open in Explorer" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </Border>
 
@@ -126,9 +146,12 @@
                             <TextBlock Text="{Binding SatPacketSnifferPath}"
                                        Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
                                        TextWrapping="Wrap" Opacity="0.8" />
-                            <Button Content="Open in Explorer"
-                                    Command="{Binding OpenSatFolderCommand}"
-                                    Margin="0,4,0,0" />
+                            <Button Classes="Flat" Command="{Binding OpenSatFolderCommand}" Margin="0,4,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="14" Height="14" />
+                                    <TextBlock Text="Open in Explorer" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </Border>
 
@@ -175,10 +198,18 @@
                                      PlaceholderText="Enter kind + code above to preview schema…" />
 
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="Copy to Clipboard"
-                                        Command="{Binding CopyExportCommand}" />
-                                <Button Content="Save as JSON File…"
-                                        Command="{Binding SaveExportCommand}" />
+                                <Button Classes="Flat" Command="{Binding CopyExportCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{x:Static sukiTheme:Icons.ArrowULeftTop}" Width="14" Height="14" />
+                                        <TextBlock Text="Copy to Clipboard" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="Flat" Command="{Binding SaveExportCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{x:Static sukiTheme:Icons.FileOpen}" Width="14" Height="14" />
+                                        <TextBlock Text="Save as JSON" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
                         </StackPanel>
                     </Border>
