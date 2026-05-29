@@ -1,0 +1,557 @@
+{
+  "EVENT:6": {
+    "name": "HealthUpdate",
+    "params": {
+      "0": {
+        "name": "affectedObjectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "timestamp",
+        "note": ".NET ticks",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "healthChange",
+        "note": "",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "newHealthValue",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "effectType",
+        "note": "",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "effectOrigin",
+        "note": "",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "causerId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "causingSpellIndex",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:25": {
+    "name": "NewCharacter",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "name",
+        "note": "Character name",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "guid",
+        "note": "16-byte player GUID",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "guildName",
+        "note": "",
+        "resolveAs": ""
+      },
+      "40": {
+        "name": "equipment",
+        "note": "Array of equipped item indices",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:27": {
+    "name": "NewEquipmentItem",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "itemId",
+        "note": "Item index — maps to IndexedItems",
+        "resolveAs": "itemIndex"
+      },
+      "2": {
+        "name": "quantity",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "emv",
+        "note": "Estimated market value in silver",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "quality",
+        "note": "0=Normal 1=Good 2=Outstanding 3=Excellent 4=Masterpiece",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "durability",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:32": {
+    "name": "NewSimpleItem",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "itemIndex",
+        "note": "Item ID — maps to IndexedItems",
+        "resolveAs": "itemIndex"
+      },
+      "2": {
+        "name": "quantity",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "emv",
+        "note": "Estimated market value in silver",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "durability",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:35": {
+    "name": "LaborerObjectJobInfo",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "journalItemId",
+        "note": "Item ID of the laborer's journal",
+        "resolveAs": "itemIndex"
+      },
+      "2": {
+        "name": "isLootReady",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "returnTime",
+        "note": ".NET ticks",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "owner",
+        "note": "Owner character name",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "capacity",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:30": {
+    "name": "LaborerObjectInfo",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "itemId",
+        "note": "Laborer item ID",
+        "resolveAs": "itemIndex"
+      },
+      "2": {
+        "name": "tier",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "returnTime",
+        "note": ".NET ticks",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "owner",
+        "note": "Owner character name",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "lootState",
+        "note": "0=empty 1=ready",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "capacity",
+        "note": "",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "itemIds",
+        "note": "Array of item IDs in loot",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "quantities",
+        "note": "Array of quantities matching itemIds",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "isAwayOnJob",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:56": {
+    "name": "NewBuilding",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "firstName",
+        "note": "Laborer first name",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "lastName",
+        "note": "Laborer last name",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "uniqueName",
+        "note": "Building UniqueName (optional)",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "lastHarvest",
+        "note": ".NET ticks",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "plantedAt",
+        "note": ".NET ticks",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:57": {
+    "name": "FarmableObjectInfo",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "isReady",
+        "note": "",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "itemId",
+        "note": "Farmable item ID",
+        "resolveAs": "itemIndex"
+      },
+      "3": {
+        "name": "growTime",
+        "note": "Total grow time in seconds",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "plantedAt",
+        "note": ".NET ticks",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:55": {
+    "name": "TakeSilver",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "timestamp",
+        "note": ".NET ticks",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "targetEntityId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "yieldPreTax",
+        "note": "Silver before tax",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "guildTax",
+        "note": "Guild tax amount",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "clusterTax",
+        "note": "Zone tax amount",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "isPremiumBonus",
+        "note": "",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "multiplier",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:71": {
+    "name": "UpdateMoney",
+    "params": {
+      "1": {
+        "name": "currentSilver",
+        "note": "Total silver of player",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:72": {
+    "name": "UpdateFame",
+    "params": {
+      "1": {
+        "name": "totalFame",
+        "note": "",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "fameWithMultiplier",
+        "note": "",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "zoneFame",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "multiplier",
+        "note": "",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "isPremiumBonus",
+        "note": "",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "bagInsightItemIndex",
+        "note": "",
+        "resolveAs": "itemIndex"
+      },
+      "10": {
+        "name": "satchelFame",
+        "note": "",
+        "resolveAs": ""
+      },
+      "17": {
+        "name": "bonusFactor",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:129": {
+    "name": "NewMob",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "mobIndex",
+        "note": "",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "moveSpeed",
+        "note": "",
+        "resolveAs": ""
+      },
+      "13": {
+        "name": "hitPoints",
+        "note": "",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "hitPointsMax",
+        "note": "",
+        "resolveAs": ""
+      },
+      "17": {
+        "name": "energy",
+        "note": "",
+        "resolveAs": ""
+      },
+      "18": {
+        "name": "energyMax",
+        "note": "",
+        "resolveAs": ""
+      },
+      "19": {
+        "name": "energyRegeneration",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:171": {
+    "name": "Died",
+    "params": {
+      "2": {
+        "name": "diedName",
+        "note": "Name of player who died",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "diedGuild",
+        "note": "",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "killedBy",
+        "note": "Killer name",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "killedByGuild",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:212": {
+    "name": "PartyJoined",
+    "params": {
+      "4": {
+        "name": "partyLead",
+        "note": "",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "partyUserGuids",
+        "note": "Array of party member GUIDs",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "partyUserNames",
+        "note": "Array of party member names",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:214": {
+    "name": "PartyPlayerJoined",
+    "params": {
+      "1": {
+        "name": "userGuid",
+        "note": "16-byte GUID",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "username",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "REQUEST:45": {
+    "name": "ActionOnBuildingStart",
+    "params": {
+      "0": {
+        "name": "ticks",
+        "note": ".NET ticks",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "buildingObjectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "actionType",
+        "note": "Enum value — TBD",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "costs",
+        "note": "Silver cost",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "itemIndex",
+        "note": "Item being used",
+        "resolveAs": "itemIndex"
+      },
+      "9": {
+        "name": "quantity",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "REQUEST:46": {
+    "name": "ActionOnBuildingEnd",
+    "params": {
+      "0": {
+        "name": "buildingObjectId",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:26": {
+    "name": "newCharacter",
+    "params": {
+      "40": {
+        "name": "valueType",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  }
+}
