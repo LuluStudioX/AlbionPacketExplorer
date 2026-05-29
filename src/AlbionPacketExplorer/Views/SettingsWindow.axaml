@@ -1,0 +1,95 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+                x:Class="AlbionPacketExplorer.Views.SettingsWindow"
+                x:DataType="vm:SettingsViewModel"
+                Title="Settings"
+                Icon="/Assets/app-icon.ico"
+                Width="660" Height="500"
+                MinWidth="480" MinHeight="360"
+                CanResize="True">
+
+    <Grid ColumnDefinitions="180,*">
+
+        <!-- Left nav -->
+        <Border Grid.Column="0" Background="#0d0d1a" Padding="0,8">
+            <StackPanel Spacing="2">
+                <Button Name="NavDisplay"
+                        Content="Display"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="Display" />
+                <Button Name="NavAbout"
+                        Content="About"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="About" />
+            </StackPanel>
+        </Border>
+
+        <!-- Right content -->
+        <ScrollViewer Grid.Column="1" Padding="20,16">
+            <StackPanel Spacing="16">
+
+                <!-- Display section -->
+                <StackPanel Name="SectionDisplay" Spacing="12">
+                    <TextBlock Text="Display" FontSize="18" FontWeight="SemiBold" />
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="Resolve Item Names" FontWeight="SemiBold" />
+                                <TextBlock Text="Show UniqueName + EN display name for numeric param values."
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                <TextBlock Text="Data fetched from ao-bin-dumps on first launch, cached 7 days."
+                                           Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding ResolveItemNames}"
+                                         IsEnabled="{Binding GameDataLoaded}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="Resolve Item Icons" FontWeight="SemiBold" />
+                                <TextBlock Text="Show item icons in the Packet Detail panel."
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                <TextBlock Text="Fetched from render.albiononline.com, cached permanently to disk."
+                                           Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding ResolveIcons}"
+                                         IsEnabled="{Binding GameDataLoaded}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- About section -->
+                <StackPanel Name="SectionAbout" Spacing="12" IsVisible="False">
+                    <TextBlock Text="About" FontSize="18" FontWeight="SemiBold" />
+
+                    <Border Classes="card" Padding="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Albion Packet Explorer" FontWeight="Bold" FontSize="15" />
+                            <TextBlock Text="{Binding Version}" Foreground="Gray" FontSize="12" />
+                            <TextBlock Text="Reads packet_sniffer.json from AlbionOnline-StatisticsAnalysis and decodes raw Albion Online network packets. Useful for exploring every field of every packet to write better event constructors in SAT."
+                                       Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+
+</suki:SukiWindow>
