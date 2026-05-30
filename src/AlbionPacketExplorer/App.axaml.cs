@@ -5,6 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using AlbionPacketExplorer.Views;
 using Microsoft.Extensions.DependencyInjection;
+using SukiUI;
 using SukiUI.Toasts;
 
 namespace AlbionPacketExplorer;
@@ -18,7 +19,7 @@ public class App : Application
 
     public override void Initialize()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
             SetCurrentProcessExplicitAppUserModelID("AlbionPacketExplorer.App");
 
         AvaloniaXamlLoader.Load(this);
