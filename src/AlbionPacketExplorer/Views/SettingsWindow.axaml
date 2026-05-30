@@ -77,8 +77,8 @@
         </Border>
 
         <!-- Right content -->
-        <ScrollViewer Grid.Column="1" Padding="20,16,20,24">
-            <StackPanel Spacing="16">
+        <ScrollViewer Grid.Column="1" Padding="20,16,20,0">
+            <StackPanel Spacing="16" Margin="0,0,0,24">
 
                 <!-- Display section -->
                 <StackPanel Name="SectionDisplay" Spacing="12">
