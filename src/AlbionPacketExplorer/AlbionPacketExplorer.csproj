@@ -8,7 +8,8 @@
     <RootNamespace>AlbionPacketExplorer</RootNamespace>
     <AssemblyName>AlbionPacketExplorer</AssemblyName>
     <AvaloniaVersion>12.0.3</AvaloniaVersion>
-    <Win32Resource>app.res</Win32Resource>
+    <NoWarn>$(NoWarn);AVLN3001</NoWarn>
+    <Win32Resource Condition="'$(OS)'=='Windows_NT'">app.res</Win32Resource>
     <UseAppHost>true</UseAppHost>
     <SelfContained>false</SelfContained>
   </PropertyGroup>
