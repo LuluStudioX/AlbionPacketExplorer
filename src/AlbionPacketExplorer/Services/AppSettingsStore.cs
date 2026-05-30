@@ -6,7 +6,8 @@ public record AppSettings(
     bool ResolveItemNames = false,
     bool ResolveIcons = false,
     bool FocusMode = false,
-    bool MinimizeToTray = false)
+    bool MinimizeToTray = false,
+    bool IsDarkMode = true)
 {
     public static readonly AppSettings Default = new();
 }
