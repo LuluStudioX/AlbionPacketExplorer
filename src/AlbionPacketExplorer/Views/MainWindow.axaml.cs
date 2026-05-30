@@ -65,16 +65,23 @@ public partial class MainWindow : SukiWindow, IFilePicker
 
         if (DataContext is MainViewModel vm)
         {
-            var clipboard = Clipboard;
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
             vm.Aggregator.Clipboard = clipboard;
+            vm.Aggregator.Toasts = vm.ToastManager;
             vm.PacketList.Clipboard = clipboard;
+            vm.PacketList.Toasts = vm.ToastManager;
             vm.PacketDetail.Clipboard = clipboard;
+            vm.PacketDetail.Toasts = vm.ToastManager;
             vm.PacketDetail.EditParamRequested += OnEditParamRequested;
             vm.PropertyChanged += OnMainViewModelPropertyChanged;
             BackgroundStyle = vm.BackgroundStyle;
         }
 
-        var layout = LayoutStore.Load();
+        ApplyLayout(LayoutStore.Load());
+    }
+
+    private void ApplyLayout(LayoutState layout)
+    {
         if (_overviewMainGrid != null)
             _overviewMainGrid.RowDefinitions[0] = new RowDefinition(layout.TopPanelHeight, GridUnitType.Pixel);
         if (_overviewBottomGrid != null)
@@ -86,6 +93,12 @@ public partial class MainWindow : SukiWindow, IFilePicker
         }
     }
 
+    public void ResetLayout()
+    {
+        ApplyLayout(LayoutState.Default);
+        LayoutStore.Save(LayoutState.Default);
+    }
+
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.F5 && DataContext is MainViewModel vm)
@@ -94,6 +107,8 @@ public partial class MainWindow : SukiWindow, IFilePicker
             e.Handled = true;
         }
     }
+
+    private void OnResetLayoutClicked(object? sender, RoutedEventArgs e) => ResetLayout();
 
     private void OnSummaryHeaderPressed(object? sender, PointerPressedEventArgs e)
     {
