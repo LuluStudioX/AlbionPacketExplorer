@@ -18,10 +18,11 @@
         <suki:SukiToastHost Manager="{Binding ToastManager}" />
     </suki:SukiWindow.Hosts>
 
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,*">
 
         <!-- Toolbar -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="4" Margin="6,4">
+        <DockPanel Grid.Row="0" Margin="6,4" LastChildFill="True">
+        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="4">
             <ComboBox ItemsSource="{Binding AvailableDevices}"
                       SelectedItem="{Binding SelectedDevice}"
                       DisplayMemberBinding="{Binding DisplayName}"
@@ -87,25 +88,19 @@
             </Button>
         </StackPanel>
 
-        <!-- Status bar -->
-        <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="0">
-            <suki:InfoBar Title=""
-                          Message="{Binding StatusText}"
-                          IsOpen="True"
-                          IsClosable="False"
-                          Severity="Information"
-                          Padding="8,4"
-                          FontSize="12" />
-            <Grid IsVisible="{Binding IsLoading}" Height="28">
-                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <suki:Loading LoadingStyle="Glow" Width="18" Height="18" />
-                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" FontSize="12" />
-                </StackPanel>
-            </Grid>
+        <!-- Status text + loading spinner — trailing right in toolbar -->
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
+                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0">
+            <suki:Loading LoadingStyle="Glow" Width="16" Height="16"
+                          IsVisible="{Binding IsLoading}" />
+            <TextBlock Text="{Binding StatusText}"
+                       VerticalAlignment="Center" FontSize="12"
+                       Foreground="{DynamicResource SukiText}" />
         </StackPanel>
+        </DockPanel>
 
         <!-- content area: only one of the two grids visible at a time -->
-        <Panel Grid.Row="2">
+        <Panel Grid.Row="1">
 
         <!-- ═══════════════════════════════════════
              OVERVIEW MODE (side-by-side, default)
