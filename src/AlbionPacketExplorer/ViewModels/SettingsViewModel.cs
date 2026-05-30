@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Avalonia.Input.Platform;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -46,7 +45,7 @@ public partial class SettingsViewModel : ObservableObject
 
     public string SatPacketSnifferPath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        @"StatisticsAnalysisTool\Instances");
+        "StatisticsAnalysisTool", "Instances");
 
     public string ItemCachePath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -63,9 +62,9 @@ public partial class SettingsViewModel : ObservableObject
         try
         {
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (OperatingSystem.IsWindows())
                 Process.Start("explorer.exe", path);
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            else if (OperatingSystem.IsMacOS())
                 Process.Start("open", path);
             else
                 Process.Start("xdg-open", path);
