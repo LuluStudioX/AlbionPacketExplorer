@@ -9,8 +9,8 @@
         Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
         WindowStartupLocation="CenterScreen"
-        BackgroundAnimationEnabled="True"
-        BackgroundTransitionsEnabled="True"
+        HorizontalContentAlignment="Stretch"
+        VerticalContentAlignment="Stretch"
         x:DataType="vm:MainViewModel"
         KeyDown="OnKeyDown">
 
@@ -18,9 +18,10 @@
         <suki:SukiToastHost Manager="{Binding ToastManager}" />
     </suki:SukiWindow.Hosts>
 
-    <DockPanel>
+    <Grid RowDefinitions="Auto,Auto,*">
+
         <!-- Toolbar -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4" Margin="6,4">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="4" Margin="6,4">
             <ComboBox ItemsSource="{Binding AvailableDevices}"
                       SelectedItem="{Binding SelectedDevice}"
                       DisplayMemberBinding="{Binding DisplayName}"
@@ -62,6 +63,11 @@
                 <PathIcon Data="{x:Static sukiTheme:Icons.KeyboardCaps}" Width="16" Height="16" />
             </Button>
 
+            <Button Classes="Flat" Click="OnResetLayoutClicked" Padding="8">
+                <ToolTip.Tip>Reset panel sizes to default.</ToolTip.Tip>
+                <PathIcon Data="{x:Static sukiTheme:Icons.RefreshCircle}" Width="16" Height="16" />
+            </Button>
+
             <Separator Width="1" Background="Gray" Margin="4,0" />
 
             <Button Classes="Flat" Command="{Binding SaveFileCommand}" Padding="10,8">
@@ -82,7 +88,7 @@
         </StackPanel>
 
         <!-- Status bar -->
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Spacing="0">
+        <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="0">
             <suki:InfoBar Title=""
                           Message="{Binding StatusText}"
                           IsOpen="True"
@@ -98,6 +104,9 @@
             </Grid>
         </StackPanel>
 
+        <!-- content area: only one of the two grids visible at a time -->
+        <Panel Grid.Row="2">
+
         <!-- ═══════════════════════════════════════
              OVERVIEW MODE (side-by-side, default)
              ═══════════════════════════════════════ -->
@@ -105,14 +114,21 @@
               RowDefinitions="200,4,*"
               IsVisible="{Binding FocusMode, Converter={x:Static BoolConverters.Not}}">
 
-            <!-- TOP: Code Aggregator -->
             <DockPanel Grid.Row="0" MinHeight="80">
-                <Border DockPanel.Dock="Top" Background="#1a1a2e" Padding="6,3">
+                <Border DockPanel.Dock="Top"
+                        Background="{DynamicResource ThemeCardBrush}"
+                        BorderBrush="{DynamicResource ThemeAccentBrush}"
+                        BorderThickness="0,0,0,2"
+                        Padding="6,3">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="Event Summary" FontWeight="Bold" VerticalAlignment="Center" />
-                        <Border Background="#333355" CornerRadius="8" Padding="4,1"
+                        <TextBlock Text="Event Summary"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}" />
+                        <Border Background="{DynamicResource HighlightBrush}"
+                                CornerRadius="8" Padding="4,1"
                                 ToolTip.Tip="Each row = one packet type (e.g. EVENT 32).&#xA;Count = how many times seen.&#xA;Keys = which param indices were present, with % showing how often.&#xA;100% = always present (required field). Less = optional/conditional.&#xA;&#xA;Click a row to filter the packet list below.">
-                            <TextBlock Text="?" FontSize="11" Foreground="#aaaaff" />
+                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource HighlightForegroundBrush}" />
                         </Border>
                     </StackPanel>
                 </Border>
@@ -120,18 +136,25 @@
             </DockPanel>
 
             <GridSplitter Grid.Row="1" ResizeDirection="Rows"
-                          Background="#444444"
+                          Background="{DynamicResource ThemeAccentBrush}"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-            <!-- BOTTOM: Packet List + Detail side by side -->
             <Grid Grid.Row="2" x:Name="BottomGrid" ColumnDefinitions="2*,4,*">
                 <DockPanel Grid.Column="0" MinWidth="200">
-                    <Border DockPanel.Dock="Top" Background="#1a2e1a" Padding="6,3">
+                    <Border DockPanel.Dock="Top"
+                            Background="{DynamicResource ThemeCardBrush}"
+                            BorderBrush="{DynamicResource HighlightBrush}"
+                            BorderThickness="0,0,0,2"
+                            Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Packet List" FontWeight="Bold" VerticalAlignment="Center" />
-                            <Border Background="#335533" CornerRadius="8" Padding="4,1"
+                            <TextBlock Text="Packet List"
+                                       FontWeight="Bold"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource ThemeForegroundBrush}" />
+                            <Border Background="{DynamicResource HighlightBrush}"
+                                    CornerRadius="8" Padding="4,1"
                                     ToolTip.Tip="All individual packets matching the current filter.&#xA;Filter is set automatically when you click a row in Event Summary.&#xA;Click a packet row to inspect its fields in the detail panel.">
-                                <TextBlock Text="?" FontSize="11" Foreground="#aaffaa" />
+                                <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource HighlightForegroundBrush}" />
                             </Border>
                         </StackPanel>
                     </Border>
@@ -139,16 +162,24 @@
                 </DockPanel>
 
                 <GridSplitter Grid.Column="1" ResizeDirection="Columns"
-                              Background="#444444"
+                              Background="{DynamicResource ThemeAccentBrush}"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
                 <DockPanel Grid.Column="2" MinWidth="200">
-                    <Border DockPanel.Dock="Top" Background="#2e1a1a" Padding="6,3">
+                    <Border DockPanel.Dock="Top"
+                            Background="{DynamicResource ThemeCardBrush}"
+                            BorderBrush="{DynamicResource ErrorBrush}"
+                            BorderThickness="0,0,0,2"
+                            Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Packet Detail" FontWeight="Bold" VerticalAlignment="Center" />
-                            <Border Background="#553333" CornerRadius="8" Padding="4,1"
+                            <TextBlock Text="Packet Detail"
+                                       FontWeight="Bold"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource ThemeForegroundBrush}" />
+                            <Border Background="{DynamicResource HighlightBrush}"
+                                    CornerRadius="8" Padding="4,1"
                                     ToolTip.Tip="Key/Type/Value breakdown of the selected packet.&#xA;Key = param index (0–255). Type = wire type. Value = decoded value.&#xA;Right-click a row to edit param name/note.">
-                                <TextBlock Text="?" FontSize="11" Foreground="#ffaaaa" />
+                                <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource HighlightForegroundBrush}" />
                             </Border>
                         </StackPanel>
                     </Border>
@@ -164,13 +195,20 @@
               RowDefinitions="160,4,*,4,*"
               IsVisible="{Binding FocusMode}">
 
-            <!-- Row 0: Event Summary (collapsible) -->
             <DockPanel Grid.Row="0">
-                <Border DockPanel.Dock="Top" Background="#1a1a2e" Padding="6,3"
+                <Border DockPanel.Dock="Top"
+                        Background="{DynamicResource ThemeCardBrush}"
+                        BorderBrush="{DynamicResource ThemeAccentBrush}"
+                        BorderThickness="0,0,0,2"
+                        Padding="6,3"
                         Cursor="Hand" PointerPressed="OnSummaryHeaderPressed">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock x:Name="SummaryCollapseIcon" Text="▼" FontSize="10" VerticalAlignment="Center" Foreground="#aaaaff" />
-                        <TextBlock Text="Event Summary" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock x:Name="SummaryCollapseIcon" Text="▼" FontSize="10" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource ThemeAccentBrush}" />
+                        <TextBlock Text="Event Summary"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}" />
                     </StackPanel>
                 </Border>
                 <views:CodeAggregatorView x:Name="FocusSummaryContent"
@@ -178,29 +216,42 @@
             </DockPanel>
 
             <GridSplitter Grid.Row="1" ResizeDirection="Rows"
-                          Background="#444444"
+                          Background="{DynamicResource ThemeAccentBrush}"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-            <!-- Row 2: Packet List full-width -->
             <DockPanel Grid.Row="2">
-                <Border DockPanel.Dock="Top" Background="#1a2e1a" Padding="6,3">
-                    <TextBlock Text="Packet List" FontWeight="Bold" VerticalAlignment="Center" />
+                <Border DockPanel.Dock="Top"
+                        Background="{DynamicResource ThemeCardBrush}"
+                        BorderBrush="{DynamicResource HighlightBrush}"
+                        BorderThickness="0,0,0,2"
+                        Padding="6,3">
+                    <TextBlock Text="Packet List"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource ThemeForegroundBrush}" />
                 </Border>
                 <views:PacketListView DataContext="{Binding PacketList}" />
             </DockPanel>
 
             <GridSplitter Grid.Row="3" ResizeDirection="Rows"
-                          Background="#444444"
+                          Background="{DynamicResource ThemeAccentBrush}"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-            <!-- Row 4: Packet Detail full-width -->
             <DockPanel Grid.Row="4">
-                <Border DockPanel.Dock="Top" Background="#2e1a1a" Padding="6,3">
+                <Border DockPanel.Dock="Top"
+                        Background="{DynamicResource ThemeCardBrush}"
+                        BorderBrush="{DynamicResource ErrorBrush}"
+                        BorderThickness="0,0,0,2"
+                        Padding="6,3">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="Packet Detail" FontWeight="Bold" VerticalAlignment="Center" />
-                        <Border Background="#553333" CornerRadius="8" Padding="4,1"
+                        <TextBlock Text="Packet Detail"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}" />
+                        <Border Background="{DynamicResource HighlightBrush}"
+                                CornerRadius="8" Padding="4,1"
                                 ToolTip.Tip="Right-click a row to edit param name/note.">
-                            <TextBlock Text="?" FontSize="11" Foreground="#ffaaaa" />
+                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource HighlightForegroundBrush}" />
                         </Border>
                     </StackPanel>
                 </Border>
@@ -209,6 +260,8 @@
 
         </Grid>
 
-    </DockPanel>
+        </Panel>
+
+    </Grid>
 
 </suki:SukiWindow>
