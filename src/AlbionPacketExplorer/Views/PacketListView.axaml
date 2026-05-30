@@ -24,7 +24,14 @@
                   IsReadOnly="True"
                   CanUserSortColumns="False"
                   CanUserResizeColumns="True"
+                  FontSize="12"
+                  RowHeight="26"
                   GridLinesVisibility="Horizontal">
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell">
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
+            </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Params"   Command="{Binding CopyParamSummaryCommand}" />

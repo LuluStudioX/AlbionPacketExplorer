@@ -16,7 +16,7 @@
     <Grid ColumnDefinitions="180,*">
 
         <!-- Left nav -->
-        <Border Grid.Column="0" Background="#0d0d1a" Padding="0,8">
+        <Border Grid.Column="0" Background="{DynamicResource SukiCardBackground}" Padding="0,8">
             <StackPanel Spacing="2">
                 <Button Name="NavDisplay"
                         HorizontalAlignment="Stretch"
