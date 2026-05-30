@@ -6,24 +6,21 @@
              x:DataType="vm:CodeAggregatorViewModel">
 
     <DockPanel>
-        <Button DockPanel.Dock="Bottom"
-                Classes="Flat"
-                Margin="4"
-                Command="{Binding ExportCommand}"
-                IsEnabled="{Binding SelectedRow, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-                <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="14" Height="14" />
-                <TextBlock Text="Export C# Constructor Stub" VerticalAlignment="Center" />
-            </StackPanel>
-        </Button>
 
         <DataGrid ItemsSource="{Binding CodeStats}"
+                  FontSize="12"
+                  RowHeight="24"
                   SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserSortColumns="True"
                   CanUserResizeColumns="True"
                   GridLinesVisibility="Horizontal">
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell">
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
+            </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Keys Summary"          Command="{Binding CopyKeySummaryCommand}" />

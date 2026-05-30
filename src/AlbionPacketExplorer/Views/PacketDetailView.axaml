@@ -15,8 +15,14 @@
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserResizeColumns="True"
-                  RowHeight="36"
+                  FontSize="12"
+                  RowHeight="30"
                   GridLinesVisibility="Horizontal">
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell">
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
+            </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Value"    Command="{Binding CopyValueCommand}" />
