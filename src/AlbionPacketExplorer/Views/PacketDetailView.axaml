@@ -8,7 +8,8 @@
         <TextBlock DockPanel.Dock="Top"
                    Margin="4,4,4,2"
                    FontWeight="Bold"
-                   Text="{Binding Packet, StringFormat='Packet: {0}', FallbackValue='No packet selected'}" />
+                   IsVisible="{Binding Packet, Converter={x:Static ObjectConverters.IsNotNull}}"
+                   Text="{Binding Packet, StringFormat='Packet: {0}'}" />
 
         <DataGrid ItemsSource="{Binding Rows}"
                   SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
@@ -55,10 +56,10 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTextColumn Header="Type"  Binding="{Binding Type}"  Width="100" />
-                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="1.2*" MinWidth="80" />
 
                 <!-- Resolved column: icon + text -->
-                <DataGridTemplateColumn Header="Resolved" Width="260">
+                <DataGridTemplateColumn Header="Resolved" Width="2*" MinWidth="160">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
                             <StackPanel Orientation="Horizontal" Spacing="6"
