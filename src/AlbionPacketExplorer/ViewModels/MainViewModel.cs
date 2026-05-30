@@ -6,6 +6,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using Avalonia.Controls.Notifications;
+using Avalonia.Styling;
+using SukiUI;
 using SukiUI.Enums;
 using SukiUI.Toasts;
 
@@ -80,7 +82,8 @@ public partial class MainViewModel : ObservableObject
     public SettingsViewModel Settings => new(this);
 
     private void SaveSettings() =>
-        AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, FocusMode, MinimizeToTray));
+        AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, FocusMode, MinimizeToTray,
+            SukiTheme.GetInstance().ActiveBaseTheme == ThemeVariant.Dark));
 
     public MainViewModel(IFilePicker filePicker, ISukiToastManager toasts)
     {
@@ -93,6 +96,10 @@ public partial class MainViewModel : ObservableObject
         _packetDetail.ResolveIcons = saved.ResolveIcons;
         FocusMode = saved.FocusMode;
         MinimizeToTray = saved.MinimizeToTray;
+
+        var theme = SukiTheme.GetInstance();
+        theme.ChangeBaseTheme(saved.IsDarkMode ? ThemeVariant.Dark : ThemeVariant.Light);
+        theme.OnBaseThemeChanged += _ => SaveSettings();
 
         _ = LoadGameDataAsync();
         RefreshDevices();
