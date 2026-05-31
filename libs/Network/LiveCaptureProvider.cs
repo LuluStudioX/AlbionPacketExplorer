@@ -14,7 +14,7 @@ public class LiveCaptureProvider : PacketProvider
     private readonly string? _deviceName;
     private readonly Action<string>? _log;
 
-    private ILiveDevice? _device;
+    private readonly List<ILiveDevice> _devices = [];
     private volatile bool _running;
 
     public override bool IsRunning => _running;
@@ -30,53 +30,66 @@ public class LiveCaptureProvider : PacketProvider
     {
         if (_running) return;
 
-        var chosen = SelectDevice();
-        if (chosen == null)
+        var toOpen = SelectDevices();
+        if (toOpen.Count == 0)
         {
             _log?.Invoke("SharpPcap: no suitable device found");
             return;
         }
 
-        chosen.Open(DeviceModes.Promiscuous, 1000);
-        chosen.Filter = "udp port 5055 or udp port 5056 or udp port 5058";
-        chosen.OnPacketArrival += OnPacketArrival;
+        foreach (var dev in toOpen)
+        {
+            try
+            {
+                dev.Open(DeviceModes.Promiscuous, 1000);
+                dev.Filter = "udp port 5055 or udp port 5056 or udp port 5058";
+                dev.OnPacketArrival += OnPacketArrival;
+                dev.StartCapture();
+                _devices.Add(dev);
+                _log?.Invoke($"SharpPcap: capturing on {dev.Description ?? dev.Name}");
+            }
+            catch (Exception ex)
+            {
+                _log?.Invoke($"SharpPcap: failed to open {dev.Name}: {ex.Message}");
+            }
+        }
 
-        _device = chosen;
-        _running = true;
-
-        chosen.StartCapture();
-        _log?.Invoke($"SharpPcap: capturing on {chosen.Description ?? chosen.Name}");
+        if (_devices.Count > 0)
+            _running = true;
     }
 
     public override void Stop()
     {
         _running = false;
-        var dev = _device;
-        _device = null;
+        var snapshot = _devices.ToList();
+        _devices.Clear();
 
-        if (dev == null) return;
-
-        try
+        foreach (var dev in snapshot)
         {
-            dev.OnPacketArrival -= OnPacketArrival;
-            dev.StopCapture();
-            dev.Close();
-        }
-        catch (Exception ex)
-        {
-            _log?.Invoke($"SharpPcap: stop error: {ex.Message}");
+            try
+            {
+                dev.OnPacketArrival -= OnPacketArrival;
+                dev.StopCapture();
+                dev.Close();
+            }
+            catch (Exception ex)
+            {
+                _log?.Invoke($"SharpPcap: stop error on {dev.Name}: {ex.Message}");
+            }
         }
     }
 
-    private ILiveDevice? SelectDevice()
+    private List<ILiveDevice> SelectDevices()
     {
-        var devices = CaptureDeviceList.Instance;
+        var all = CaptureDeviceList.Instance.OfType<ILiveDevice>().ToList();
 
         if (_deviceName != null)
-            return devices.OfType<ILiveDevice>()
-                .FirstOrDefault(d => d.Name.Equals(_deviceName, StringComparison.OrdinalIgnoreCase));
+        {
+            var single = all.FirstOrDefault(d => d.Name.Equals(_deviceName, StringComparison.OrdinalIgnoreCase));
+            return single != null ? [single] : [];
+        }
 
-        return devices.OfType<ILiveDevice>().FirstOrDefault();
+        return all;
     }
 
     private void OnPacketArrival(object sender, PacketCapture e)
