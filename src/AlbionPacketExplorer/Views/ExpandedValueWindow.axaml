@@ -1,0 +1,23 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+        x:Class="AlbionPacketExplorer.Views.ExpandedValueWindow"
+        Title="Full Value"
+        Width="600" Height="400"
+        MinWidth="300" MinHeight="200"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto"
+                  Margin="16">
+        <TextBox x:Name="ValueBox"
+                 IsReadOnly="True"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 FontFamily="Monospace"
+                 BorderThickness="0"
+                 Background="Transparent" />
+    </ScrollViewer>
+</suki:SukiWindow>

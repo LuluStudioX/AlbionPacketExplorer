@@ -7,4 +7,5 @@ public record PacketEntry(
     Dictionary<string, ParamValue> Params)
 {
     public int KeyCount => Params.Count;
+    public string ResolvedSummary { get; set; } = string.Empty;
 }
