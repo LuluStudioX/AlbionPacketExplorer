@@ -39,6 +39,24 @@ public partial class SettingsViewModel : ObservableObject
         set => _main.MinimizeToTray = value;
     }
 
+    public bool ForceExpandRows
+    {
+        get => _main.ForceExpandRows;
+        set => _main.ForceExpandRows = value;
+    }
+
+    public bool AutoStartCapture
+    {
+        get => _main.AutoStartCapture;
+        set => _main.AutoStartCapture = value;
+    }
+
+    public bool AutoSaveLogs
+    {
+        get => _main.AutoSaveLogs;
+        set => _main.AutoSaveLogs = value;
+    }
+
     public string DataFolderPath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "AlbionPacketExplorer");
@@ -172,6 +190,12 @@ public partial class SettingsViewModel : ObservableObject
                     break;
                 case nameof(MainViewModel.BackgroundStyle):
                     OnPropertyChanged(nameof(BackgroundStyle));
+                    break;
+                case nameof(MainViewModel.AutoStartCapture):
+                    OnPropertyChanged(nameof(AutoStartCapture));
+                    break;
+                case nameof(MainViewModel.AutoSaveLogs):
+                    OnPropertyChanged(nameof(AutoSaveLogs));
                     break;
             }
         };
