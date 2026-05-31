@@ -26,6 +26,14 @@ public partial class CodeAggregatorViewModel : ObservableObject
 
     private readonly Dictionary<(string Kind, int Code), CodeStats> _map = [];
 
+    private string _filterKind = "";
+    private string _filterCode = "";
+    private string _filterKeys = "";
+
+    public string FilterKind  { get => _filterKind;  set { _filterKind  = value; OnPropertyChanged(); ApplyFilter(); } }
+    public string FilterCode  { get => _filterCode;  set { _filterCode  = value; OnPropertyChanged(); ApplyFilter(); } }
+    public string FilterKeys  { get => _filterKeys;  set { _filterKeys  = value; OnPropertyChanged(); ApplyFilter(); } }
+
     public IClipboard? Clipboard { get; set; }
     public ISukiToastManager? Toasts { get; set; }
 
@@ -38,9 +46,19 @@ public partial class CodeAggregatorViewModel : ObservableObject
 
     public void Flush()
     {
-        CodeStats.Clear();
-        foreach (var s in _map.Values.OrderByDescending(s => s.Count))
-            CodeStats.Add(new CodeStatsRow(s));
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        var rows = _map.Values
+            .Where(s =>
+                FilterHelper.Matches(_filterKind, s.Kind) &&
+                FilterHelper.Matches(_filterCode, s.Code.ToString()) &&
+                FilterHelper.Matches(_filterKeys, PacketDisplayFormatter.FormatKeySummary(s)))
+            .OrderByDescending(s => s.Count)
+            .Select(s => new CodeStatsRow(s));
+        CodeStats = new ObservableCollection<CodeStatsRow>(rows);
     }
 
     public void Reset()

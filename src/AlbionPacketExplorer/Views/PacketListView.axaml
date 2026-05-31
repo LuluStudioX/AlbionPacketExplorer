@@ -6,23 +6,48 @@
              x:DataType="vm:PacketListViewModel">
 
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4,4,4,2">
-            <TextBlock VerticalAlignment="Center" Text="Kind:" />
-            <TextBox Text="{Binding FilterKind}" Width="80" PlaceholderText="EVENT…" />
-            <TextBlock VerticalAlignment="Center" Text="Code:" />
-            <TextBox Text="{Binding FilterCode}" Width="60" PlaceholderText="32…" />
-            <Button Classes="Flat" Command="{Binding ClearFilterCommand}" Padding="8">
-                <ToolTip.Tip>Clear filter</ToolTip.Tip>
-                <PathIcon Data="{x:Static sukiTheme:Icons.BackspaceOutline}" Width="15" Height="15" />
-            </Button>
-            <TextBlock VerticalAlignment="Center" Text="{Binding CountText}" Foreground="Gray" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Spacing="2" Margin="4,4,4,2">
+            <!-- Filter row -->
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock VerticalAlignment="Center" Text="Kind:" />
+                <TextBox Text="{Binding FilterKind}" Width="80" PlaceholderText="EVENT…" />
+                <TextBlock VerticalAlignment="Center" Text="Code:" />
+                <TextBox Text="{Binding FilterCode}" Width="60" PlaceholderText="32…" />
+                <Button Classes="Flat" Command="{Binding ClearFilterCommand}" Padding="8">
+                    <ToolTip.Tip>Clear filter</ToolTip.Tip>
+                    <PathIcon Data="{x:Static sukiTheme:Icons.BackspaceOutline}" Width="15" Height="15" />
+                </Button>
+                <TextBlock VerticalAlignment="Center" Text="{Binding CountText}"
+                           Foreground="{DynamicResource SukiLowText}" />
+            </StackPanel>
+            <!-- Preset row -->
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBox Text="{Binding NewPresetName}" Width="140" PlaceholderText="Preset name…" />
+                <Button Classes="Flat" Command="{Binding SavePresetCommand}" Padding="8">
+                    <ToolTip.Tip>Save current filter as preset</ToolTip.Tip>
+                    <PathIcon Data="{x:Static sukiTheme:Icons.Check}" Width="14" Height="14" />
+                </Button>
+                <ComboBox ItemsSource="{Binding Presets}"
+                          SelectedItem="{Binding SelectedPreset, Mode=TwoWay}"
+                          DisplayMemberBinding="{Binding Name}"
+                          PlaceholderText="Load preset…"
+                          MinWidth="160" />
+                <Button Classes="Flat" Command="{Binding LoadPresetCommand}" Padding="8">
+                    <ToolTip.Tip>Apply selected preset</ToolTip.Tip>
+                    <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="14" Height="14" />
+                </Button>
+                <Button Classes="Flat" Command="{Binding DeletePresetCommand}" Padding="8">
+                    <ToolTip.Tip>Delete selected preset</ToolTip.Tip>
+                    <PathIcon Data="{x:Static sukiTheme:Icons.Cross}" Width="14" Height="14" />
+                </Button>
+            </StackPanel>
         </StackPanel>
 
-        <DataGrid ItemsSource="{Binding Packets}"
+        <DataGrid x:Name="MainGrid" ItemsSource="{Binding Packets}"
                   SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  CanUserSortColumns="False"
+                  CanUserSortColumns="True"
                   CanUserResizeColumns="True"
                   FontSize="12"
                   RowHeight="26"
@@ -36,15 +61,132 @@
                 <ContextMenu>
                     <MenuItem Header="Copy Params"   Command="{Binding CopyParamSummaryCommand}" />
                     <MenuItem Header="Copy as JSON"  Command="{Binding CopyAsJsonCommand}" />
+                    <Separator />
+                    <MenuItem Header="Auto-select Newest"
+                              Command="{Binding ToggleAutoSelectNewestCommand}"
+                              IsChecked="{Binding AutoSelectNewest, Mode=OneWay}"
+                              ToggleType="CheckBox" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="100" />
-                <DataGridTextColumn Header="Kind"      Binding="{Binding Kind}"        Width="90" />
-                <DataGridTextColumn Header="Code"      Binding="{Binding Code}"        Width="55" />
-                <DataGridTextColumn Header="Name"      Binding="{Binding EventName}"   Width="220" />
-                <DataGridTextColumn Header="# Keys"    Binding="{Binding KeyCount}"    Width="60" />
-                <DataGridTextColumn Header="Params"    Binding="{Binding ParamSummary}" Width="*" />
+
+                <DataGridTemplateColumn Width="100" SortMemberPath="Timestamp" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="Timestamp" VerticalAlignment="Center" />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PacketRow">
+                            <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}"
+                                       Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="90" SortMemberPath="Kind" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Kind" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKind, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Kind…" Width="160" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PacketRow">
+                            <TextBlock Text="{Binding Kind}" Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="55" SortMemberPath="Code" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Code" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterCode, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Code…" Width="160" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PacketRow">
+                            <TextBlock Text="{Binding Code}" Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="220" SortMemberPath="EventName" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Name" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterName, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Name…" Width="200" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PacketRow">
+                            <TextBlock Text="{Binding EventName}" Margin="12,0" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="60" SortMemberPath="KeyCount" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="# Keys" VerticalAlignment="Center" />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PacketRow">
+                            <TextBlock Text="{Binding KeyCount}" Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="*" SortMemberPath="ParamSummary" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Params" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterParams, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Params…" Width="240" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PacketRow">
+                            <TextBlock Text="{Binding ParamSummary}" Margin="12,0" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
