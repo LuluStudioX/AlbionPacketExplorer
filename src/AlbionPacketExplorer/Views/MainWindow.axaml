@@ -26,7 +26,9 @@
             <ComboBox ItemsSource="{Binding AvailableDevices}"
                       SelectedItem="{Binding SelectedDevice}"
                       DisplayMemberBinding="{Binding DisplayName}"
-                      Width="240"
+                      MinWidth="160"
+                      MaxWidth="480"
+                      MaxDropDownHeight="450"
                       IsEnabled="{Binding IsCapturing, Converter={x:Static BoolConverters.Not}}">
                 <ToolTip.Tip>Select network adapter to capture Albion traffic from.</ToolTip.Tip>
             </ComboBox>
@@ -127,7 +129,7 @@
                         </Border>
                     </StackPanel>
                 </Border>
-                <views:CodeAggregatorView DataContext="{Binding Aggregator}" />
+                <views:CodeAggregatorView x:Name="OverviewAggregatorView" DataContext="{Binding Aggregator}" />
             </DockPanel>
 
             <GridSplitter Grid.Row="1" ResizeDirection="Rows"
@@ -153,7 +155,7 @@
                             </Border>
                         </StackPanel>
                     </Border>
-                    <views:PacketListView DataContext="{Binding PacketList}" />
+                    <views:PacketListView x:Name="OverviewPacketListView" DataContext="{Binding PacketList}" />
                 </DockPanel>
 
                 <GridSplitter Grid.Column="1" ResizeDirection="Columns"
@@ -178,7 +180,7 @@
                             </Border>
                         </StackPanel>
                     </Border>
-                    <views:PacketDetailView DataContext="{Binding PacketDetail}" />
+                    <views:PacketDetailView x:Name="OverviewPacketDetailView" DataContext="{Binding PacketDetail}" />
                 </DockPanel>
             </Grid>
         </Grid>
@@ -190,8 +192,8 @@
               RowDefinitions="160,4,*,4,*"
               IsVisible="{Binding FocusMode}">
 
-            <DockPanel Grid.Row="0">
-                <Border DockPanel.Dock="Top"
+            <Grid Grid.Row="0" RowDefinitions="Auto,*">
+                <Border Grid.Row="0"
                         Background="{DynamicResource ThemeCardBrush}"
                         BorderBrush="{DynamicResource ThemeAccentBrush}"
                         BorderThickness="0,0,0,2"
@@ -207,8 +209,9 @@
                     </StackPanel>
                 </Border>
                 <views:CodeAggregatorView x:Name="FocusSummaryContent"
+                                          Grid.Row="1"
                                           DataContext="{Binding Aggregator}" />
-            </DockPanel>
+            </Grid>
 
             <GridSplitter Grid.Row="1" ResizeDirection="Rows"
                           Background="{DynamicResource ThemeAccentBrush}"
