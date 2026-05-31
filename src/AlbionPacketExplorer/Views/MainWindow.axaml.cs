@@ -18,6 +18,7 @@ public partial class MainWindow : SukiWindow, IFilePicker
     private Grid? _overviewBottomGrid;
     private Grid? _focusGrid;
     private bool _summaryCollapsed;
+    private bool _closing;
 
     public MainWindow(ISukiToastManager toastManager)
     {
@@ -63,6 +64,7 @@ public partial class MainWindow : SukiWindow, IFilePicker
         _overviewBottomGrid = this.FindControl<Grid>("BottomGrid");
         _focusGrid = this.FindControl<Grid>("FocusGrid");
 
+
         if (DataContext is MainViewModel vm)
         {
             var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
@@ -78,6 +80,9 @@ public partial class MainWindow : SukiWindow, IFilePicker
         }
 
         ApplyLayout(LayoutStore.Load());
+
+        if (DataContext is MainViewModel vmAuto)
+            vmAuto.TriggerAutoStart();
     }
 
     private void ApplyLayout(LayoutState layout)
@@ -90,6 +95,7 @@ public partial class MainWindow : SukiWindow, IFilePicker
         {
             _focusGrid.RowDefinitions[0] = new RowDefinition(layout.FocusTopHeight, GridUnitType.Pixel);
             _focusGrid.RowDefinitions[2] = new RowDefinition(layout.FocusMidHeight, GridUnitType.Pixel);
+            _focusGrid.RowDefinitions[4] = new RowDefinition(1, GridUnitType.Star);
         }
     }
 
@@ -110,13 +116,32 @@ public partial class MainWindow : SukiWindow, IFilePicker
 
     private void OnResetLayoutClicked(object? sender, RoutedEventArgs e) => ResetLayout();
 
+    private double _summaryExpandedHeight = 160;
+
     private void OnSummaryHeaderPressed(object? sender, PointerPressedEventArgs e)
     {
         _summaryCollapsed = !_summaryCollapsed;
         var content = this.FindControl<Control>("FocusSummaryContent");
         var icon = this.FindControl<TextBlock>("SummaryCollapseIcon");
-        if (content != null) content.IsVisible = !_summaryCollapsed;
         if (icon != null) icon.Text = _summaryCollapsed ? "▶" : "▼";
+
+        if (_focusGrid != null)
+        {
+            if (_summaryCollapsed)
+            {
+                var current = _focusGrid.RowDefinitions[0].ActualHeight;
+                if (current > 40) _summaryExpandedHeight = current;
+                if (content != null) content.IsVisible = false;
+                _focusGrid.RowDefinitions[0] = new RowDefinition(GridLength.Auto);
+                _focusGrid.RowDefinitions[1] = new RowDefinition(0, GridUnitType.Pixel);
+            }
+            else
+            {
+                if (content != null) content.IsVisible = true;
+                _focusGrid.RowDefinitions[0] = new RowDefinition(_summaryExpandedHeight, GridUnitType.Pixel);
+                _focusGrid.RowDefinitions[1] = new RowDefinition(4, GridUnitType.Pixel);
+            }
+        }
     }
 
     private void OnMainViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -155,19 +180,40 @@ public partial class MainWindow : SukiWindow, IFilePicker
 
     private void OnClosing(object? sender, WindowClosingEventArgs e)
     {
-        var focusTop = _focusGrid?.RowDefinitions[0].ActualHeight ?? 160;
-        var focusMid = _focusGrid?.RowDefinitions[2].ActualHeight ?? 220;
+        if (_closing) return;
+        var prev = LayoutStore.Load();
+
+        var topH     = _overviewMainGrid?.RowDefinitions[0].ActualHeight ?? 0;
+        var leftW    = _overviewBottomGrid?.ColumnDefinitions[0].ActualWidth ?? 0;
+        var focusTop = _summaryCollapsed ? _summaryExpandedHeight : (_focusGrid?.RowDefinitions[0].ActualHeight ?? 0);
+        var focusMid = _focusGrid?.RowDefinitions[2].ActualHeight ?? 0;
 
         LayoutStore.Save(new LayoutState(
-            _overviewMainGrid?.RowDefinitions[0].ActualHeight ?? 320,
-            _overviewBottomGrid?.ColumnDefinitions[0].ActualWidth ?? 900,
-            focusTop,
-            focusMid));
+            topH     > 10 ? topH     : prev.TopPanelHeight,
+            leftW    > 10 ? leftW    : prev.LeftPanelWidth,
+            focusTop > 10 ? focusTop : prev.FocusTopHeight,
+            focusMid > 10 ? focusMid : prev.FocusMidHeight));
 
-        if (DataContext is MainViewModel { MinimizeToTray: true })
+        var vm2 = DataContext as MainViewModel;
+        if (vm2?.MinimizeToTray == true)
         {
             e.Cancel = true;
             Hide();
         }
+        else if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            _closing = true;
+            e.Cancel = true;
+            _ = ShutdownAsync(desktop, vm2);
+        }
+    }
+
+    private async Task ShutdownAsync(
+        Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop,
+        MainViewModel? vm)
+    {
+        if (vm != null)
+            await vm.AutoSaveLogsAsync();
+        desktop.Shutdown();
     }
 }
