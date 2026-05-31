@@ -1,24 +1,19 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              x:Class="AlbionPacketExplorer.Views.PacketDetailView"
              x:DataType="vm:PacketDetailViewModel">
 
-    <DockPanel>
-        <TextBlock DockPanel.Dock="Top"
-                   Margin="4,4,4,2"
-                   FontWeight="Bold"
-                   IsVisible="{Binding Packet, Converter={x:Static ObjectConverters.IsNotNull}}"
-                   Text="{Binding Packet, StringFormat='Packet: {0}'}" />
-
-        <DataGrid ItemsSource="{Binding Rows}"
-                  SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserResizeColumns="True"
-                  FontSize="12"
-                  RowHeight="30"
-                  GridLinesVisibility="Horizontal">
+    <DataGrid x:Name="MainGrid" ItemsSource="{Binding Rows}"
+              SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              CanUserSortColumns="True"
+              CanUserResizeColumns="True"
+              FontSize="12"
+              HorizontalScrollBarVisibility="Disabled"
+              GridLinesVisibility="Horizontal">
             <DataGrid.Styles>
                 <Style Selector="DataGridCell">
                     <Setter Property="FontSize" Value="12" />
@@ -27,17 +22,34 @@
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Value"    Command="{Binding CopyValueCommand}" />
+                    <MenuItem Header="View Full Value…" Command="{Binding ViewFullValueCommand}" />
                     <MenuItem Header="Copy Row"      Command="{Binding CopyRowCommand}" />
                     <Separator />
                     <MenuItem Header="Copy All Rows" Command="{Binding CopyAllRowsCommand}" />
+                    <Separator />
+                    <MenuItem Header="Preview Resolve" Command="{Binding PreviewResolveCommand}" />
                     <Separator />
                     <MenuItem Header="Edit Param Name…" Command="{Binding EditParamCommand}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
 
-                <!-- Key column: "0" bold + "paramName" normal, note shown as tooltip on hover -->
-                <DataGridTemplateColumn Header="Key" Width="160">
+                <DataGridTemplateColumn Width="160" SortMemberPath="Key" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Key" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKey, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Key…" Width="180" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
                             <StackPanel Orientation="Horizontal" Spacing="6"
@@ -55,29 +67,105 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Type"  Binding="{Binding Type}"  Width="100" />
-                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="1.2*" MinWidth="80" />
-
-                <!-- Resolved column: icon + text -->
-                <DataGridTemplateColumn Header="Resolved" Width="2*" MinWidth="160">
+                <DataGridTemplateColumn Width="100" SortMemberPath="Type" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Type" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterType, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Type…" Width="160" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
-                            <StackPanel Orientation="Horizontal" Spacing="6"
-                                        VerticalAlignment="Center" Margin="4,0">
-                                <Image Source="{Binding Icon}"
-                                       Width="28" Height="28"
-                                       IsVisible="{Binding HasResolved}"
-                                       RenderOptions.BitmapInterpolationMode="MediumQuality" />
-                                <TextBlock Text="{Binding ResolvedName}"
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding Type}" Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="1.2*" MinWidth="80" SortMemberPath="Value" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Value" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterValue, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Value…" Width="200" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:ParamRow">
+                            <TextBlock Text="{Binding DisplayValue}" Margin="12,4" VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       FontFamily="Monospace" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="2*" MinWidth="160" SortMemberPath="ResolvedName" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Resolved" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterResolved, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Resolved…" Width="200" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:ParamRow">
+                            <StackPanel Margin="4,2" VerticalAlignment="Center">
+                                <!-- Single resolved item -->
+                                <StackPanel Orientation="Horizontal" Spacing="6"
+                                            IsVisible="{Binding HasSingleResolved}">
+                                    <Image Source="{Binding Icon}" Width="28" Height="28"
+                                           IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                           RenderOptions.BitmapInterpolationMode="MediumQuality"
+                                           VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding ResolvedName}" VerticalAlignment="Center"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                                <!-- Multi-item array resolution -->
+                                <ItemsControl ItemsSource="{Binding ResolvedItems}"
+                                              IsVisible="{Binding HasResolvedItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:ResolvedItem">
+                                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,1,0,1">
+                                                <Image Source="{Binding Icon}" Width="22" Height="22"
+                                                       IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                                       RenderOptions.BitmapInterpolationMode="MediumQuality"
+                                                       VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding DisplayName}"
+                                                           FontSize="11" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
             </DataGrid.Columns>
-        </DataGrid>
-    </DockPanel>
+    </DataGrid>
 
 </UserControl>

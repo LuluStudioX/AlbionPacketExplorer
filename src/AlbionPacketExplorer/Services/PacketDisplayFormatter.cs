@@ -38,6 +38,15 @@ public static class PacketDisplayFormatter
         if (value is List<object?> list)
             return FormatList(list);
 
+        if (value is System.Collections.IList arr)
+            return FormatList(arr.Cast<object?>().ToList());
+
+        if (value is System.Collections.IDictionary dict)
+        {
+            var parts = dict.Keys.Cast<object?>().Select(k => $"{k}:{dict[k]}");
+            return $"{{{string.Join(", ", parts)}}}";
+        }
+
         return value.ToString() ?? "(null)";
     }
 
@@ -77,10 +86,8 @@ public static class PacketDisplayFormatter
 
     private static string FormatList(List<object?> list)
     {
-        const int maxItems = 20;
-        var items = list.Take(maxItems).Select(v => v?.ToString() ?? "null");
-        var overflow = list.Count > maxItems ? $" …{list.Count - maxItems} more" : "";
-        return $"[{string.Join(", ", items)}{overflow}]";
+        var items = list.Select(v => v?.ToString() ?? "null");
+        return $"[{string.Join(", ", items)}]";
     }
 
     private static string FormatValueShort(object? v) => v switch
