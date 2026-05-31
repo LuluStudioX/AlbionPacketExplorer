@@ -7,7 +7,7 @@
 
     <DockPanel>
 
-        <DataGrid ItemsSource="{Binding CodeStats}"
+        <DataGrid x:Name="MainGrid" ItemsSource="{Binding CodeStats}"
                   FontSize="12"
                   RowHeight="24"
                   SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
@@ -28,10 +28,88 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Kind"  Binding="{Binding Kind}"       Width="80" />
-                <DataGridTextColumn Header="Code"  Binding="{Binding Code}"       Width="60" />
-                <DataGridTextColumn Header="Count" Binding="{Binding Count}"      Width="80" />
-                <DataGridTextColumn Header="Keys"  Binding="{Binding KeySummary}" Width="*" />
+
+                <DataGridTemplateColumn Width="80" SortMemberPath="Kind" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Kind" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKind, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Kind…" Width="160" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:CodeStatsRow">
+                            <TextBlock Text="{Binding Kind}" Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="60" SortMemberPath="Code" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Code" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterCode, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Code…" Width="160" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:CodeStatsRow">
+                            <TextBlock Text="{Binding Code}" Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="80" SortMemberPath="Count" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="Count" VerticalAlignment="Center" />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:CodeStatsRow">
+                            <TextBlock Text="{Binding Count}" Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="*" SortMemberPath="KeySummary" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Keys" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKeys, Mode=TwoWay}"
+                                                 PlaceholderText="Filter Keys…" Width="240" />
+                                    </Flyout>
+                                </Button.Flyout>
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
+                                          Foreground="{DynamicResource SukiText}" />
+                            </Button>
+                        </Grid>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:CodeStatsRow">
+                            <TextBlock Text="{Binding KeySummary}" Margin="12,0" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
