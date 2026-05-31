@@ -6,9 +6,19 @@ public record LayoutState(
     double TopPanelHeight,
     double LeftPanelWidth,
     double FocusTopHeight = 160,
-    double FocusMidHeight = 220)
+    double FocusMidHeight = 220,
+    Dictionary<string, double[]>? ColumnWidths = null)
 {
     public static readonly LayoutState Default = new(320, 900);
+
+    public double[]? GetColumnWidths(string gridKey) =>
+        ColumnWidths?.TryGetValue(gridKey, out var w) == true ? w : null;
+
+    public LayoutState WithColumnWidths(string gridKey, double[] widths)
+    {
+        var dict = new Dictionary<string, double[]>(ColumnWidths ?? []) { [gridKey] = widths };
+        return this with { ColumnWidths = dict };
+    }
 }
 
 public static class LayoutStore
