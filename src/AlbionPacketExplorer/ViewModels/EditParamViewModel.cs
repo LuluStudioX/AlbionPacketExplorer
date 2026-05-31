@@ -16,6 +16,8 @@ public partial class EditParamViewModel : ObservableObject
     [ObservableProperty] private string _note = string.Empty;
     [ObservableProperty] private string _resolveAs = string.Empty;
 
+    public static readonly string[] ResolveAsOptions = ["", "itemIndex"];
+
     public string Title { get; }
 
     public EditParamViewModel(PacketSchemaService schema, string kind, int code,
@@ -34,11 +36,14 @@ public partial class EditParamViewModel : ObservableObject
         Title = $"Edit param {key} — {kind} {code}";
     }
 
+    public event Action? CloseRequested;
+
     [RelayCommand]
     private async Task SaveAsync()
     {
         await _schema.SaveUserParamAsync(_kind, _code, _key, ParamName.Trim(), Note.Trim(), ResolveAs.Trim());
         _onSaved();
+        CloseRequested?.Invoke();
     }
 
     [RelayCommand]
@@ -46,5 +51,6 @@ public partial class EditParamViewModel : ObservableObject
     {
         await _schema.ClearUserParamAsync(_kind, _code, _key);
         _onSaved();
+        CloseRequested?.Invoke();
     }
 }
