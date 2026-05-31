@@ -128,6 +128,51 @@
                                          VerticalAlignment="Center" Margin="20,0,0,0" />
                         </Grid>
                     </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="Force Expand All Rows" FontWeight="SemiBold" />
+                                <TextBlock Text="Automatically expand all Packet Detail rows to show full decoded values."
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                <TextBlock Text="Arrays and dicts shown one entry per line with item index resolution."
+                                           Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding ForceExpandRows}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="Auto-start capture on launch" FontWeight="SemiBold" />
+                                <TextBlock Text="Start network capture automatically when the app opens."
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                <TextBlock Text="Uses the last selected device (or all adapters if set to Automatic)."
+                                           Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding AutoStartCapture}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="Auto-save capture log on exit" FontWeight="SemiBold" />
+                                <TextBlock Text="Save all captured packets to a JSON file when closing the app."
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                <TextBlock Text="Saved to AppData\AlbionPacketExplorer\logs\ with a timestamp filename."
+                                           Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding AutoSaveLogs}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
                 </StackPanel>
 
                 <!-- Paths section -->

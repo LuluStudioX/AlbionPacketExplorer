@@ -42,6 +42,7 @@ public partial class MainViewModel : ObservableObject
         set
         {
             _packetDetail.ResolveItemNames = value;
+            PacketList.SetResolveItemNames(value);
             OnPropertyChanged();
             SaveSettings();
         }
@@ -57,6 +58,23 @@ public partial class MainViewModel : ObservableObject
             SaveSettings();
         }
     }
+
+    public bool ForceExpandRows
+    {
+        get => _packetDetail.ForceExpandRows;
+        set
+        {
+            _packetDetail.ForceExpandRows = value;
+            OnPropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    [ObservableProperty] private bool _autoStartCapture;
+    [ObservableProperty] private bool _autoSaveLogs;
+
+    partial void OnAutoStartCaptureChanged(bool value) => SaveSettings();
+    partial void OnAutoSaveLogsChanged(bool value) => SaveSettings();
 
     public bool GameDataLoaded => _gameData.IsLoaded;
 
@@ -83,19 +101,26 @@ public partial class MainViewModel : ObservableObject
 
     private void SaveSettings() =>
         AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, FocusMode, MinimizeToTray,
-            SukiTheme.GetInstance().ActiveBaseTheme == ThemeVariant.Dark));
+            SukiTheme.GetInstance().ActiveBaseTheme == ThemeVariant.Dark, ForceExpandRows,
+            AutoStartCapture, AutoSaveLogs));
 
     public MainViewModel(IFilePicker filePicker, ISukiToastManager toasts)
     {
         _filePicker = filePicker;
         _toasts = toasts;
         _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema);
+        PacketList.Configure(_gameData, false);
+        PacketList.LoadPersistedState();
 
         var saved = AppSettingsStore.Load();
         _packetDetail.ResolveItemNames = saved.ResolveItemNames;
+        PacketList.SetResolveItemNames(saved.ResolveItemNames);
         _packetDetail.ResolveIcons = saved.ResolveIcons;
+        _packetDetail.ForceExpandRows = saved.ForceExpandRows;
         FocusMode = saved.FocusMode;
         MinimizeToTray = saved.MinimizeToTray;
+        AutoStartCapture = saved.AutoStartCapture;
+        AutoSaveLogs = saved.AutoSaveLogs;
 
         var theme = SukiTheme.GetInstance();
         theme.ChangeBaseTheme(saved.IsDarkMode ? ThemeVariant.Dark : ThemeVariant.Light);
@@ -124,6 +149,10 @@ public partial class MainViewModel : ObservableObject
         await _schema.LoadAsync();
         await _gameData.LoadAsync(msg => StatusText = msg);
         OnPropertyChanged(nameof(GameDataLoaded));
+        if (_packetDetail.Packet != null)
+            _packetDetail.ForceRebuild();
+        if (_allPackets.Count > 0 && ResolveItemNames)
+            PacketList.SetResolveItemNames(true);
     }
 
     [RelayCommand]
@@ -132,11 +161,11 @@ public partial class MainViewModel : ObservableObject
         try
         {
             AvailableDevices.Clear();
+            AvailableDevices.Add(new NetworkDeviceInfo("", "Automatic (all adapters)", -1));
             foreach (var d in NetworkDeviceScanner.GetDevices())
                 AvailableDevices.Add(d);
 
-            if (AvailableDevices.Count > 0)
-                SelectedDevice = AvailableDevices[0];
+            SelectedDevice = AvailableDevices[0];
         }
         catch (Exception ex)
         {
@@ -153,7 +182,8 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            _session.Start(SelectedDevice?.Name);
+            var deviceName = string.IsNullOrEmpty(SelectedDevice?.Name) ? null : SelectedDevice.Name;
+            _session.Start(deviceName);
         }
         catch (Exception ex)
         {
@@ -307,6 +337,39 @@ public partial class MainViewModel : ObservableObject
         Aggregator.Reset();
         PacketList.SetSource([]);
         PacketDetail.Packet = null;
+    }
+
+    public void TriggerAutoStart()
+    {
+        if (AutoStartCapture && !IsCapturing && !IsLoading)
+            StartCaptureCommand.Execute(null);
+    }
+
+    public async Task AutoSaveLogsAsync()
+    {
+        if (!AutoSaveLogs || _allPackets.Count == 0) return;
+        try
+        {
+            var dir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "AlbionPacketExplorer", "logs");
+            Directory.CreateDirectory(dir);
+            var path = Path.Combine(dir, $"packets_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+            var opts = new JsonSerializerOptions { WriteIndented = false };
+            var payload = _allPackets.Select(p => new
+            {
+                ts = p.Timestamp,
+                kind = p.Kind,
+                code = p.Code,
+                @params = p.Params.ToDictionary(
+                    kv => kv.Key,
+                    kv => new { type = kv.Value.Type, value = kv.Value.Value })
+            });
+            await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None,
+                bufferSize: 65536, useAsync: true);
+            await JsonSerializer.SerializeAsync(stream, payload, opts);
+        }
+        catch { }
     }
 
     private void OnAggregatorSelectionChanged()

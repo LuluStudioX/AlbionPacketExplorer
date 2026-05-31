@@ -7,7 +7,10 @@ public record AppSettings(
     bool ResolveIcons = false,
     bool FocusMode = false,
     bool MinimizeToTray = false,
-    bool IsDarkMode = true)
+    bool IsDarkMode = true,
+    bool ForceExpandRows = false,
+    bool AutoStartCapture = false,
+    bool AutoSaveLogs = false)
 {
     public static readonly AppSettings Default = new();
 }
