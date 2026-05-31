@@ -9,5 +9,6 @@ public partial class EditParamWindow : SukiWindow
     {
         InitializeComponent();
         DataContext = vm;
+        vm.CloseRequested += Close;
     }
 }
