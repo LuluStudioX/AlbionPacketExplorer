@@ -17,75 +17,115 @@ public record PacketRow(PacketEntry Packet)
     public string Kind => Packet.Kind;
     public int Code => Packet.Code;
     public string EventName => PacketNameResolver.Resolve(Packet.Kind, Packet.Code);
+    public bool IsKnown => !string.IsNullOrEmpty(EventName);
     public int KeyCount => Packet.KeyCount;
     public string ParamSummary => PacketDisplayFormatter.FormatParamSummary(Packet);
 }
 
-public record PacketFilter(string Kind, string Code, string Name = "", string Params = "")
+/// <summary>
+/// Compiled filter from a query string. Token syntax:
+///   -term          exclude if any column contains term
+///   term           include only if any column contains term
+///   col:term       scoped inclusion  (col = kind|code|name|params)
+///   -col:term      scoped exclusion
+/// Exclusions are evaluated before inclusions for short-circuit efficiency.
+/// Plain code tokens are matched exactly; all others are substring (case-insensitive).
+/// </summary>
+public sealed class PacketFilter
 {
-    public static readonly PacketFilter Empty = new("", "");
+    public static readonly PacketFilter Empty = new("");
+
+    private readonly struct Token(bool exclude, string? col, string term)
+    {
+        public readonly bool Exclude = exclude;
+        public readonly string? Col = col;   // null = any column
+        public readonly string Term = term;
+    }
+
+    private readonly Token[] _exclusions;
+    private readonly Token[] _inclusions;
+
+    public string Query { get; }
+
+    public PacketFilter(string? query)
+    {
+        Query = query ?? string.Empty;
+        var excl = new List<Token>();
+        var incl = new List<Token>();
+
+        foreach (var raw in query.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            bool exclude = raw.StartsWith('-') && raw.Length > 1;
+            var tok = exclude ? raw[1..] : raw;
+            var colon = tok.IndexOf(':');
+            string? col = colon > 0 ? tok[..colon].ToLowerInvariant() : null;
+            string term = colon > 0 ? tok[(colon + 1)..] : tok;
+            if (string.IsNullOrEmpty(term)) continue;
+            (exclude ? excl : incl).Add(new Token(exclude, col, term));
+        }
+
+        _exclusions = [.. excl];
+        _inclusions = [.. incl];
+    }
 
     public bool Matches(PacketEntry p)
     {
-        // compound tokens: -kind:code or kind:code in any field
-        if (!string.IsNullOrWhiteSpace(Code) && !MatchesCodeFilter(Code, p.Kind, p.Code)) return false;
-        if (!FilterHelper.Matches(Kind, p.Kind)) return false;
-        if (!FilterHelper.Matches(Name, PacketNameResolver.Resolve(p.Kind, p.Code))) return false;
-        if (!FilterHelper.Matches(Params,
-            PacketDisplayFormatter.FormatParamSummary(p),
-            p.ResolvedSummary)) return false;
-        return true;
-    }
+        if (_exclusions.Length == 0 && _inclusions.Length == 0) return true;
 
-    private static bool MatchesCodeFilter(string filter, string kind, int code)
-    {
-        var codeStr = code.ToString();
-        var tokens = filter.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries);
-        var inclusions = new List<string>();
-        var exclusions = new List<string>();
-        var compoundExclusions = new List<(string kind, string code)>();
-        var compoundInclusions = new List<(string kind, string code)>();
+        var codeStr   = p.Code.ToString();
+        var kind      = p.Kind;
+        var name      = PacketNameResolver.Resolve(p.Kind, p.Code);
+        var paramStr  = PacketDisplayFormatter.FormatParamSummary(p);
+        var resolved  = p.ResolvedSummary ?? string.Empty;
 
-        foreach (var token in tokens)
+        // Exclusions first — reject early
+        foreach (var t in _exclusions)
         {
-            if (token.StartsWith('-') && token.Length > 1)
-            {
-                var term = token[1..];
-                var colon = term.IndexOf(':');
-                if (colon > 0)
-                    compoundExclusions.Add((term[..colon], term[(colon + 1)..]));
-                else
-                    exclusions.Add(term);
-            }
-            else
-            {
-                var colon = token.IndexOf(':');
-                if (colon > 0)
-                    compoundInclusions.Add((token[..colon], token[(colon + 1)..]));
-                else
-                    inclusions.Add(token);
-            }
+            if (ColumnMatches(t.Col, t.Term, kind, codeStr, name, paramStr, resolved))
+                return false;
         }
 
-        // compound exclusions: -kind:code → reject if both match
-        if (compoundExclusions.Any(c =>
-                kind.Equals(c.kind, StringComparison.OrdinalIgnoreCase) && c.code == codeStr))
-            return false;
-
-        // compound inclusions: kind:code → must match one if any specified
-        if (compoundInclusions.Count > 0 &&
-            !compoundInclusions.Any(c =>
-                kind.Equals(c.kind, StringComparison.OrdinalIgnoreCase) && c.code == codeStr))
-            return false;
-
-        // plain exclusions: reject if code matches
-        if (exclusions.Any(e => e == codeStr)) return false;
-
-        // plain inclusions: code must match one if any specified
-        if (inclusions.Count > 0 && !inclusions.Any(i => i == codeStr)) return false;
+        // Inclusions — ALL must match (AND semantics across tokens)
+        foreach (var t in _inclusions)
+        {
+            if (!ColumnMatches(t.Col, t.Term, kind, codeStr, name, paramStr, resolved))
+                return false;
+        }
 
         return true;
     }
+
+    private static readonly char[] ParamDelimiters = [' ', '=', ',', '[', ']'];
+
+    private static bool ParamMatches(string term, string paramStr, string resolved)
+    {
+        // Match only value tokens, not key indices.
+        // paramStr format: "0=value  1=[2]  2=190,07" — each space-separated chunk is key=value.
+        foreach (var pair in paramStr.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var eq = pair.IndexOf('=');
+            if (eq < 0) continue;
+            var value = pair[(eq + 1)..]; // e.g. "5,5" or "[2]" or "190,07"
+            // split value on comma/brackets to get individual numbers
+            foreach (var tok in value.Split([',', '[', ']'], StringSplitOptions.RemoveEmptyEntries))
+                if (tok.Equals(term, StringComparison.OrdinalIgnoreCase)) return true;
+        }
+        return resolved.Contains(term, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool ColumnMatches(string? col, string term,
+        string kind, string codeStr, string name, string paramStr, string resolved)
+        => col switch
+        {
+            "kind"   => kind.Contains(term, StringComparison.OrdinalIgnoreCase),
+            "code"   => codeStr == term,
+            "name"   => name.Contains(term, StringComparison.OrdinalIgnoreCase),
+            "params" => ParamMatches(term, paramStr, resolved),
+            _        => kind.Contains(term, StringComparison.OrdinalIgnoreCase)
+                     || codeStr == term
+                     || name.Contains(term, StringComparison.OrdinalIgnoreCase)
+                     || ParamMatches(term, paramStr, resolved),
+        };
 }
 
 public partial class PacketListViewModel : ObservableObject
@@ -103,23 +143,30 @@ public partial class PacketListViewModel : ObservableObject
     public void LoadPersistedState()
     {
         var last = FilterPresetStore.LoadLastFilter();
-        _filter = new PacketFilter(last.Kind, last.Code, last.EventName, last.Params);
+        Presets = new ObservableCollection<FilterPreset>(FilterPresetStore.LoadPresets());
+        _filter = new PacketFilter(last.Query);
+        NotifyAllFilterProps();
+    }
+
+    private void NotifyAllFilterProps()
+    {
+        OnPropertyChanged(nameof(FilterQuery));
         OnPropertyChanged(nameof(FilterKind));
         OnPropertyChanged(nameof(FilterCode));
         OnPropertyChanged(nameof(FilterName));
         OnPropertyChanged(nameof(FilterParams));
-
-        Presets = new ObservableCollection<FilterPreset>(FilterPresetStore.LoadPresets());
+        OnPropertyChanged(nameof(FilterLabel));
+        OnPropertyChanged(nameof(FilterDisplayText));
     }
 
     private void PersistLastFilter() =>
-        FilterPresetStore.SaveLastFilter(new FilterState(_filter.Kind, _filter.Code, _filter.Name, _filter.Params));
+        FilterPresetStore.SaveLastFilter(new FilterState(_filter.Query));
 
     [RelayCommand(CanExecute = nameof(CanSavePreset))]
     private void SavePreset()
     {
         var name = NewPresetName.Trim();
-        var preset = new FilterPreset(name, _filter.Kind, _filter.Code, _filter.Name, _filter.Params);
+        var preset = new FilterPreset(name, _filter.Query);
         var existing = Presets.FirstOrDefault(p => p.Name == name);
         if (existing != null)
             Presets[Presets.IndexOf(existing)] = preset;
@@ -138,11 +185,8 @@ public partial class PacketListViewModel : ObservableObject
     private void LoadPreset()
     {
         if (SelectedPreset == null) return;
-        _filter = new PacketFilter(SelectedPreset.Kind, SelectedPreset.Code, SelectedPreset.EventName, SelectedPreset.Params);
-        OnPropertyChanged(nameof(FilterKind));
-        OnPropertyChanged(nameof(FilterCode));
-        OnPropertyChanged(nameof(FilterName));
-        OnPropertyChanged(nameof(FilterParams));
+        _filter = new PacketFilter(SelectedPreset.Query);
+        NotifyAllFilterProps();
         PersistLastFilter();
         ApplyFilter();
     }
@@ -180,6 +224,7 @@ public partial class PacketListViewModel : ObservableObject
 
     [ObservableProperty] private ObservableCollection<PacketRow> _packets = [];
     [ObservableProperty] private bool _autoSelectNewest;
+    [ObservableProperty] private bool _sortUnknownFirst;
 
     public event Action<PacketRow>? ScrollToRowRequested;
 
@@ -200,36 +245,133 @@ public partial class PacketListViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private void ToggleAutoSelectNewest() => AutoSelectNewest = !AutoSelectNewest;
+    partial void OnSortUnknownFirstChanged(bool value) => ApplyFilter();
 
     public PacketEntry? SelectedPacket => SelectedRow?.Packet;
     public IClipboard? Clipboard { get; set; }
     public ISukiToastManager? Toasts { get; set; }
 
+    public string FilterQuery
+    {
+        get => _filter.Query;
+        set
+        {
+            _filter = new PacketFilter(value);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(FilterKind));
+            OnPropertyChanged(nameof(FilterCode));
+            OnPropertyChanged(nameof(FilterName));
+            OnPropertyChanged(nameof(FilterParams));
+            OnPropertyChanged(nameof(FilterLabel));
+            OnPropertyChanged(nameof(FilterDisplayText));
+            PersistLastFilter();
+            ApplyFilter();
+        }
+    }
+
+    // Per-column scoped filter helpers — read/write scoped tokens within the unified query.
+    // "kind" column: tokens prefixed kind: or plain tokens that are EVENT/REQUEST/RESPONSE
+    // "code" column: tokens prefixed code: or plain numeric tokens
+    // "name" column: tokens prefixed name:
+    // "params" column: tokens prefixed params:
     public string FilterKind
     {
-        get => _filter.Kind;
-        set { _filter = _filter with { Kind = value }; OnPropertyChanged(); PersistLastFilter(); ApplyFilter(); }
+        get => GetScopedTokens("kind");
+        set => SetScopedTokens("kind", value);
     }
 
     public string FilterCode
     {
-        get => _filter.Code;
-        set { _filter = _filter with { Code = value }; OnPropertyChanged(); PersistLastFilter(); ApplyFilter(); }
+        get => GetScopedTokens("code");
+        set => SetScopedTokens("code", value);
     }
 
     public string FilterName
     {
-        get => _filter.Name;
-        set { _filter = _filter with { Name = value }; OnPropertyChanged(); PersistLastFilter(); ApplyFilter(); }
+        get => GetScopedTokens("name");
+        set => SetScopedTokens("name", value);
     }
 
     public string FilterParams
     {
-        get => _filter.Params;
-        set { _filter = _filter with { Params = value }; OnPropertyChanged(); PersistLastFilter(); ApplyFilter(); }
+        get => GetScopedTokens("params");
+        set => SetScopedTokens("params", value);
     }
+
+    private string GetScopedTokens(string col)
+    {
+        var parts = new List<string>();
+        foreach (var raw in _filter.Query.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            bool excl = raw.StartsWith('-') && raw.Length > 1;
+            var tok = excl ? raw[1..] : raw;
+            var colon = tok.IndexOf(':');
+            var tokCol = colon > 0 ? tok[..colon] : null;
+            var term = colon > 0 ? tok[(colon + 1)..] : tok;
+            if (string.Equals(tokCol, col, StringComparison.OrdinalIgnoreCase))
+                parts.Add(excl ? $"-{term}" : term);
+        }
+        return string.Join(" ", parts);
+    }
+
+    private void SetScopedTokens(string col, string value)
+    {
+        // Remove all existing tokens for this column, then append new ones
+        var kept = _filter.Query.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Where(raw =>
+            {
+                var tok = raw.TrimStart('-');
+                var colon = tok.IndexOf(':');
+                var tokCol = colon > 0 ? tok[..colon] : null;
+                return !string.Equals(tokCol, col, StringComparison.OrdinalIgnoreCase);
+            });
+
+        var added = value.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(t => t.StartsWith('-') ? $"-{col}:{t[1..]}" : $"{col}:{t}");
+
+        var newQuery = string.Join(" ", kept.Concat(added));
+        _filter = new PacketFilter(newQuery);
+        OnPropertyChanged(nameof(FilterQuery));
+        OnPropertyChanged(nameof(FilterLabel));
+        OnPropertyChanged(nameof(FilterDisplayText));
+        PersistLastFilter();
+        ApplyFilter();
+    }
+
+    // e.g. "Islands • Custom (code, name)"
+    public string FilterLabel
+    {
+        get
+        {
+            var q = _filter.Query;
+            if (string.IsNullOrWhiteSpace(q)) return string.Empty;
+
+            // check if query exactly matches a saved preset
+            var matched = Presets.FirstOrDefault(p => p.Query == q);
+
+            // find which columns have custom (non-preset-base) tokens
+            var cols = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var tok in q.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var t = tok.TrimStart('-');
+                var colon = t.IndexOf(':');
+                cols.Add(colon > 0 ? t[..colon] : "any");
+            }
+
+            if (matched != null && cols.Count > 0)
+                return matched.Name;
+
+            if (matched == null && cols.Count > 0)
+            {
+                var colList = string.Join(", ", cols.Order());
+                return $"Custom ({colList})";
+            }
+
+            return string.Empty;
+        }
+    }
+
+    public string FilterDisplayText => string.IsNullOrWhiteSpace(FilterLabel) ? "Filter…" : FilterLabel;
 
     public string CountText => $"{Packets.Count:N0} / {_allPackets.Count:N0} packets";
 
@@ -283,11 +425,8 @@ public partial class PacketListViewModel : ObservableObject
 
     public void FilterTo(string kind, int code)
     {
-        _filter = new PacketFilter(kind, code.ToString());
-        OnPropertyChanged(nameof(FilterKind));
-        OnPropertyChanged(nameof(FilterCode));
-        OnPropertyChanged(nameof(FilterName));
-        OnPropertyChanged(nameof(FilterParams));
+        _filter = new PacketFilter($"kind:{kind} code:{code}");
+        OnPropertyChanged(nameof(FilterQuery));
         ApplyFilter();
     }
 
@@ -295,10 +434,8 @@ public partial class PacketListViewModel : ObservableObject
     private void ClearFilter()
     {
         _filter = PacketFilter.Empty;
-        OnPropertyChanged(nameof(FilterKind));
-        OnPropertyChanged(nameof(FilterCode));
-        OnPropertyChanged(nameof(FilterName));
-        OnPropertyChanged(nameof(FilterParams));
+        NotifyAllFilterProps();
+        PersistLastFilter();
         ApplyFilter();
     }
 
@@ -342,9 +479,13 @@ public partial class PacketListViewModel : ObservableObject
 
     private void ApplyFilter()
     {
-        var rows = _allPackets
-            .Where(_filter.Matches)
-            .Select(p => new PacketRow(p));
+        var filtered = _allPackets.Where(_filter.Matches);
+
+        IEnumerable<PacketEntry> ordered = SortUnknownFirst
+            ? filtered.OrderBy(p => string.IsNullOrEmpty(PacketNameResolver.Resolve(p.Kind, p.Code)) ? 0 : 1)
+            : filtered;
+
+        var rows = ordered.Select(p => new PacketRow(p));
 
         _suppressSelectedRowFeedback = true;
         Packets = new ObservableCollection<PacketRow>(rows);
