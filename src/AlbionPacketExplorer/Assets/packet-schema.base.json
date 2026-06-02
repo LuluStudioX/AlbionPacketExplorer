@@ -670,7 +670,9 @@
   },
   "EVENT:1": {
     "name": "Leave",
-    "params": {}
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:2": {
     "name": "Move",
@@ -775,20 +777,37 @@
     "params": {}
   },
   "EVENT:29": {
-    "name": "NewKillTrophyItem",
-    "params": {}
+    "name": "NewCharacter",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "name", "note": "Character name", "resolveAs": "" },
+      "7": { "name": "guid", "note": "16-byte player GUID", "resolveAs": "" },
+      "8": { "name": "guildName", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:31": {
     "name": "NewEquipmentItemLegendarySoul",
     "params": {}
   },
   "EVENT:33": {
-    "name": "NewSimpleHarvestableObjectList",
-    "params": {}
+    "name": "NewFurnitureItem",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "itemId", "note": "Item index", "resolveAs": "itemIndex" },
+      "2": { "name": "quantity", "note": "", "resolveAs": "" },
+      "4": { "name": "emv", "note": "Estimated market value in silver", "resolveAs": "" },
+      "7": { "name": "durability", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:34": {
-    "name": "NewTreasureDestinationObject",
-    "params": {}
+    "name": "NewKillTrophyItem",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "itemId", "note": "Item index", "resolveAs": "itemIndex" },
+      "2": { "name": "quantity", "note": "", "resolveAs": "" },
+      "4": { "name": "emv", "note": "Estimated market value in silver", "resolveAs": "" },
+      "7": { "name": "durability", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:36": {
     "name": "CloseTreasureDestinationObject",
@@ -827,8 +846,20 @@
     "params": {}
   },
   "EVENT:45": {
-    "name": "ConstructionSiteInfo",
-    "params": {}
+    "name": "NewBuilding",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "buildingGuid", "note": "16-byte building GUID", "resolveAs": "" },
+      "3": { "name": "uniqueName", "note": "Building UniqueName", "resolveAs": "" },
+      "4": { "name": "position", "note": "World position", "resolveAs": "" },
+      "7": { "name": "nutrition", "note": "Current nutrition", "resolveAs": "" },
+      "8": { "name": "lastActionAt", "note": ".NET ticks", "resolveAs": "" },
+      "9": { "name": "housePlotGuid", "note": "16-byte plot GUID", "resolveAs": "" },
+      "11": { "name": "islandOwnerName", "note": "", "resolveAs": "" },
+      "13": { "name": "laborerFirstName", "note": "", "resolveAs": "" },
+      "14": { "name": "laborerLastName", "note": "", "resolveAs": "" },
+      "16": { "name": "hasPremium", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:46": {
     "name": "PlayerBuildingInfo",
@@ -863,8 +894,16 @@
     "params": {}
   },
   "EVENT:54": {
-    "name": "ActionOnBuildingStart",
-    "params": {}
+    "name": "HarvestFinished",
+    "params": {
+      "0": { "name": "userObjectId", "note": "", "resolveAs": "" },
+      "3": { "name": "objectId", "note": "Harvested object", "resolveAs": "" },
+      "4": { "name": "itemId", "note": "Item index", "resolveAs": "itemIndex" },
+      "5": { "name": "standardAmount", "note": "", "resolveAs": "" },
+      "6": { "name": "collectorBonusAmount", "note": "", "resolveAs": "" },
+      "7": { "name": "premiumBonusAmount", "note": "", "resolveAs": "" },
+      "8": { "name": "degradationProcesses", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:58": {
     "name": "InstallResourceCancel",
@@ -883,8 +922,17 @@
     "params": {}
   },
   "EVENT:62": {
-    "name": "ChatMessage",
-    "params": {}
+    "name": "TakeSilver",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "timestamp", "note": ".NET ticks", "resolveAs": "" },
+      "2": { "name": "targetEntityId", "note": "", "resolveAs": "" },
+      "3": { "name": "yieldPreTax", "note": "Silver before tax", "resolveAs": "" },
+      "5": { "name": "guildTax", "note": "Guild tax amount", "resolveAs": "" },
+      "6": { "name": "clusterTax", "note": "Zone tax amount", "resolveAs": "" },
+      "7": { "name": "isPremiumBonus", "note": "", "resolveAs": "" },
+      "8": { "name": "multiplier", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:63": {
     "name": "ChatSay",
@@ -899,8 +947,12 @@
     "params": {}
   },
   "EVENT:66": {
-    "name": "PlayEmote",
-    "params": {}
+    "name": "ActionOnBuildingFinished",
+    "params": {
+      "0": { "name": "userObjectId", "note": "", "resolveAs": "" },
+      "2": { "name": "buildingObjectId", "note": "", "resolveAs": "" },
+      "4": { "name": "actionType", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:67": {
     "name": "StopEmote",
@@ -963,20 +1015,36 @@
     "params": {}
   },
   "EVENT:84": {
-    "name": "GuildUpdate",
-    "params": {}
+    "name": "UpdateReSpecPoints",
+    "params": {
+      "2": { "name": "gainedReSpecPoints", "note": "", "resolveAs": "" },
+      "3": { "name": "paidSilver", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:85": {
-    "name": "GuildPlayerUpdated",
-    "params": {}
+    "name": "UpdateCurrency",
+    "params": {
+      "2": { "name": "cityFaction", "note": "Faction byte ID", "resolveAs": "" },
+      "3": { "name": "gainedFactionCoins", "note": "", "resolveAs": "" },
+      "4": { "name": "factionRankPoints", "note": "", "resolveAs": "" },
+      "9": { "name": "totalPlayerFactionPoints", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:86": {
-    "name": "InvitedToGuild",
-    "params": {}
+    "name": "UpdateFactionStanding",
+    "params": {
+      "0": { "name": "cityFaction", "note": "Faction byte ID", "resolveAs": "" },
+      "1": { "name": "gainedFactionFlagPoints", "note": "", "resolveAs": "" },
+      "2": { "name": "bonusPremiumGained", "note": "", "resolveAs": "" },
+      "3": { "name": "totalPlayerFactionFlagPoints", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:87": {
-    "name": "GuildMemberWorldUpdate",
-    "params": {}
+    "name": "UpdateStanding",
+    "params": {
+      "0": { "name": "totalPoints", "note": "", "resolveAs": "" },
+      "1": { "name": "premiumBonus", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:88": {
     "name": "UpdateMatchDetails",
@@ -987,8 +1055,11 @@
     "params": {}
   },
   "EVENT:90": {
-    "name": "NewMonolithObject",
-    "params": {}
+    "name": "CharacterEquipmentChanged",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "2": { "name": "equipment", "note": "Array of equipped item indices", "resolveAs": "" }
+    }
   },
   "EVENT:91": {
     "name": "MonolithHasBannersPlacedUpdate",
@@ -1019,12 +1090,20 @@
     "params": {}
   },
   "EVENT:98": {
-    "name": "NewTreasureChest",
-    "params": {}
+    "name": "NewLoot",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "3": { "name": "lootBody", "note": "Loot container identifier string", "resolveAs": "" }
+    }
   },
   "EVENT:99": {
-    "name": "StartMatch",
-    "params": {}
+    "name": "AttachItemContainer",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "containerGuid", "note": "16-byte GUID", "resolveAs": "" },
+      "2": { "name": "privateContainerGuid", "note": "16-byte GUID", "resolveAs": "" },
+      "3": { "name": "containerSlots", "note": "Container slot data", "resolveAs": "" }
+    }
   },
   "EVENT:100": {
     "name": "StartArenaMatchInfos",
@@ -1115,8 +1194,17 @@
     "params": {}
   },
   "EVENT:123": {
-    "name": "ForcedMovementCancel",
-    "params": {}
+    "name": "NewMob",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "mobIndex", "note": "", "resolveAs": "" },
+      "11": { "name": "moveSpeed", "note": "", "resolveAs": "" },
+      "13": { "name": "hitPoints", "note": "", "resolveAs": "" },
+      "14": { "name": "hitPointsMax", "note": "", "resolveAs": "" },
+      "17": { "name": "energy", "note": "", "resolveAs": "" },
+      "18": { "name": "energyMax", "note": "", "resolveAs": "" },
+      "19": { "name": "energyRegeneration", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:124": {
     "name": "CharacterStats",
@@ -1279,8 +1367,13 @@
     "params": {}
   },
   "EVENT:165": {
-    "name": "DuellingChallengePlayer",
-    "params": {}
+    "name": "Died",
+    "params": {
+      "2": { "name": "diedName", "note": "Name of player who died", "resolveAs": "" },
+      "3": { "name": "diedGuild", "note": "", "resolveAs": "" },
+      "10": { "name": "killedBy", "note": "Killer name", "resolveAs": "" },
+      "11": { "name": "killedByGuild", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:166": {
     "name": "NewDuellingPost",
@@ -1319,24 +1412,38 @@
     "params": {}
   },
   "EVENT:176": {
-    "name": "GuildLogoUpdate",
-    "params": {}
+    "name": "InvitationPlayerTrade",
+    "params": {
+      "0": { "name": "partnerObjectId", "note": "", "resolveAs": "" },
+      "1": { "name": "partnerName", "note": "", "resolveAs": "" },
+      "2": { "name": "partnerGuildName", "note": "", "resolveAs": "" },
+      "6": { "name": "tradeId", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:177": {
     "name": "GuildLogoChanged",
     "params": {}
   },
   "EVENT:178": {
-    "name": "PlaceableObjectPlace",
-    "params": {}
+    "name": "PlayerTradeCancel",
+    "params": {
+      "0": { "name": "tradeId", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:179": {
-    "name": "PlaceableObjectPlaceCancel",
-    "params": {}
+    "name": "PlayerTradeUpdate",
+    "params": {
+      "0": { "name": "tradeId", "note": "", "resolveAs": "" },
+      "1": { "name": "revision", "note": "", "resolveAs": "" },
+      "2": { "name": "localSilver", "note": "Silver offered by local player", "resolveAs": "" },
+      "4": { "name": "partnerSilver", "note": "Silver offered by partner", "resolveAs": "" }
+    }
   },
   "EVENT:180": {
-    "name": "FurnitureObjectBuffProviderInfo",
-    "params": {}
+    "name": "PlayerTradeFinished",
+    "params": {
+      "0": { "name": "tradeId", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:181": {
     "name": "FurnitureObjectCheatProviderInfo",
@@ -1531,24 +1638,31 @@
     "params": {}
   },
   "EVENT:231": {
-    "name": "QuestGiverInfoForPlayer",
-    "params": {}
+    "name": "PartyJoined",
+    "params": {
+      "6": { "name": "userNames", "note": "Array of party member names", "resolveAs": "" }
+    }
   },
   "EVENT:232": {
-    "name": "FullExpeditionInfo",
+    "name": "PartyDisbanded",
     "params": {}
   },
   "EVENT:233": {
-    "name": "ExpeditionQuestProgressInfo",
-    "params": {}
+    "name": "PartyPlayerJoined",
+    "params": {
+      "1": { "name": "userGuid", "note": "16-byte GUID", "resolveAs": "" },
+      "2": { "name": "username", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:234": {
-    "name": "InvitedToExpedition",
+    "name": "PartyChangedOrder",
     "params": {}
   },
   "EVENT:235": {
-    "name": "ExpeditionRegistrationInfo",
-    "params": {}
+    "name": "PartyPlayerLeft",
+    "params": {
+      "1": { "name": "userGuid", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:236": {
     "name": "EnteringExpeditionStart",
@@ -1559,8 +1673,13 @@
     "params": {}
   },
   "EVENT:238": {
-    "name": "RewardGranted",
-    "params": {}
+    "name": "PartySilverGained",
+    "params": {
+      "0": { "name": "timestamp", "note": ".NET ticks", "resolveAs": "" },
+      "1": { "name": "targetEntityId", "note": "", "resolveAs": "" },
+      "2": { "name": "silverNet", "note": "", "resolveAs": "" },
+      "3": { "name": "silverPreTax", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:239": {
     "name": "ArenaRegistrationInfo",
@@ -1667,8 +1786,11 @@
     "params": {}
   },
   "EVENT:265": {
-    "name": "FriendInfos",
-    "params": {}
+    "name": "RewardGranted",
+    "params": {
+      "1": { "name": "itemIndex", "note": "Item index", "resolveAs": "itemIndex" },
+      "3": { "name": "quantity", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:266": {
     "name": "FriendRequestAnswered",
@@ -1711,12 +1833,23 @@
     "params": {}
   },
   "EVENT:276": {
-    "name": "DefenseUnitAttackEnd",
-    "params": {}
+    "name": "InCombatStateUpdate",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "inActiveCombat", "note": "", "resolveAs": "" },
+      "2": { "name": "inPassiveCombat", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:277": {
-    "name": "DefenseUnitAttackDamage",
-    "params": {}
+    "name": "OtherGrabbedLoot",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "lootedFromName", "note": "Name of entity loot was taken from", "resolveAs": "" },
+      "2": { "name": "looterName", "note": "Name of player who looted", "resolveAs": "" },
+      "3": { "name": "isSilver", "note": "True if this is a silver loot event", "resolveAs": "" },
+      "4": { "name": "itemIndex", "note": "Item index", "resolveAs": "itemIndex" },
+      "5": { "name": "quantity", "note": "Amount looted (silver or item qty)", "resolveAs": "" }
+    }
   },
   "EVENT:278": {
     "name": "UnrestrictedPvpZoneUpdate",
@@ -2171,12 +2304,18 @@
     "params": {}
   },
   "EVENT:391": {
-    "name": "IpChanged",
-    "params": {}
+    "name": "NewLootChest",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "3": { "name": "uniqueName", "note": "Chest UniqueName", "resolveAs": "" },
+      "4": { "name": "uniqueNameWithLocation", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:392": {
-    "name": "SmartClusterQueueUpdateInfo",
-    "params": {}
+    "name": "UpdateLootChest",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:393": {
     "name": "SmartClusterQueueActiveInfo",
@@ -2251,12 +2390,18 @@
     "params": {}
   },
   "EVENT:411": {
-    "name": "MinimapPositionMarkers",
-    "params": {}
+    "name": "GuildVaultInfo",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "locationGuid", "note": "Vault location GUID string", "resolveAs": "" }
+    }
   },
   "EVENT:412": {
-    "name": "NewTunnelExit",
-    "params": {}
+    "name": "BankVaultInfo",
+    "params": {
+      "0": { "name": "objectId", "note": "", "resolveAs": "" },
+      "1": { "name": "locationGuid", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:413": {
     "name": "CorruptedDungeonUpdate",
@@ -2331,8 +2476,10 @@
     "params": {}
   },
   "EVENT:431": {
-    "name": "DungonEscapeReady",
-    "params": {}
+    "name": "ReceivedGvgSeasonPoints",
+    "params": {
+      "1": { "name": "seasonPoints", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:432": {
     "name": "FactionWarfareClusterState",
@@ -2525,6 +2672,18 @@
   "EVENT:479": {
     "name": "ConsumableVanityChargesAdded",
     "params": {}
+  },
+  "EVENT:494": {
+    "name": "MightAndFavorReceived",
+    "params": {
+      "1": { "name": "might", "note": "", "resolveAs": "" },
+      "2": { "name": "bonusOfMight", "note": "Premium/bonus might", "resolveAs": "" },
+      "3": { "name": "premiumOfMight", "note": "", "resolveAs": "" },
+      "4": { "name": "favor", "note": "", "resolveAs": "" },
+      "5": { "name": "bonusOfFavor", "note": "Premium/bonus favor", "resolveAs": "" },
+      "6": { "name": "premiumOfFavor", "note": "", "resolveAs": "" },
+      "7": { "name": "totalFavor", "note": "", "resolveAs": "" }
+    }
   },
   "EVENT:516": {
     "name": "FestivitiesUpdate",
@@ -3212,7 +3371,16 @@
   },
   "RESPONSE:2": {
     "name": "Join",
-    "params": {}
+    "params": {
+      "0": { "name": "userObjectId", "note": "", "resolveAs": "" },
+      "1": { "name": "userGuid", "note": "", "resolveAs": "" },
+      "2": { "name": "username", "note": "", "resolveAs": "" },
+      "8": { "name": "mapIndex", "note": "", "resolveAs": "" },
+      "33": { "name": "silver", "note": "", "resolveAs": "" },
+      "34": { "name": "gold", "note": "", "resolveAs": "" },
+      "58": { "name": "guildName", "note": "", "resolveAs": "" },
+      "79": { "name": "allianceName", "note": "", "resolveAs": "" }
+    }
   },
   "REQUEST:3": {
     "name": "VersionedOperation",
@@ -3555,8 +3723,12 @@
     "params": {}
   },
   "RESPONSE:46": {
-    "name": "CraftBuildingTakeMoney",
-    "params": {}
+    "name": "ChangeCluster",
+    "params": {
+      "0": { "name": "clusterIndex", "note": "Map/cluster identifier string", "resolveAs": "" },
+      "1": { "name": "worldMapDataType", "note": "", "resolveAs": "" },
+      "2": { "name": "islandName", "note": "", "resolveAs": "" }
+    }
   },
   "REQUEST:47": {
     "name": "RepairBuildingChangeSettings",
@@ -3583,16 +3755,20 @@
     "params": {}
   },
   "REQUEST:50": {
-    "name": "HarvestStart",
-    "params": {}
+    "name": "RegisterToObject",
+    "params": {
+      "0": { "name": "buildingObjectId", "note": "", "resolveAs": "" }
+    }
   },
   "RESPONSE:50": {
     "name": "HarvestStart",
     "params": {}
   },
   "REQUEST:51": {
-    "name": "HarvestCancel",
-    "params": {}
+    "name": "UnRegisterFromObject",
+    "params": {
+      "0": { "name": "buildingObjectId", "note": "", "resolveAs": "" }
+    }
   },
   "RESPONSE:51": {
     "name": "HarvestCancel",
@@ -3811,8 +3987,11 @@
     "params": {}
   },
   "RESPONSE:78": {
-    "name": "AuctionGetOffers",
-    "params": {}
+    "name": "FarmableHarvest",
+    "params": {
+      "0": { "name": "names", "note": "Array of harvested item UniqueName strings", "resolveAs": "" },
+      "1": { "name": "quantities", "note": "Quantities matching names array", "resolveAs": "" }
+    }
   },
   "REQUEST:79": {
     "name": "AuctionGetRequests",
@@ -5751,8 +5930,11 @@
     "params": {}
   },
   "REQUEST:321": {
-    "name": "ChangeAccessTagPublicFlag",
-    "params": {}
+    "name": "FishingStart",
+    "params": {
+      "0": { "name": "eventId", "note": "", "resolveAs": "" },
+      "2": { "name": "itemIndex", "note": "Fishing rod item index", "resolveAs": "itemIndex" }
+    }
   },
   "RESPONSE:321": {
     "name": "ChangeAccessTagPublicFlag",
@@ -5799,15 +5981,17 @@
     "params": {}
   },
   "REQUEST:327": {
-    "name": "SteamIdHasActiveAccount",
-    "params": {}
+    "name": "FishingFinish",
+    "params": {
+      "1": { "name": "succeeded", "note": "True if fish was caught", "resolveAs": "" }
+    }
   },
   "RESPONSE:327": {
-    "name": "SteamIdHasActiveAccount",
+    "name": "FishingFinish",
     "params": {}
   },
   "REQUEST:328": {
-    "name": "CheckEmailAccountState",
+    "name": "FishingCancel",
     "params": {}
   },
   "RESPONSE:328": {
