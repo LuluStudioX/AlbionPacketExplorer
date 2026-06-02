@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- Spacing scale (px) -->
+    <system:Double x:Key="Apx.Space.1">4</system:Double>
+    <system:Double x:Key="Apx.Space.2">8</system:Double>
+    <system:Double x:Key="Apx.Space.3">12</system:Double>
+    <system:Double x:Key="Apx.Space.4">16</system:Double>
+    <system:Double x:Key="Apx.Space.5">24</system:Double>
+    <system:Double x:Key="Apx.Space.6">32</system:Double>
+
+    <Thickness x:Key="Apx.Pad.Sm">8,4</Thickness>
+    <Thickness x:Key="Apx.Pad.Md">12,8</Thickness>
+    <Thickness x:Key="Apx.Pad.Lg">16,12</Thickness>
+    <Thickness x:Key="Apx.Pad.Card">16</Thickness>
+
+    <!-- Corner radii -->
+    <CornerRadius x:Key="Apx.Radius.Sm">4</CornerRadius>
+    <CornerRadius x:Key="Apx.Radius.Md">8</CornerRadius>
+    <CornerRadius x:Key="Apx.Radius.Lg">12</CornerRadius>
+
+    <!-- Font sizes -->
+    <system:Double x:Key="Apx.Font.Xs">11</system:Double>
+    <system:Double x:Key="Apx.Font.Sm">12</system:Double>
+    <system:Double x:Key="Apx.Font.Md">14</system:Double>
+    <system:Double x:Key="Apx.Font.Lg">18</system:Double>
+    <system:Double x:Key="Apx.Font.Xl">24</system:Double>
+
+</ResourceDictionary>

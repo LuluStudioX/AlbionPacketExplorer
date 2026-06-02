@@ -1,0 +1,40 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+      Apx control styles. Phase A commit 1 = scaffold: only the IconPath style
+      (used to render Lucide stroke geometries) and the .card border style.
+      Full control restyling (Button/ComboBox/DataGrid/etc) lands in commit 2.
+    -->
+
+    <!-- Lucide icon renderer: a Path that STROKES its Data geometry.
+         Usage: <Path Classes="icon" Data="{StaticResource Icon.Search}" /> -->
+    <Style Selector="Path.icon">
+        <Setter Property="Stroke" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="StrokeThickness" Value="2" />
+        <Setter Property="StrokeLineCap" Value="Round" />
+        <Setter Property="StrokeJoin" Value="Round" />
+        <Setter Property="Fill" Value="Transparent" />
+        <Setter Property="Stretch" Value="Uniform" />
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+    </Style>
+
+    <Style Selector="Path.icon.muted">
+        <Setter Property="Stroke" Value="{DynamicResource Apx.TextMuted}" />
+    </Style>
+
+    <Style Selector="Path.icon.accent">
+        <Setter Property="Stroke" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+
+    <!-- Card surface -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{DynamicResource Apx.Card}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Md}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Card}" />
+    </Style>
+
+</Styles>
