@@ -2,13 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!--
-      Apx control styles. Phase A commit 1 = scaffold: only the IconPath style
-      (used to render Lucide stroke geometries) and the .card border style.
-      Full control restyling (Button/ComboBox/DataGrid/etc) lands in commit 2.
+      Apx control styles — full in-house restyle of the Avalonia primitives the app
+      uses, themed entirely through Apx.* tokens (Tokens.axaml) and the scale (Scale.axaml).
+      No SukiUI dependency. Light/Dark handled by the token ThemeDictionaries.
     -->
 
-    <!-- Lucide icon renderer: a Path that STROKES its Data geometry.
-         Usage: <Path Classes="icon" Data="{StaticResource Icon.Search}" /> -->
+    <!-- ═══════════════ Icon (Lucide stroke renderer) ═══════════════ -->
     <Style Selector="Path.icon">
         <Setter Property="Stroke" Value="{DynamicResource Apx.Text}" />
         <Setter Property="StrokeThickness" Value="2" />
@@ -19,22 +18,338 @@
         <Setter Property="Width" Value="16" />
         <Setter Property="Height" Value="16" />
     </Style>
-
     <Style Selector="Path.icon.muted">
         <Setter Property="Stroke" Value="{DynamicResource Apx.TextMuted}" />
     </Style>
-
     <Style Selector="Path.icon.accent">
         <Setter Property="Stroke" Value="{DynamicResource Apx.Accent}" />
     </Style>
+    <Style Selector="Path.icon.sm">
+        <Setter Property="Width" Value="13" />
+        <Setter Property="Height" Value="13" />
+    </Style>
+    <Style Selector="Path.icon.lg">
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+    </Style>
 
-    <!-- Card surface -->
+    <!-- ═══════════════ Card surface ═══════════════ -->
     <Style Selector="Border.card">
         <Setter Property="Background" Value="{DynamicResource Apx.Card}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Md}" />
         <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Card}" />
+    </Style>
+
+    <!-- ═══════════════ TextBlock defaults ═══════════════ -->
+    <Style Selector="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.TextMuted}" />
+    </Style>
+    <Style Selector="TextBlock.faint">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.TextFaint}" />
+    </Style>
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Xl}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.h2">
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Lg}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- ═══════════════ Button ═══════════════ -->
+    <Style Selector="Button">
+        <Setter Property="Background" Value="{DynamicResource Apx.SurfaceAlt}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Md}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.BorderStrong}" />
+    </Style>
+    <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Selected}" />
+    </Style>
+    <Style Selector="Button:disabled">
+        <Setter Property="Opacity" Value="0.45" />
+    </Style>
+
+    <!-- Accent button -->
+    <Style Selector="Button.accent">
+        <Setter Property="Background" Value="{DynamicResource Apx.Accent}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.AccentText}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.AccentHover}" />
+    </Style>
+    <Style Selector="Button.accent:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.AccentPressed}" />
+    </Style>
+
+    <!-- Success / Danger buttons -->
+    <Style Selector="Button.success">
+        <Setter Property="Background" Value="{DynamicResource Apx.Success}" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.success:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Success}" />
+        <Setter Property="Opacity" Value="0.88" />
+    </Style>
+    <Style Selector="Button.danger">
+        <Setter Property="Background" Value="{DynamicResource Apx.Danger}" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Danger}" />
+        <Setter Property="Opacity" Value="0.88" />
+    </Style>
+
+    <!-- Ghost / transparent button (toolbar icon buttons) -->
+    <Style Selector="Button.ghost">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+    </Style>
+
+    <!-- Icon-only square button -->
+    <Style Selector="Button.iconbtn">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+    </Style>
+    <Style Selector="Button.iconbtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+    </Style>
+
+    <!-- ═══════════════ ToggleButton ═══════════════ -->
+    <Style Selector="ToggleButton">
+        <Setter Property="Background" Value="{DynamicResource Apx.SurfaceAlt}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Sm}" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="ToggleButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+    </Style>
+    <Style Selector="ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Accent}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource Apx.AccentText}" />
+    </Style>
+
+    <!-- ═══════════════ ToggleSwitch ═══════════════ -->
+    <Style Selector="ToggleSwitch">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+    </Style>
+    <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
+        <Setter Property="Background" Value="{DynamicResource Apx.Accent}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+    <Style Selector="ToggleSwitch:unchecked /template/ Border#SwitchKnobBounds">
+        <Setter Property="Background" Value="{DynamicResource Apx.SurfaceAlt}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.BorderStrong}" />
+    </Style>
+
+    <!-- ═══════════════ TextBox ═══════════════ -->
+    <Style Selector="TextBox">
+        <Setter Property="Background" Value="{DynamicResource Apx.Surface}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Apx.Accent}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Sm}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Apx.Selected}" />
+    </Style>
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.BorderStrong}" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+    <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.TextFaint}" />
+    </Style>
+
+    <!-- ═══════════════ ComboBox ═══════════════ -->
+    <Style Selector="ComboBox">
+        <Setter Property="Background" Value="{DynamicResource Apx.Surface}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Sm}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+        <Setter Property="PlaceholderForeground" Value="{DynamicResource Apx.TextFaint}" />
+    </Style>
+    <Style Selector="ComboBox:pointerover /template/ Border#Background">
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.BorderStrong}" />
+    </Style>
+    <Style Selector="ComboBox:focus /template/ Border#Background">
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+    <Style Selector="ComboBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Sm}" />
+    </Style>
+    <Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+    </Style>
+    <Style Selector="ComboBoxItem:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Selected}" />
+    </Style>
+
+    <!-- ═══════════════ ListBox ═══════════════ -->
+    <Style Selector="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="ListBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Sm}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+    </Style>
+    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+    </Style>
+    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Selected}" />
+    </Style>
+
+    <!-- ═══════════════ Flyout / Popup ═══════════════ -->
+    <Style Selector="FlyoutPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Surface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Md}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Md}" />
+    </Style>
+
+    <!-- ═══════════════ ContextMenu / MenuItem ═══════════════ -->
+    <Style Selector="ContextMenu">
+        <Setter Property="Background" Value="{DynamicResource Apx.Surface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Md}" />
+    </Style>
+    <Style Selector="MenuItem">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+    </Style>
+    <Style Selector="MenuItem:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+    </Style>
+
+    <!-- ═══════════════ ToolTip ═══════════════ -->
+    <Style Selector="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource Apx.SurfaceAlt}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Sm}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+        <Setter Property="MaxWidth" Value="380" />
+    </Style>
+
+    <!-- ═══════════════ Separator ═══════════════ -->
+    <Style Selector="Separator">
+        <Setter Property="Background" Value="{DynamicResource Apx.Border}" />
+    </Style>
+
+    <!-- ═══════════════ GridSplitter ═══════════════ -->
+    <Style Selector="GridSplitter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Border}" />
+    </Style>
+    <Style Selector="GridSplitter:pointerover">
+        <Setter Property="Background" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+
+    <!-- ═══════════════ ScrollBar ═══════════════ -->
+    <Style Selector="ScrollBar">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ScrollBar:vertical /template/ Thumb">
+        <Setter Property="Background" Value="{DynamicResource Apx.BorderStrong}" />
+    </Style>
+    <Style Selector="ScrollBar:horizontal /template/ Thumb">
+        <Setter Property="Background" Value="{DynamicResource Apx.BorderStrong}" />
+    </Style>
+
+    <!-- ═══════════════ TabControl (bottom detail tabs) ═══════════════ -->
+    <Style Selector="TabControl">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="TabItem">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.TextMuted}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Md}" />
+        <Setter Property="MinHeight" Value="0" />
+    </Style>
+    <Style Selector="TabItem:selected">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+    </Style>
+    <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+    </Style>
+    <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Accent}" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+    </Style>
+
+    <!-- ═══════════════ DataGrid ═══════════════ -->
+    <Style Selector="DataGrid">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="GridLinesVisibility" Value="Horizontal" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="RowBackground" Value="Transparent" />
+    </Style>
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource Apx.SurfaceAlt}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.TextMuted}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="{DynamicResource Apx.Pad.Sm}" />
+        <Setter Property="SeparatorBrush" Value="{DynamicResource Apx.Border}" />
+    </Style>
+    <Style Selector="DataGridCell">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+    </Style>
+    <Style Selector="DataGridRow:pointerover /template/ DataGridCellsPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+    </Style>
+    <Style Selector="DataGridRow:selected /template/ DataGridCellsPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Selected}" />
     </Style>
 
 </Styles>
