@@ -1,6 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              xmlns:views="using:AlbionPacketExplorer.Views"
              x:Class="AlbionPacketExplorer.Views.CodeAggregatorView"
@@ -48,8 +47,7 @@
                                                  PlaceholderText="Filter Kind…" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -71,8 +69,7 @@
                                                  PlaceholderText="Filter Code…" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -118,8 +115,7 @@
                                                  PlaceholderText="Filter Keys…" Width="240" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>

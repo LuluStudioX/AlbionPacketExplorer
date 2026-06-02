@@ -1,12 +1,10 @@
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Network;
 using AlbionPacketExplorer.Services;
-using Avalonia.Controls.Notifications;
 using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using SukiUI.Toasts;
 
 namespace AlbionPacketExplorer.ViewModels;
 
@@ -40,7 +38,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
     public bool SortUnknownFirst { get => _sortUnknownFirst; set { _sortUnknownFirst = value; OnPropertyChanged(); ApplyFilter(); } }
 
     public IClipboard? Clipboard { get; set; }
-    public ISukiToastManager? Toasts { get; set; }
+    public ToastService? Toasts { get; set; }
 
     public void Ingest(PacketEntry packet)
     {
@@ -85,13 +83,9 @@ public partial class CodeAggregatorViewModel : ObservableObject
     {
         if (SelectedCode == null || Clipboard == null) return;
         await Clipboard.SetTextAsync(ConstructorExporter.Export(SelectedCode));
-        Toasts?.CreateToast()
-            .WithTitle("Copied to Clipboard")
-            .WithContent($"{SelectedCode.Kind} {SelectedCode.Code} constructor stub")
-            .OfType(NotificationType.Success)
-            .Dismiss().After(TimeSpan.FromSeconds(3))
-            .Dismiss().ByClicking()
-            .Queue();
+        Toasts?.Show("Copied to Clipboard",
+            $"{SelectedCode.Kind} {SelectedCode.Code} constructor stub",
+            ToastSeverity.Success);
     }
 
     [RelayCommand(CanExecute = nameof(CanExport))]

@@ -2,17 +2,14 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using AlbionPacketExplorer.Controls;
 using AlbionPacketExplorer.Services;
 using AlbionPacketExplorer.ViewModels;
-using SukiUI.Controls;
-using SukiUI.Toasts;
 using System.ComponentModel;
-using System.Linq;
-using Avalonia.VisualTree;
 
 namespace AlbionPacketExplorer.Views;
 
-public partial class MainWindow : SukiWindow, IFilePicker
+public partial class MainWindow : ApxWindow, IFilePicker
 {
     private Grid? _overviewMainGrid;
     private Grid? _overviewBottomGrid;
@@ -20,7 +17,7 @@ public partial class MainWindow : SukiWindow, IFilePicker
     private bool _summaryCollapsed;
     private bool _closing;
 
-    public MainWindow(ISukiToastManager toastManager)
+    public MainWindow(ToastService toastManager)
     {
         InitializeComponent();
         DataContext = new MainViewModel(this, toastManager);
@@ -76,8 +73,6 @@ public partial class MainWindow : SukiWindow, IFilePicker
             vm.PacketDetail.Toasts = vm.ToastManager;
             vm.PacketDetail.EditParamRequested += OnEditParamRequested;
             vm.PacketDetail.ViewFullValueRequested += OnViewFullValueRequested;
-            vm.PropertyChanged += OnMainViewModelPropertyChanged;
-            BackgroundStyle = vm.BackgroundStyle;
         }
 
         ApplyLayout(LayoutStore.Load());
@@ -142,18 +137,6 @@ public partial class MainWindow : SukiWindow, IFilePicker
                 _focusGrid.RowDefinitions[0] = new RowDefinition(_summaryExpandedHeight, GridUnitType.Pixel);
                 _focusGrid.RowDefinitions[1] = new RowDefinition(4, GridUnitType.Pixel);
             }
-        }
-    }
-
-    private void OnMainViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(MainViewModel.BackgroundStyle) && sender is MainViewModel vm)
-        {
-            BackgroundStyle = vm.BackgroundStyle;
-            var host = this.GetVisualDescendants().OfType<SukiUI.Controls.SukiMainHost>().FirstOrDefault();
-            if (host != null) host.BackgroundStyle = vm.BackgroundStyle;
-            var bg = this.GetVisualDescendants().OfType<SukiUI.Controls.SukiBackground>().FirstOrDefault();
-            if (bg != null) bg.Style = vm.BackgroundStyle;
         }
     }
 

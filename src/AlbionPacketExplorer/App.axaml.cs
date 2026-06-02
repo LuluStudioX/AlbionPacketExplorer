@@ -5,8 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using AlbionPacketExplorer.Views;
 using Microsoft.Extensions.DependencyInjection;
-using SukiUI;
-using SukiUI.Toasts;
+using AlbionPacketExplorer.Services;
 
 namespace AlbionPacketExplorer;
 
@@ -28,12 +27,12 @@ public class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<ISukiToastManager, SukiToastManager>();
+        services.AddSingleton<ToastService>();
         Services = services.BuildServiceProvider();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow(Services.GetRequiredService<ISukiToastManager>());
+            desktop.MainWindow = new MainWindow(Services.GetRequiredService<ToastService>());
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         }
 
