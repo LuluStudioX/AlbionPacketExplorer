@@ -1,3 +1,5 @@
+using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -6,6 +8,7 @@ using AlbionPacketExplorer.Controls;
 using AlbionPacketExplorer.Services;
 using AlbionPacketExplorer.ViewModels;
 using System.ComponentModel;
+using System.Linq;
 
 namespace AlbionPacketExplorer.Views;
 
@@ -22,7 +25,52 @@ public partial class MainWindow : ApxWindow, IFilePicker
         InitializeComponent();
         DataContext = new MainViewModel(this, toastManager);
         Loaded += OnLoaded;
+        Opened += OnOpened;
         Closing += OnClosing;
+        SizeChanged += (_, _) => ClampPanelSizes();
+    }
+
+    // Center using the real physical FrameSize, which is only known once the window has
+    // opened — computing it from DIP * scale beforehand was always a few px off.
+    private void OnOpened(object? sender, EventArgs e)
+    {
+        if (WindowState != WindowState.Normal) return;
+        var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+        if (screen is null) return;
+
+        var area = screen.WorkingArea;
+        var frame = PixelSize.FromSize(FrameSize ?? ClientSize, screen.Scaling);
+        var x = area.X + (area.Width - frame.Width) / 2;
+        var y = area.Y + (area.Height - frame.Height) / 2;
+        Position = new PixelPoint(x, y);
+    }
+
+    // Keep the fixed-size summary row and left column from exceeding what the current
+    // window can show, so the star-sized panels (packet list / detail) never get pushed
+    // off-screen when the window shrinks. Mutates the existing definitions in place so the
+    // GridSplitter bindings stay intact (recreating them breaks resizing).
+    private void ClampPanelSizes()
+    {
+        if (_overviewMainGrid is { } mg && mg.Bounds.Height > 0)
+        {
+            var max = mg.Bounds.Height - MinPanelSize - mg.RowDefinitions[1].ActualHeight;
+            var def = mg.RowDefinitions[0];
+            if (max > MinPanelSize && def.Height.IsAbsolute && def.ActualHeight > max)
+                def.Height = new GridLength(max, GridUnitType.Pixel);
+        }
+        // BottomGrid columns are star-sized, so they cannot overflow and need no clamping.
+    }
+
+    // Re-fit the window to its screen when it returns from maximized, so un-maximizing
+    // on a smaller monitor never spills onto the next one.
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == WindowStateProperty &&
+            change.GetNewValue<WindowState>() == WindowState.Normal && IsLoaded)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(ClampToCurrentScreen);
+        }
     }
 
     public async Task<string?> PickJsonFileAsync()
@@ -75,23 +123,141 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.PacketDetail.ViewFullValueRequested += OnViewFullValueRequested;
         }
 
-        ApplyLayout(LayoutStore.Load());
+        var layout = LayoutStore.Load();
+        RestoreWindowBounds(layout);
+        ApplyLayout(layout);
 
         if (DataContext is MainViewModel vmAuto)
             vmAuto.TriggerAutoStart();
     }
 
+    // Restore the saved window size/position, but only if those bounds still land on a
+    // connected screen — otherwise the window could open off-screen (e.g. a monitor that
+    // was unplugged). Falls back to centering on the primary screen.
+    private void RestoreWindowBounds(LayoutState layout)
+    {
+        if (!layout.HasWindowBounds)
+        {
+            CenterOnPrimary();
+            return;
+        }
+
+        var width = layout.WindowWidth!.Value;
+        var height = layout.WindowHeight!.Value;
+        var x = (int)layout.WindowX!.Value;
+        var y = (int)layout.WindowY!.Value;
+
+        var bounds = new PixelRect(x, y, (int)width, (int)height);
+        var screen = Screens.All.FirstOrDefault(s => s.WorkingArea.Intersects(bounds));
+
+        if (screen is null)
+        {
+            Width = width;
+            Height = height;
+            CenterOnPrimary();
+            return;
+        }
+
+        WindowStartupLocation = WindowStartupLocation.Manual;
+        Width = width;
+        Height = height;
+        // Restore the saved size on the screen it was last on, but centered there rather
+        // than at the exact old coordinates.
+        CenterOn(screen);
+
+        if (layout.WindowMaximized)
+            WindowState = WindowState.Maximized;
+    }
+
+    private void CenterOnPrimary()
+    {
+        var screen = Screens.Primary ?? Screens.All.FirstOrDefault();
+        if (screen is not null) CenterOn(screen);
+    }
+
+    // Center the window on the given screen, clamping its size to fit with a margin.
+    private void CenterOn(Avalonia.Platform.Screen screen)
+    {
+        const int margin = 12;
+        WindowStartupLocation = WindowStartupLocation.Manual;
+        var area = screen.WorkingArea;
+        var scale = screen.Scaling;
+
+        var maxWpx = area.Width - margin * 2;
+        var maxHpx = area.Height - margin * 2;
+        var pxW = (int)Math.Ceiling((Width > 0 ? Width : 1400) * scale);
+        var pxH = (int)Math.Ceiling((Height > 0 ? Height : 900) * scale);
+        if (pxW > maxWpx) { Width = maxWpx / scale; pxW = (int)Math.Ceiling(Width * scale); }
+        if (pxH > maxHpx) { Height = maxHpx / scale; pxH = (int)Math.Ceiling(Height * scale); }
+
+        var x = area.X + (area.Width - pxW) / 2;
+        var y = area.Y + (area.Height - pxH) / 2;
+        Position = new PixelPoint(x, y);
+    }
+
+    // When the window leaves the maximized state, make sure its restored size still fits
+    // the screen it sits on — otherwise un-maximizing on a smaller monitor bleeds onto the
+    // neighbouring one.
+    private void ClampToCurrentScreen()
+    {
+        var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+        if (screen is null) return;
+
+        ClampWindowToScreen(screen);
+    }
+
+    // Shared clamp working in physical pixels against the screen working area. Leaves an
+    // 8px margin so OS borders / fractional-DPI rounding never reach the screen edge.
+    private void ClampWindowToScreen(Avalonia.Platform.Screen screen)
+    {
+        const int margin = 12;
+        var area = screen.WorkingArea;
+        var scale = screen.Scaling;
+
+        var maxWpx = area.Width - margin * 2;
+        var maxHpx = area.Height - margin * 2;
+
+        var pxW = (int)Math.Ceiling(Width * scale);
+        var pxH = (int)Math.Ceiling(Height * scale);
+
+        if (pxW > maxWpx) { Width = maxWpx / scale; pxW = (int)Math.Ceiling(Width * scale); }
+        if (pxH > maxHpx) { Height = maxHpx / scale; pxH = (int)Math.Ceiling(Height * scale); }
+
+        var nx = Math.Clamp(Position.X, area.X + margin, Math.Max(area.X + margin, area.X + area.Width - margin - pxW));
+        var ny = Math.Clamp(Position.Y, area.Y + margin, Math.Max(area.Y + margin, area.Y + area.Height - margin - pxH));
+        if (nx != Position.X || ny != Position.Y) Position = new PixelPoint(nx, ny);
+    }
+
+    // Each resizable panel keeps at least this many px so a splitter can never be
+    // collapsed to the point it becomes ungrabbable.
+    private const double MinPanelSize = 60;
+    private const double MinColumnWidth = 180;
+
     private void ApplyLayout(LayoutState layout)
     {
         if (_overviewMainGrid != null)
-            _overviewMainGrid.RowDefinitions[0] = new RowDefinition(layout.TopPanelHeight, GridUnitType.Pixel);
+        {
+            _overviewMainGrid.RowDefinitions[0] =
+                new RowDefinition(layout.TopPanelHeight, GridUnitType.Pixel) { MinHeight = MinPanelSize };
+            _overviewMainGrid.RowDefinitions[2].MinHeight = MinPanelSize;
+        }
         if (_overviewBottomGrid != null)
-            _overviewBottomGrid.ColumnDefinitions[0] = new ColumnDefinition(layout.LeftPanelWidth, GridUnitType.Pixel);
+        {
+            // Star-sized so the two panels always sum to the available width — never
+            // overflowing the window the way fixed-pixel columns did.
+            var frac = Math.Clamp(layout.LeftPanelFraction, 0.2, 0.8);
+            _overviewBottomGrid.ColumnDefinitions[0] =
+                new ColumnDefinition(frac, GridUnitType.Star) { MinWidth = MinColumnWidth };
+            _overviewBottomGrid.ColumnDefinitions[2] =
+                new ColumnDefinition(1 - frac, GridUnitType.Star) { MinWidth = MinColumnWidth };
+        }
         if (_focusGrid != null)
         {
-            _focusGrid.RowDefinitions[0] = new RowDefinition(layout.FocusTopHeight, GridUnitType.Pixel);
-            _focusGrid.RowDefinitions[2] = new RowDefinition(layout.FocusMidHeight, GridUnitType.Pixel);
-            _focusGrid.RowDefinitions[4] = new RowDefinition(1, GridUnitType.Star);
+            _focusGrid.RowDefinitions[0] =
+                new RowDefinition(layout.FocusTopHeight, GridUnitType.Pixel) { MinHeight = MinPanelSize };
+            _focusGrid.RowDefinitions[2] =
+                new RowDefinition(layout.FocusMidHeight, GridUnitType.Pixel) { MinHeight = MinPanelSize };
+            _focusGrid.RowDefinitions[4] = new RowDefinition(1, GridUnitType.Star) { MinHeight = MinPanelSize };
         }
     }
 
@@ -134,7 +300,8 @@ public partial class MainWindow : ApxWindow, IFilePicker
             else
             {
                 if (content != null) content.IsVisible = true;
-                _focusGrid.RowDefinitions[0] = new RowDefinition(_summaryExpandedHeight, GridUnitType.Pixel);
+                _focusGrid.RowDefinitions[0] =
+                    new RowDefinition(_summaryExpandedHeight, GridUnitType.Pixel) { MinHeight = MinPanelSize };
                 _focusGrid.RowDefinitions[1] = new RowDefinition(2, GridUnitType.Pixel);
             }
         }
@@ -175,14 +342,33 @@ public partial class MainWindow : ApxWindow, IFilePicker
 
         var topH     = _overviewMainGrid?.RowDefinitions[0].ActualHeight ?? 0;
         var leftW    = _overviewBottomGrid?.ColumnDefinitions[0].ActualWidth ?? 0;
+        var rightW   = _overviewBottomGrid?.ColumnDefinitions[2].ActualWidth ?? 0;
         var focusTop = _summaryCollapsed ? _summaryExpandedHeight : (_focusGrid?.RowDefinitions[0].ActualHeight ?? 0);
         var focusMid = _focusGrid?.RowDefinitions[2].ActualHeight ?? 0;
 
-        LayoutStore.Save(new LayoutState(
-            topH     > 10 ? topH     : prev.TopPanelHeight,
-            leftW    > 10 ? leftW    : prev.LeftPanelWidth,
-            focusTop > 10 ? focusTop : prev.FocusTopHeight,
-            focusMid > 10 ? focusMid : prev.FocusMidHeight));
+        var leftFraction = (leftW + rightW) > 10 ? leftW / (leftW + rightW) : prev.LeftPanelFraction;
+
+        // Only capture the normal (restored) bounds; when maximized keep the previous
+        // normal bounds and just remember the maximized flag.
+        var maximized = WindowState == WindowState.Maximized;
+        var winX = maximized ? prev.WindowX : Position.X;
+        var winY = maximized ? prev.WindowY : Position.Y;
+        var winW = maximized ? prev.WindowWidth : Width;
+        var winH = maximized ? prev.WindowHeight : Height;
+
+        LayoutStore.Save(prev with
+        {
+            TopPanelHeight = topH     > 10 ? topH     : prev.TopPanelHeight,
+            LeftPanelWidth = leftW    > 10 ? leftW    : prev.LeftPanelWidth,
+            LeftPanelFraction = leftFraction,
+            FocusTopHeight = focusTop > 10 ? focusTop : prev.FocusTopHeight,
+            FocusMidHeight = focusMid > 10 ? focusMid : prev.FocusMidHeight,
+            WindowX = winX,
+            WindowY = winY,
+            WindowWidth = winW,
+            WindowHeight = winH,
+            WindowMaximized = maximized,
+        });
 
         var vm2 = DataContext as MainViewModel;
         if (vm2?.MinimizeToTray == true)

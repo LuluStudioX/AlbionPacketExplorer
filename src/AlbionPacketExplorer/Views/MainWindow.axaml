@@ -7,6 +7,7 @@
         Title="Albion Packet Explorer"
         Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
+        MinWidth="560" MinHeight="420"
         x:DataType="vm:MainViewModel"
         KeyDown="OnKeyDown">
 
@@ -14,78 +15,14 @@
     <Grid RowDefinitions="Auto,*">
 
         <!-- Toolbar -->
-        <DockPanel Grid.Row="0" Margin="6,4" LastChildFill="True">
-        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="4">
-            <ComboBox ItemsSource="{Binding AvailableDevices}"
-                      SelectedItem="{Binding SelectedDevice}"
-                      DisplayMemberBinding="{Binding DisplayName}"
-                      MinWidth="160"
-                      MaxWidth="480"
-                      MaxDropDownHeight="450"
-                      IsEnabled="{Binding IsCapturing, Converter={x:Static BoolConverters.Not}}">
-                <ToolTip.Tip>Select network adapter to capture Albion traffic from.</ToolTip.Tip>
-            </ComboBox>
+        <DockPanel Grid.Row="0" Background="{DynamicResource Apx.Surface}" ZIndex="1"
+                   LastChildFill="True">
 
-            <Button Classes="iconbtn" Command="{Binding RefreshDevicesCommand}">
-                <ToolTip.Tip>Re-scan network adapters.</ToolTip.Tip>
-                <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
-            </Button>
-
-            <Button Classes="success" Command="{Binding StartCaptureCommand}" Padding="10,8">
-                <ToolTip.Tip>Start live packet capture. Npcap must be installed. Run as Administrator if capture fails.</ToolTip.Tip>
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Path Classes="icon sm" Data="{StaticResource Icon.Play}" Stroke="#FFFFFF" />
-                    <TextBlock Text="Capture" VerticalAlignment="Center" Foreground="#FFFFFF" />
-                </StackPanel>
-            </Button>
-
-            <Button Classes="danger" Command="{Binding StopCaptureCommand}" Padding="10,8">
-                <ToolTip.Tip>Stop live capture. All captured packets remain visible.</ToolTip.Tip>
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Path Classes="icon sm" Data="{StaticResource Icon.Stop}" Stroke="#FFFFFF" />
-                    <TextBlock Text="Stop" VerticalAlignment="Center" Foreground="#FFFFFF" />
-                </StackPanel>
-            </Button>
-
-            <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
-
-            <Button Classes="iconbtn" Name="SettingsButton" Click="OnSettingsClicked">
-                <ToolTip.Tip>Open settings.</ToolTip.Tip>
-                <Path Classes="icon" Data="{StaticResource Icon.Settings}" />
-            </Button>
-
-            <Button Classes="iconbtn" Command="{Binding ToggleFocusModeCommand}">
-                <ToolTip.Tip>Switch between side-by-side and stacked layout. (F5)</ToolTip.Tip>
-                <Path Classes="icon" Data="{StaticResource Icon.Layers}" />
-            </Button>
-
-            <Button Classes="iconbtn" Click="OnResetLayoutClicked">
-                <ToolTip.Tip>Reset panel sizes to default.</ToolTip.Tip>
-                <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
-            </Button>
-
-            <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
-
-            <Button Classes="ghost" Command="{Binding SaveFileCommand}" Padding="10,8">
-                <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
-                    <TextBlock Text="Save JSON" VerticalAlignment="Center" />
-                </StackPanel>
-            </Button>
-
-            <Button Classes="ghost" Command="{Binding OpenFileCommand}" Padding="10,8">
-                <ToolTip.Tip>Load a saved packet capture (newline-delimited JSON).</ToolTip.Tip>
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
-                    <TextBlock Text="Open JSON" VerticalAlignment="Center" />
-                </StackPanel>
-            </Button>
-        </StackPanel>
-
-        <!-- Status text + loading spinner — trailing right in toolbar -->
+        <!-- Status text + loading spinner — docked right; declared first so the action
+             WrapPanel (last child) fills the remaining width and wraps when narrow. -->
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
-                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0">
+                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"
+                    MaxWidth="320">
             <!-- Update available banner -->
             <StackPanel Orientation="Horizontal" Spacing="6"
                         IsVisible="{Binding UpdateVersion, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
@@ -104,21 +41,91 @@
             <controls:ApxSpinner Width="16" Height="16" IsVisible="{Binding IsLoading}" />
             <TextBlock Text="{Binding StatusText}"
                        VerticalAlignment="Center" FontSize="12"
+                       TextTrimming="CharacterEllipsis"
+                       ToolTip.Tip="{Binding StatusText}"
                        Foreground="{DynamicResource Apx.Text}" />
         </StackPanel>
+
+        <!-- Action controls — fill the remaining width and wrap to multiple rows when narrow -->
+        <WrapPanel Orientation="Horizontal" Margin="6,4" VerticalAlignment="Center">
+            <ComboBox ItemsSource="{Binding AvailableDevices}"
+                      SelectedItem="{Binding SelectedDevice}"
+                      DisplayMemberBinding="{Binding DisplayName}"
+                      MinWidth="160" MaxWidth="480" MaxDropDownHeight="450" Margin="0,0,4,0"
+                      IsEnabled="{Binding IsCapturing, Converter={x:Static BoolConverters.Not}}">
+                <ToolTip.Tip>Select network adapter to capture Albion traffic from.</ToolTip.Tip>
+            </ComboBox>
+
+            <Button Classes="iconbtn" Command="{Binding RefreshDevicesCommand}" Margin="0,0,4,0">
+                <ToolTip.Tip>Re-scan network adapters.</ToolTip.Tip>
+                <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
+            </Button>
+
+            <Button Classes="success" Command="{Binding StartCaptureCommand}" Padding="10,8" Margin="0,0,4,0">
+                <ToolTip.Tip>Start live packet capture. Npcap must be installed. Run as Administrator if capture fails.</ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Path Classes="icon sm" Data="{StaticResource Icon.Play}" Stroke="#FFFFFF" />
+                    <TextBlock Text="Capture" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                </StackPanel>
+            </Button>
+
+            <Button Classes="danger" Command="{Binding StopCaptureCommand}" Padding="10,8" Margin="0,0,4,0">
+                <ToolTip.Tip>Stop live capture. All captured packets remain visible.</ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Path Classes="icon sm" Data="{StaticResource Icon.Stop}" Stroke="#FFFFFF" />
+                    <TextBlock Text="Stop" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                </StackPanel>
+            </Button>
+
+            <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
+
+            <Button Classes="iconbtn" Name="SettingsButton" Click="OnSettingsClicked" Margin="0,0,4,0">
+                <ToolTip.Tip>Open settings.</ToolTip.Tip>
+                <Path Classes="icon" Data="{StaticResource Icon.Settings}" />
+            </Button>
+
+            <Button Classes="iconbtn" Command="{Binding ToggleFocusModeCommand}" Margin="0,0,4,0">
+                <ToolTip.Tip>Switch between side-by-side and stacked layout. (F5)</ToolTip.Tip>
+                <Path Classes="icon" Data="{StaticResource Icon.Layers}" />
+            </Button>
+
+            <Button Classes="iconbtn" Click="OnResetLayoutClicked" Margin="0,0,4,0">
+                <ToolTip.Tip>Reset panel sizes to default.</ToolTip.Tip>
+                <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
+            </Button>
+
+            <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
+
+            <Button Classes="ghost" Command="{Binding SaveFileCommand}" Padding="10,8" Margin="0,0,4,0">
+                <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
+                    <TextBlock Text="Save JSON" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <Button Classes="ghost" Command="{Binding OpenFileCommand}" Padding="10,8">
+                <ToolTip.Tip>Load a saved packet capture (newline-delimited JSON).</ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
+                    <TextBlock Text="Open JSON" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </WrapPanel>
         </DockPanel>
 
         <!-- content area: only one of the two grids visible at a time -->
-        <Panel Grid.Row="1">
+        <Panel Grid.Row="1" ClipToBounds="True">
 
         <!-- ═══════════════════════════════════════
              OVERVIEW MODE (side-by-side, default)
              ═══════════════════════════════════════ -->
         <Grid x:Name="OverviewGrid"
               RowDefinitions="200,2,*"
+              ClipToBounds="True"
               IsVisible="{Binding FocusMode, Converter={x:Static BoolConverters.Not}}">
 
-            <DockPanel Grid.Row="0" MinHeight="80">
+            <DockPanel Grid.Row="0" ClipToBounds="True">
                 <Border DockPanel.Dock="Top"
                         Background="{DynamicResource Apx.Card}"
                         BorderBrush="{DynamicResource Apx.Accent}"
@@ -143,7 +150,7 @@
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
             <Grid Grid.Row="2" x:Name="BottomGrid" ColumnDefinitions="2*,2,*">
-                <DockPanel Grid.Column="0" MinWidth="200">
+                <DockPanel Grid.Column="0" MinWidth="180" ClipToBounds="True">
                     <Border DockPanel.Dock="Top"
                             Background="{DynamicResource Apx.Card}"
                             BorderBrush="{DynamicResource Apx.Highlight}"
@@ -167,7 +174,7 @@
                 <GridSplitter Grid.Column="1" ResizeDirection="Columns"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-                <DockPanel Grid.Column="2" MinWidth="200">
+                <DockPanel Grid.Column="2" MinWidth="180" ClipToBounds="True">
                     <Border DockPanel.Dock="Top"
                             Background="{DynamicResource Apx.Card}"
                             BorderBrush="{DynamicResource Apx.Danger}"

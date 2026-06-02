@@ -7,9 +7,19 @@ public record LayoutState(
     double LeftPanelWidth,
     double FocusTopHeight = 160,
     double FocusMidHeight = 220,
-    Dictionary<string, double[]>? ColumnWidths = null)
+    Dictionary<string, double[]>? ColumnWidths = null,
+    double LeftPanelFraction = 0.66,
+    double? WindowX = null,
+    double? WindowY = null,
+    double? WindowWidth = null,
+    double? WindowHeight = null,
+    bool WindowMaximized = false)
 {
     public static readonly LayoutState Default = new(320, 900);
+
+    public bool HasWindowBounds =>
+        WindowX is not null && WindowY is not null &&
+        WindowWidth is > 0 && WindowHeight is > 0;
 
     public double[]? GetColumnWidths(string gridKey) =>
         ColumnWidths?.TryGetValue(gridKey, out var w) == true ? w : null;
