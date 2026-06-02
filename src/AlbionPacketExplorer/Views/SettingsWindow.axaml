@@ -6,16 +6,17 @@
                 x:DataType="vm:SettingsViewModel"
                 Title="Settings"
                 Icon="/Assets/app-icon.ico"
-                Width="680"
-                MinWidth="500" MinHeight="400"
-                MaxHeight="700"
-                SizeToContent="Height"
-                CanResize="True">
+                Width="800" Height="640"
+                MinWidth="640" MinHeight="420"
+                MaxHeight="820"
+                CanResize="True"
+                WindowStartupLocation="CenterOwner">
 
     <Grid ColumnDefinitions="180,*">
 
         <!-- Left nav -->
-        <Border Grid.Column="0" Background="{DynamicResource Apx.Surface}" Padding="0,8">
+        <Border Grid.Column="0" Background="{DynamicResource Apx.Surface}" Padding="0,8"
+                BorderBrush="{DynamicResource Apx.Border}" BorderThickness="0,0,1,0">
             <StackPanel Spacing="2">
                 <Button Name="NavDisplay"
                         HorizontalAlignment="Stretch"
@@ -76,8 +77,8 @@
         </Border>
 
         <!-- Right content -->
-        <ScrollViewer Grid.Column="1" Padding="20,16,20,0">
-            <StackPanel Spacing="16" Margin="0,0,0,24">
+        <ScrollViewer Grid.Column="1" Padding="24,20,16,0">
+            <StackPanel Spacing="16" Margin="0,0,8,24">
 
                 <!-- Display section -->
                 <StackPanel Name="SectionDisplay" Spacing="12">

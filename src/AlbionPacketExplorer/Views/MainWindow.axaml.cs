@@ -135,7 +135,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
             {
                 if (content != null) content.IsVisible = true;
                 _focusGrid.RowDefinitions[0] = new RowDefinition(_summaryExpandedHeight, GridUnitType.Pixel);
-                _focusGrid.RowDefinitions[1] = new RowDefinition(4, GridUnitType.Pixel);
+                _focusGrid.RowDefinitions[1] = new RowDefinition(2, GridUnitType.Pixel);
             }
         }
     }
