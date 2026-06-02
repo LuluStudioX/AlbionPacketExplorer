@@ -3,8 +3,8 @@
         xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
         x:Class="AlbionPacketExplorer.Views.ExpandedValueWindow"
         Title="Full Value"
-        Width="600" Height="400"
-        MinWidth="300" MinHeight="200"
+        Width="640" Height="460"
+        MinWidth="320" MinHeight="200"
         CanResize="True"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">

@@ -11,9 +11,30 @@ public partial class ExpandedValueWindow : ApxWindow
     public ExpandedValueWindow(ParamRow row, GameDataService gameData)
     {
         InitializeComponent();
+        var text = BuildText(row, gameData);
         var box = this.FindControl<TextBox>("ValueBox");
         if (box != null)
-            box.Text = BuildText(row, gameData);
+            box.Text = text;
+
+        Opened += (_, _) => SizeForText(text);
+    }
+
+    // Pick a window size from the content: width by the longest line, height by line
+    // count, both clamped to the screen by the ApxWindow helper.
+    private void SizeForText(string text)
+    {
+        var lines = text.Split('\n');
+        var longest = 0;
+        foreach (var line in lines)
+            if (line.Length > longest) longest = line.Length;
+
+        const double charWidth = 7.5;   // monospace approximation
+        const double lineHeight = 17.0;
+        const double padding = 48.0;
+
+        var desiredWidth = longest * charWidth + padding;
+        var desiredHeight = lines.Length * lineHeight + padding;
+        SizeToScreen(desiredWidth, desiredHeight, minWidth: 360, minHeight: 200);
     }
 
     private static string BuildText(ParamRow row, GameDataService gameData)
