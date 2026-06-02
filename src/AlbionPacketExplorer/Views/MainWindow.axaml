@@ -93,6 +93,22 @@
         <!-- Status text + loading spinner — trailing right in toolbar -->
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
                     HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0">
+            <!-- Update available banner -->
+            <StackPanel Orientation="Horizontal" Spacing="6"
+                        IsVisible="{Binding UpdateVersion, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock VerticalAlignment="Center" FontSize="12"
+                           Foreground="{DynamicResource ThemeAccentBrush}"
+                           Text="{Binding UpdateVersion, StringFormat='v{0} available'}" />
+                <Button Classes="Flat" Command="{Binding ApplyUpdateCommand}"
+                        Padding="8,4" IsEnabled="{Binding IsUpdating, Converter={x:Static BoolConverters.Not}}"
+                        ToolTip.Tip="Download and install update, then restart">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <suki:Loading LoadingStyle="Glow" Width="12" Height="12"
+                                      IsVisible="{Binding IsUpdating}" />
+                        <TextBlock Text="Update" FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
             <suki:Loading LoadingStyle="Glow" Width="16" Height="16"
                           IsVisible="{Binding IsLoading}" />
             <TextBlock Text="{Binding StatusText}"
