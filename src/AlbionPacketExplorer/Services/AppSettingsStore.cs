@@ -2,6 +2,13 @@ using System.Text.Json;
 
 namespace AlbionPacketExplorer.Services;
 
+public enum DetailDensity
+{
+    Compact,
+    Normal,
+    Comfortable
+}
+
 public record AppSettings(
     bool ResolveItemNames = false,
     bool ResolveIcons = false,
@@ -10,7 +17,8 @@ public record AppSettings(
     bool IsDarkMode = true,
     bool ForceExpandRows = false,
     bool AutoStartCapture = false,
-    bool AutoSaveLogs = false)
+    bool AutoSaveLogs = false,
+    DetailDensity Density = DetailDensity.Normal)
 {
     public static readonly AppSettings Default = new();
 }

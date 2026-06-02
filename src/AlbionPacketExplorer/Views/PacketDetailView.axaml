@@ -35,17 +35,10 @@
               IsReadOnly="True"
               CanUserSortColumns="True"
               CanUserResizeColumns="True"
-              FontSize="12"
+              FontSize="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}"
+              RowHeight="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=26}"
               HorizontalScrollBarVisibility="Disabled"
               GridLinesVisibility="Horizontal">
-            <DataGrid.Styles>
-                <Style Selector="DataGridCell">
-                    <Setter Property="FontSize" Value="12" />
-                </Style>
-                <Style Selector="DataGridRow">
-                    <Setter Property="MinHeight" Value="26" />
-                </Style>
-            </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Value"    Command="{Binding CopyValueCommand}" />
@@ -163,10 +156,27 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
                             <Panel VerticalAlignment="Center">
-                                <!-- Normal -->
-                                <TextBlock Text="{Binding DisplayValue}" Margin="12,4"
-                                           TextWrapping="Wrap" FontFamily="Monospace"
-                                           IsVisible="{Binding IsVisible}" />
+                                <!-- Normal: collections show a chevron to expand inline;
+                                     the value text collapses to "[N items]" until expanded. -->
+                                <StackPanel Orientation="Horizontal" Spacing="2" Margin="8,4"
+                                            IsVisible="{Binding IsVisible}">
+                                    <Button Classes="iconbtn" Padding="2" Width="20" Height="20"
+                                            VerticalAlignment="Top"
+                                            Command="{Binding $parent[UserControl].DataContext.ToggleRowExpandCommand}"
+                                            CommandParameter="{Binding}"
+                                            IsVisible="{Binding IsCollection}"
+                                            ToolTip.Tip="Expand / collapse this collection">
+                                        <Panel>
+                                            <Path Classes="icon muted sm" Data="{StaticResource Icon.ChevronRight}"
+                                                  IsVisible="{Binding !IsExpanded}" />
+                                            <Path Classes="icon muted sm" Data="{StaticResource Icon.ChevronDown}"
+                                                  IsVisible="{Binding IsExpanded}" />
+                                        </Panel>
+                                    </Button>
+                                    <TextBlock Text="{Binding DisplayValue}"
+                                               TextWrapping="Wrap" FontFamily="Monospace"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
                                 <!-- Hidden / collapsed: inline, ellipsis -->
                                 <TextBlock Text="{Binding Value}" Margin="12,0"
                                            FontSize="10" FontFamily="Monospace" FontStyle="Italic"

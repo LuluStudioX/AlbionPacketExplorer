@@ -15,19 +15,14 @@
         </StackPanel>
 
         <DataGrid x:Name="MainGrid" ItemsSource="{Binding CodeStats}"
-                  FontSize="12"
-                  RowHeight="24"
+                  FontSize="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}"
+                  RowHeight="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=24}"
                   SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserSortColumns="True"
                   CanUserResizeColumns="True"
                   GridLinesVisibility="Horizontal">
-            <DataGrid.Styles>
-                <Style Selector="DataGridCell">
-                    <Setter Property="FontSize" Value="12" />
-                </Style>
-            </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Keys Summary"          Command="{Binding CopyKeySummaryCommand}" />
