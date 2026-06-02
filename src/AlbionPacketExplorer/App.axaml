@@ -14,7 +14,9 @@
 
     <Application.Styles>
         <suki:SukiTheme ThemeColor="Blue" />
-        <StyleInclude Source="/Themes/Controls.axaml" />
+        <!-- Themes/Controls.axaml is intentionally NOT included while SukiUI is still
+             active: its global selectors would clash with Suki's templates (double focus
+             boxes, half-styled ComboBoxes). It is activated when SukiUI is removed. -->
     </Application.Styles>
     <TrayIcon.Icons>
         <TrayIcons>
