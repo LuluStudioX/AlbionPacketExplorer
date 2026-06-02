@@ -1,0 +1,99 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+      Apx semantic design tokens. Light + Dark variants live in ThemeDictionaries
+      so they swap automatically with the window/app RequestedThemeVariant.
+      Accent brushes are overwritten at runtime by ThemeService when the accent
+      palette changes; defaults below are the "Indigo" accent.
+    -->
+    <ResourceDictionary.ThemeDictionaries>
+
+        <!-- ───────────── DARK ───────────── -->
+        <ResourceDictionary x:Key="Dark">
+            <Color x:Key="Apx.BgColor">#0E1014</Color>
+            <Color x:Key="Apx.SurfaceColor">#16191F</Color>
+            <Color x:Key="Apx.SurfaceAltColor">#1C2027</Color>
+            <Color x:Key="Apx.CardColor">#1A1E25</Color>
+            <Color x:Key="Apx.BorderColor">#2A2F38</Color>
+            <Color x:Key="Apx.BorderStrongColor">#3A414D</Color>
+            <Color x:Key="Apx.TextColor">#E8EAED</Color>
+            <Color x:Key="Apx.TextMutedColor">#9AA1AC</Color>
+            <Color x:Key="Apx.TextFaintColor">#5E6672</Color>
+            <Color x:Key="Apx.AccentColor">#6D7BF5</Color>
+            <Color x:Key="Apx.AccentHoverColor">#828EF7</Color>
+            <Color x:Key="Apx.AccentPressedColor">#5867E0</Color>
+            <Color x:Key="Apx.AccentTextColor">#FFFFFF</Color>
+            <Color x:Key="Apx.SuccessColor">#3FB67A</Color>
+            <Color x:Key="Apx.DangerColor">#E05656</Color>
+            <Color x:Key="Apx.WarningColor">#E0A23F</Color>
+            <Color x:Key="Apx.HighlightColor">#2A3550</Color>
+            <Color x:Key="Apx.HoverColor">#22272F</Color>
+            <Color x:Key="Apx.SelectedColor">#26304A</Color>
+
+            <SolidColorBrush x:Key="Apx.Bg" Color="{DynamicResource Apx.BgColor}" />
+            <SolidColorBrush x:Key="Apx.Surface" Color="{DynamicResource Apx.SurfaceColor}" />
+            <SolidColorBrush x:Key="Apx.SurfaceAlt" Color="{DynamicResource Apx.SurfaceAltColor}" />
+            <SolidColorBrush x:Key="Apx.Card" Color="{DynamicResource Apx.CardColor}" />
+            <SolidColorBrush x:Key="Apx.Border" Color="{DynamicResource Apx.BorderColor}" />
+            <SolidColorBrush x:Key="Apx.BorderStrong" Color="{DynamicResource Apx.BorderStrongColor}" />
+            <SolidColorBrush x:Key="Apx.Text" Color="{DynamicResource Apx.TextColor}" />
+            <SolidColorBrush x:Key="Apx.TextMuted" Color="{DynamicResource Apx.TextMutedColor}" />
+            <SolidColorBrush x:Key="Apx.TextFaint" Color="{DynamicResource Apx.TextFaintColor}" />
+            <SolidColorBrush x:Key="Apx.Accent" Color="{DynamicResource Apx.AccentColor}" />
+            <SolidColorBrush x:Key="Apx.AccentHover" Color="{DynamicResource Apx.AccentHoverColor}" />
+            <SolidColorBrush x:Key="Apx.AccentPressed" Color="{DynamicResource Apx.AccentPressedColor}" />
+            <SolidColorBrush x:Key="Apx.AccentText" Color="{DynamicResource Apx.AccentTextColor}" />
+            <SolidColorBrush x:Key="Apx.Success" Color="{DynamicResource Apx.SuccessColor}" />
+            <SolidColorBrush x:Key="Apx.Danger" Color="{DynamicResource Apx.DangerColor}" />
+            <SolidColorBrush x:Key="Apx.Warning" Color="{DynamicResource Apx.WarningColor}" />
+            <SolidColorBrush x:Key="Apx.Highlight" Color="{DynamicResource Apx.HighlightColor}" />
+            <SolidColorBrush x:Key="Apx.Hover" Color="{DynamicResource Apx.HoverColor}" />
+            <SolidColorBrush x:Key="Apx.Selected" Color="{DynamicResource Apx.SelectedColor}" />
+        </ResourceDictionary>
+
+        <!-- ───────────── LIGHT ───────────── -->
+        <ResourceDictionary x:Key="Light">
+            <Color x:Key="Apx.BgColor">#F4F5F7</Color>
+            <Color x:Key="Apx.SurfaceColor">#FFFFFF</Color>
+            <Color x:Key="Apx.SurfaceAltColor">#EDEFF2</Color>
+            <Color x:Key="Apx.CardColor">#FFFFFF</Color>
+            <Color x:Key="Apx.BorderColor">#DCDFE4</Color>
+            <Color x:Key="Apx.BorderStrongColor">#C2C7D0</Color>
+            <Color x:Key="Apx.TextColor">#1A1D23</Color>
+            <Color x:Key="Apx.TextMutedColor">#5E6672</Color>
+            <Color x:Key="Apx.TextFaintColor">#9AA1AC</Color>
+            <Color x:Key="Apx.AccentColor">#4F5DE0</Color>
+            <Color x:Key="Apx.AccentHoverColor">#3F4DCF</Color>
+            <Color x:Key="Apx.AccentPressedColor">#3540B5</Color>
+            <Color x:Key="Apx.AccentTextColor">#FFFFFF</Color>
+            <Color x:Key="Apx.SuccessColor">#2E9E63</Color>
+            <Color x:Key="Apx.DangerColor">#CC4545</Color>
+            <Color x:Key="Apx.WarningColor">#C2871F</Color>
+            <Color x:Key="Apx.HighlightColor">#E2E6F5</Color>
+            <Color x:Key="Apx.HoverColor">#E9EBEF</Color>
+            <Color x:Key="Apx.SelectedColor">#DCE1F5</Color>
+
+            <SolidColorBrush x:Key="Apx.Bg" Color="{DynamicResource Apx.BgColor}" />
+            <SolidColorBrush x:Key="Apx.Surface" Color="{DynamicResource Apx.SurfaceColor}" />
+            <SolidColorBrush x:Key="Apx.SurfaceAlt" Color="{DynamicResource Apx.SurfaceAltColor}" />
+            <SolidColorBrush x:Key="Apx.Card" Color="{DynamicResource Apx.CardColor}" />
+            <SolidColorBrush x:Key="Apx.Border" Color="{DynamicResource Apx.BorderColor}" />
+            <SolidColorBrush x:Key="Apx.BorderStrong" Color="{DynamicResource Apx.BorderStrongColor}" />
+            <SolidColorBrush x:Key="Apx.Text" Color="{DynamicResource Apx.TextColor}" />
+            <SolidColorBrush x:Key="Apx.TextMuted" Color="{DynamicResource Apx.TextMutedColor}" />
+            <SolidColorBrush x:Key="Apx.TextFaint" Color="{DynamicResource Apx.TextFaintColor}" />
+            <SolidColorBrush x:Key="Apx.Accent" Color="{DynamicResource Apx.AccentColor}" />
+            <SolidColorBrush x:Key="Apx.AccentHover" Color="{DynamicResource Apx.AccentHoverColor}" />
+            <SolidColorBrush x:Key="Apx.AccentPressed" Color="{DynamicResource Apx.AccentPressedColor}" />
+            <SolidColorBrush x:Key="Apx.AccentText" Color="{DynamicResource Apx.AccentTextColor}" />
+            <SolidColorBrush x:Key="Apx.Success" Color="{DynamicResource Apx.SuccessColor}" />
+            <SolidColorBrush x:Key="Apx.Danger" Color="{DynamicResource Apx.DangerColor}" />
+            <SolidColorBrush x:Key="Apx.Warning" Color="{DynamicResource Apx.WarningColor}" />
+            <SolidColorBrush x:Key="Apx.Highlight" Color="{DynamicResource Apx.HighlightColor}" />
+            <SolidColorBrush x:Key="Apx.Hover" Color="{DynamicResource Apx.HoverColor}" />
+            <SolidColorBrush x:Key="Apx.Selected" Color="{DynamicResource Apx.SelectedColor}" />
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>
