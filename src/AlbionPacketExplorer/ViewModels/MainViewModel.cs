@@ -21,6 +21,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IconCacheService _iconCache = new();
     private readonly PacketSchemaService _schema = new();
     private readonly RowHideStore _rowHideStore = new();
+    private readonly UpdateService _updater = new();
 
     [ObservableProperty] private CodeAggregatorViewModel _aggregator = new();
     [ObservableProperty] private PacketListViewModel _packetList = new();
@@ -29,6 +30,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private double _loadProgress;
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _isCapturing;
+    [ObservableProperty] private string? _updateVersion;
+    [ObservableProperty] private bool _isUpdating;
+    [ObservableProperty] private int _updateProgress;
     [ObservableProperty] private string _statusText = "Select a network device and click Start, or open a file.";
     [ObservableProperty] private ObservableCollection<NetworkDeviceInfo> _availableDevices = [];
     [ObservableProperty] private NetworkDeviceInfo? _selectedDevice;
@@ -128,6 +132,7 @@ public partial class MainViewModel : ObservableObject
         theme.OnBaseThemeChanged += _ => SaveSettings();
 
         _ = LoadGameDataAsync();
+        _ = CheckForUpdateAsync();
         RefreshDevices();
 
         Aggregator.PropertyChanged += (_, args) =>
@@ -154,6 +159,22 @@ public partial class MainViewModel : ObservableObject
             _packetDetail.ForceRebuild();
         if (_allPackets.Count > 0 && ResolveItemNames)
             PacketList.SetResolveItemNames(true);
+    }
+
+    private async Task CheckForUpdateAsync()
+    {
+        var version = await _updater.CheckForUpdateAsync();
+        if (version != null)
+            UpdateVersion = version;
+    }
+
+    [RelayCommand]
+    private async Task ApplyUpdateAsync()
+    {
+        IsUpdating = true;
+        var progress = new Progress<int>(p => UpdateProgress = p);
+        await _updater.ApplyUpdateAsync(progress);
+        IsUpdating = false;
     }
 
     [RelayCommand]
