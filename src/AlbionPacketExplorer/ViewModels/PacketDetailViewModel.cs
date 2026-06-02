@@ -62,7 +62,35 @@ public sealed class ParamRow : ObservableObject
     }
 
     public string ExpandedText { get; set; } = string.Empty;
-    public string DisplayValue => _isExpanded ? ExpandedText : Value;
+
+    // Arrays "[a, b, c]" and dicts "{...}" collapse to a compact "[N items]" / "{N fields}"
+    // badge so a long collection never inflates the row to several screens. The full value
+    // is one click away (chevron / View Full Value) and via the expanded text.
+    public bool IsCollection => IsArray || IsDict;
+    private bool IsArray => Value.Length >= 2 && Value[0] == '[' && Value[^1] == ']';
+    private bool IsDict => Value.Length >= 2 && Value[0] == '{' && Value[^1] == '}';
+
+    public int CollectionCount
+    {
+        get
+        {
+            if (!IsCollection) return 0;
+            var inner = Value[1..^1].Trim();
+            return inner.Length == 0 ? 0 : inner.Split(',').Length;
+        }
+    }
+
+    public string CollapsedValue =>
+        IsArray ? $"[{CollectionCount} items]" :
+        IsDict  ? $"{{{CollectionCount} fields}}" :
+        Value;
+
+    // What the Value column shows: full text when expanded, collapsed badge for
+    // collections, plain value otherwise.
+    public string DisplayValue =>
+        _isExpanded ? ExpandedText :
+        IsCollection ? CollapsedValue :
+        Value;
 
     private bool _isHidden;
     public bool IsHidden
@@ -379,6 +407,15 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     {
         if (SelectedRow == null) return;
         ViewFullValueRequested?.Invoke(SelectedRow, _gameData);
+    }
+
+    [RelayCommand]
+    private void ToggleRowExpand(ParamRow? row)
+    {
+        if (row == null || !row.IsCollection) return;
+        if (!row.IsExpanded && string.IsNullOrEmpty(row.ExpandedText))
+            row.ExpandedText = BuildExpandedText(row);
+        row.IsExpanded = !row.IsExpanded;
     }
 
     private string BuildExpandedText(ParamRow row)

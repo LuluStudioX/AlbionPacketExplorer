@@ -76,6 +76,40 @@ public partial class MainViewModel : ObservableObject
     partial void OnAutoStartCaptureChanged(bool value) => SaveSettings();
     partial void OnAutoSaveLogsChanged(bool value) => SaveSettings();
 
+    [ObservableProperty] private DetailDensity _density = DetailDensity.Normal;
+
+    /// <summary>Grid row min-height for the active density (Compact/Normal/Comfortable).</summary>
+    public double RowHeight => Density switch
+    {
+        DetailDensity.Compact     => 20,
+        DetailDensity.Comfortable => 32,
+        _                         => 26
+    };
+
+    /// <summary>Grid cell font size for the active density.</summary>
+    public double GridFontSize => Density switch
+    {
+        DetailDensity.Compact     => 11,
+        DetailDensity.Comfortable => 13,
+        _                         => 12
+    };
+
+    /// <summary>Resolved-item icon size for the active density.</summary>
+    public double IconSize => Density switch
+    {
+        DetailDensity.Compact     => 20,
+        DetailDensity.Comfortable => 28,
+        _                         => 24
+    };
+
+    partial void OnDensityChanged(DetailDensity value)
+    {
+        OnPropertyChanged(nameof(RowHeight));
+        OnPropertyChanged(nameof(GridFontSize));
+        OnPropertyChanged(nameof(IconSize));
+        SaveSettings();
+    }
+
     public bool GameDataLoaded => _gameData.IsLoaded;
 
     [ObservableProperty] private bool _focusMode;
@@ -101,7 +135,7 @@ public partial class MainViewModel : ObservableObject
     private void SaveSettings() =>
         AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, FocusMode, MinimizeToTray,
             ThemeService.Instance.IsDark, ForceExpandRows,
-            AutoStartCapture, AutoSaveLogs));
+            AutoStartCapture, AutoSaveLogs, Density));
 
     public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
@@ -120,6 +154,7 @@ public partial class MainViewModel : ObservableObject
         MinimizeToTray = saved.MinimizeToTray;
         AutoStartCapture = saved.AutoStartCapture;
         AutoSaveLogs = saved.AutoSaveLogs;
+        Density = saved.Density;
 
         ThemeService.Instance.Initialize(saved.IsDarkMode, null);
         ThemeService.Instance.Changed += SaveSettings;
