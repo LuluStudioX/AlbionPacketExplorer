@@ -1,4 +1,5 @@
 using AlbionPacketExplorer.Models;
+using AlbionPacketExplorer.Network;
 using AlbionPacketExplorer.Services;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input.Platform;
@@ -14,6 +15,8 @@ public record CodeStatsRow(CodeStats Stats)
     public string Kind => Stats.Kind;
     public int Code => Stats.Code;
     public int Count => Stats.Count;
+    public string EventName => PacketNameResolver.Resolve(Stats.Kind, Stats.Code);
+    public bool IsKnown => !string.IsNullOrEmpty(EventName);
     public string KeySummary => PacketDisplayFormatter.FormatKeySummary(Stats);
 }
 
@@ -29,10 +32,12 @@ public partial class CodeAggregatorViewModel : ObservableObject
     private string _filterKind = "";
     private string _filterCode = "";
     private string _filterKeys = "";
+    private bool _sortUnknownFirst;
 
     public string FilterKind  { get => _filterKind;  set { _filterKind  = value; OnPropertyChanged(); ApplyFilter(); } }
     public string FilterCode  { get => _filterCode;  set { _filterCode  = value; OnPropertyChanged(); ApplyFilter(); } }
     public string FilterKeys  { get => _filterKeys;  set { _filterKeys  = value; OnPropertyChanged(); ApplyFilter(); } }
+    public bool SortUnknownFirst { get => _sortUnknownFirst; set { _sortUnknownFirst = value; OnPropertyChanged(); ApplyFilter(); } }
 
     public IClipboard? Clipboard { get; set; }
     public ISukiToastManager? Toasts { get; set; }
@@ -51,14 +56,21 @@ public partial class CodeAggregatorViewModel : ObservableObject
 
     private void ApplyFilter()
     {
-        var rows = _map.Values
+        var filtered = _map.Values
             .Where(s =>
                 FilterHelper.Matches(_filterKind, s.Kind) &&
                 FilterHelper.Matches(_filterCode, s.Code.ToString()) &&
-                FilterHelper.Matches(_filterKeys, PacketDisplayFormatter.FormatKeySummary(s)))
-            .OrderByDescending(s => s.Count)
-            .Select(s => new CodeStatsRow(s));
-        CodeStats = new ObservableCollection<CodeStatsRow>(rows);
+                FilterHelper.Matches(_filterKeys, PacketDisplayFormatter.FormatKeySummary(s)));
+
+        IOrderedEnumerable<CodeStats> ordered;
+        if (_sortUnknownFirst)
+            ordered = filtered
+                .OrderBy(s => string.IsNullOrEmpty(PacketNameResolver.Resolve(s.Kind, s.Code)) ? 0 : 1)
+                .ThenByDescending(s => s.Count);
+        else
+            ordered = filtered.OrderByDescending(s => s.Count);
+
+        CodeStats = new ObservableCollection<CodeStatsRow>(ordered.Select(s => new CodeStatsRow(s)));
     }
 
     public void Reset()

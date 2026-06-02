@@ -2,10 +2,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+             xmlns:views="using:AlbionPacketExplorer.Views"
              x:Class="AlbionPacketExplorer.Views.CodeAggregatorView"
              x:DataType="vm:CodeAggregatorViewModel">
 
     <DockPanel>
+
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4,2">
+            <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,3">
+                <ToolTip.Tip>Sort codes with no known name to top</ToolTip.Tip>
+                <TextBlock Text="? First" FontSize="11" VerticalAlignment="Center" />
+            </ToggleButton>
+        </StackPanel>
 
         <DataGrid x:Name="MainGrid" ItemsSource="{Binding CodeStats}"
                   FontSize="12"
@@ -71,6 +79,19 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:CodeStatsRow">
                             <TextBlock Text="{Binding Code}" Margin="12,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="180" SortMemberPath="EventName" CanUserSort="True">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="Name" VerticalAlignment="Center" />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:CodeStatsRow">
+                            <TextBlock Margin="12,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                       Text="{Binding EventName}"
+                                       Opacity="{Binding IsKnown, Converter={x:Static views:ViewConverters.BoolToOpacity}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
