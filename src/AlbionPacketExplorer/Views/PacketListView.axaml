@@ -1,6 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              xmlns:views="using:AlbionPacketExplorer.Views"
              x:Class="AlbionPacketExplorer.Views.PacketListView"
@@ -12,7 +11,7 @@
             <StackPanel Orientation="Horizontal" Spacing="6">
 
                 <!-- Filter edit button — shows label or placeholder, opens flyout to edit query -->
-                <Button Classes="Flat" Padding="8,4" MinWidth="120"
+                <Button Classes="ghost" Padding="8,4" MinWidth="120"
                         ToolTip.Tip="Click to edit filter query&#xA;Syntax: term  kind:X  code:32  name:X  params:X  prefix - to exclude">
                     <Button.Flyout>
                         <Flyout Placement="Bottom" ShowMode="TransientWithDismissOnPointerMoveAway">
@@ -22,41 +21,41 @@
                         </Flyout>
                     </Button.Flyout>
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" />
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Search}" />
                         <TextBlock Text="{Binding FilterDisplayText}" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
 
-                <Button Classes="Flat" Command="{Binding ClearFilterCommand}" Padding="8">
+                <Button Classes="iconbtn" Command="{Binding ClearFilterCommand}">
                     <ToolTip.Tip>Clear filter</ToolTip.Tip>
-                    <PathIcon Data="{x:Static sukiTheme:Icons.BackspaceOutline}" Width="15" Height="15" />
+                    <Path Classes="icon" Data="{StaticResource Icon.X}" />
                 </Button>
                 <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,4">
                     <ToolTip.Tip>Sort unknown codes to top</ToolTip.Tip>
                     <TextBlock Text="? First" FontSize="11" VerticalAlignment="Center" />
                 </ToggleButton>
                 <TextBlock VerticalAlignment="Center" Text="{Binding CountText}"
-                           Foreground="{DynamicResource SukiLowText}" />
+                           Foreground="{DynamicResource Apx.TextMuted}" />
             </StackPanel>
             <!-- Preset row -->
             <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBox Text="{Binding NewPresetName}" Width="140" PlaceholderText="Preset name…" />
-                <Button Classes="Flat" Command="{Binding SavePresetCommand}" Padding="8">
+                <Button Classes="iconbtn" Command="{Binding SavePresetCommand}">
                     <ToolTip.Tip>Save current filter as preset</ToolTip.Tip>
-                    <PathIcon Data="{x:Static sukiTheme:Icons.Check}" Width="14" Height="14" />
+                    <Path Classes="icon" Data="{StaticResource Icon.Check}" />
                 </Button>
                 <ComboBox ItemsSource="{Binding Presets}"
                           SelectedItem="{Binding SelectedPreset, Mode=TwoWay}"
                           DisplayMemberBinding="{Binding Name}"
                           PlaceholderText="Load preset…"
                           MinWidth="160" />
-                <Button Classes="Flat" Command="{Binding LoadPresetCommand}" Padding="8">
+                <Button Classes="iconbtn" Command="{Binding LoadPresetCommand}">
                     <ToolTip.Tip>Apply selected preset</ToolTip.Tip>
-                    <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="14" Height="14" />
+                    <Path Classes="icon" Data="{StaticResource Icon.ChevronRight}" />
                 </Button>
-                <Button Classes="Flat" Command="{Binding DeletePresetCommand}" Padding="8">
+                <Button Classes="iconbtn" Command="{Binding DeletePresetCommand}">
                     <ToolTip.Tip>Delete selected preset</ToolTip.Tip>
-                    <PathIcon Data="{x:Static sukiTheme:Icons.Cross}" Width="14" Height="14" />
+                    <Path Classes="icon" Data="{StaticResource Icon.Trash}" />
                 </Button>
             </StackPanel>
         </StackPanel>
@@ -113,7 +112,7 @@
                                                  PlaceholderText="EVENT  -REQUEST …" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -135,7 +134,7 @@
                                                  PlaceholderText="32  -45  -103 …" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -157,7 +156,7 @@
                                                  PlaceholderText="Leave  -NewChar …" Width="200" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -192,7 +191,7 @@
                                                  PlaceholderText="objectId  T8_FARM …" Width="240" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>

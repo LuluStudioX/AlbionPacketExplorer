@@ -1,11 +1,96 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
+        xmlns:services="clr-namespace:AlbionPacketExplorer.Services">
 
     <!--
       Apx control styles — full in-house restyle of the Avalonia primitives the app
       uses, themed entirely through Apx.* tokens (Tokens.axaml) and the scale (Scale.axaml).
       No SukiUI dependency. Light/Dark handled by the token ThemeDictionaries.
     -->
+
+    <Styles.Resources>
+
+        <!-- ═══════════════ ApxSpinner (indeterminate arc) ═══════════════ -->
+        <ControlTheme x:Key="{x:Type controls:ApxSpinner}" TargetType="controls:ApxSpinner">
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Canvas Width="16" Height="16">
+                        <Arc x:Name="PART_Arc"
+                             Width="16" Height="16"
+                             StartAngle="0" SweepAngle="280"
+                             Stroke="{DynamicResource Apx.Accent}"
+                             StrokeThickness="2"
+                             StrokeLineCap="Round"
+                             RenderTransformOrigin="50%,50%">
+                            <Arc.RenderTransform>
+                                <RotateTransform />
+                            </Arc.RenderTransform>
+                            <Arc.Styles>
+                                <Style Selector="Arc">
+                                    <Style.Animations>
+                                        <Animation Duration="0:0:0.9" IterationCount="Infinite">
+                                            <KeyFrame Cue="0%">
+                                                <Setter Property="RotateTransform.Angle" Value="0" />
+                                            </KeyFrame>
+                                            <KeyFrame Cue="100%">
+                                                <Setter Property="RotateTransform.Angle" Value="360" />
+                                            </KeyFrame>
+                                        </Animation>
+                                    </Style.Animations>
+                                </Style>
+                            </Arc.Styles>
+                        </Arc>
+                    </Canvas>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
+        <!-- ═══════════════ ApxToastHost (bottom-right toast stack) ═══════════════ -->
+        <ControlTheme x:Key="{x:Type controls:ApxToastHost}" TargetType="controls:ApxToastHost">
+            <Setter Property="IsHitTestVisible" Value="True" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ItemsControl x:Name="PART_Items"
+                                  ItemsSource="{Binding Manager.Toasts, RelativeSource={RelativeSource TemplatedParent}}"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Bottom"
+                                  Margin="16">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:Toast">
+                                <Border Classes="card toast"
+                                        MinWidth="240" MaxWidth="360"
+                                        Margin="0,6,0,0"
+                                        Cursor="Hand">
+                                    <DockPanel>
+                                        <Border DockPanel.Dock="Left" Width="4" CornerRadius="2"
+                                                Margin="0,0,10,0"
+                                                Background="{Binding Severity, Converter={x:Static controls:ToastConverters.SeverityToBrush}}" />
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold"
+                                                       FontSize="{DynamicResource Apx.Font.Sm}" />
+                                            <TextBlock Text="{Binding Message}" Classes="muted"
+                                                       FontSize="{DynamicResource Apx.Font.Xs}"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
+    </Styles.Resources>
+
+    <Style Selector="Border.toast">
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.BorderStrong}" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="BoxShadow" Value="0 4 16 0 #40000000" />
+    </Style>
 
     <!-- ═══════════════ Icon (Lucide stroke renderer) ═══════════════ -->
     <Style Selector="Path.icon">

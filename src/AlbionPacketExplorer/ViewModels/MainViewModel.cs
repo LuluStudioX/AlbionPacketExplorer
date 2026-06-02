@@ -5,18 +5,13 @@ using AlbionPacketExplorer.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using Avalonia.Controls.Notifications;
-using Avalonia.Styling;
-using SukiUI;
-using SukiUI.Enums;
-using SukiUI.Toasts;
 
 namespace AlbionPacketExplorer.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     private readonly IFilePicker _filePicker;
-    private readonly ISukiToastManager _toasts;
+    private readonly ToastService _toasts;
     private readonly GameDataService _gameData = new();
     private readonly IconCacheService _iconCache = new();
     private readonly PacketSchemaService _schema = new();
@@ -85,9 +80,8 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _focusMode;
     [ObservableProperty] private bool _minimizeToTray;
-    [ObservableProperty] private SukiBackgroundStyle _backgroundStyle = SukiBackgroundStyle.Gradient;
 
-    public ISukiToastManager ToastManager => _toasts;
+    public ToastService ToastManager => _toasts;
 
     public string LayoutToggleIcon => FocusMode ? "⊞" : "⊟";
 
@@ -106,10 +100,10 @@ public partial class MainViewModel : ObservableObject
 
     private void SaveSettings() =>
         AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, FocusMode, MinimizeToTray,
-            SukiTheme.GetInstance().ActiveBaseTheme == ThemeVariant.Dark, ForceExpandRows,
+            ThemeService.Instance.IsDark, ForceExpandRows,
             AutoStartCapture, AutoSaveLogs));
 
-    public MainViewModel(IFilePicker filePicker, ISukiToastManager toasts)
+    public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
         _filePicker = filePicker;
         _toasts = toasts;
@@ -127,9 +121,8 @@ public partial class MainViewModel : ObservableObject
         AutoStartCapture = saved.AutoStartCapture;
         AutoSaveLogs = saved.AutoSaveLogs;
 
-        var theme = SukiTheme.GetInstance();
-        theme.ChangeBaseTheme(saved.IsDarkMode ? ThemeVariant.Dark : ThemeVariant.Light);
-        theme.OnBaseThemeChanged += _ => SaveSettings();
+        ThemeService.Instance.Initialize(saved.IsDarkMode, null);
+        ThemeService.Instance.Changed += SaveSettings;
 
         _ = LoadGameDataAsync();
         _ = CheckForUpdateAsync();
@@ -217,13 +210,9 @@ public partial class MainViewModel : ObservableObject
 
         IsCapturing = true;
         StatusText = $"Capturing on {SelectedDevice?.DisplayName ?? "all devices"}…";
-        _toasts.CreateToast()
-            .WithTitle("Capture Started")
-            .WithContent($"Listening on {SelectedDevice?.DisplayName ?? "all devices"}")
-            .OfType(NotificationType.Success)
-            .Dismiss().After(TimeSpan.FromSeconds(3))
-            .Dismiss().ByClicking()
-            .Queue();
+        _toasts.Show("Capture Started",
+            $"Listening on {SelectedDevice?.DisplayName ?? "all devices"}",
+            ToastSeverity.Success);
     }
 
     private bool CanStartCapture() => !IsCapturing && !IsLoading;
@@ -236,13 +225,9 @@ public partial class MainViewModel : ObservableObject
         IsCapturing = false;
         Aggregator.Flush();
         StatusText = $"Capture stopped. {_capturedPackets.Count:N0} packets captured.";
-        _toasts.CreateToast()
-            .WithTitle("Capture Stopped")
-            .WithContent($"{_capturedPackets.Count:N0} packets captured")
-            .OfType(NotificationType.Information)
-            .Dismiss().After(TimeSpan.FromSeconds(4))
-            .Dismiss().ByClicking()
-            .Queue();
+        _toasts.Show("Capture Stopped",
+            $"{_capturedPackets.Count:N0} packets captured",
+            ToastSeverity.Info);
     }
 
     private bool CanStopCapture() => IsCapturing;
@@ -314,25 +299,16 @@ public partial class MainViewModel : ObservableObject
             PacketList.SetSource(loaded);
             SaveFileCommand.NotifyCanExecuteChanged();
             StatusText = $"Loaded {loaded.Count:N0} packets from {Path.GetFileName(path)}";
-            _toasts.CreateToast()
-                .WithTitle("File Loaded")
-                .WithContent($"{loaded.Count:N0} packets from {Path.GetFileName(path)}")
-                .OfType(NotificationType.Success)
-                .Dismiss().After(TimeSpan.FromSeconds(4))
-                .Dismiss().ByClicking()
-                .Queue();
+            _toasts.Show("File Loaded",
+                $"{loaded.Count:N0} packets from {Path.GetFileName(path)}",
+                ToastSeverity.Success);
         }
         catch (Exception ex)
         {
             Aggregator.Reset();
             PacketList.SetSource([]);
             StatusText = $"Error loading file: {ex.Message}";
-            _toasts.CreateToast()
-                .WithTitle("Load Failed")
-                .WithContent(ex.Message)
-                .OfType(NotificationType.Error)
-                .Dismiss().ByClicking()
-                .Queue();
+            _toasts.Show("Load Failed", ex.Message, ToastSeverity.Error);
         }
         finally
         {

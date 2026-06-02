@@ -1,6 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              xmlns:views="using:AlbionPacketExplorer.Views"
              x:Class="AlbionPacketExplorer.Views.PacketDetailView"
@@ -11,21 +10,21 @@
         <!-- Hide preset toolbar -->
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="4,2,4,4">
             <TextBox Text="{Binding NewHidePresetName}" Width="130" PlaceholderText="Hide preset name…" FontSize="11" />
-            <Button Classes="Flat" Command="{Binding SaveHidePresetCommand}" Padding="6,3" ToolTip.Tip="Save current hidden rows as preset">
-                <PathIcon Data="{x:Static sukiTheme:Icons.Check}" Width="13" Height="13" />
+            <Button Classes="iconbtn" Command="{Binding SaveHidePresetCommand}" Padding="6" ToolTip.Tip="Save current hidden rows as preset">
+                <Path Classes="icon sm" Data="{StaticResource Icon.Check}" />
             </Button>
             <ComboBox ItemsSource="{Binding HidePresets}"
                       SelectedItem="{Binding SelectedHidePreset, Mode=TwoWay}"
                       DisplayMemberBinding="{Binding Name}"
                       PlaceholderText="Load hide preset…"
                       MinWidth="140" FontSize="11" />
-            <Button Classes="Flat" Command="{Binding LoadHidePresetCommand}" Padding="6,3" ToolTip.Tip="Apply selected hide preset">
-                <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="13" Height="13" />
+            <Button Classes="iconbtn" Command="{Binding LoadHidePresetCommand}" Padding="6" ToolTip.Tip="Apply selected hide preset">
+                <Path Classes="icon sm" Data="{StaticResource Icon.ChevronRight}" />
             </Button>
-            <Button Classes="Flat" Command="{Binding DeleteHidePresetCommand}" Padding="6,3" ToolTip.Tip="Delete selected hide preset">
-                <PathIcon Data="{x:Static sukiTheme:Icons.Cross}" Width="13" Height="13" />
+            <Button Classes="iconbtn" Command="{Binding DeleteHidePresetCommand}" Padding="6" ToolTip.Tip="Delete selected hide preset">
+                <Path Classes="icon sm" Data="{StaticResource Icon.Trash}" />
             </Button>
-            <Button Classes="Flat" Command="{Binding UnhideAllRowsCommand}" Padding="6,3" ToolTip.Tip="Show all hidden rows">
+            <Button Classes="ghost" Command="{Binding UnhideAllRowsCommand}" Padding="8,4" ToolTip.Tip="Show all hidden rows">
                 <TextBlock Text="Show all" FontSize="11" />
             </Button>
         </StackPanel>
@@ -77,8 +76,7 @@
                                                  PlaceholderText="Filter Key…" Width="180" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -98,7 +96,7 @@
                                                VerticalAlignment="Center"
                                                IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                     <Ellipse Width="7" Height="7" VerticalAlignment="Center"
-                                             Fill="{DynamicResource SukiLowText}"
+                                             Fill="{DynamicResource Apx.TextFaint}"
                                              ToolTip.Tip="SAT-derived (base schema)">
                                         <Ellipse.IsVisible>
                                             <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsBase}" />
@@ -115,7 +113,7 @@
                                 <!-- Hidden / collapsed view -->
                                 <TextBlock Text="{Binding Key}" FontSize="10"
                                            FontStyle="Italic" Margin="4,0"
-                                           Foreground="{DynamicResource SukiLowText}"
+                                           Foreground="{DynamicResource Apx.TextFaint}"
                                            VerticalAlignment="Center"
                                            IsVisible="{Binding IsHidden}" />
                             </Panel>
@@ -134,8 +132,7 @@
                                                  PlaceholderText="Filter Type…" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -143,7 +140,7 @@
                         <DataTemplate x:DataType="vm:ParamRow">
                             <TextBlock Text="{Binding Type}" Margin="12,0" VerticalAlignment="Center"
                                        IsVisible="{Binding IsVisible}"
-                                       Foreground="{DynamicResource SukiText}" />
+                                       Foreground="{DynamicResource Apx.Text}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -159,8 +156,7 @@
                                                  PlaceholderText="Filter Value…" Width="200" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -175,7 +171,7 @@
                                 <TextBlock Text="{Binding Value}" Margin="12,0"
                                            FontSize="10" FontFamily="Monospace" FontStyle="Italic"
                                            TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
-                                           Foreground="{DynamicResource SukiLowText}"
+                                           Foreground="{DynamicResource Apx.TextFaint}"
                                            IsVisible="{Binding IsHidden}" />
                             </Panel>
                         </DataTemplate>
@@ -193,8 +189,7 @@
                                                  PlaceholderText="Filter Resolved…" Width="200" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>

@@ -1,11 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using AlbionPacketExplorer.ViewModels;
-using SukiUI.Controls;
+using AlbionPacketExplorer.Controls;
 
 namespace AlbionPacketExplorer.Views;
 
-public partial class EditParamWindow : SukiWindow
+public partial class EditParamWindow : ApxWindow
 {
     public EditParamWindow(EditParamViewModel vm)
     {

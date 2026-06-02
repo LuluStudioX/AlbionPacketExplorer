@@ -1,23 +1,16 @@
-<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+<controls:ApxWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-        xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
+        xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
         xmlns:vm="using:AlbionPacketExplorer.ViewModels"
         xmlns:views="using:AlbionPacketExplorer.Views"
         x:Class="AlbionPacketExplorer.Views.MainWindow"
         Title="Albion Packet Explorer"
         Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
-        WindowStartupLocation="CenterScreen"
-        HorizontalContentAlignment="Stretch"
-        VerticalContentAlignment="Stretch"
         x:DataType="vm:MainViewModel"
         KeyDown="OnKeyDown">
 
-    <suki:SukiWindow.Hosts>
-        <suki:SukiToastHost Manager="{Binding ToastManager}" />
-    </suki:SukiWindow.Hosts>
-
+    <Panel>
     <Grid RowDefinitions="Auto,*">
 
         <!-- Toolbar -->
@@ -33,58 +26,58 @@
                 <ToolTip.Tip>Select network adapter to capture Albion traffic from.</ToolTip.Tip>
             </ComboBox>
 
-            <Button Classes="Flat" Command="{Binding RefreshDevicesCommand}" Padding="8">
+            <Button Classes="iconbtn" Command="{Binding RefreshDevicesCommand}">
                 <ToolTip.Tip>Re-scan network adapters.</ToolTip.Tip>
-                <PathIcon Data="{x:Static sukiTheme:Icons.Refresh}" Width="16" Height="16" />
+                <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
             </Button>
 
-            <Button Classes="Flat Success" Command="{Binding StartCaptureCommand}" Padding="10,8">
+            <Button Classes="success" Command="{Binding StartCaptureCommand}" Padding="10,8">
                 <ToolTip.Tip>Start live packet capture. Npcap must be installed. Run as Administrator if capture fails.</ToolTip.Tip>
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <PathIcon Data="{x:Static sukiTheme:Icons.Login}" Width="15" Height="15" />
-                    <TextBlock Text="Capture" VerticalAlignment="Center" />
+                    <Path Classes="icon sm" Data="{StaticResource Icon.Play}" Stroke="#FFFFFF" />
+                    <TextBlock Text="Capture" VerticalAlignment="Center" Foreground="#FFFFFF" />
                 </StackPanel>
             </Button>
 
-            <Button Classes="Flat Danger" Command="{Binding StopCaptureCommand}" Padding="10,8">
+            <Button Classes="danger" Command="{Binding StopCaptureCommand}" Padding="10,8">
                 <ToolTip.Tip>Stop live capture. All captured packets remain visible.</ToolTip.Tip>
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <PathIcon Data="{x:Static sukiTheme:Icons.Logout}" Width="15" Height="15" />
-                    <TextBlock Text="Stop" VerticalAlignment="Center" />
+                    <Path Classes="icon sm" Data="{StaticResource Icon.Stop}" Stroke="#FFFFFF" />
+                    <TextBlock Text="Stop" VerticalAlignment="Center" Foreground="#FFFFFF" />
                 </StackPanel>
             </Button>
 
-            <Separator Width="1" Background="Gray" Margin="4,0" />
+            <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
 
-            <Button Classes="Flat" Name="SettingsButton" Click="OnSettingsClicked" Padding="8">
+            <Button Classes="iconbtn" Name="SettingsButton" Click="OnSettingsClicked">
                 <ToolTip.Tip>Open settings.</ToolTip.Tip>
-                <PathIcon Data="{x:Static sukiTheme:Icons.Menu}" Width="16" Height="16" />
+                <Path Classes="icon" Data="{StaticResource Icon.Settings}" />
             </Button>
 
-            <Button Classes="Flat" Command="{Binding ToggleFocusModeCommand}" Padding="8">
+            <Button Classes="iconbtn" Command="{Binding ToggleFocusModeCommand}">
                 <ToolTip.Tip>Switch between side-by-side and stacked layout. (F5)</ToolTip.Tip>
-                <PathIcon Data="{x:Static sukiTheme:Icons.KeyboardCaps}" Width="16" Height="16" />
+                <Path Classes="icon" Data="{StaticResource Icon.Layers}" />
             </Button>
 
-            <Button Classes="Flat" Click="OnResetLayoutClicked" Padding="8">
+            <Button Classes="iconbtn" Click="OnResetLayoutClicked">
                 <ToolTip.Tip>Reset panel sizes to default.</ToolTip.Tip>
-                <PathIcon Data="{x:Static sukiTheme:Icons.RefreshCircle}" Width="16" Height="16" />
+                <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
             </Button>
 
-            <Separator Width="1" Background="Gray" Margin="4,0" />
+            <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
 
-            <Button Classes="Flat" Command="{Binding SaveFileCommand}" Padding="10,8">
+            <Button Classes="ghost" Command="{Binding SaveFileCommand}" Padding="10,8">
                 <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="15" Height="15" />
+                    <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
                     <TextBlock Text="Save JSON" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
 
-            <Button Classes="Flat" Command="{Binding OpenFileCommand}" Padding="10,8">
-                <ToolTip.Tip>Load a packet_sniffer.json file recorded by SAT.&#xA;Default path: %LOCALAPPDATA%\StatisticsAnalysisTool\Instances\...\temp\packet_sniffer.json</ToolTip.Tip>
+            <Button Classes="ghost" Command="{Binding OpenFileCommand}" Padding="10,8">
+                <ToolTip.Tip>Load a saved packet capture (newline-delimited JSON).</ToolTip.Tip>
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <PathIcon Data="{x:Static sukiTheme:Icons.FileOpen}" Width="15" Height="15" />
+                    <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
                     <TextBlock Text="Open JSON" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
@@ -97,23 +90,21 @@
             <StackPanel Orientation="Horizontal" Spacing="6"
                         IsVisible="{Binding UpdateVersion, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                 <TextBlock VerticalAlignment="Center" FontSize="12"
-                           Foreground="{DynamicResource ThemeAccentBrush}"
+                           Foreground="{DynamicResource Apx.Accent}"
                            Text="{Binding UpdateVersion, StringFormat='v{0} available'}" />
-                <Button Classes="Flat" Command="{Binding ApplyUpdateCommand}"
+                <Button Classes="ghost" Command="{Binding ApplyUpdateCommand}"
                         Padding="8,4" IsEnabled="{Binding IsUpdating, Converter={x:Static BoolConverters.Not}}"
                         ToolTip.Tip="Download and install update, then restart">
                     <StackPanel Orientation="Horizontal" Spacing="4">
-                        <suki:Loading LoadingStyle="Glow" Width="12" Height="12"
-                                      IsVisible="{Binding IsUpdating}" />
+                        <controls:ApxSpinner Width="12" Height="12" IsVisible="{Binding IsUpdating}" />
                         <TextBlock Text="Update" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>
-            <suki:Loading LoadingStyle="Glow" Width="16" Height="16"
-                          IsVisible="{Binding IsLoading}" />
+            <controls:ApxSpinner Width="16" Height="16" IsVisible="{Binding IsLoading}" />
             <TextBlock Text="{Binding StatusText}"
                        VerticalAlignment="Center" FontSize="12"
-                       Foreground="{DynamicResource SukiText}" />
+                       Foreground="{DynamicResource Apx.Text}" />
         </StackPanel>
         </DockPanel>
 
@@ -129,19 +120,19 @@
 
             <DockPanel Grid.Row="0" MinHeight="80">
                 <Border DockPanel.Dock="Top"
-                        Background="{DynamicResource ThemeCardBrush}"
-                        BorderBrush="{DynamicResource ThemeAccentBrush}"
+                        Background="{DynamicResource Apx.Card}"
+                        BorderBrush="{DynamicResource Apx.Accent}"
                         BorderThickness="0,0,0,2"
                         Padding="6,3">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock Text="Event Summary"
                                    FontWeight="Bold"
                                    VerticalAlignment="Center"
-                                   Foreground="{DynamicResource ThemeForegroundBrush}" />
-                        <Border Background="{DynamicResource HighlightBrush}"
+                                   Foreground="{DynamicResource Apx.Text}" />
+                        <Border Background="{DynamicResource Apx.Highlight}"
                                 CornerRadius="8" Padding="4,1"
                                 ToolTip.Tip="Each row = one packet type (e.g. EVENT 32).&#xA;Count = how many times seen.&#xA;Keys = which param indices were present, with % showing how often.&#xA;100% = always present (required field). Less = optional/conditional.&#xA;&#xA;Click a row to filter the packet list below.">
-                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource HighlightForegroundBrush}" />
+                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                         </Border>
                     </StackPanel>
                 </Border>
@@ -149,25 +140,25 @@
             </DockPanel>
 
             <GridSplitter Grid.Row="1" ResizeDirection="Rows"
-                          Background="{DynamicResource ThemeAccentBrush}"
+                          Background="{DynamicResource Apx.Accent}"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
             <Grid Grid.Row="2" x:Name="BottomGrid" ColumnDefinitions="2*,4,*">
                 <DockPanel Grid.Column="0" MinWidth="200">
                     <Border DockPanel.Dock="Top"
-                            Background="{DynamicResource ThemeCardBrush}"
-                            BorderBrush="{DynamicResource HighlightBrush}"
+                            Background="{DynamicResource Apx.Card}"
+                            BorderBrush="{DynamicResource Apx.Highlight}"
                             BorderThickness="0,0,0,2"
                             Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Text="Packet List"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
-                                       Foreground="{DynamicResource ThemeForegroundBrush}" />
-                            <Border Background="{DynamicResource HighlightBrush}"
+                                       Foreground="{DynamicResource Apx.Text}" />
+                            <Border Background="{DynamicResource Apx.Highlight}"
                                     CornerRadius="8" Padding="4,1"
                                     ToolTip.Tip="All individual packets matching the current filter.&#xA;Filter is set automatically when you click a row in Event Summary.&#xA;Click a packet row to inspect its fields in the detail panel.">
-                                <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource HighlightForegroundBrush}" />
+                                <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                             </Border>
                         </StackPanel>
                     </Border>
@@ -175,24 +166,24 @@
                 </DockPanel>
 
                 <GridSplitter Grid.Column="1" ResizeDirection="Columns"
-                              Background="{DynamicResource ThemeAccentBrush}"
+                              Background="{DynamicResource Apx.Accent}"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
                 <DockPanel Grid.Column="2" MinWidth="200">
                     <Border DockPanel.Dock="Top"
-                            Background="{DynamicResource ThemeCardBrush}"
-                            BorderBrush="{DynamicResource ErrorBrush}"
+                            Background="{DynamicResource Apx.Card}"
+                            BorderBrush="{DynamicResource Apx.Danger}"
                             BorderThickness="0,0,0,2"
                             Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Text="Packet Detail"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
-                                       Foreground="{DynamicResource ThemeForegroundBrush}" />
-                            <Border Background="{DynamicResource HighlightBrush}"
+                                       Foreground="{DynamicResource Apx.Text}" />
+                            <Border Background="{DynamicResource Apx.Highlight}"
                                     CornerRadius="8" Padding="4,1"
                                     ToolTip.Tip="Key/Type/Value breakdown of the selected packet.&#xA;Key = param index (0–255). Type = wire type. Value = decoded value.&#xA;Right-click a row to edit param name/note.">
-                                <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource HighlightForegroundBrush}" />
+                                <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                             </Border>
                         </StackPanel>
                     </Border>
@@ -210,18 +201,18 @@
 
             <Grid Grid.Row="0" RowDefinitions="Auto,*">
                 <Border Grid.Row="0"
-                        Background="{DynamicResource ThemeCardBrush}"
-                        BorderBrush="{DynamicResource ThemeAccentBrush}"
+                        Background="{DynamicResource Apx.Card}"
+                        BorderBrush="{DynamicResource Apx.Accent}"
                         BorderThickness="0,0,0,2"
                         Padding="6,3"
                         Cursor="Hand" PointerPressed="OnSummaryHeaderPressed">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock x:Name="SummaryCollapseIcon" Text="▼" FontSize="10" VerticalAlignment="Center"
-                                   Foreground="{DynamicResource ThemeAccentBrush}" />
+                                   Foreground="{DynamicResource Apx.Accent}" />
                         <TextBlock Text="Event Summary"
                                    FontWeight="Bold"
                                    VerticalAlignment="Center"
-                                   Foreground="{DynamicResource ThemeForegroundBrush}" />
+                                   Foreground="{DynamicResource Apx.Text}" />
                     </StackPanel>
                 </Border>
                 <views:CodeAggregatorView x:Name="FocusSummaryContent"
@@ -230,42 +221,42 @@
             </Grid>
 
             <GridSplitter Grid.Row="1" ResizeDirection="Rows"
-                          Background="{DynamicResource ThemeAccentBrush}"
+                          Background="{DynamicResource Apx.Accent}"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
             <DockPanel Grid.Row="2">
                 <Border DockPanel.Dock="Top"
-                        Background="{DynamicResource ThemeCardBrush}"
-                        BorderBrush="{DynamicResource HighlightBrush}"
+                        Background="{DynamicResource Apx.Card}"
+                        BorderBrush="{DynamicResource Apx.Highlight}"
                         BorderThickness="0,0,0,2"
                         Padding="6,3">
                     <TextBlock Text="Packet List"
                                FontWeight="Bold"
                                VerticalAlignment="Center"
-                               Foreground="{DynamicResource ThemeForegroundBrush}" />
+                               Foreground="{DynamicResource Apx.Text}" />
                 </Border>
                 <views:PacketListView DataContext="{Binding PacketList}" />
             </DockPanel>
 
             <GridSplitter Grid.Row="3" ResizeDirection="Rows"
-                          Background="{DynamicResource ThemeAccentBrush}"
+                          Background="{DynamicResource Apx.Accent}"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
             <DockPanel Grid.Row="4">
                 <Border DockPanel.Dock="Top"
-                        Background="{DynamicResource ThemeCardBrush}"
-                        BorderBrush="{DynamicResource ErrorBrush}"
+                        Background="{DynamicResource Apx.Card}"
+                        BorderBrush="{DynamicResource Apx.Danger}"
                         BorderThickness="0,0,0,2"
                         Padding="6,3">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock Text="Packet Detail"
                                    FontWeight="Bold"
                                    VerticalAlignment="Center"
-                                   Foreground="{DynamicResource ThemeForegroundBrush}" />
-                        <Border Background="{DynamicResource HighlightBrush}"
+                                   Foreground="{DynamicResource Apx.Text}" />
+                        <Border Background="{DynamicResource Apx.Highlight}"
                                 CornerRadius="8" Padding="4,1"
                                 ToolTip.Tip="Right-click a row to edit param name/note.">
-                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource HighlightForegroundBrush}" />
+                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                         </Border>
                     </StackPanel>
                 </Border>
@@ -278,4 +269,10 @@
 
     </Grid>
 
-</suki:SukiWindow>
+    <!-- Toast overlay -->
+    <controls:ApxToastHost Manager="{Binding ToastManager}"
+                           IsHitTestVisible="False"
+                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+    </Panel>
+
+</controls:ApxWindow>
