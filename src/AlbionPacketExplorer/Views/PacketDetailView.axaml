@@ -2,8 +2,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+             xmlns:views="using:AlbionPacketExplorer.Views"
              x:Class="AlbionPacketExplorer.Views.PacketDetailView"
              x:DataType="vm:PacketDetailViewModel">
+
+    <DockPanel>
+
+        <!-- Hide preset toolbar -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="4,2,4,4">
+            <TextBox Text="{Binding NewHidePresetName}" Width="130" PlaceholderText="Hide preset name…" FontSize="11" />
+            <Button Classes="Flat" Command="{Binding SaveHidePresetCommand}" Padding="6,3" ToolTip.Tip="Save current hidden rows as preset">
+                <PathIcon Data="{x:Static sukiTheme:Icons.Check}" Width="13" Height="13" />
+            </Button>
+            <ComboBox ItemsSource="{Binding HidePresets}"
+                      SelectedItem="{Binding SelectedHidePreset, Mode=TwoWay}"
+                      DisplayMemberBinding="{Binding Name}"
+                      PlaceholderText="Load hide preset…"
+                      MinWidth="140" FontSize="11" />
+            <Button Classes="Flat" Command="{Binding LoadHidePresetCommand}" Padding="6,3" ToolTip.Tip="Apply selected hide preset">
+                <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="13" Height="13" />
+            </Button>
+            <Button Classes="Flat" Command="{Binding DeleteHidePresetCommand}" Padding="6,3" ToolTip.Tip="Delete selected hide preset">
+                <PathIcon Data="{x:Static sukiTheme:Icons.Cross}" Width="13" Height="13" />
+            </Button>
+            <Button Classes="Flat" Command="{Binding UnhideAllRowsCommand}" Padding="6,3" ToolTip.Tip="Show all hidden rows">
+                <TextBlock Text="Show all" FontSize="11" />
+            </Button>
+        </StackPanel>
 
     <DataGrid x:Name="MainGrid" ItemsSource="{Binding Rows}"
               SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
@@ -18,6 +43,9 @@
                 <Style Selector="DataGridCell">
                     <Setter Property="FontSize" Value="12" />
                 </Style>
+                <Style Selector="DataGridRow">
+                    <Setter Property="MinHeight" Value="26" />
+                </Style>
             </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
@@ -30,6 +58,10 @@
                     <MenuItem Header="Preview Resolve" Command="{Binding PreviewResolveCommand}" />
                     <Separator />
                     <MenuItem Header="Edit Param Name…" Command="{Binding EditParamCommand}" />
+                    <Separator />
+                    <MenuItem Header="Hide Row"         Command="{Binding HideRowCommand}" />
+                    <MenuItem Header="Unhide Row"       Command="{Binding UnhideRowCommand}" />
+                    <MenuItem Header="Show All Rows"    Command="{Binding UnhideAllRowsCommand}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
@@ -52,17 +84,41 @@
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
-                            <StackPanel Orientation="Horizontal" Spacing="6"
-                                        VerticalAlignment="Center" Margin="4,0"
-                                        ToolTip.Tip="{Binding Note}">
-                                <TextBlock Text="{Binding Key}"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding SchemaName}"
-                                           Foreground="#aaaacc" FontSize="13"
+                            <Panel VerticalAlignment="Center">
+                                <!-- Normal view -->
+                                <StackPanel Orientation="Horizontal" Spacing="6"
+                                            Margin="4,0"
+                                            ToolTip.Tip="{Binding Note}"
+                                            IsVisible="{Binding IsVisible}">
+                                    <TextBlock Text="{Binding Key}"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding SchemaName}"
+                                               Foreground="#aaaacc" FontSize="13"
+                                               VerticalAlignment="Center"
+                                               IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                    <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                                             Fill="{DynamicResource SukiLowText}"
+                                             ToolTip.Tip="SAT-derived (base schema)">
+                                        <Ellipse.IsVisible>
+                                            <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsBase}" />
+                                        </Ellipse.IsVisible>
+                                    </Ellipse>
+                                    <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                                             Fill="{DynamicResource ThemeAccentBrush}"
+                                             ToolTip.Tip="Your custom override (user schema)">
+                                        <Ellipse.IsVisible>
+                                            <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsUser}" />
+                                        </Ellipse.IsVisible>
+                                    </Ellipse>
+                                </StackPanel>
+                                <!-- Hidden / collapsed view -->
+                                <TextBlock Text="{Binding Key}" FontSize="10"
+                                           FontStyle="Italic" Margin="4,0"
+                                           Foreground="{DynamicResource SukiLowText}"
                                            VerticalAlignment="Center"
-                                           IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                            </StackPanel>
+                                           IsVisible="{Binding IsHidden}" />
+                            </Panel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -85,7 +141,9 @@
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
-                            <TextBlock Text="{Binding Type}" Margin="12,0" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Type}" Margin="12,0" VerticalAlignment="Center"
+                                       IsVisible="{Binding IsVisible}"
+                                       Foreground="{DynamicResource SukiText}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -108,9 +166,18 @@
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
-                            <TextBlock Text="{Binding DisplayValue}" Margin="12,4" VerticalAlignment="Center"
-                                       TextWrapping="Wrap"
-                                       FontFamily="Monospace" />
+                            <Panel VerticalAlignment="Center">
+                                <!-- Normal -->
+                                <TextBlock Text="{Binding DisplayValue}" Margin="12,4"
+                                           TextWrapping="Wrap" FontFamily="Monospace"
+                                           IsVisible="{Binding IsVisible}" />
+                                <!-- Hidden / collapsed: inline, ellipsis -->
+                                <TextBlock Text="{Binding Value}" Margin="12,0"
+                                           FontSize="10" FontFamily="Monospace" FontStyle="Italic"
+                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                                           Foreground="{DynamicResource SukiLowText}"
+                                           IsVisible="{Binding IsHidden}" />
+                            </Panel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -133,7 +200,8 @@
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:ParamRow">
-                            <StackPanel Margin="4,2" VerticalAlignment="Center">
+                            <StackPanel Margin="4,2" VerticalAlignment="Center"
+                                        IsVisible="{Binding IsVisible}">
                                 <!-- Single resolved item -->
                                 <StackPanel Orientation="Horizontal" Spacing="6"
                                             IsVisible="{Binding HasSingleResolved}">
@@ -167,5 +235,7 @@
 
             </DataGrid.Columns>
     </DataGrid>
+
+    </DockPanel>
 
 </UserControl>

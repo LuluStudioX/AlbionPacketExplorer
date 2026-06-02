@@ -5,6 +5,7 @@ using SukiUI.Toasts;
 using Avalonia.Threading;
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Services;
+using static AlbionPacketExplorer.Services.PacketSchemaService;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -37,6 +38,7 @@ public sealed class ParamRow : ObservableObject
     public string UniqueName { get; }
     public string Note { get; }
     public bool HasNote => !string.IsNullOrEmpty(Note);
+    public ParamSource Source { get; }
 
     public ObservableCollection<ResolvedItem> ResolvedItems { get; } = [];
 
@@ -64,8 +66,16 @@ public sealed class ParamRow : ObservableObject
     public string ExpandedText { get; set; } = string.Empty;
     public string DisplayValue => _isExpanded ? ExpandedText : Value;
 
+    private bool _isHidden;
+    public bool IsHidden
+    {
+        get => _isHidden;
+        set { _isHidden = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsVisible)); }
+    }
+    public bool IsVisible => !_isHidden;
+
     public ParamRow(string key, string schemaName, string type, string value,
-                    string resolvedName, string uniqueName, string note)
+                    string resolvedName, string uniqueName, string note, ParamSource source = ParamSource.None)
     {
         Key = key;
         SchemaName = schemaName;
@@ -74,6 +84,7 @@ public sealed class ParamRow : ObservableObject
         ResolvedName = resolvedName;
         UniqueName = uniqueName;
         Note = note;
+        Source = source;
     }
 }
 
@@ -82,6 +93,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     private readonly GameDataService _gameData;
     private readonly IconCacheService _icons;
     private readonly PacketSchemaService _schema;
+    private readonly RowHideStore _hideStore;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
@@ -91,7 +103,14 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _forceExpandRows;
     [ObservableProperty] private ParamRow? _selectedRow;
 
+    // Hide preset management
+    [ObservableProperty] private ObservableCollection<RowHidePreset> _hidePresets = [];
+    [ObservableProperty] private RowHidePreset? _selectedHidePreset;
+    [ObservableProperty] private string _newHidePresetName = "";
+
     private List<ParamRow> _allRows = [];
+
+    private string PacketKey => Packet == null ? "" : $"{Packet.Kind}:{Packet.Code}";
 
     private string _filterKey = "";
     private string _filterType = "";
@@ -135,11 +154,14 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     public IClipboard? Clipboard { get; set; }
     public ISukiToastManager? Toasts { get; set; }
 
-    public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema)
+    public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema, RowHideStore hideStore)
     {
         _gameData = gameData;
         _icons = icons;
         _schema = schema;
+        _hideStore = hideStore;
+        _hideStore.Load();
+        RefreshHidePresets();
     }
 
     partial void OnPacketChanged(PacketEntry? value)
@@ -201,6 +223,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             var schemaName = paramSchema?.Name ?? string.Empty;
             var note = paramSchema?.Note ?? string.Empty;
             var resolveAs = paramSchema?.ResolveAs ?? string.Empty;
+            var source = _schema.GetParamSource(Packet.Kind, Packet.Code, key);
 
             var (resolved, uniqueName) = (string.Empty, string.Empty);
             List<ResolvedItem>? resolvedItems = null;
@@ -218,7 +241,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                     (resolved, uniqueName) = TryResolveParam(pv);
             }
 
-            var row = new ParamRow(key, schemaName, pv.Type, formatted, resolved, uniqueName, note);
+            var row = new ParamRow(key, schemaName, pv.Type, formatted, resolved, uniqueName, note, source);
             if (resolvedItems != null)
                 foreach (var ri in resolvedItems)
                     row.ResolvedItems.Add(ri);
@@ -237,7 +260,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                     }
                 }
                 // Arrays + schema-tagged itemIndex: resolve each element
-                else if (resolveAs == "itemIndex" || pv.Value is System.Collections.IList || pv.Value is List<object?>)
+                // Only when resolveAs is set, or resolve is explicitly enabled by user
+                else if (resolveAs == "itemIndex" || (ResolveItemNames && (pv.Value is System.Collections.IList || pv.Value is List<object?>)))
                 {
                     var previewItems = ResolveIndexItems(pv);
                     if (previewItems.Count > 0)
@@ -248,8 +272,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                                 row.ResolvedItems.Add(pi);
                     }
                 }
-                // Scalar numerics: preview-only resolution (no schema tag required)
-                else
+                // Scalar numerics: only when resolve is on or param has a schema name
+                else if (ResolveItemNames || !string.IsNullOrEmpty(schemaName))
                 {
                     var idx = ToInt(pv.Value);
                     if (idx != null && _gameData.TryResolve(idx.Value, out var pu, out var pd))
@@ -268,11 +292,20 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             }
         }
 
+        ApplyHiddenState();
         ApplyFilter();
         if (ForceExpandRows) ExpandAllRows();
 
         if (rowsToLoad.Count > 0)
             _ = LoadIconsAsync(rowsToLoad, cts.Token);
+    }
+
+    private void ApplyHiddenState()
+    {
+        if (Packet == null) return;
+        var hidden = _hideStore.GetHidden(PacketKey);
+        foreach (var row in _allRows)
+            row.IsHidden = hidden.Contains(row.Key);
     }
 
     private void ExpandAllRows()
@@ -392,13 +425,15 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     {
         if (SelectedRow == null || Packet == null) return;
         var existing = _schema.GetParam(Packet.Kind, Packet.Code, SelectedRow.Key);
+        var src = _schema.GetParamSource(Packet.Kind, Packet.Code, SelectedRow.Key);
         var vm = new EditParamViewModel(
             _schema,
             Packet.Kind, Packet.Code, SelectedRow.Key,
             existing?.Name ?? string.Empty,
             existing?.Note ?? string.Empty,
             existing?.ResolveAs ?? string.Empty,
-            () => RebuildRows());
+            () => RebuildRows(),
+            src);
         EditParamRequested?.Invoke(vm);
     }
 
@@ -450,6 +485,63 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             .Queue();
     }
 
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private void HideRow()
+    {
+        if (SelectedRow == null || Packet == null) return;
+        _hideStore.Hide(PacketKey, SelectedRow.Key);
+        SelectedRow.IsHidden = true;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private void UnhideRow()
+    {
+        if (SelectedRow == null || Packet == null) return;
+        _hideStore.Unhide(PacketKey, SelectedRow.Key);
+        SelectedRow.IsHidden = false;
+    }
+
+    [RelayCommand]
+    private void UnhideAllRows()
+    {
+        if (Packet == null) return;
+        _hideStore.UnhideAll(PacketKey);
+        foreach (var row in _allRows)
+            row.IsHidden = false;
+    }
+
+    [RelayCommand]
+    private void SaveHidePreset()
+    {
+        if (Packet == null || string.IsNullOrWhiteSpace(NewHidePresetName)) return;
+        var hidden = _allRows.Where(r => r.IsHidden).Select(r => r.Key);
+        _hideStore.SavePreset(NewHidePresetName.Trim(), PacketKey, hidden);
+        NewHidePresetName = "";
+        RefreshHidePresets();
+    }
+
+    [RelayCommand]
+    private void LoadHidePreset()
+    {
+        if (Packet == null || SelectedHidePreset == null) return;
+        _hideStore.ApplyPreset(SelectedHidePreset.Name, PacketKey);
+        ApplyHiddenState();
+    }
+
+    [RelayCommand]
+    private void DeleteHidePreset()
+    {
+        if (SelectedHidePreset == null) return;
+        _hideStore.DeletePreset(SelectedHidePreset.Name);
+        SelectedHidePreset = null;
+        RefreshHidePresets();
+    }
+
+    private void RefreshHidePresets()
+    {
+        HidePresets = new ObservableCollection<RowHidePreset>(_hideStore.Presets);
+    }
+
     private bool CanCopyRow() => SelectedRow != null;
 
     partial void OnSelectedRowChanged(ParamRow? value)
@@ -459,6 +551,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         PreviewResolveCommand.NotifyCanExecuteChanged();
         ViewFullValueCommand.NotifyCanExecuteChanged();
         EditParamCommand.NotifyCanExecuteChanged();
+        HideRowCommand.NotifyCanExecuteChanged();
+        UnhideRowCommand.NotifyCanExecuteChanged();
     }
 
     private static int? ToInt(object? v) => v switch
