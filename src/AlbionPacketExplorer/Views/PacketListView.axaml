@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+             xmlns:views="using:AlbionPacketExplorer.Views"
              x:Class="AlbionPacketExplorer.Views.PacketListView"
              x:DataType="vm:PacketListViewModel">
 
@@ -9,14 +10,31 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Spacing="2" Margin="4,4,4,2">
             <!-- Filter row -->
             <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock VerticalAlignment="Center" Text="Kind:" />
-                <TextBox Text="{Binding FilterKind}" Width="80" PlaceholderText="EVENT…" />
-                <TextBlock VerticalAlignment="Center" Text="Code:" />
-                <TextBox Text="{Binding FilterCode}" Width="60" PlaceholderText="32…" />
+
+                <!-- Filter edit button — shows label or placeholder, opens flyout to edit query -->
+                <Button Classes="Flat" Padding="8,4" MinWidth="120"
+                        ToolTip.Tip="Click to edit filter query&#xA;Syntax: term  kind:X  code:32  name:X  params:X  prefix - to exclude">
+                    <Button.Flyout>
+                        <Flyout Placement="Bottom" ShowMode="TransientWithDismissOnPointerMoveAway">
+                            <TextBox Text="{Binding FilterQuery, Mode=TwoWay}"
+                                     PlaceholderText="kind:EVENT code:32 -code:45 name:Leave …"
+                                     MinWidth="420" />
+                        </Flyout>
+                    </Button.Flyout>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" />
+                        <TextBlock Text="{Binding FilterDisplayText}" FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
                 <Button Classes="Flat" Command="{Binding ClearFilterCommand}" Padding="8">
                     <ToolTip.Tip>Clear filter</ToolTip.Tip>
                     <PathIcon Data="{x:Static sukiTheme:Icons.BackspaceOutline}" Width="15" Height="15" />
                 </Button>
+                <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,4">
+                    <ToolTip.Tip>Sort unknown codes to top</ToolTip.Tip>
+                    <TextBlock Text="? First" FontSize="11" VerticalAlignment="Center" />
+                </ToggleButton>
                 <TextBlock VerticalAlignment="Center" Text="{Binding CountText}"
                            Foreground="{DynamicResource SukiLowText}" />
             </StackPanel>
@@ -63,8 +81,10 @@
                     <MenuItem Header="Copy as JSON"  Command="{Binding CopyAsJsonCommand}" />
                     <Separator />
                     <MenuItem Header="Auto-select Newest"
-                              Command="{Binding ToggleAutoSelectNewestCommand}"
-                              IsChecked="{Binding AutoSelectNewest, Mode=OneWay}"
+                              IsChecked="{Binding AutoSelectNewest, Mode=TwoWay}"
+                              ToggleType="CheckBox" />
+                    <MenuItem Header="Unknown codes first"
+                              IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}"
                               ToggleType="CheckBox" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
@@ -90,11 +110,10 @@
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKind, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Kind…" Width="160" />
+                                                 PlaceholderText="EVENT  -REQUEST …" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" Foreground="{DynamicResource SukiText}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -113,11 +132,10 @@
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterCode, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Code…" Width="160" />
+                                                 PlaceholderText="32  -45  -103 …" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" Foreground="{DynamicResource SukiText}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
@@ -136,18 +154,18 @@
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterName, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Name…" Width="200" />
+                                                 PlaceholderText="Leave  -NewChar …" Width="200" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" Foreground="{DynamicResource SukiText}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PacketRow">
-                            <TextBlock Text="{Binding EventName}" Margin="12,0" VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Margin="12,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                       Text="{Binding EventName}"
+                                       Opacity="{Binding IsKnown, Converter={x:Static views:ViewConverters.BoolToOpacity}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -171,11 +189,10 @@
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterParams, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Params…" Width="240" />
+                                                 PlaceholderText="objectId  T8_FARM …" Width="240" />
                                     </Flyout>
                                 </Button.Flyout>
-                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13"
-                                          Foreground="{DynamicResource SukiText}" />
+                                <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="13" Height="13" Foreground="{DynamicResource SukiText}" />
                             </Button>
                         </Grid>
                     </DataGridTemplateColumn.Header>
