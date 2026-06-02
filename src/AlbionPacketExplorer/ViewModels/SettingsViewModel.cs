@@ -54,6 +54,15 @@ public partial class SettingsViewModel : ObservableObject
         set => _main.AutoSaveLogs = value;
     }
 
+    public IReadOnlyList<DetailDensity> DensityOptions { get; } =
+        [DetailDensity.Compact, DetailDensity.Normal, DetailDensity.Comfortable];
+
+    public DetailDensity Density
+    {
+        get => _main.Density;
+        set { _main.Density = value; OnPropertyChanged(); }
+    }
+
     public string DataFolderPath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "AlbionPacketExplorer");
@@ -176,6 +185,9 @@ public partial class SettingsViewModel : ObservableObject
                     break;
                 case nameof(MainViewModel.AutoSaveLogs):
                     OnPropertyChanged(nameof(AutoSaveLogs));
+                    break;
+                case nameof(MainViewModel.Density):
+                    OnPropertyChanged(nameof(Density));
                     break;
             }
         };

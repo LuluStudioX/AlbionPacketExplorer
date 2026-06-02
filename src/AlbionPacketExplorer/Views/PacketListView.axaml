@@ -66,14 +66,9 @@
                   IsReadOnly="True"
                   CanUserSortColumns="True"
                   CanUserResizeColumns="True"
-                  FontSize="12"
-                  RowHeight="26"
+                  FontSize="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}"
+                  RowHeight="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=26}"
                   GridLinesVisibility="Horizontal">
-            <DataGrid.Styles>
-                <Style Selector="DataGridCell">
-                    <Setter Property="FontSize" Value="12" />
-                </Style>
-            </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Params"   Command="{Binding CopyParamSummaryCommand}" />
