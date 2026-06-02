@@ -9,16 +9,46 @@ public class PacketFileReader
     {
         var fileInfo = new FileInfo(filePath);
         long totalBytes = fileInfo.Length;
-        long bytesRead = 0;
 
         using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        using var reader = new StreamReader(stream);
+
+        bool isArray = await IsJsonArrayAsync(stream);
+        stream.Position = 0;
+
+        if (isArray)
+        {
+            await foreach (var entry in ReadArrayAsync(stream, totalBytes, progress))
+                yield return entry;
+        }
+        else
+        {
+            await foreach (var entry in ReadNdjsonAsync(stream, totalBytes, progress))
+                yield return entry;
+        }
+    }
+
+    private static async Task<bool> IsJsonArrayAsync(Stream stream)
+    {
+        var buf = new byte[64];
+        int read = await stream.ReadAsync(buf);
+        for (int i = 0; i < read; i++)
+        {
+            if (buf[i] == '[') return true;
+            if (buf[i] == '{') return false;
+        }
+        return false;
+    }
+
+    private static async IAsyncEnumerable<PacketEntry> ReadNdjsonAsync(Stream stream, long totalBytes, IProgress<double>? progress)
+    {
+        long bytesRead = 0;
+        using var reader = new StreamReader(stream, System.Text.Encoding.UTF8, leaveOpen: true);
 
         string? line;
         while ((line = await reader.ReadLineAsync()) != null)
         {
             bytesRead += line.Length + 1;
-            progress?.Report((double) bytesRead / totalBytes);
+            progress?.Report((double)bytesRead / totalBytes);
 
             if (string.IsNullOrWhiteSpace(line)) continue;
 
@@ -28,11 +58,30 @@ public class PacketFileReader
         }
     }
 
+    private static async IAsyncEnumerable<PacketEntry> ReadArrayAsync(Stream stream, long totalBytes, IProgress<double>? progress)
+    {
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var entries = await JsonSerializer.DeserializeAsync<List<JsonElement>>(stream, options);
+        if (entries == null) yield break;
+
+        progress?.Report(1.0);
+
+        foreach (var el in entries)
+        {
+            PacketEntry? entry = null;
+            try { entry = ParseElement(el); } catch { }
+            if (entry != null) yield return entry;
+        }
+    }
+
     private static PacketEntry? ParseLine(string line)
     {
         using var doc = JsonDocument.Parse(line);
-        var root = doc.RootElement;
+        return ParseElement(doc.RootElement);
+    }
 
+    private static PacketEntry? ParseElement(JsonElement root)
+    {
         if (!root.TryGetProperty("ts", out var tsEl) ||
             !root.TryGetProperty("kind", out var kindEl) ||
             !root.TryGetProperty("code", out var codeEl) ||
