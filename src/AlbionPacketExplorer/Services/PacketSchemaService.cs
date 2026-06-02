@@ -134,6 +134,25 @@ public sealed class PacketSchemaService
         }
     }
 
+    public enum ParamSource { None, Base, User }
+
+    public ParamSource GetParamSource(string kind, int code, string key)
+    {
+        var typeKey = $"{kind.ToUpperInvariant()}:{code}";
+        if (_user.TryGetValue(typeKey, out var u) && u.Params.ContainsKey(key)) return ParamSource.User;
+        if (_base.TryGetValue(typeKey, out var b) && b.Params.ContainsKey(key)) return ParamSource.Base;
+        return ParamSource.None;
+    }
+
+    public IReadOnlyList<string> GetAllKnownParamNames()
+        => _base.Values
+            .SelectMany(t => t.Params.Values)
+            .Select(p => p.Name)
+            .Where(n => !string.IsNullOrWhiteSpace(n))
+            .Distinct()
+            .OrderBy(n => n)
+            .ToList();
+
     public string ExportEventSchema(string kind, int code)
     {
         var schema = GetSchema(kind, code);
