@@ -1,6 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:suki="clr-namespace:SukiUI;assembly=SukiUI"
+             RequestedThemeVariant="Dark"
              x:Class="AlbionPacketExplorer.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -8,16 +8,15 @@
                 <ResourceInclude Source="/Themes/Tokens.axaml" />
                 <ResourceInclude Source="/Themes/Scale.axaml" />
                 <ResourceInclude Source="/Themes/Icons.axaml" />
-                <ResourceInclude Source="/Themes/ApxWindow.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 
     <Application.Styles>
-        <suki:SukiTheme ThemeColor="Blue" />
-        <!-- Themes/Controls.axaml is intentionally NOT included while SukiUI is still
-             active: its global selectors would clash with Suki's templates (double focus
-             boxes, half-styled ComboBoxes). It is activated when SukiUI is removed. -->
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="/Themes/Controls.axaml" />
+        <StyleInclude Source="/Themes/ApxWindow.axaml" />
     </Application.Styles>
     <TrayIcon.Icons>
         <TrayIcons>

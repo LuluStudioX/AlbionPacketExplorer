@@ -1,7 +1,5 @@
-using Avalonia.Controls.Notifications;
 using Avalonia.Input.Platform;
 using Avalonia.Media.Imaging;
-using SukiUI.Toasts;
 using Avalonia.Threading;
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Services;
@@ -152,7 +150,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     }
 
     public IClipboard? Clipboard { get; set; }
-    public ISukiToastManager? Toasts { get; set; }
+    public ToastService? Toasts { get; set; }
 
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema, RowHideStore hideStore)
     {
@@ -444,13 +442,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     {
         if (SelectedRow == null || Clipboard == null) return;
         await Clipboard.SetTextAsync(SelectedRow.Value);
-        Toasts?.CreateToast()
-            .WithTitle("Copied")
-            .WithContent("Value copied to clipboard")
-            .OfType(NotificationType.Success)
-            .Dismiss().After(TimeSpan.FromSeconds(2))
-            .Dismiss().ByClicking()
-            .Queue();
+        Toasts?.Show("Copied", "Value copied to clipboard", ToastSeverity.Success);
     }
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
@@ -461,13 +453,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             ? $"{SelectedRow.Key}\t{SelectedRow.Type}\t{SelectedRow.Value}"
             : $"{SelectedRow.Key}\t{SelectedRow.Type}\t{SelectedRow.Value}\t{SelectedRow.ResolvedName}";
         await Clipboard.SetTextAsync(text);
-        Toasts?.CreateToast()
-            .WithTitle("Copied")
-            .WithContent("Row copied to clipboard")
-            .OfType(NotificationType.Success)
-            .Dismiss().After(TimeSpan.FromSeconds(2))
-            .Dismiss().ByClicking()
-            .Queue();
+        Toasts?.Show("Copied", "Row copied to clipboard", ToastSeverity.Success);
     }
 
     [RelayCommand]
@@ -478,13 +464,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             ? $"{r.Key}\t{r.Type}\t{r.Value}"
             : $"{r.Key}\t{r.Type}\t{r.Value}\t{r.ResolvedName}");
         await Clipboard.SetTextAsync(string.Join("\n", lines));
-        Toasts?.CreateToast()
-            .WithTitle("Copied")
-            .WithContent("All rows copied to clipboard")
-            .OfType(NotificationType.Success)
-            .Dismiss().After(TimeSpan.FromSeconds(2))
-            .Dismiss().ByClicking()
-            .Queue();
+        Toasts?.Show("Copied", "All rows copied to clipboard", ToastSeverity.Success);
     }
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]

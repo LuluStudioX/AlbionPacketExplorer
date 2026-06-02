@@ -2,11 +2,11 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using AlbionPacketExplorer.ViewModels;
-using SukiUI.Controls;
+using AlbionPacketExplorer.Controls;
 
 namespace AlbionPacketExplorer.Views;
 
-public partial class SettingsWindow : SukiWindow
+public partial class SettingsWindow : ApxWindow
 {
     private StackPanel? _sectionDisplay;
     private StackPanel? _sectionPaths;

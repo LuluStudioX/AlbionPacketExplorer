@@ -1,7 +1,6 @@
-<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+<controls:ApxWindow xmlns="https://github.com/avaloniaui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-                xmlns:sukiTheme="https://github.com/kikipoulet/SukiUI"
+                xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
                 xmlns:vm="using:AlbionPacketExplorer.ViewModels"
                 x:Class="AlbionPacketExplorer.Views.SettingsWindow"
                 x:DataType="vm:SettingsViewModel"
@@ -16,7 +15,7 @@
     <Grid ColumnDefinitions="180,*">
 
         <!-- Left nav -->
-        <Border Grid.Column="0" Background="{DynamicResource SukiCardBackground}" Padding="0,8">
+        <Border Grid.Column="0" Background="{DynamicResource Apx.Surface}" Padding="0,8">
             <StackPanel Spacing="2">
                 <Button Name="NavDisplay"
                         HorizontalAlignment="Stretch"
@@ -25,7 +24,7 @@
                         Click="OnNavClicked"
                         Tag="Display">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <PathIcon Data="{x:Static sukiTheme:Icons.Star}" Width="14" Height="14" />
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Monitor}" />
                         <TextBlock Text="Display" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -36,7 +35,7 @@
                         Click="OnNavClicked"
                         Tag="Paths">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <PathIcon Data="{x:Static sukiTheme:Icons.FileOpen}" Width="14" Height="14" />
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Folder}" />
                         <TextBlock Text="Paths" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -47,7 +46,7 @@
                         Click="OnNavClicked"
                         Tag="Schema">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <PathIcon Data="{x:Static sukiTheme:Icons.ArrowRight}" Width="14" Height="14" />
+                        <Path Classes="icon sm" Data="{StaticResource Icon.FileCode}" />
                         <TextBlock Text="Schema Export" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -58,7 +57,7 @@
                         Click="OnNavClicked"
                         Tag="Theme">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <PathIcon Data="{x:Static sukiTheme:Icons.Star}" Width="14" Height="14" />
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Palette}" />
                         <TextBlock Text="Theme" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -69,7 +68,7 @@
                         Click="OnNavClicked"
                         Tag="About">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <PathIcon Data="{x:Static sukiTheme:Icons.CircleInformation}" Width="14" Height="14" />
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Info}" />
                         <TextBlock Text="About" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -187,9 +186,9 @@
                             <TextBlock Text="{Binding DataFolderPath}"
                                        Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
                                        TextWrapping="Wrap" Opacity="0.8" />
-                            <Button Classes="Flat" Command="{Binding OpenDataFolderCommand}" Margin="0,4,0,0">
+                            <Button Classes="ghost" Command="{Binding OpenDataFolderCommand}" Margin="0,4,0,0">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="14" Height="14" />
+                                    <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
                                     <TextBlock Text="Open in Explorer" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
@@ -204,9 +203,9 @@
                             <TextBlock Text="{Binding SatPacketSnifferPath}"
                                        Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
                                        TextWrapping="Wrap" Opacity="0.8" />
-                            <Button Classes="Flat" Command="{Binding OpenSatFolderCommand}" Margin="0,4,0,0">
+                            <Button Classes="ghost" Command="{Binding OpenSatFolderCommand}" Margin="0,4,0,0">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <PathIcon Data="{x:Static sukiTheme:Icons.Search}" Width="14" Height="14" />
+                                    <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
                                     <TextBlock Text="Open in Explorer" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
@@ -256,15 +255,15 @@
                                      PlaceholderText="Enter kind + code above to preview schema…" />
 
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Classes="Flat" Command="{Binding CopyExportCommand}">
+                                <Button Classes="ghost" Command="{Binding CopyExportCommand}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <PathIcon Data="{x:Static sukiTheme:Icons.ArrowULeftTop}" Width="14" Height="14" />
+                                        <Path Classes="icon sm" Data="{StaticResource Icon.Copy}" />
                                         <TextBlock Text="Copy to Clipboard" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
-                                <Button Classes="Flat" Command="{Binding SaveExportCommand}">
+                                <Button Classes="ghost" Command="{Binding SaveExportCommand}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <PathIcon Data="{x:Static sukiTheme:Icons.FileOpen}" Width="14" Height="14" />
+                                        <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
                                         <TextBlock Text="Save as JSON" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
@@ -306,7 +305,7 @@
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Border Width="80" Height="36" CornerRadius="6" Margin="4"
-                                                Background="{Binding PrimaryBrush}">
+                                                Background="{Binding AccentBrush}">
                                             <TextBlock Text="{Binding DisplayName}"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"
@@ -319,16 +318,6 @@
                         </StackPanel>
                     </Border>
 
-                    <Border Classes="card" Padding="16">
-                        <StackPanel Spacing="10">
-                            <TextBlock Text="Background Style" FontWeight="SemiBold" />
-                            <TextBlock Text="Animated background effect for the main window."
-                                       Foreground="Gray" FontSize="12" />
-                            <ComboBox ItemsSource="{Binding AvailableBackgroundStyles}"
-                                      SelectedItem="{Binding BackgroundStyle}"
-                                      HorizontalAlignment="Stretch" />
-                        </StackPanel>
-                    </Border>
                 </StackPanel>
 
                 <!-- About section -->
@@ -350,4 +339,4 @@
 
     </Grid>
 
-</suki:SukiWindow>
+</controls:ApxWindow>

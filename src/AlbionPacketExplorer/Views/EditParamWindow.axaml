@@ -1,6 +1,6 @@
-<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+<controls:ApxWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+        xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
         xmlns:vm="using:AlbionPacketExplorer.ViewModels"
         xmlns:system="clr-namespace:System;assembly=System.Runtime"
         x:Class="AlbionPacketExplorer.Views.EditParamWindow"
@@ -19,7 +19,7 @@
                 <TextBlock Text="Param name" FontSize="12" Foreground="Gray" VerticalAlignment="Center" />
                 <Border Background="{DynamicResource ThemeAccentBrush}" CornerRadius="3" Padding="4,1"
                         IsVisible="{Binding SourceIsBase}" ToolTip.Tip="Name comes from base schema (SAT-derived)">
-                    <TextBlock Text="base" FontSize="10" Foreground="{DynamicResource SukiBackground}" />
+                    <TextBlock Text="base" FontSize="10" Foreground="{DynamicResource Apx.AccentText}" />
                 </Border>
                 <Border Background="{DynamicResource HighlightBrush}" CornerRadius="3" Padding="4,1"
                         IsVisible="{Binding SourceIsUser}" ToolTip.Tip="Name is your custom override">
@@ -30,7 +30,7 @@
                      PlaceholderText="e.g. objectId"
                      MaxLength="64" />
             <Border IsVisible="{Binding ShowSuggestions}"
-                    Background="{DynamicResource SukiCardBackground}"
+                    Background="{DynamicResource Apx.Card}"
                     BorderBrush="{DynamicResource ThemeAccentBrush}"
                     BorderThickness="1" CornerRadius="4" MaxHeight="160"
                     ClipToBounds="True">
@@ -51,7 +51,7 @@
                         <Style Selector="ListBoxItem">
                             <Setter Property="Cursor" Value="Hand" />
                             <Setter Property="Padding" Value="6,4" />
-                            <Setter Property="Foreground" Value="{DynamicResource SukiText}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
                             <Setter Property="Background" Value="Transparent" />
                             <Setter Property="FontSize" Value="12" />
                         </Style>
@@ -90,4 +90,4 @@
         </StackPanel>
 
     </StackPanel>
-</suki:SukiWindow>
+</controls:ApxWindow>

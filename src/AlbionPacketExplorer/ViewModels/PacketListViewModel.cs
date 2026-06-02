@@ -1,6 +1,4 @@
-using Avalonia.Controls.Notifications;
 using Avalonia.Input.Platform;
-using SukiUI.Toasts;
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Network;
 using AlbionPacketExplorer.Services;
@@ -249,7 +247,7 @@ public partial class PacketListViewModel : ObservableObject
 
     public PacketEntry? SelectedPacket => SelectedRow?.Packet;
     public IClipboard? Clipboard { get; set; }
-    public ISukiToastManager? Toasts { get; set; }
+    public ToastService? Toasts { get; set; }
 
     public string FilterQuery
     {
@@ -444,13 +442,7 @@ public partial class PacketListViewModel : ObservableObject
     {
         if (SelectedRow == null || Clipboard == null) return;
         await Clipboard.SetTextAsync(SelectedRow.ParamSummary);
-        Toasts?.CreateToast()
-            .WithTitle("Copied")
-            .WithContent("Param summary copied to clipboard")
-            .OfType(NotificationType.Success)
-            .Dismiss().After(TimeSpan.FromSeconds(2))
-            .Dismiss().ByClicking()
-            .Queue();
+        Toasts?.Show("Copied", "Param summary copied to clipboard", ToastSeverity.Success);
     }
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
@@ -466,13 +458,7 @@ public partial class PacketListViewModel : ObservableObject
             @params = p.Params.ToDictionary(kv => kv.Key, kv => new { type = kv.Value.Type, value = kv.Value.Value })
         }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
         await Clipboard.SetTextAsync(json);
-        Toasts?.CreateToast()
-            .WithTitle("Copied")
-            .WithContent("Packet JSON copied to clipboard")
-            .OfType(NotificationType.Success)
-            .Dismiss().After(TimeSpan.FromSeconds(2))
-            .Dismiss().ByClicking()
-            .Queue();
+        Toasts?.Show("Copied", "Packet JSON copied to clipboard", ToastSeverity.Success);
     }
 
     private bool CanCopyRow() => SelectedRow != null;
