@@ -75,6 +75,7 @@ public partial class MainWindow : SukiWindow, IFilePicker
             vm.PacketDetail.Clipboard = clipboard;
             vm.PacketDetail.Toasts = vm.ToastManager;
             vm.PacketDetail.EditParamRequested += OnEditParamRequested;
+            vm.PacketDetail.ViewFullValueRequested += OnViewFullValueRequested;
             vm.PropertyChanged += OnMainViewModelPropertyChanged;
             BackgroundStyle = vm.BackgroundStyle;
         }
@@ -159,6 +160,12 @@ public partial class MainWindow : SukiWindow, IFilePicker
     private void OnEditParamRequested(EditParamViewModel vm)
     {
         var win = new EditParamWindow(vm);
+        win.Show(this);
+    }
+
+    private void OnViewFullValueRequested(ParamRow row, Services.GameDataService gameData)
+    {
+        var win = new ExpandedValueWindow(row, gameData);
         win.Show(this);
     }
 

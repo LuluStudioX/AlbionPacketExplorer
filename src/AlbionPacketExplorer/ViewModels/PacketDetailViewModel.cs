@@ -229,7 +229,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             List<ResolvedItem>? resolvedItems = null;
             if (ResolveItemNames && _gameData.IsLoaded)
             {
-                if (resolveAs == "itemIndex")
+                if (resolveAs == "itemIndex" && pv.Type != "Byte[]")
                 {
                     var items = ResolveIndexItems(pv);
                     if (items.Count == 1)
@@ -259,9 +259,11 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                             row.ResolvedItems.Add(item);
                     }
                 }
-                // Arrays + schema-tagged itemIndex: resolve each element
-                // Only when resolveAs is set, or resolve is explicitly enabled by user
-                else if (resolveAs == "itemIndex" || (ResolveItemNames && (pv.Value is System.Collections.IList || pv.Value is List<object?>)))
+                // Arrays: resolve each element as an item index ONLY when the schema
+                // explicitly tags the param resolveAs="itemIndex". The global Resolve
+                // toggle must NOT blind-resolve raw arrays (e.g. Byte[] GUIDs, zero-padded
+                // Int16[]) — that produced garbage item names. Byte[] never index-resolves.
+                else if (resolveAs == "itemIndex" && pv.Type != "Byte[]")
                 {
                     var previewItems = ResolveIndexItems(pv);
                     if (previewItems.Count > 0)
@@ -371,14 +373,14 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>Raised when the user asks to inspect a row's full value in a popup window.</summary>
+    public event Action<ParamRow, GameDataService>? ViewFullValueRequested;
+
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
     private void ViewFullValue()
     {
         if (SelectedRow == null) return;
-        if (SelectedRow.IsExpanded) { SelectedRow.IsExpanded = false; return; }
-        if (string.IsNullOrEmpty(SelectedRow.ExpandedText))
-            SelectedRow.ExpandedText = BuildExpandedText(SelectedRow);
-        SelectedRow.IsExpanded = true;
+        ViewFullValueRequested?.Invoke(SelectedRow, _gameData);
     }
 
     private string BuildExpandedText(ParamRow row)
