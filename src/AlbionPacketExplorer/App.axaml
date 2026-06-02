@@ -8,6 +8,7 @@
                 <ResourceInclude Source="/Themes/Tokens.axaml" />
                 <ResourceInclude Source="/Themes/Scale.axaml" />
                 <ResourceInclude Source="/Themes/Icons.axaml" />
+                <ResourceInclude Source="/Themes/ApxWindow.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -1,12 +1,12 @@
 using Avalonia.Controls;
-using SukiUI.Controls;
+using AlbionPacketExplorer.Controls;
 using AlbionPacketExplorer.ViewModels;
 using AlbionPacketExplorer.Services;
 using System.Text;
 
 namespace AlbionPacketExplorer.Views;
 
-public partial class ExpandedValueWindow : SukiWindow
+public partial class ExpandedValueWindow : ApxWindow
 {
     public ExpandedValueWindow(ParamRow row, GameDataService gameData)
     {

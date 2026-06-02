@@ -1,0 +1,123 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
+                    xmlns:chrome="clr-namespace:Avalonia.Controls.Chrome;assembly=Avalonia.Controls">
+
+    <!-- Caption buttons (min/max/close). Defined first so the window template can
+         reference it via StaticResource. -->
+    <ControlTheme x:Key="CaptionButtonTheme" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Width" Value="44" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="bg" Background="{TemplateBinding Background}">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#bg">
+            <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+        </Style>
+        <Style Selector="^.close:pointerover /template/ Border#bg">
+            <Setter Property="Background" Value="{DynamicResource Apx.Danger}" />
+        </Style>
+        <Style Selector="^.close:pointerover Path">
+            <Setter Property="Stroke" Value="#FFFFFF" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="ApxWindowTheme" TargetType="controls:ApxWindow">
+        <Setter Property="Background" Value="{DynamicResource Apx.Bg}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="FontSize" Value="{DynamicResource Apx.Font.Sm}" />
+        <Setter Property="TransparencyLevelHint" Value="None" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_RootBorder"
+                        Background="{DynamicResource Apx.Bg}"
+                        BorderBrush="{DynamicResource Apx.BorderStrong}"
+                        BorderThickness="1">
+                    <DockPanel LastChildFill="True">
+
+                        <!-- Title bar — marked TitleBar so the platform handles drag + double-click maximize -->
+                        <Grid x:Name="PART_TitleBar"
+                              DockPanel.Dock="Top"
+                              Height="36"
+                              Background="{DynamicResource Apx.Surface}"
+                              ColumnDefinitions="Auto,Auto,*,Auto,Auto"
+                              chrome:WindowDecorationProperties.ElementRole="TitleBar"
+                              IsVisible="{TemplateBinding IsTitleBarVisible}">
+
+                            <ContentControl Grid.Column="0"
+                                            Content="{TemplateBinding LogoContent}"
+                                            VerticalAlignment="Center"
+                                            Margin="10,0,0,0" />
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{TemplateBinding Title}"
+                                       FontWeight="SemiBold"
+                                       FontSize="{DynamicResource Apx.Font.Sm}"
+                                       Foreground="{DynamicResource Apx.Text}"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+
+                            <ContentControl Grid.Column="3"
+                                            Content="{TemplateBinding TitleBarContent}"
+                                            VerticalAlignment="Center"
+                                            Margin="0,0,4,0" />
+
+                            <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <Button x:Name="PART_MinimizeButton"
+                                        Theme="{StaticResource CaptionButtonTheme}"
+                                        chrome:WindowDecorationProperties.ElementRole="MinimizeButton"
+                                        ToolTip.Tip="Minimize">
+                                    <Path Data="{StaticResource Icon.Minus}"
+                                          Stroke="{DynamicResource Apx.Text}" StrokeThickness="2"
+                                          StrokeLineCap="Round" StrokeJoin="Round" Stretch="Uniform"
+                                          Width="13" Height="13" />
+                                </Button>
+                                <Button x:Name="PART_MaximizeButton"
+                                        Theme="{StaticResource CaptionButtonTheme}"
+                                        chrome:WindowDecorationProperties.ElementRole="MaximizeButton"
+                                        ToolTip.Tip="Maximize">
+                                    <Path Data="{StaticResource Icon.Maximize}"
+                                          Stroke="{DynamicResource Apx.Text}" StrokeThickness="2"
+                                          StrokeLineCap="Round" StrokeJoin="Round" Stretch="Uniform"
+                                          Width="13" Height="13" />
+                                </Button>
+                                <Button x:Name="PART_CloseButton"
+                                        Theme="{StaticResource CaptionButtonTheme}"
+                                        Classes="close"
+                                        chrome:WindowDecorationProperties.ElementRole="CloseButton"
+                                        ToolTip.Tip="Close">
+                                    <Path Data="{StaticResource Icon.X}"
+                                          Stroke="{DynamicResource Apx.Text}" StrokeThickness="2"
+                                          StrokeLineCap="Round" StrokeJoin="Round" Stretch="Uniform"
+                                          Width="13" Height="13" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Background="{DynamicResource Apx.Bg}" />
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <!-- Maximized: drop the outer border so it sits flush to screen edges -->
+        <Style Selector="^[WindowState=Maximized] /template/ Border#PART_RootBorder">
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+    </ControlTheme>
+
+</ResourceDictionary>
