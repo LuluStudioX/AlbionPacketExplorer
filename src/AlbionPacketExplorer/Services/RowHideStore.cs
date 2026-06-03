@@ -12,13 +12,9 @@ public sealed class RowHideStore
 {
     private static readonly JsonSerializerOptions JsonOpts = new() { WriteIndented = true };
 
-    private static string HiddenPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "row-hidden.json");
+    private static string HiddenPath => AppPaths.RowHidden;
 
-    private static string PresetsPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "row-hide-presets.json");
+    private static string PresetsPath => AppPaths.RowHidePresets;
 
     // packetKey = "EVENT:32"
     private Dictionary<string, HashSet<string>> _hidden = [];

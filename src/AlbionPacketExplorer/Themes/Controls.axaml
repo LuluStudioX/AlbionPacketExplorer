@@ -188,6 +188,15 @@
         <Setter Property="Background" Value="{DynamicResource Apx.AccentPressed}" />
     </Style>
 
+    <!-- Path chip: read-only path display (selectable text, not editable) -->
+    <Style Selector="Border.pathchip">
+        <Setter Property="Background" Value="{DynamicResource Apx.SurfaceAlt}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+        <Setter Property="Padding" Value="10,6" />
+    </Style>
+
     <!-- Active nav item (Settings left rail): tinted background + accent text -->
     <Style Selector="Button.navactive /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource Apx.Selected}" />

@@ -9,9 +9,7 @@ public sealed class IconCacheService : IDisposable
     private const int IconSize = 64;
     private const int MemoryCacheLimit = 500;
 
-    private static readonly string DiskCacheDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "icons");
+    private static string DiskCacheDir => AppPaths.IconCacheDir;
 
     private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(10) };
     private readonly ConcurrentDictionary<string, Bitmap?> _memCache = new();

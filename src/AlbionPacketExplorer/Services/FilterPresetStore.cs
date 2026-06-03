@@ -11,13 +11,9 @@ public sealed class FilterPresetStore
 {
     private static readonly JsonSerializerOptions JsonOpts = new() { WriteIndented = true };
 
-    private static string PresetsPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "filter-presets.json");
+    private static string PresetsPath => AppPaths.FilterPresets;
 
-    private static string LastFilterPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "filter-last.json");
+    private static string LastFilterPath => AppPaths.LastFilter;
 
     public static List<FilterPreset> LoadPresets()
     {

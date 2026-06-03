@@ -81,17 +81,67 @@ public partial class SettingsViewModel : ObservableObject
         set { _main.ToggleRowExpandGesture = value; OnPropertyChanged(); }
     }
 
-    public string DataFolderPath { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer");
+    [ObservableProperty] private string _dataFolderPath = AppPaths.BaseDir;
+    [ObservableProperty] private string _satPacketSnifferPath = AppPaths.AlbionLogFolder;
+    [ObservableProperty] private string _itemCachePath = AppPaths.ItemCache;
+    [ObservableProperty] private bool _itemCacheIsCustom = AppPaths.ItemCacheIsCustom;
 
-    public string SatPacketSnifferPath { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "StatisticsAnalysisTool", "Instances");
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task ChangeDataFolderAsync()
+    {
+        var folder = await _main.FilePicker.PickFolderAsync("Choose data folder");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        if (AppPaths.Relocate(folder, migrate: true, out var error))
+        {
+            RefreshPaths();
+            _main.ToastManager.Show(Loc.T("toast.path.moved.title"),
+                Loc.Format("toast.path.moved.body", AppPaths.BaseDir), ToastSeverity.Success);
+        }
+        else
+            ReportPathError(error);
+    }
 
-    public string ItemCachePath { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "items.json");
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task ChangeLogFolderAsync()
+    {
+        var folder = await _main.FilePicker.PickFolderAsync("Choose Albion log folder");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        if (AppPaths.SetLogFolder(folder, out var error))
+        {
+            RefreshPaths();
+            _main.ToastManager.Show(Loc.T("toast.path.set.title"),
+                Loc.Format("toast.path.set.body", AppPaths.AlbionLogFolder), ToastSeverity.Success);
+        }
+        else
+            ReportPathError(error);
+    }
+
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task ChangeItemCacheFolderAsync()
+    {
+        var folder = await _main.FilePicker.PickFolderAsync("Choose item cache folder");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        if (AppPaths.SetItemCacheDir(folder, migrate: true, out var error))
+        {
+            RefreshPaths();
+            _main.ToastManager.Show(Loc.T("toast.path.moved.title"),
+                Loc.Format("toast.path.moved.body", AppPaths.ItemCache), ToastSeverity.Success);
+        }
+        else
+            ReportPathError(error);
+    }
+
+    private void ReportPathError(string? error) =>
+        _main.ToastManager.Show(Loc.T("toast.path.failed.title"),
+            error ?? string.Empty, ToastSeverity.Error);
+
+    private void RefreshPaths()
+    {
+        DataFolderPath = AppPaths.BaseDir;
+        SatPacketSnifferPath = AppPaths.AlbionLogFolder;
+        ItemCachePath = AppPaths.ItemCache;
+        ItemCacheIsCustom = AppPaths.ItemCacheIsCustom;
+    }
 
     [RelayCommand]
     private void OpenDataFolder() => OpenInExplorer(DataFolderPath);
@@ -100,7 +150,7 @@ public partial class SettingsViewModel : ObservableObject
     private void OpenSatFolder() => OpenInExplorer(SatPacketSnifferPath);
 
     [RelayCommand]
-    private void OpenItemCacheFolder() => OpenInExplorer(DataFolderPath);
+    private void OpenItemCacheFolder() => OpenInExplorer(Path.GetDirectoryName(ItemCachePath) ?? DataFolderPath);
 
     private static void OpenInExplorer(string path)
     {
