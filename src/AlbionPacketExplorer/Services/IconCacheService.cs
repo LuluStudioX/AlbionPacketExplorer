@@ -11,6 +11,12 @@ public sealed class IconCacheService : IDisposable
 
     private static string DiskCacheDir => AppPaths.IconCacheDir;
 
+    /// <summary>
+    /// Active caching mode. Off is enforced by callers (they stop requesting icons); this service
+    /// honours Disk vs Memory: in Memory mode fetched icons are never written to disk.
+    /// </summary>
+    public IconCacheMode Mode { get; set; } = IconCacheMode.Disk;
+
     /// <summary>Number of cached icon files on disk and their total byte size.</summary>
     public static (int Count, long Bytes) GetDiskStats()
     {
@@ -81,11 +87,19 @@ public sealed class IconCacheService : IDisposable
     {
         try
         {
-            Directory.CreateDirectory(DiskCacheDir);
             var url = $"{RenderBaseUrl}{Uri.EscapeDataString(uniqueName)}.png?size={IconSize}";
             var bytes = await _http.GetByteArrayAsync(url);
-            await File.WriteAllBytesAsync(diskPath, bytes);
-            return LoadBitmap(diskPath);
+
+            if (Mode == IconCacheMode.Disk)
+            {
+                Directory.CreateDirectory(DiskCacheDir);
+                await File.WriteAllBytesAsync(diskPath, bytes);
+                return LoadBitmap(diskPath);
+            }
+
+            // Memory mode: decode from the downloaded bytes without touching disk.
+            using var ms = new MemoryStream(bytes);
+            return new Bitmap(ms);
         }
         catch
         {
