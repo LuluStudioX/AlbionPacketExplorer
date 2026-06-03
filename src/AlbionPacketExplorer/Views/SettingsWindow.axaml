@@ -164,13 +164,15 @@
                                 <TextBlock Text="{loc:T settings.display.resolveIcons}" FontWeight="SemiBold" />
                                 <TextBlock Text="{loc:T settings.display.resolveIcons.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
-                                <TextBlock Text="{loc:T settings.display.resolveIcons.note}"
+                                <TextBlock Text="{loc:T settings.display.iconMode.note}"
                                            Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
                             </StackPanel>
-                            <ToggleSwitch Grid.Column="1"
-                                         IsChecked="{Binding ResolveIcons}"
-                                         IsEnabled="{Binding GameDataLoaded}"
-                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding IconModeOptions}"
+                                      SelectedItem="{Binding IconMode}"
+                                      IsEnabled="{Binding GameDataLoaded}"
+                                      MinWidth="120"
+                                      VerticalAlignment="Center" Margin="20,0,0,0" />
                         </Grid>
                     </Border>
 

@@ -49,12 +49,12 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public bool ResolveIcons
+    public IconCacheMode IconMode
     {
-        get => _packetDetail.ResolveIcons;
+        get => _packetDetail.IconMode;
         set
         {
-            _packetDetail.ResolveIcons = value;
+            _packetDetail.IconMode = value;
             OnPropertyChanged();
             SaveSettings();
         }
@@ -196,7 +196,7 @@ public partial class MainViewModel : ObservableObject
     public SettingsViewModel Settings => new(this);
 
     private void SaveSettings() =>
-        AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, SidebarVisible, MinimizeToTray,
+        AppSettingsStore.Save(new AppSettings(ResolveItemNames, IconMode, SidebarVisible, MinimizeToTray,
             ThemeService.Instance.IsDark, ForceExpandRows,
             AutoStartCapture, AutoSaveLogs, Density,
             Culture: LocalizationService.Instance.CurrentCulture,
@@ -217,7 +217,7 @@ public partial class MainViewModel : ObservableObject
         var saved = AppSettingsStore.Load();
         _packetDetail.ResolveItemNames = saved.ResolveItemNames;
         PacketList.SetResolveItemNames(saved.ResolveItemNames);
-        _packetDetail.ResolveIcons = saved.ResolveIcons;
+        _packetDetail.IconMode = saved.IconMode;
         _packetDetail.ForceExpandRows = saved.ForceExpandRows;
         SidebarVisible = saved.SidebarVisible;
         MinimizeToTray = saved.MinimizeToTray;

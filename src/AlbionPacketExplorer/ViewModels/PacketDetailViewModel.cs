@@ -131,7 +131,9 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     [ObservableProperty] private PacketEntry? _packet;
     [ObservableProperty] private ObservableCollection<ParamRow> _rows = [];
     [ObservableProperty] private bool _resolveItemNames;
-    [ObservableProperty] private bool _resolveIcons;
+    [ObservableProperty] private IconCacheMode _iconMode = IconCacheMode.Disk;
+
+    private bool IconsEnabled => IconMode != IconCacheMode.Off;
     [ObservableProperty] private bool _forceExpandRows;
     [ObservableProperty] private ParamRow? _selectedRow;
 
@@ -249,9 +251,10 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         if (_allRows.Count > 0)
             RebuildRows();
     }
-    partial void OnResolveIconsChanged(bool value)
+    partial void OnIconModeChanged(IconCacheMode value)
     {
-        if (value)
+        _icons.Mode = value;
+        if (value != IconCacheMode.Off)
             TriggerIconLoad();
         else
             ClearIcons();
@@ -344,7 +347,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
             _allRows.Add(row);
 
-            if (ResolveIcons)
+            if (IconsEnabled)
             {
                 if (!string.IsNullOrEmpty(uniqueName))
                     rowsToLoad.Add(row);
