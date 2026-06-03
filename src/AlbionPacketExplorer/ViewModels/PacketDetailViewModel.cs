@@ -135,6 +135,27 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _forceExpandRows;
     [ObservableProperty] private ParamRow? _selectedRow;
 
+    /// <summary>Rows that resolved to one or more item names (for the Resolved tab).</summary>
+    public IEnumerable<ParamRow> ResolvedRows => Rows.Where(r => r.IsVisible && r.HasResolved);
+    public bool HasAnyResolved => Rows.Any(r => r.HasResolved);
+
+    /// <summary>The selected packet serialized as indented JSON (for the Raw JSON tab).</summary>
+    public string RawJson
+    {
+        get
+        {
+            if (Packet is not { } p) return string.Empty;
+            return System.Text.Json.JsonSerializer.Serialize(new
+            {
+                ts = p.Timestamp,
+                kind = p.Kind,
+                code = p.Code,
+                @params = p.Params.ToDictionary(kv => kv.Key,
+                    kv => new { type = kv.Value.Type, value = kv.Value.Value })
+            }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        }
+    }
+
     // Hide preset management
     [ObservableProperty] private ObservableCollection<RowHidePreset> _hidePresets = [];
     [ObservableProperty] private RowHidePreset? _selectedHidePreset;
@@ -207,8 +228,16 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(FilterType));
         OnPropertyChanged(nameof(FilterValue));
         OnPropertyChanged(nameof(FilterResolved));
+        OnPropertyChanged(nameof(RawJson));
         RebuildRows();
     }
+
+    partial void OnRowsChanged(ObservableCollection<ParamRow> value)
+    {
+        OnPropertyChanged(nameof(ResolvedRows));
+        OnPropertyChanged(nameof(HasAnyResolved));
+    }
+
     public void ForceRebuild() => RebuildRows();
     partial void OnResolveItemNamesChanged(bool value) => RebuildRows();
     partial void OnForceExpandRowsChanged(bool value)
