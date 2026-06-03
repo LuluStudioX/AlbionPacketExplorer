@@ -16,13 +16,22 @@
 
         <DataGrid x:Name="MainGrid" ItemsSource="{Binding CodeStats}"
                   FontSize="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}"
-                  RowHeight="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=24}"
                   SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserSortColumns="True"
                   CanUserResizeColumns="True"
                   GridLinesVisibility="Horizontal">
+            <DataGrid.Styles>
+                <Style Selector="DataGridRow">
+                    <Setter Property="MinHeight"
+                            Value="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=24}" />
+                </Style>
+                <Style Selector="DataGridCell TextBlock">
+                    <Setter Property="FontSize"
+                            Value="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}" />
+                </Style>
+            </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Keys Summary"          Command="{Binding CopyKeySummaryCommand}" />
