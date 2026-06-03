@@ -59,7 +59,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Open packet_sniffer.json",
+            Title = "Open packet capture (JSON)",
             AllowMultiple = false,
             FileTypeFilter =
             [

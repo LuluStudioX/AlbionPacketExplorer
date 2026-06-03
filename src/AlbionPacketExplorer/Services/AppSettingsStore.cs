@@ -23,7 +23,8 @@ public record AppSettings(
     string SidebarToggleGesture = "F5",
     string AutoSelectNewestGesture = "Ctrl+L",
     string ToggleRowExpandGesture = "Space",
-    bool HasSeenWelcome = false)
+    bool HasSeenWelcome = false,
+    string AccentTheme = "Indigo")
 {
     public static readonly AppSettings Default = new();
 }

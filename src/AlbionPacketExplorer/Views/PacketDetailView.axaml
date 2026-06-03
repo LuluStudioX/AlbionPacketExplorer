@@ -102,7 +102,7 @@
                                                        FontWeight="SemiBold"
                                                        VerticalAlignment="Center" />
                                             <TextBlock Text="{Binding SchemaName}"
-                                                       Foreground="#aaaacc" FontSize="13"
+                                                       Foreground="{DynamicResource Apx.TextMuted}" FontSize="13"
                                                        VerticalAlignment="Center"
                                                        IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                             <Ellipse Width="7" Height="7" VerticalAlignment="Center"

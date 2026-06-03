@@ -203,7 +203,8 @@ public partial class MainViewModel : ObservableObject
             SidebarToggleGesture: SidebarToggleGesture,
             AutoSelectNewestGesture: AutoSelectNewestGesture,
             ToggleRowExpandGesture: ToggleRowExpandGesture,
-            HasSeenWelcome: !ShowWelcome));
+            HasSeenWelcome: !ShowWelcome,
+            AccentTheme: ThemeService.Instance.ActiveAccent.DisplayName));
 
     public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
@@ -228,7 +229,7 @@ public partial class MainViewModel : ObservableObject
         ToggleRowExpandGesture = string.IsNullOrWhiteSpace(saved.ToggleRowExpandGesture) ? "Space" : saved.ToggleRowExpandGesture;
         ShowWelcome = !saved.HasSeenWelcome;
 
-        ThemeService.Instance.Initialize(saved.IsDarkMode, null);
+        ThemeService.Instance.Initialize(saved.IsDarkMode, saved.AccentTheme);
         ThemeService.Instance.Changed += SaveSettings;
 
         _ = LoadGameDataAsync();
