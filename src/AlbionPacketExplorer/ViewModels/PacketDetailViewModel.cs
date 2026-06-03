@@ -34,6 +34,7 @@ public sealed class ParamRow : ObservableObject
     public string Value { get; }
     public string ResolvedName { get; }
     public string UniqueName { get; }
+    public string ResolveAs { get; }
     public string Note { get; }
     public bool HasNote => !string.IsNullOrEmpty(Note);
     public ParamSource Source { get; }
@@ -76,7 +77,10 @@ public sealed class ParamRow : ObservableObject
         {
             if (!IsCollection) return 0;
             var inner = Value[1..^1].Trim();
-            return inner.Length == 0 ? 0 : inner.Split(',').Length;
+            // Elements are joined with ", " (comma + space). A bare comma is a decimal
+            // separator under comma-decimal cultures (e.g. "180,09836"), so split on the
+            // ", " delimiter only, never a lone comma.
+            return inner.Length == 0 ? 0 : inner.Split(", ").Length;
         }
     }
 
@@ -101,7 +105,8 @@ public sealed class ParamRow : ObservableObject
     public bool IsVisible => !_isHidden;
 
     public ParamRow(string key, string schemaName, string type, string value,
-                    string resolvedName, string uniqueName, string note, ParamSource source = ParamSource.None)
+                    string resolvedName, string uniqueName, string note,
+                    ParamSource source = ParamSource.None, string resolveAs = "")
     {
         Key = key;
         SchemaName = schemaName;
@@ -109,6 +114,7 @@ public sealed class ParamRow : ObservableObject
         Value = value;
         ResolvedName = resolvedName;
         UniqueName = uniqueName;
+        ResolveAs = resolveAs;
         Note = note;
         Source = source;
     }
@@ -255,7 +261,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             List<ResolvedItem>? resolvedItems = null;
             if (ResolveItemNames && _gameData.IsLoaded)
             {
-                if (resolveAs == "itemIndex" && pv.Type != "Byte[]")
+                if (resolveAs == "itemIndex" && IsIndexResolvable(pv.Type))
                 {
                     var items = ResolveIndexItems(pv);
                     if (items.Count == 1)
@@ -267,7 +273,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                     (resolved, uniqueName) = TryResolveParam(pv);
             }
 
-            var row = new ParamRow(key, schemaName, pv.Type, formatted, resolved, uniqueName, note, source);
+            var row = new ParamRow(key, schemaName, pv.Type, formatted, resolved, uniqueName, note, source, resolveAs);
             if (resolvedItems != null)
                 foreach (var ri in resolvedItems)
                     row.ResolvedItems.Add(ri);
@@ -285,11 +291,12 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                             row.ResolvedItems.Add(item);
                     }
                 }
-                // Arrays: resolve each element as an item index ONLY when the schema
-                // explicitly tags the param resolveAs="itemIndex". The global Resolve
-                // toggle must NOT blind-resolve raw arrays (e.g. Byte[] GUIDs, zero-padded
-                // Int16[]) — that produced garbage item names. Byte[] never index-resolves.
-                else if (resolveAs == "itemIndex" && pv.Type != "Byte[]")
+                // Item-index resolution (scalar or array) happens ONLY when the schema
+                // explicitly tags the param resolveAs="itemIndex" and the wire type can
+                // actually hold an item index (integer, never Single/Double/Byte[]). There
+                // is no blind auto-matching: a raw Int/array/Byte[] is never guessed as an
+                // item index, because that produced garbage names (GUIDs, positions, etc.).
+                else if (resolveAs == "itemIndex" && IsIndexResolvable(pv.Type))
                 {
                     var previewItems = ResolveIndexItems(pv);
                     if (previewItems.Count > 0)
@@ -299,13 +306,6 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                             foreach (var pi in previewItems)
                                 row.ResolvedItems.Add(pi);
                     }
-                }
-                // Scalar numerics: only when resolve is on or param has a schema name
-                else if (ResolveItemNames || !string.IsNullOrEmpty(schemaName))
-                {
-                    var idx = ToInt(pv.Value);
-                    if (idx != null && _gameData.TryResolve(idx.Value, out var pu, out var pd))
-                        row.PreviewText = $"{pu} — {pd}";
                 }
             }
 
@@ -423,6 +423,9 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         var raw = row.Value;
         if (raw.StartsWith('[') && raw.EndsWith(']'))
         {
+            // Only resolve elements as item names when the param is schema-tagged
+            // resolveAs="itemIndex" and the wire type is an integer array. Never guess.
+            var canResolve = row.ResolveAs == "itemIndex" && IsIndexResolvable(row.Type);
             var inner = raw[1..^1];
             var items = inner.Split(", ");
             var lines = new System.Text.StringBuilder();
@@ -430,7 +433,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             {
                 var item = items[i].Trim();
                 string resolved = "";
-                if (_gameData.IsLoaded && long.TryParse(item, out var idx) && idx >= 0)
+                if (canResolve && _gameData.IsLoaded && long.TryParse(item, out var idx) && idx >= 0)
                     if (_gameData.TryResolve((int)idx, out var u, out var d))
                         resolved = $"  → {u} — {d}";
                 lines.AppendLine($"[{i}] {item}{resolved}");
@@ -479,7 +482,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     {
         if (SelectedRow == null || Clipboard == null) return;
         await Clipboard.SetTextAsync(SelectedRow.Value);
-        Toasts?.Show("Copied", "Value copied to clipboard", ToastSeverity.Success);
+        Toasts?.Show(Loc.T("toast.copied.title"), Loc.T("toast.copied.value"), ToastSeverity.Success);
     }
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
@@ -490,7 +493,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             ? $"{SelectedRow.Key}\t{SelectedRow.Type}\t{SelectedRow.Value}"
             : $"{SelectedRow.Key}\t{SelectedRow.Type}\t{SelectedRow.Value}\t{SelectedRow.ResolvedName}";
         await Clipboard.SetTextAsync(text);
-        Toasts?.Show("Copied", "Row copied to clipboard", ToastSeverity.Success);
+        Toasts?.Show(Loc.T("toast.copied.title"), Loc.T("toast.copied.row"), ToastSeverity.Success);
     }
 
     [RelayCommand]
@@ -501,7 +504,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             ? $"{r.Key}\t{r.Type}\t{r.Value}"
             : $"{r.Key}\t{r.Type}\t{r.Value}\t{r.ResolvedName}");
         await Clipboard.SetTextAsync(string.Join("\n", lines));
-        Toasts?.Show("Copied", "All rows copied to clipboard", ToastSeverity.Success);
+        Toasts?.Show(Loc.T("toast.copied.title"), Loc.T("toast.copied.allRows"), ToastSeverity.Success);
     }
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
@@ -573,6 +576,16 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         HideRowCommand.NotifyCanExecuteChanged();
         UnhideRowCommand.NotifyCanExecuteChanged();
     }
+
+    // Item indices are integers. Float types (Single/Double) hold positions or factors,
+    // and Byte[] holds GUIDs/blobs — none are item indices, so they never index-resolve
+    // even when a param is mistakenly tagged resolveAs="itemIndex".
+    private static bool IsIndexResolvable(string type) => type switch
+    {
+        "Byte" or "Int16" or "Int32" or "Int64"
+            or "Int16[]" or "Int32[]" or "Int64[]" => true,
+        _ => false
+    };
 
     private static int? ToInt(object? v) => v switch
     {

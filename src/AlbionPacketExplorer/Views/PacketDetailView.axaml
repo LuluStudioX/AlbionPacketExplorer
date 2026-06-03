@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              xmlns:views="using:AlbionPacketExplorer.Views"
+             xmlns:loc="using:AlbionPacketExplorer.Markup"
              x:Class="AlbionPacketExplorer.Views.PacketDetailView"
              x:DataType="vm:PacketDetailViewModel">
 
@@ -9,23 +10,23 @@
 
         <!-- Hide preset toolbar -->
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="4,2,4,4">
-            <TextBox Text="{Binding NewHidePresetName}" Width="130" PlaceholderText="Hide preset name…" FontSize="11" />
-            <Button Classes="iconbtn" Command="{Binding SaveHidePresetCommand}" Padding="6" ToolTip.Tip="Save current hidden rows as preset">
+            <TextBox Text="{Binding NewHidePresetName}" Width="130" PlaceholderText="{loc:T detail.hide.placeholder}" FontSize="11" />
+            <Button Classes="iconbtn" Command="{Binding SaveHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.save.tip}">
                 <Path Classes="icon sm" Data="{StaticResource Icon.Check}" />
             </Button>
             <ComboBox ItemsSource="{Binding HidePresets}"
                       SelectedItem="{Binding SelectedHidePreset, Mode=TwoWay}"
                       DisplayMemberBinding="{Binding Name}"
-                      PlaceholderText="Load hide preset…"
+                      PlaceholderText="{loc:T detail.hide.load.placeholder}"
                       MinWidth="140" FontSize="11" />
-            <Button Classes="iconbtn" Command="{Binding LoadHidePresetCommand}" Padding="6" ToolTip.Tip="Apply selected hide preset">
+            <Button Classes="iconbtn" Command="{Binding LoadHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.apply.tip}">
                 <Path Classes="icon sm" Data="{StaticResource Icon.ChevronRight}" />
             </Button>
-            <Button Classes="iconbtn" Command="{Binding DeleteHidePresetCommand}" Padding="6" ToolTip.Tip="Delete selected hide preset">
+            <Button Classes="iconbtn" Command="{Binding DeleteHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.delete.tip}">
                 <Path Classes="icon sm" Data="{StaticResource Icon.Trash}" />
             </Button>
-            <Button Classes="ghost" Command="{Binding UnhideAllRowsCommand}" Padding="8,4" ToolTip.Tip="Show all hidden rows">
-                <TextBlock Text="Show all" FontSize="11" />
+            <Button Classes="ghost" Command="{Binding UnhideAllRowsCommand}" Padding="8,4" ToolTip.Tip="{loc:T detail.hide.showAll.tip}">
+                <TextBlock Text="{loc:T common.showAll}" FontSize="11" />
             </Button>
         </StackPanel>
 
@@ -53,19 +54,19 @@
             </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Copy Value"    Command="{Binding CopyValueCommand}" />
-                    <MenuItem Header="View Full Value…" Command="{Binding ViewFullValueCommand}" />
-                    <MenuItem Header="Copy Row"      Command="{Binding CopyRowCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.copyValue}"    Command="{Binding CopyValueCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.viewFull}" Command="{Binding ViewFullValueCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.copyRow}"      Command="{Binding CopyRowCommand}" />
                     <Separator />
-                    <MenuItem Header="Copy All Rows" Command="{Binding CopyAllRowsCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.copyAll}" Command="{Binding CopyAllRowsCommand}" />
                     <Separator />
-                    <MenuItem Header="Preview Resolve" Command="{Binding PreviewResolveCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.previewResolve}" Command="{Binding PreviewResolveCommand}" />
                     <Separator />
-                    <MenuItem Header="Edit Param Name…" Command="{Binding EditParamCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.editParam}" Command="{Binding EditParamCommand}" />
                     <Separator />
-                    <MenuItem Header="Hide Row"         Command="{Binding HideRowCommand}" />
-                    <MenuItem Header="Unhide Row"       Command="{Binding UnhideRowCommand}" />
-                    <MenuItem Header="Show All Rows"    Command="{Binding UnhideAllRowsCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.hideRow}"         Command="{Binding HideRowCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.unhideRow}"       Command="{Binding UnhideRowCommand}" />
+                    <MenuItem Header="{loc:T detail.menu.showAll}"    Command="{Binding UnhideAllRowsCommand}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
@@ -73,12 +74,12 @@
                 <DataGridTemplateColumn Width="160" SortMemberPath="Key" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Key" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T detail.col.key}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKey, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Key…" Width="180" />
+                                                 PlaceholderText="{loc:T detail.filterKey.placeholder}" Width="180" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
@@ -102,14 +103,14 @@
                                                IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                     <Ellipse Width="7" Height="7" VerticalAlignment="Center"
                                              Fill="{DynamicResource Apx.TextFaint}"
-                                             ToolTip.Tip="SAT-derived (base schema)">
+                                             ToolTip.Tip="{loc:T detail.source.base.tip}">
                                         <Ellipse.IsVisible>
                                             <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsBase}" />
                                         </Ellipse.IsVisible>
                                     </Ellipse>
                                     <Ellipse Width="7" Height="7" VerticalAlignment="Center"
                                              Fill="{DynamicResource ThemeAccentBrush}"
-                                             ToolTip.Tip="Your custom override (user schema)">
+                                             ToolTip.Tip="{loc:T detail.source.user.tip}">
                                         <Ellipse.IsVisible>
                                             <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsUser}" />
                                         </Ellipse.IsVisible>
@@ -129,12 +130,12 @@
                 <DataGridTemplateColumn Width="100" SortMemberPath="Type" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Type" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T detail.col.type}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterType, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Type…" Width="160" />
+                                                 PlaceholderText="{loc:T detail.filterType.placeholder}" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
@@ -153,12 +154,12 @@
                 <DataGridTemplateColumn Width="1.2*" MinWidth="80" SortMemberPath="Value" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Value" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T detail.col.value}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterValue, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Value…" Width="200" />
+                                                 PlaceholderText="{loc:T detail.filterValue.placeholder}" Width="200" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
@@ -177,7 +178,7 @@
                                             Command="{Binding $parent[UserControl].DataContext.ToggleRowExpandCommand}"
                                             CommandParameter="{Binding}"
                                             IsVisible="{Binding IsCollection}"
-                                            ToolTip.Tip="Expand / collapse this collection">
+                                            ToolTip.Tip="{loc:T detail.expand.tip}">
                                         <Panel>
                                             <Path Classes="icon muted sm" Data="{StaticResource Icon.ChevronRight}"
                                                   IsVisible="{Binding !IsExpanded}" />
@@ -203,12 +204,12 @@
                 <DataGridTemplateColumn Width="2*" MinWidth="160" SortMemberPath="ResolvedName" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Resolved" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T detail.col.resolved}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterResolved, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Resolved…" Width="200" />
+                                                 PlaceholderText="{loc:T detail.filterResolved.placeholder}" Width="200" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />

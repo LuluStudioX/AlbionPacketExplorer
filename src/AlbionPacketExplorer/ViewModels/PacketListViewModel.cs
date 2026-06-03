@@ -442,7 +442,7 @@ public partial class PacketListViewModel : ObservableObject
     {
         if (SelectedRow == null || Clipboard == null) return;
         await Clipboard.SetTextAsync(SelectedRow.ParamSummary);
-        Toasts?.Show("Copied", "Param summary copied to clipboard", ToastSeverity.Success);
+        Toasts?.Show(Loc.T("toast.copied.title"), Loc.T("toast.copied.paramSummary"), ToastSeverity.Success);
     }
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
@@ -458,7 +458,7 @@ public partial class PacketListViewModel : ObservableObject
             @params = p.Params.ToDictionary(kv => kv.Key, kv => new { type = kv.Value.Type, value = kv.Value.Value })
         }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
         await Clipboard.SetTextAsync(json);
-        Toasts?.Show("Copied", "Packet JSON copied to clipboard", ToastSeverity.Success);
+        Toasts?.Show(Loc.T("toast.copied.title"), Loc.T("toast.copied.packetJson"), ToastSeverity.Success);
     }
 
     private bool CanCopyRow() => SelectedRow != null;

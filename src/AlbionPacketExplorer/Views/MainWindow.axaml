@@ -32,10 +32,10 @@
                            Text="{Binding UpdateVersion, StringFormat='v{0} available'}" />
                 <Button Classes="ghost" Command="{Binding ApplyUpdateCommand}"
                         Padding="8,4" IsEnabled="{Binding IsUpdating, Converter={x:Static BoolConverters.Not}}"
-                        ToolTip.Tip="Download and install update, then restart">
+                        ToolTip.Tip="{loc:T toolbar.update.tip}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <controls:ApxSpinner Width="12" Height="12" IsVisible="{Binding IsUpdating}" />
-                        <TextBlock Text="Update" FontSize="12" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T toolbar.update}" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -54,62 +54,62 @@
                       DisplayMemberBinding="{Binding DisplayName}"
                       MinWidth="160" MaxWidth="480" MaxDropDownHeight="450" Margin="0,0,4,0"
                       IsEnabled="{Binding IsCapturing, Converter={x:Static BoolConverters.Not}}">
-                <ToolTip.Tip>Select network adapter to capture Albion traffic from.</ToolTip.Tip>
+                <ToolTip.Tip><TextBlock Text="{loc:T toolbar.device.tip}" /></ToolTip.Tip>
             </ComboBox>
 
-            <Button Classes="iconbtn" Command="{Binding RefreshDevicesCommand}" Margin="0,0,4,0">
-                <ToolTip.Tip>Re-scan network adapters.</ToolTip.Tip>
+            <Button Classes="iconbtn" Command="{Binding RefreshDevicesCommand}" Margin="0,0,4,0"
+                    ToolTip.Tip="{loc:T toolbar.refresh.tip}">
                 <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
             </Button>
 
-            <Button Classes="success" Command="{Binding StartCaptureCommand}" Padding="10,8" Margin="0,0,4,0">
-                <ToolTip.Tip>Start live packet capture. Npcap must be installed. Run as Administrator if capture fails.</ToolTip.Tip>
+            <Button Classes="success" Command="{Binding StartCaptureCommand}" Padding="10,8" Margin="0,0,4,0"
+                    ToolTip.Tip="{loc:T toolbar.capture.tip}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <Path Classes="icon sm" Data="{StaticResource Icon.Play}" Stroke="#FFFFFF" />
-                    <TextBlock Text="Capture" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                    <TextBlock Text="{loc:T toolbar.capture}" VerticalAlignment="Center" Foreground="#FFFFFF" />
                 </StackPanel>
             </Button>
 
-            <Button Classes="danger" Command="{Binding StopCaptureCommand}" Padding="10,8" Margin="0,0,4,0">
-                <ToolTip.Tip>Stop live capture. All captured packets remain visible.</ToolTip.Tip>
+            <Button Classes="danger" Command="{Binding StopCaptureCommand}" Padding="10,8" Margin="0,0,4,0"
+                    ToolTip.Tip="{loc:T toolbar.stop.tip}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <Path Classes="icon sm" Data="{StaticResource Icon.Stop}" Stroke="#FFFFFF" />
-                    <TextBlock Text="Stop" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                    <TextBlock Text="{loc:T toolbar.stop}" VerticalAlignment="Center" Foreground="#FFFFFF" />
                 </StackPanel>
             </Button>
 
             <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
 
-            <Button Classes="iconbtn" Name="SettingsButton" Click="OnSettingsClicked" Margin="0,0,4,0">
-                <ToolTip.Tip>Open settings.</ToolTip.Tip>
+            <Button Classes="iconbtn" Name="SettingsButton" Click="OnSettingsClicked" Margin="0,0,4,0"
+                    ToolTip.Tip="{loc:T toolbar.settings.tip}">
                 <Path Classes="icon" Data="{StaticResource Icon.Settings}" />
             </Button>
 
-            <Button Classes="iconbtn" Command="{Binding ToggleFocusModeCommand}" Margin="0,0,4,0">
-                <ToolTip.Tip>Switch between side-by-side and stacked layout. (F5)</ToolTip.Tip>
+            <Button Classes="iconbtn" Command="{Binding ToggleFocusModeCommand}" Margin="0,0,4,0"
+                    ToolTip.Tip="{loc:T toolbar.layout.tip}">
                 <Path Classes="icon" Data="{StaticResource Icon.Layers}" />
             </Button>
 
-            <Button Classes="iconbtn" Click="OnResetLayoutClicked" Margin="0,0,4,0">
-                <ToolTip.Tip>Reset panel sizes to default.</ToolTip.Tip>
+            <Button Classes="iconbtn" Click="OnResetLayoutClicked" Margin="0,0,4,0"
+                    ToolTip.Tip="{loc:T toolbar.resetLayout.tip}">
                 <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
             </Button>
 
             <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
 
-            <Button Classes="ghost" Command="{Binding SaveFileCommand}" Padding="10,8" Margin="0,0,4,0">
-                <ToolTip.Tip>Save all loaded/captured packets to a newline-delimited JSON file.</ToolTip.Tip>
+            <Button Classes="ghost" Command="{Binding SaveFileCommand}" Padding="10,8" Margin="0,0,4,0"
+                    ToolTip.Tip="{loc:T toolbar.saveJson.tip}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
-                    <TextBlock Text="Save JSON" VerticalAlignment="Center" />
+                    <TextBlock Text="{loc:T toolbar.saveJson}" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
 
-            <Button Classes="ghost" Command="{Binding OpenFileCommand}" Padding="10,8">
-                <ToolTip.Tip>Load a saved packet capture (newline-delimited JSON).</ToolTip.Tip>
+            <Button Classes="ghost" Command="{Binding OpenFileCommand}" Padding="10,8"
+                    ToolTip.Tip="{loc:T toolbar.openJson.tip}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
-                    <TextBlock Text="Open JSON" VerticalAlignment="Center" />
+                    <TextBlock Text="{loc:T toolbar.openJson}" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
         </WrapPanel>
@@ -139,7 +139,7 @@
                                    Foreground="{DynamicResource Apx.Text}" />
                         <Border Background="{DynamicResource Apx.Highlight}"
                                 CornerRadius="8" Padding="4,1"
-                                ToolTip.Tip="Each row = one packet type (e.g. EVENT 32).&#xA;Count = how many times seen.&#xA;Keys = which param indices were present, with % showing how often.&#xA;100% = always present (required field). Less = optional/conditional.&#xA;&#xA;Click a row to filter the packet list below.">
+                                ToolTip.Tip="{loc:T panel.eventSummary.help}">
                             <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                         </Border>
                     </StackPanel>
@@ -164,7 +164,7 @@
                                        Foreground="{DynamicResource Apx.Text}" />
                             <Border Background="{DynamicResource Apx.Highlight}"
                                     CornerRadius="8" Padding="4,1"
-                                    ToolTip.Tip="All individual packets matching the current filter.&#xA;Filter is set automatically when you click a row in Event Summary.&#xA;Click a packet row to inspect its fields in the detail panel.">
+                                    ToolTip.Tip="{loc:T panel.packetList.help}">
                                 <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                             </Border>
                         </StackPanel>
@@ -188,7 +188,7 @@
                                        Foreground="{DynamicResource Apx.Text}" />
                             <Border Background="{DynamicResource Apx.Highlight}"
                                     CornerRadius="8" Padding="4,1"
-                                    ToolTip.Tip="Key/Type/Value breakdown of the selected packet.&#xA;Key = param index (0–255). Type = wire type. Value = decoded value.&#xA;Right-click a row to edit param name/note.">
+                                    ToolTip.Tip="{loc:T panel.packetDetail.help}">
                                 <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                             </Border>
                         </StackPanel>
@@ -235,7 +235,7 @@
                         BorderBrush="{DynamicResource Apx.Highlight}"
                         BorderThickness="0,0,0,2"
                         Padding="6,3">
-                    <TextBlock Text="Packet List"
+                    <TextBlock Text="{loc:T panel.packetList}"
                                FontWeight="Bold"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource Apx.Text}" />
@@ -253,13 +253,13 @@
                         BorderThickness="0,0,0,2"
                         Padding="6,3">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="Packet Detail"
+                        <TextBlock Text="{loc:T panel.packetDetail}"
                                    FontWeight="Bold"
                                    VerticalAlignment="Center"
                                    Foreground="{DynamicResource Apx.Text}" />
                         <Border Background="{DynamicResource Apx.Highlight}"
                                 CornerRadius="8" Padding="4,1"
-                                ToolTip.Tip="Right-click a row to edit param name/note.">
+                                ToolTip.Tip="{loc:T panel.packetDetail.helpShort}">
                             <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                         </Border>
                     </StackPanel>

@@ -38,9 +38,9 @@ public partial class SettingsWindow : ApxWindow
     private void SetActiveNav(Button btn)
     {
         if (_activeNavButton != null)
-            _activeNavButton.Classes.Remove("Accent");
+            _activeNavButton.Classes.Remove("navactive");
         _activeNavButton = btn;
-        btn.Classes.Add("Accent");
+        btn.Classes.Add("navactive");
     }
 
     private void OnNavClicked(object? sender, RoutedEventArgs e)
