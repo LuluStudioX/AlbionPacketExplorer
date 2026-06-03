@@ -18,7 +18,7 @@ public partial class SettingsWindow : ApxWindow
     private StackPanel? _sectionAbout;
     private Button? _activeNavButton;
 
-    public SettingsWindow(SettingsViewModel vm)
+    public SettingsWindow(SettingsViewModel vm, string? initialSection = null)
     {
         InitializeComponent();
         DataContext = vm;
@@ -35,9 +35,10 @@ public partial class SettingsWindow : ApxWindow
             _sectionGlossary = this.FindControl<StackPanel>("SectionGlossary");
             _sectionAbout   = this.FindControl<StackPanel>("SectionAbout");
 
-            // Highlight Display as default active
-            var defaultBtn = this.FindControl<Button>("NavDisplay");
-            if (defaultBtn != null) SetActiveNav(defaultBtn);
+            // Select the requested section, or Display by default.
+            var navName = "Nav" + (string.IsNullOrEmpty(initialSection) ? "Display" : initialSection);
+            var startBtn = this.FindControl<Button>(navName) ?? this.FindControl<Button>("NavDisplay");
+            if (startBtn != null) ShowSection(startBtn);
         };
     }
 
@@ -51,7 +52,11 @@ public partial class SettingsWindow : ApxWindow
 
     private void OnNavClicked(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button btn) return;
+        if (sender is Button btn) ShowSection(btn);
+    }
+
+    private void ShowSection(Button btn)
+    {
         var tag = btn.Tag as string;
         if (_sectionDisplay   != null) _sectionDisplay.IsVisible   = tag == "Display";
         if (_sectionCapture   != null) _sectionCapture.IsVisible   = tag == "Capture";

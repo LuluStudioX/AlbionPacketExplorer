@@ -22,7 +22,8 @@ public record AppSettings(
     string Culture = "en",
     string SidebarToggleGesture = "F5",
     string AutoSelectNewestGesture = "Ctrl+L",
-    string ToggleRowExpandGesture = "Space")
+    string ToggleRowExpandGesture = "Space",
+    bool HasSeenWelcome = false)
 {
     public static readonly AppSettings Default = new();
 }
