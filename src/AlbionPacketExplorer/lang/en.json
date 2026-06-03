@@ -82,6 +82,10 @@
   "list.menu.autoSelectNewest": "Auto-select Newest",
   "list.menu.unknownFirst": "Unknown codes first",
 
+  "detail.tab.params": "Params",
+  "detail.tab.resolved": "Resolved",
+  "detail.tab.rawJson": "Raw JSON",
+  "detail.resolved.empty": "No params resolved to item names for this packet.",
   "detail.col.key": "Key",
   "detail.col.type": "Type",
   "detail.col.value": "Value",
