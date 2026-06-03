@@ -112,30 +112,64 @@ public partial class MainViewModel : ObservableObject
 
     public bool GameDataLoaded => _gameData.IsLoaded;
 
-    [ObservableProperty] private bool _focusMode;
+    [ObservableProperty] private bool _sidebarVisible = true;
     [ObservableProperty] private bool _minimizeToTray;
 
     public ToastService ToastManager => _toasts;
 
-    public string LayoutToggleIcon => FocusMode ? "⊞" : "⊟";
+    partial void OnMinimizeToTrayChanged(bool value) => SaveSettings();
+    partial void OnSidebarVisibleChanged(bool value) => SaveSettings();
 
-    partial void OnFocusModeChanged(bool value)
+    /// <summary>Key gesture (e.g. "F5", "Ctrl+B") that toggles the filter sidebar.</summary>
+    [ObservableProperty] private string _sidebarToggleGesture = "F5";
+
+    /// <summary>Key gesture that toggles auto-select-newest on the packet list.</summary>
+    [ObservableProperty] private string _autoSelectNewestGesture = "Ctrl+L";
+
+    /// <summary>Key gesture that expands/collapses the selected packet-detail row.</summary>
+    [ObservableProperty] private string _toggleRowExpandGesture = "Space";
+
+    partial void OnSidebarToggleGestureChanged(string value)
     {
-        OnPropertyChanged(nameof(LayoutToggleIcon));
         SaveSettings();
+        ShortcutsChanged?.Invoke();
     }
 
-    partial void OnMinimizeToTrayChanged(bool value) => SaveSettings();
+    partial void OnAutoSelectNewestGestureChanged(string value)
+    {
+        SaveSettings();
+        ShortcutsChanged?.Invoke();
+    }
+
+    partial void OnToggleRowExpandGestureChanged(string value)
+    {
+        SaveSettings();
+        ShortcutsChanged?.Invoke();
+    }
+
+    /// <summary>Raised when any configurable shortcut changes so the view can rebind them.</summary>
+    public event Action? ShortcutsChanged;
 
     [RelayCommand]
-    private void ToggleFocusMode() => FocusMode = !FocusMode;
+    private void ToggleAutoSelectNewest() =>
+        PacketList.AutoSelectNewest = !PacketList.AutoSelectNewest;
+
+    [RelayCommand]
+    private void ToggleRowExpand() =>
+        PacketDetail.ToggleSelectedRowExpandCommand.Execute(null);
+
+    [RelayCommand]
+    private void ToggleSidebar() => SidebarVisible = !SidebarVisible;
 
     public SettingsViewModel Settings => new(this);
 
     private void SaveSettings() =>
-        AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, FocusMode, MinimizeToTray,
+        AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, SidebarVisible, MinimizeToTray,
             ThemeService.Instance.IsDark, ForceExpandRows,
-            AutoStartCapture, AutoSaveLogs, Density));
+            AutoStartCapture, AutoSaveLogs, Density,
+            SidebarToggleGesture: SidebarToggleGesture,
+            AutoSelectNewestGesture: AutoSelectNewestGesture,
+            ToggleRowExpandGesture: ToggleRowExpandGesture));
 
     public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
@@ -150,11 +184,14 @@ public partial class MainViewModel : ObservableObject
         PacketList.SetResolveItemNames(saved.ResolveItemNames);
         _packetDetail.ResolveIcons = saved.ResolveIcons;
         _packetDetail.ForceExpandRows = saved.ForceExpandRows;
-        FocusMode = saved.FocusMode;
+        SidebarVisible = saved.SidebarVisible;
         MinimizeToTray = saved.MinimizeToTray;
         AutoStartCapture = saved.AutoStartCapture;
         AutoSaveLogs = saved.AutoSaveLogs;
         Density = saved.Density;
+        SidebarToggleGesture = string.IsNullOrWhiteSpace(saved.SidebarToggleGesture) ? "F5" : saved.SidebarToggleGesture;
+        AutoSelectNewestGesture = string.IsNullOrWhiteSpace(saved.AutoSelectNewestGesture) ? "Ctrl+L" : saved.AutoSelectNewestGesture;
+        ToggleRowExpandGesture = string.IsNullOrWhiteSpace(saved.ToggleRowExpandGesture) ? "Space" : saved.ToggleRowExpandGesture;
 
         ThemeService.Instance.Initialize(saved.IsDarkMode, null);
         ThemeService.Instance.Changed += SaveSettings;
@@ -173,6 +210,12 @@ public partial class MainViewModel : ObservableObject
         {
             if (args.PropertyName == nameof(PacketListViewModel.SelectedPacket))
                 PacketDetail.Packet = PacketList.SelectedPacket;
+            // Mirror the sidebar status filter into the By-Code list so it shows only the
+            // selected kind's codes.
+            else if (args.PropertyName == nameof(PacketListViewModel.ActiveStatusFilter))
+                Aggregator.FilterKind = PacketList.ActiveStatusFilter == "All"
+                    ? string.Empty
+                    : PacketList.ActiveStatusFilter;
         };
     }
 

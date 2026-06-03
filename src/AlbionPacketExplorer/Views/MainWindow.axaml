@@ -9,267 +9,200 @@
         Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
         MinWidth="560" MinHeight="420"
-        x:DataType="vm:MainViewModel"
-        KeyDown="OnKeyDown">
+        x:DataType="vm:MainViewModel">
 
     <Panel>
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*,Auto">
 
-        <!-- Toolbar -->
+        <!-- ═══════════ TOOLBAR ═══════════ -->
         <DockPanel Grid.Row="0" Background="{DynamicResource Apx.Surface}" ZIndex="1"
                    LastChildFill="True">
 
-        <!-- Status text + loading spinner — docked right; declared first so the action
-             WrapPanel (last child) fills the remaining width and wraps when narrow. -->
-        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
-                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"
-                    MaxWidth="320">
-            <!-- Update available banner -->
-            <StackPanel Orientation="Horizontal" Spacing="6"
-                        IsVisible="{Binding UpdateVersion, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                <TextBlock VerticalAlignment="Center" FontSize="12"
-                           Foreground="{DynamicResource Apx.Accent}"
-                           Text="{Binding UpdateVersion, StringFormat='v{0} available'}" />
-                <Button Classes="ghost" Command="{Binding ApplyUpdateCommand}"
-                        Padding="8,4" IsEnabled="{Binding IsUpdating, Converter={x:Static BoolConverters.Not}}"
-                        ToolTip.Tip="{loc:T toolbar.update.tip}">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <controls:ApxSpinner Width="12" Height="12" IsVisible="{Binding IsUpdating}" />
-                        <TextBlock Text="{loc:T toolbar.update}" FontSize="12" VerticalAlignment="Center" />
+            <!-- Status text + spinner — docked right; declared first so the action WrapPanel
+                 (last child) fills the remaining width and wraps when narrow. -->
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
+                        HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"
+                        MaxWidth="320">
+                <StackPanel Orientation="Horizontal" Spacing="6"
+                            IsVisible="{Binding UpdateVersion, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock VerticalAlignment="Center" FontSize="12"
+                               Foreground="{DynamicResource Apx.Accent}"
+                               Text="{Binding UpdateVersion, StringFormat='v{0} available'}" />
+                    <Button Classes="ghost" Command="{Binding ApplyUpdateCommand}"
+                            Padding="8,4" IsEnabled="{Binding IsUpdating, Converter={x:Static BoolConverters.Not}}"
+                            ToolTip.Tip="{loc:T toolbar.update.tip}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <controls:ApxSpinner Width="12" Height="12" IsVisible="{Binding IsUpdating}" />
+                            <TextBlock Text="{loc:T toolbar.update}" FontSize="12" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <controls:ApxSpinner Width="16" Height="16" IsVisible="{Binding IsLoading}" />
+                <TextBlock Text="{Binding StatusText}"
+                           VerticalAlignment="Center" FontSize="12"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="{Binding StatusText}"
+                           Foreground="{DynamicResource Apx.Text}" />
+            </StackPanel>
+
+            <WrapPanel Orientation="Horizontal" Margin="6,4" VerticalAlignment="Center">
+                <ComboBox ItemsSource="{Binding AvailableDevices}"
+                          SelectedItem="{Binding SelectedDevice}"
+                          DisplayMemberBinding="{Binding DisplayName}"
+                          MinWidth="160" MaxWidth="480" MaxDropDownHeight="450" Margin="0,0,4,0"
+                          IsEnabled="{Binding IsCapturing, Converter={x:Static BoolConverters.Not}}">
+                    <ToolTip.Tip><TextBlock Text="{loc:T toolbar.device.tip}" /></ToolTip.Tip>
+                </ComboBox>
+
+                <Button Classes="iconbtn" Command="{Binding RefreshDevicesCommand}" Margin="0,0,4,0"
+                        ToolTip.Tip="{loc:T toolbar.refresh.tip}">
+                    <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
+                </Button>
+
+                <Button Classes="success" Command="{Binding StartCaptureCommand}" Padding="10,8" Margin="0,0,4,0"
+                        ToolTip.Tip="{loc:T toolbar.capture.tip}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Play}" Stroke="#FFFFFF" />
+                        <TextBlock Text="{loc:T toolbar.capture}" VerticalAlignment="Center" Foreground="#FFFFFF" />
                     </StackPanel>
                 </Button>
-            </StackPanel>
-            <controls:ApxSpinner Width="16" Height="16" IsVisible="{Binding IsLoading}" />
-            <TextBlock Text="{Binding StatusText}"
-                       VerticalAlignment="Center" FontSize="12"
-                       TextTrimming="CharacterEllipsis"
-                       ToolTip.Tip="{Binding StatusText}"
-                       Foreground="{DynamicResource Apx.Text}" />
-        </StackPanel>
 
-        <!-- Action controls — fill the remaining width and wrap to multiple rows when narrow -->
-        <WrapPanel Orientation="Horizontal" Margin="6,4" VerticalAlignment="Center">
-            <ComboBox ItemsSource="{Binding AvailableDevices}"
-                      SelectedItem="{Binding SelectedDevice}"
-                      DisplayMemberBinding="{Binding DisplayName}"
-                      MinWidth="160" MaxWidth="480" MaxDropDownHeight="450" Margin="0,0,4,0"
-                      IsEnabled="{Binding IsCapturing, Converter={x:Static BoolConverters.Not}}">
-                <ToolTip.Tip><TextBlock Text="{loc:T toolbar.device.tip}" /></ToolTip.Tip>
-            </ComboBox>
+                <Button Classes="danger" Command="{Binding StopCaptureCommand}" Padding="10,8" Margin="0,0,4,0"
+                        ToolTip.Tip="{loc:T toolbar.stop.tip}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Stop}" Stroke="#FFFFFF" />
+                        <TextBlock Text="{loc:T toolbar.stop}" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                    </StackPanel>
+                </Button>
 
-            <Button Classes="iconbtn" Command="{Binding RefreshDevicesCommand}" Margin="0,0,4,0"
-                    ToolTip.Tip="{loc:T toolbar.refresh.tip}">
-                <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
-            </Button>
+                <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
 
-            <Button Classes="success" Command="{Binding StartCaptureCommand}" Padding="10,8" Margin="0,0,4,0"
-                    ToolTip.Tip="{loc:T toolbar.capture.tip}">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Path Classes="icon sm" Data="{StaticResource Icon.Play}" Stroke="#FFFFFF" />
-                    <TextBlock Text="{loc:T toolbar.capture}" VerticalAlignment="Center" Foreground="#FFFFFF" />
-                </StackPanel>
-            </Button>
+                <Button Classes="iconbtn" Name="SettingsButton" Click="OnSettingsClicked" Margin="0,0,4,0"
+                        ToolTip.Tip="{loc:T toolbar.settings.tip}">
+                    <Path Classes="icon" Data="{StaticResource Icon.Settings}" />
+                </Button>
 
-            <Button Classes="danger" Command="{Binding StopCaptureCommand}" Padding="10,8" Margin="0,0,4,0"
-                    ToolTip.Tip="{loc:T toolbar.stop.tip}">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Path Classes="icon sm" Data="{StaticResource Icon.Stop}" Stroke="#FFFFFF" />
-                    <TextBlock Text="{loc:T toolbar.stop}" VerticalAlignment="Center" Foreground="#FFFFFF" />
-                </StackPanel>
-            </Button>
+                <Button Classes="iconbtn" Click="OnResetLayoutClicked" Margin="0,0,4,0"
+                        ToolTip.Tip="{loc:T toolbar.resetLayout.tip}">
+                    <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
+                </Button>
 
-            <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
+                <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
 
-            <Button Classes="iconbtn" Name="SettingsButton" Click="OnSettingsClicked" Margin="0,0,4,0"
-                    ToolTip.Tip="{loc:T toolbar.settings.tip}">
-                <Path Classes="icon" Data="{StaticResource Icon.Settings}" />
-            </Button>
+                <Button Classes="ghost" Command="{Binding SaveFileCommand}" Padding="10,8" Margin="0,0,4,0"
+                        ToolTip.Tip="{loc:T toolbar.saveJson.tip}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
+                        <TextBlock Text="{loc:T toolbar.saveJson}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
 
-            <Button Classes="iconbtn" Command="{Binding ToggleFocusModeCommand}" Margin="0,0,4,0"
-                    ToolTip.Tip="{loc:T toolbar.layout.tip}">
-                <Path Classes="icon" Data="{StaticResource Icon.Layers}" />
-            </Button>
-
-            <Button Classes="iconbtn" Click="OnResetLayoutClicked" Margin="0,0,4,0"
-                    ToolTip.Tip="{loc:T toolbar.resetLayout.tip}">
-                <Path Classes="icon" Data="{StaticResource Icon.Refresh}" />
-            </Button>
-
-            <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
-
-            <Button Classes="ghost" Command="{Binding SaveFileCommand}" Padding="10,8" Margin="0,0,4,0"
-                    ToolTip.Tip="{loc:T toolbar.saveJson.tip}">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
-                    <TextBlock Text="{loc:T toolbar.saveJson}" VerticalAlignment="Center" />
-                </StackPanel>
-            </Button>
-
-            <Button Classes="ghost" Command="{Binding OpenFileCommand}" Padding="10,8"
-                    ToolTip.Tip="{loc:T toolbar.openJson.tip}">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
-                    <TextBlock Text="{loc:T toolbar.openJson}" VerticalAlignment="Center" />
-                </StackPanel>
-            </Button>
-        </WrapPanel>
+                <Button Classes="ghost" Command="{Binding OpenFileCommand}" Padding="10,8"
+                        ToolTip.Tip="{loc:T toolbar.openJson.tip}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
+                        <TextBlock Text="{loc:T toolbar.openJson}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
         </DockPanel>
 
-        <!-- content area: only one of the two grids visible at a time -->
-        <Panel Grid.Row="1" ClipToBounds="True">
+        <!-- ═══════════ WORKSPACE: sidebar | table + detail ═══════════ -->
+        <Grid Grid.Row="1" x:Name="WorkspaceGrid" ColumnDefinitions="260,2,*" ClipToBounds="True">
 
-        <!-- ═══════════════════════════════════════
-             OVERVIEW MODE (side-by-side, default)
-             ═══════════════════════════════════════ -->
-        <Grid x:Name="OverviewGrid"
-              RowDefinitions="200,2,*"
-              ClipToBounds="True"
-              IsVisible="{Binding FocusMode, Converter={x:Static BoolConverters.Not}}">
+            <!-- FILTER SIDEBAR -->
+            <Grid Grid.Column="0" x:Name="SidebarPanel" RowDefinitions="Auto,Auto,Auto,*"
+                  Background="{DynamicResource Apx.Surface}" ClipToBounds="True">
+                <!-- Status group -->
+                <Border Grid.Row="0" Background="{DynamicResource Apx.Card}"
+                        BorderBrush="{DynamicResource Apx.Accent}" BorderThickness="0,0,0,2" Padding="8,4">
+                    <TextBlock Text="{loc:T sidebar.status}" FontWeight="Bold"
+                               Foreground="{DynamicResource Apx.Text}" />
+                </Border>
+                <views:StatusFilterView Grid.Row="1" Margin="6,6,6,10"
+                                        DataContext="{Binding PacketList}" />
 
-            <DockPanel Grid.Row="0" ClipToBounds="True">
-                <Border DockPanel.Dock="Top"
-                        Background="{DynamicResource Apx.Card}"
-                        BorderBrush="{DynamicResource Apx.Accent}"
-                        BorderThickness="0,0,0,2"
-                        Padding="6,3">
+                <!-- By-code list header -->
+                <Border Grid.Row="2" Background="{DynamicResource Apx.Card}"
+                        BorderBrush="{DynamicResource Apx.Highlight}" BorderThickness="0,0,0,2" Padding="8,4">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="{loc:T panel.eventSummary}"
-                                   FontWeight="Bold"
-                                   VerticalAlignment="Center"
+                        <TextBlock Text="{loc:T sidebar.byCode}" FontWeight="Bold"
                                    Foreground="{DynamicResource Apx.Text}" />
-                        <Border Background="{DynamicResource Apx.Highlight}"
-                                CornerRadius="8" Padding="4,1"
+                        <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
                                 ToolTip.Tip="{loc:T panel.eventSummary.help}">
                             <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                         </Border>
                     </StackPanel>
                 </Border>
-                <views:CodeAggregatorView x:Name="OverviewAggregatorView" DataContext="{Binding Aggregator}" />
-            </DockPanel>
+                <views:CodeAggregatorView Grid.Row="3" DataContext="{Binding Aggregator}" />
+            </Grid>
 
-            <GridSplitter Grid.Row="1" ResizeDirection="Rows"
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-            <Grid Grid.Row="2" x:Name="BottomGrid" ColumnDefinitions="2*,2,*">
-                <DockPanel Grid.Column="0" MinWidth="180" ClipToBounds="True">
-                    <Border DockPanel.Dock="Top"
-                            Background="{DynamicResource Apx.Card}"
-                            BorderBrush="{DynamicResource Apx.Highlight}"
-                            BorderThickness="0,0,0,2"
-                            Padding="6,3">
+            <!-- TABLE + DETAIL -->
+            <Grid Grid.Column="2" x:Name="ContentGrid" RowDefinitions="*,2,2*" ClipToBounds="True">
+                <DockPanel Grid.Row="0" ClipToBounds="True">
+                    <Border DockPanel.Dock="Top" Background="{DynamicResource Apx.Card}"
+                            BorderBrush="{DynamicResource Apx.Highlight}" BorderThickness="0,0,0,2" Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="{loc:T panel.packetList}"
-                                       FontWeight="Bold"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource Apx.Text}" />
-                            <Border Background="{DynamicResource Apx.Highlight}"
-                                    CornerRadius="8" Padding="4,1"
+                            <!-- Sidebar collapse / expand toggle -->
+                            <Button Classes="iconbtn" Padding="2" Width="22" Height="22"
+                                    Command="{Binding ToggleSidebarCommand}"
+                                    ToolTip.Tip="{loc:T toolbar.toggleSidebar.tip}">
+                                <Panel>
+                                    <Path Classes="icon sm" Data="{StaticResource Icon.ChevronLeft}"
+                                          IsVisible="{Binding SidebarVisible}" />
+                                    <Path Classes="icon sm" Data="{StaticResource Icon.ChevronRight}"
+                                          IsVisible="{Binding !SidebarVisible}" />
+                                </Panel>
+                            </Button>
+                            <TextBlock Text="{loc:T panel.packetList}" FontWeight="Bold"
+                                       VerticalAlignment="Center" Foreground="{DynamicResource Apx.Text}" />
+                            <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
                                     ToolTip.Tip="{loc:T panel.packetList.help}">
                                 <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                             </Border>
                         </StackPanel>
                     </Border>
-                    <views:PacketListView x:Name="OverviewPacketListView" DataContext="{Binding PacketList}" />
+                    <views:PacketListView x:Name="PacketListViewHost" DataContext="{Binding PacketList}" />
                 </DockPanel>
 
-                <GridSplitter Grid.Column="1" ResizeDirection="Columns"
+                <GridSplitter Grid.Row="1" ResizeDirection="Rows"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-                <DockPanel Grid.Column="2" MinWidth="180" ClipToBounds="True">
-                    <Border DockPanel.Dock="Top"
-                            Background="{DynamicResource Apx.Card}"
-                            BorderBrush="{DynamicResource Apx.Danger}"
-                            BorderThickness="0,0,0,2"
-                            Padding="6,3">
+                <DockPanel Grid.Row="2" ClipToBounds="True">
+                    <Border DockPanel.Dock="Top" Background="{DynamicResource Apx.Card}"
+                            BorderBrush="{DynamicResource Apx.Danger}" BorderThickness="0,0,0,2" Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="{loc:T panel.packetDetail}"
-                                       FontWeight="Bold"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource Apx.Text}" />
-                            <Border Background="{DynamicResource Apx.Highlight}"
-                                    CornerRadius="8" Padding="4,1"
+                            <TextBlock Text="{loc:T panel.packetDetail}" FontWeight="Bold"
+                                       VerticalAlignment="Center" Foreground="{DynamicResource Apx.Text}" />
+                            <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
                                     ToolTip.Tip="{loc:T panel.packetDetail.help}">
                                 <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
                             </Border>
                         </StackPanel>
                     </Border>
-                    <views:PacketDetailView x:Name="OverviewPacketDetailView" DataContext="{Binding PacketDetail}" />
+                    <views:PacketDetailView x:Name="PacketDetailViewHost" DataContext="{Binding PacketDetail}" />
                 </DockPanel>
             </Grid>
         </Grid>
 
-        <!-- ═══════════════════════════════════════
-             FOCUS MODE (stacked, full-width detail)
-             ═══════════════════════════════════════ -->
-        <Grid x:Name="FocusGrid"
-              RowDefinitions="160,2,*,2,*"
-              IsVisible="{Binding FocusMode}">
-
-            <Grid Grid.Row="0" RowDefinitions="Auto,*">
-                <Border Grid.Row="0"
-                        Background="{DynamicResource Apx.Card}"
-                        BorderBrush="{DynamicResource Apx.Accent}"
-                        BorderThickness="0,0,0,2"
-                        Padding="6,3"
-                        Cursor="Hand" PointerPressed="OnSummaryHeaderPressed">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock x:Name="SummaryCollapseIcon" Text="▼" FontSize="10" VerticalAlignment="Center"
-                                   Foreground="{DynamicResource Apx.Accent}" />
-                        <TextBlock Text="{loc:T panel.eventSummary}"
-                                   FontWeight="Bold"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource Apx.Text}" />
-                    </StackPanel>
-                </Border>
-                <views:CodeAggregatorView x:Name="FocusSummaryContent"
-                                          Grid.Row="1"
-                                          DataContext="{Binding Aggregator}" />
+        <!-- ═══════════ STATUS BAR ═══════════ -->
+        <Border Grid.Row="2" Background="{DynamicResource Apx.Surface}"
+                BorderBrush="{DynamicResource Apx.Border}" BorderThickness="0,1,0,0" Padding="10,3">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                    <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                             Fill="{DynamicResource Apx.Success}" IsVisible="{Binding IsCapturing}" />
+                    <TextBlock Text="{Binding PacketList.CountText}" VerticalAlignment="Center"
+                               FontSize="12" Foreground="{DynamicResource Apx.TextMuted}" />
+                </StackPanel>
+                <TextBlock Grid.Column="2" Text="{Binding StatusText}" VerticalAlignment="Center"
+                           FontSize="12" Foreground="{DynamicResource Apx.TextMuted}"
+                           TextTrimming="CharacterEllipsis" MaxWidth="500" />
             </Grid>
-
-            <GridSplitter Grid.Row="1" ResizeDirection="Rows"
-                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-
-            <DockPanel Grid.Row="2">
-                <Border DockPanel.Dock="Top"
-                        Background="{DynamicResource Apx.Card}"
-                        BorderBrush="{DynamicResource Apx.Highlight}"
-                        BorderThickness="0,0,0,2"
-                        Padding="6,3">
-                    <TextBlock Text="{loc:T panel.packetList}"
-                               FontWeight="Bold"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource Apx.Text}" />
-                </Border>
-                <views:PacketListView DataContext="{Binding PacketList}" />
-            </DockPanel>
-
-            <GridSplitter Grid.Row="3" ResizeDirection="Rows"
-                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-
-            <DockPanel Grid.Row="4">
-                <Border DockPanel.Dock="Top"
-                        Background="{DynamicResource Apx.Card}"
-                        BorderBrush="{DynamicResource Apx.Danger}"
-                        BorderThickness="0,0,0,2"
-                        Padding="6,3">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="{loc:T panel.packetDetail}"
-                                   FontWeight="Bold"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource Apx.Text}" />
-                        <Border Background="{DynamicResource Apx.Highlight}"
-                                CornerRadius="8" Padding="4,1"
-                                ToolTip.Tip="{loc:T panel.packetDetail.helpShort}">
-                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
-                        </Border>
-                    </StackPanel>
-                </Border>
-                <views:PacketDetailView DataContext="{Binding PacketDetail}" />
-            </DockPanel>
-
-        </Grid>
-
-        </Panel>
+        </Border>
 
     </Grid>
 

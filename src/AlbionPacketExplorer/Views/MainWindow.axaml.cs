@@ -14,10 +14,9 @@ namespace AlbionPacketExplorer.Views;
 
 public partial class MainWindow : ApxWindow, IFilePicker
 {
-    private Grid? _overviewMainGrid;
-    private Grid? _overviewBottomGrid;
-    private Grid? _focusGrid;
-    private bool _summaryCollapsed;
+    private Grid? _workspaceGrid;   // [sidebar | splitter | content]
+    private Grid? _contentGrid;     // [table | splitter | detail]
+    private Control? _sidebarPanel;
     private bool _closing;
 
     public MainWindow(ToastService toastManager)
@@ -27,7 +26,6 @@ public partial class MainWindow : ApxWindow, IFilePicker
         Loaded += OnLoaded;
         Opened += OnOpened;
         Closing += OnClosing;
-        SizeChanged += (_, _) => ClampPanelSizes();
     }
 
     // Center using the real physical FrameSize, which is only known once the window has
@@ -43,22 +41,6 @@ public partial class MainWindow : ApxWindow, IFilePicker
         var x = area.X + (area.Width - frame.Width) / 2;
         var y = area.Y + (area.Height - frame.Height) / 2;
         Position = new PixelPoint(x, y);
-    }
-
-    // Keep the fixed-size summary row and left column from exceeding what the current
-    // window can show, so the star-sized panels (packet list / detail) never get pushed
-    // off-screen when the window shrinks. Mutates the existing definitions in place so the
-    // GridSplitter bindings stay intact (recreating them breaks resizing).
-    private void ClampPanelSizes()
-    {
-        if (_overviewMainGrid is { } mg && mg.Bounds.Height > 0)
-        {
-            var max = mg.Bounds.Height - MinPanelSize - mg.RowDefinitions[1].ActualHeight;
-            var def = mg.RowDefinitions[0];
-            if (max > MinPanelSize && def.Height.IsAbsolute && def.ActualHeight > max)
-                def.Height = new GridLength(max, GridUnitType.Pixel);
-        }
-        // BottomGrid columns are star-sized, so they cannot overflow and need no clamping.
     }
 
     // Re-fit the window to its screen when it returns from maximized, so un-maximizing
@@ -105,10 +87,9 @@ public partial class MainWindow : ApxWindow, IFilePicker
 
     private void OnLoaded(object? sender, EventArgs e)
     {
-        _overviewMainGrid = this.FindControl<Grid>("OverviewGrid");
-        _overviewBottomGrid = this.FindControl<Grid>("BottomGrid");
-        _focusGrid = this.FindControl<Grid>("FocusGrid");
-
+        _workspaceGrid = this.FindControl<Grid>("WorkspaceGrid");
+        _contentGrid = this.FindControl<Grid>("ContentGrid");
+        _sidebarPanel = this.FindControl<Control>("SidebarPanel");
 
         if (DataContext is MainViewModel vm)
         {
@@ -121,6 +102,10 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.PacketDetail.Toasts = vm.ToastManager;
             vm.PacketDetail.EditParamRequested += OnEditParamRequested;
             vm.PacketDetail.ViewFullValueRequested += OnViewFullValueRequested;
+            vm.PropertyChanged += OnViewModelPropertyChanged;
+            vm.ShortcutsChanged += ApplyShortcuts;
+            ApplySidebarVisibility(vm.SidebarVisible);
+            ApplyShortcuts();
         }
 
         var layout = LayoutStore.Load();
@@ -129,6 +114,35 @@ public partial class MainWindow : ApxWindow, IFilePicker
 
         if (DataContext is MainViewModel vmAuto)
             vmAuto.TriggerAutoStart();
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.SidebarVisible) &&
+            DataContext is MainViewModel vm)
+            ApplySidebarVisibility(vm.SidebarVisible);
+    }
+
+    // Collapse the sidebar column (and its splitter) to zero width when hidden, instead of
+    // just toggling visibility, so the table reclaims the space.
+    private void ApplySidebarVisibility(bool visible)
+    {
+        if (_workspaceGrid == null || _sidebarPanel == null) return;
+        _sidebarPanel.IsVisible = visible;
+        if (visible)
+        {
+            var saved = LayoutStore.Load();
+            _workspaceGrid.ColumnDefinitions[0].Width =
+                new GridLength(saved.LeftPanelWidth > MinColumnWidth ? saved.LeftPanelWidth : 260, GridUnitType.Pixel);
+            _workspaceGrid.ColumnDefinitions[0].MinWidth = MinColumnWidth;
+            _workspaceGrid.ColumnDefinitions[1].Width = new GridLength(2, GridUnitType.Pixel);
+        }
+        else
+        {
+            _workspaceGrid.ColumnDefinitions[0].MinWidth = 0;
+            _workspaceGrid.ColumnDefinitions[0].Width = new GridLength(0, GridUnitType.Pixel);
+            _workspaceGrid.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Pixel);
+        }
     }
 
     // Restore the saved window size/position, but only if those bounds still land on a
@@ -235,29 +249,20 @@ public partial class MainWindow : ApxWindow, IFilePicker
 
     private void ApplyLayout(LayoutState layout)
     {
-        if (_overviewMainGrid != null)
+        // Sidebar = fixed-width first column (only when visible); the content column is star.
+        if (_workspaceGrid != null && (DataContext as MainViewModel)?.SidebarVisible != false)
         {
-            _overviewMainGrid.RowDefinitions[0] =
+            var w = layout.LeftPanelWidth > MinColumnWidth ? layout.LeftPanelWidth : 260;
+            _workspaceGrid.ColumnDefinitions[0] =
+                new ColumnDefinition(w, GridUnitType.Pixel) { MinWidth = MinColumnWidth };
+        }
+        // Content = table row over detail row, split by a GridSplitter; table fixed, detail star.
+        if (_contentGrid != null)
+        {
+            _contentGrid.RowDefinitions[0] =
                 new RowDefinition(layout.TopPanelHeight, GridUnitType.Pixel) { MinHeight = MinPanelSize };
-            _overviewMainGrid.RowDefinitions[2].MinHeight = MinPanelSize;
-        }
-        if (_overviewBottomGrid != null)
-        {
-            // Star-sized so the two panels always sum to the available width — never
-            // overflowing the window the way fixed-pixel columns did.
-            var frac = Math.Clamp(layout.LeftPanelFraction, 0.2, 0.8);
-            _overviewBottomGrid.ColumnDefinitions[0] =
-                new ColumnDefinition(frac, GridUnitType.Star) { MinWidth = MinColumnWidth };
-            _overviewBottomGrid.ColumnDefinitions[2] =
-                new ColumnDefinition(1 - frac, GridUnitType.Star) { MinWidth = MinColumnWidth };
-        }
-        if (_focusGrid != null)
-        {
-            _focusGrid.RowDefinitions[0] =
-                new RowDefinition(layout.FocusTopHeight, GridUnitType.Pixel) { MinHeight = MinPanelSize };
-            _focusGrid.RowDefinitions[2] =
-                new RowDefinition(layout.FocusMidHeight, GridUnitType.Pixel) { MinHeight = MinPanelSize };
-            _focusGrid.RowDefinitions[4] = new RowDefinition(1, GridUnitType.Star) { MinHeight = MinPanelSize };
+            _contentGrid.RowDefinitions[2] =
+                new RowDefinition(1, GridUnitType.Star) { MinHeight = MinPanelSize };
         }
     }
 
@@ -267,45 +272,27 @@ public partial class MainWindow : ApxWindow, IFilePicker
         LayoutStore.Save(LayoutState.Default);
     }
 
-    private void OnKeyDown(object? sender, KeyEventArgs e)
+    // Rebuild the configurable KeyBindings from the user's gestures. Invalid or empty
+    // gestures fall back to a sensible default so each shortcut always works.
+    private void ApplyShortcuts()
     {
-        if (e.Key == Key.F5 && DataContext is MainViewModel vm)
-        {
-            vm.ToggleFocusModeCommand.Execute(null);
-            e.Handled = true;
-        }
+        if (DataContext is not MainViewModel vm) return;
+
+        KeyBindings.Clear();
+        AddBinding(vm.SidebarToggleGesture, "F5", vm.ToggleSidebarCommand);
+        AddBinding(vm.AutoSelectNewestGesture, "Ctrl+L", vm.ToggleAutoSelectNewestCommand);
+        AddBinding(vm.ToggleRowExpandGesture, "Space", vm.ToggleRowExpandCommand);
+    }
+
+    private void AddBinding(string? gestureText, string fallback, System.Windows.Input.ICommand command)
+    {
+        KeyGesture gesture;
+        try { gesture = KeyGesture.Parse(string.IsNullOrWhiteSpace(gestureText) ? fallback : gestureText); }
+        catch { gesture = KeyGesture.Parse(fallback); }
+        KeyBindings.Add(new KeyBinding { Gesture = gesture, Command = command });
     }
 
     private void OnResetLayoutClicked(object? sender, RoutedEventArgs e) => ResetLayout();
-
-    private double _summaryExpandedHeight = 160;
-
-    private void OnSummaryHeaderPressed(object? sender, PointerPressedEventArgs e)
-    {
-        _summaryCollapsed = !_summaryCollapsed;
-        var content = this.FindControl<Control>("FocusSummaryContent");
-        var icon = this.FindControl<TextBlock>("SummaryCollapseIcon");
-        if (icon != null) icon.Text = _summaryCollapsed ? "▶" : "▼";
-
-        if (_focusGrid != null)
-        {
-            if (_summaryCollapsed)
-            {
-                var current = _focusGrid.RowDefinitions[0].ActualHeight;
-                if (current > 40) _summaryExpandedHeight = current;
-                if (content != null) content.IsVisible = false;
-                _focusGrid.RowDefinitions[0] = new RowDefinition(GridLength.Auto);
-                _focusGrid.RowDefinitions[1] = new RowDefinition(0, GridUnitType.Pixel);
-            }
-            else
-            {
-                if (content != null) content.IsVisible = true;
-                _focusGrid.RowDefinitions[0] =
-                    new RowDefinition(_summaryExpandedHeight, GridUnitType.Pixel) { MinHeight = MinPanelSize };
-                _focusGrid.RowDefinitions[1] = new RowDefinition(2, GridUnitType.Pixel);
-            }
-        }
-    }
 
     private void OnEditParamRequested(EditParamViewModel vm)
     {
@@ -340,13 +327,10 @@ public partial class MainWindow : ApxWindow, IFilePicker
         if (_closing) return;
         var prev = LayoutStore.Load();
 
-        var topH     = _overviewMainGrid?.RowDefinitions[0].ActualHeight ?? 0;
-        var leftW    = _overviewBottomGrid?.ColumnDefinitions[0].ActualWidth ?? 0;
-        var rightW   = _overviewBottomGrid?.ColumnDefinitions[2].ActualWidth ?? 0;
-        var focusTop = _summaryCollapsed ? _summaryExpandedHeight : (_focusGrid?.RowDefinitions[0].ActualHeight ?? 0);
-        var focusMid = _focusGrid?.RowDefinitions[2].ActualHeight ?? 0;
-
-        var leftFraction = (leftW + rightW) > 10 ? leftW / (leftW + rightW) : prev.LeftPanelFraction;
+        // Only persist the sidebar width while it is visible (a hidden sidebar is 0-wide).
+        var sidebarVisible = (DataContext as MainViewModel)?.SidebarVisible != false;
+        var sidebarW = sidebarVisible ? (_workspaceGrid?.ColumnDefinitions[0].ActualWidth ?? 0) : 0;
+        var tableH   = _contentGrid?.RowDefinitions[0].ActualHeight ?? 0;
 
         // Only capture the normal (restored) bounds; when maximized keep the previous
         // normal bounds and just remember the maximized flag.
@@ -358,11 +342,8 @@ public partial class MainWindow : ApxWindow, IFilePicker
 
         LayoutStore.Save(prev with
         {
-            TopPanelHeight = topH     > 10 ? topH     : prev.TopPanelHeight,
-            LeftPanelWidth = leftW    > 10 ? leftW    : prev.LeftPanelWidth,
-            LeftPanelFraction = leftFraction,
-            FocusTopHeight = focusTop > 10 ? focusTop : prev.FocusTopHeight,
-            FocusMidHeight = focusMid > 10 ? focusMid : prev.FocusMidHeight,
+            TopPanelHeight = tableH   > 10 ? tableH   : prev.TopPanelHeight,
+            LeftPanelWidth = sidebarW > 10 ? sidebarW : prev.LeftPanelWidth,
             WindowX = winX,
             WindowY = winY,
             WindowWidth = winW,

@@ -15,7 +15,8 @@ public record LayoutState(
     double? WindowHeight = null,
     bool WindowMaximized = false)
 {
-    public static readonly LayoutState Default = new(320, 900);
+    // TopPanelHeight = packet-table height; LeftPanelWidth = filter-sidebar width.
+    public static readonly LayoutState Default = new(TopPanelHeight: 300, LeftPanelWidth: 260);
 
     public bool HasWindowBounds =>
         WindowX is not null && WindowY is not null &&
