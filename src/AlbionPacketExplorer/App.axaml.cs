@@ -26,6 +26,8 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        LocalizationService.Instance.SetCulture(AppSettingsStore.Load().Culture);
+
         var services = new ServiceCollection();
         services.AddSingleton<ToastService>();
         Services = services.BuildServiceProvider();

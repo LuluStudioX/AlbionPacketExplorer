@@ -18,7 +18,8 @@ public record AppSettings(
     bool ForceExpandRows = false,
     bool AutoStartCapture = false,
     bool AutoSaveLogs = false,
-    DetailDensity Density = DetailDensity.Normal)
+    DetailDensity Density = DetailDensity.Normal,
+    string Culture = "en")
 {
     public static readonly AppSettings Default = new();
 }

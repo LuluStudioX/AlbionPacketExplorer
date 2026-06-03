@@ -32,6 +32,7 @@
     <AvaloniaResource Include="Assets\app-icon.ico" />
     <AvaloniaResource Include="Assets\app-icon.png" />
     <EmbeddedResource Include="Assets\packet-schema.base.json" />
+    <EmbeddedResource Include="lang\*.json" />
   </ItemGroup>
 
 </Project>

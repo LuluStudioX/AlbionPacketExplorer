@@ -3,8 +3,9 @@
         xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
         xmlns:vm="using:AlbionPacketExplorer.ViewModels"
         xmlns:views="using:AlbionPacketExplorer.Views"
+        xmlns:loc="using:AlbionPacketExplorer.Markup"
         x:Class="AlbionPacketExplorer.Views.MainWindow"
-        Title="Albion Packet Explorer"
+        Title="{loc:T app.title}"
         Icon="/Assets/app-icon.ico"
         Width="1400" Height="900"
         MinWidth="560" MinHeight="420"
@@ -132,7 +133,7 @@
                         BorderThickness="0,0,0,2"
                         Padding="6,3">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="Event Summary"
+                        <TextBlock Text="{loc:T panel.eventSummary}"
                                    FontWeight="Bold"
                                    VerticalAlignment="Center"
                                    Foreground="{DynamicResource Apx.Text}" />
@@ -157,7 +158,7 @@
                             BorderThickness="0,0,0,2"
                             Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Packet List"
+                            <TextBlock Text="{loc:T panel.packetList}"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
                                        Foreground="{DynamicResource Apx.Text}" />
@@ -181,7 +182,7 @@
                             BorderThickness="0,0,0,2"
                             Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Packet Detail"
+                            <TextBlock Text="{loc:T panel.packetDetail}"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
                                        Foreground="{DynamicResource Apx.Text}" />
@@ -214,7 +215,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock x:Name="SummaryCollapseIcon" Text="▼" FontSize="10" VerticalAlignment="Center"
                                    Foreground="{DynamicResource Apx.Accent}" />
-                        <TextBlock Text="Event Summary"
+                        <TextBlock Text="{loc:T panel.eventSummary}"
                                    FontWeight="Bold"
                                    VerticalAlignment="Center"
                                    Foreground="{DynamicResource Apx.Text}" />
