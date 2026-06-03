@@ -1,473 +1,227 @@
 #!/usr/bin/env python3
-"""
-Extracts packet param schemas from SAT Network/Events/*.cs and Network/Handler/*.cs.
-Outputs packet-schema.base.json to src/AlbionPacketExplorer/Assets/.
+"""Resync packet-schema.base.json with the current SAT EventCodes / OperationCodes enums.
+
+Model: this tool RE-KEYS the existing schema to the current enum ordinals and applies the
+island field-map overrides below. It preserves curated param annotations by carrying them
+forward BY NAME (a param byte-index map is tied to the packet structure i.e. the event/op
+name, not the numeric code, so it survives code renumbering across game patches).
+
+Why a rewrite (vs the old extractor): the previous generator skipped any enum member with an
+inline `// comment` (it only stripped trailing commas), which desynced the ordinal counter and
+mis-coded every packet after the first commented member. Enum ordinal == wire code == the
+`code` field in packet_sniffer.json (verified via SAT dispatch: handlers register with
+`(int)EventCodes.X` and EventPacketHandler compares that to the key-252 wire code).
 
 Usage:
     python tools/generate-schema.py [--sat-path PATH]
-
-Default SAT path: D:/Users/bimas/Documents/github/AlbionOnline-StatisticsAnalysis
+    (PATH defaults to env APX_SAT_REPO, else a sibling AlbionOnline-StatisticsAnalysis clone.)
 """
-
-import re
-import json
 import argparse
+import json
+import os
+import re
+import sys
 from pathlib import Path
 
-SAT_DEFAULT = Path("D:/Users/bimas/Documents/github/AlbionOnline-StatisticsAnalysis")
-OUT_PATH = Path(__file__).parent.parent / "src/AlbionPacketExplorer/Assets/packet-schema.base.json"
-
-# Maps SAT EventCodes enum value -> (name, numeric_code)
-# We parse EventCodes.cs to build this dynamically.
-
-def parse_event_codes(sat_root: Path) -> dict[str, int]:
-    """Returns dict name->code from EventCodes.cs"""
-    cs = sat_root / "src/StatisticsAnalysisTool/Network/EventCodes.cs"
-    if not cs.exists():
-        print(f"  WARN: {cs} not found")
-        return {}
-    text = cs.read_text(encoding="utf-8", errors="replace")
-    result = {}
-    counter = 0
-    for line in text.splitlines():
-        line = line.strip().rstrip(",")
-        # match: Name = VALUE or just Name
-        m = re.match(r"^(\w+)\s*=\s*(\d+)", line)
-        if m:
-            result[m.group(1)] = int(m.group(2))
-            counter = int(m.group(2))
-        elif re.match(r"^([A-Z][A-Za-z0-9]+)$", line):
-            counter += 1
-            result[line] = counter
-    return result
+APX = Path(__file__).resolve().parents[1]
+OUT = APX / "src/AlbionPacketExplorer/Assets/packet-schema.base.json"
 
 
-def parse_op_codes(sat_root: Path) -> dict[str, int]:
-    """Returns dict name->code from OperationCodes.cs"""
-    cs = sat_root / "src/StatisticsAnalysisTool/Network/OperationCodes.cs"
-    if not cs.exists():
-        print(f"  WARN: {cs} not found")
-        return {}
-    text = cs.read_text(encoding="utf-8", errors="replace")
-    result = {}
-    counter = 0
-    for line in text.splitlines():
-        line = line.strip().rstrip(",")
-        m = re.match(r"^(\w+)\s*=\s*(\d+)", line)
-        if m:
-            result[m.group(1)] = int(m.group(2))
-            counter = int(m.group(2))
-        elif re.match(r"^([A-Z][A-Za-z0-9]+)$", line):
-            counter += 1
-            result[line] = counter
-    return result
+def parse_enum(path: Path):
+    """Return ordered list of (ordinal, name) honoring explicit `= N` resets."""
+    text = path.read_text(encoding="utf-8-sig")
+    body = text[text.index("{") + 1: text.rindex("}")]
+    members, counter = [], 0
+    for raw in body.splitlines():
+        line = re.sub(r"//.*$", "", raw).strip()  # strip trailing/whole-line comments first
+        if not line:
+            continue
+        line = line.rstrip(",").strip()
+        if not line:
+            continue
+        if "=" in line:
+            name, val = line.split("=", 1)
+            name = name.strip()
+            counter = int(val.strip())
+        else:
+            name = line
+        if not re.fullmatch(r"[A-Za-z_]\w*", name):
+            print(f"  ! skip unparsable enum line: {raw!r}", file=sys.stderr)
+            continue
+        members.append((counter, name))
+        counter += 1
+    return members
 
 
-# Patterns for extracting param accesses from C# code
-PARAM_PATTERNS = [
-    # parameters[0], parameters["0"]
-    re.compile(r'parameters\[(?:"(\d+)"|(\d+))\]'),
-    # dict[0], dict["0"]
-    re.compile(r'\bdict\[(?:"(\d+)"|(\d+))\]'),
-]
-
-# Patterns to find the variable name assigned from param
-ASSIGN_PATTERN = re.compile(
-    r'(?:var\s+(\w+)|(\w+)\s*=)\s*.*?parameters\[(?:"?(\d+)"?)\]'
-)
-
-# Property pattern in DTO classes: public Type PropName { get; set; }
-PROP_PATTERN = re.compile(
-    r'public\s+\S+\s+(\w+)\s*\{[^}]*get[^}]*\}'
-)
-
-# [GameParameter(ActionType.Something)] attribute before property
-GAME_PARAM_ATTR = re.compile(r'\[GameParameter[^\]]*\]')
+def p(name, note="", resolve=""):
+    return {"name": name, "note": note, "resolveAs": resolve}
 
 
-def extract_params_from_file(path: Path) -> dict[str, dict]:
-    """
-    Extract {key: {name, note, resolveAs}} from a C# event/handler/DTO file.
-    Best-effort — returns empty dict if nothing found.
-    """
-    text = path.read_text(encoding="utf-8", errors="replace")
-    params: dict[str, dict] = {}
+# ---- island / corrected overrides (from current SAT event constructors) ----
+EVENT_OVERRIDE = {
+    "NewBuilding": {
+        "0": p("objectId"),
+        "1": p("buildingGuid", "16-byte building GUID (Byte[])"),
+        "2": p("houseObjectId"),
+        "3": p("uniqueName", "Building UniqueName"),
+        "4": p("position", "World position Single[] {X, Y}"),
+        "7": p("nutrition", "Current nutrition"),
+        "8": p("plantedAt", ".NET ticks (UTC); lastActionAt"),
+        "9": p("housePlotGuid", "16-byte plot GUID (Byte[])"),
+        "11": p("islandOwnerName"),
+        "13": p("laborerFirstName"),
+        "14": p("laborerLastName"),
+        "16": p("hasPremium", "bool"),
+    },
+    "FarmBuildingInfo": {
+        "0": p("objectId"),
+        "4": p("elapsedGrowTime", "Elapsed grow time in 100us units"),
+        "5": p("serverNow", ".NET ticks (UTC) server now; PlantedAt = serverNow - elapsed"),
+    },
+    "LaborerObjectInfo": {
+        "0": p("objectId"),
+        "1": p("firstName", "Laborer first name"),
+        "2": p("lastName", "Laborer last name"),
+        "3": p("fameFill", "FixPoint internal value (FixPoint.FromInternalValue)"),
+        "4": p("happiness", "FixPoint internal value, truncated to int"),
+        "6": p("nextReturnAt", ".NET ticks (UTC)"),
+        "7": p("lastJobStartedAt", ".NET ticks (UTC)"),
+        "8": p("jobDispatchTime", ".NET ticks (UTC); present only while away on job"),
+        "9": p("activeJobId", "16-byte job GUID (Byte[]); present while on job"),
+        "10": p("sentByCharacter", "Dispatching character / zone name"),
+    },
+    "LaborerObjectJobInfo": {
+        "0": p("objectId"),
+        "1": p("isLootReady", "bool; true = returned home, loot ready"),
+        "2": p("journalItemId", "Journal item index", "itemIndex"),
+        "3": p("currentFameFill", "FixPoint internal value"),
+        "5": p("jobStartTime", ".NET ticks (UTC)"),
+    },
+    "FarmableObjectInfo": {
+        "0": p("objectId"),
+        "1": p("elapsedGrowTime", "Pasture/herb layout: elapsed grow time (100us units)"),
+        "2": p("serverNow", "Pasture/herb layout: server now (.NET ticks UTC)"),
+        "4": p("elapsedGrowTimeFarm", "Farm layout: elapsed grow time (100us units)"),
+        "5": p("serverNowFarm", "Farm layout: server now (.NET ticks UTC)"),
+        "9": p("activityTimestamp", ".NET ticks (UTC); last activity. A string param holds the FARMABLE uniqueName"),
+    },
+    "FestivitiesUpdate": {
+        "0": p("typeFlags", "Byte[]; per-entry flag (2 = daily)"),
+        "1": p("categories", "String[]; per-entry category"),
+        "2": p("uniqueNames", "String[]; festivity unique names"),
+        "3": p("startTicks", "Int64[]; per-entry start (.NET ticks UTC)"),
+        "4": p("endTicks", "Int64[]; per-entry end (.NET ticks UTC)"),
+    },
+    # enum renamed MightAndFavorReceived -> MightAndFavorReceivedEvent; remap + correct from SAT.
+    "MightAndFavorReceivedEvent": {
+        "0": p("might", "Might"),
+        "2": p("premiumOfMight", "Premium of might"),
+        "3": p("favor", "Favor"),
+        "5": p("premiumOfFavor", "Premium of favor"),
+        "6": p("totalFavor", "Total favor"),
+        "8": p("unknown8"),
+    },
+}
 
-    # Strategy 1: look for assignment patterns like:
-    #   var objectId = parameters[0]
-    #   ObjectId = parameters["0"]
-    for m in ASSIGN_PATTERN.finditer(text):
-        var_name = m.group(1) or m.group(2)
-        key = m.group(3)
-        if var_name and key and var_name not in ("null", "true", "false", "value"):
-            name = camel_to_snake_hint(var_name)
-            if key not in params:
-                params[key] = {"name": name, "note": "", "resolveAs": resolve_hint(name)}
+REQUEST_OVERRIDE = {
+    "ActionOnBuildingStart": {
+        "0": p("ticks", ".NET ticks"),
+        "1": p("buildingObjectId"),
+        "2": p("actionType", "Enum value"),
+        "4": p("costs", "Silver cost"),
+        "5": p("itemIndices", "Int[] of item indices being used", "itemIndex"),
+    },
+}
 
-    # Strategy 2: look for [GameParameter(X)] followed by property
-    lines = text.splitlines()
-    for i, line in enumerate(lines):
-        if "[GameParameter" in line:
-            # extract key from attribute if present
-            key_m = re.search(r'ActionType\.(\w+)|(\d+)', line)
-            # look ahead for property name
-            for j in range(i+1, min(i+4, len(lines))):
-                prop_m = re.search(r'public\s+\S+\s+(\w+)\s*[{;]', lines[j])
-                if prop_m:
-                    prop_name = prop_m.group(1)
-                    # try to get numeric key from attribute
-                    attr_key_m = re.search(r'\b(\d+)\b', line)
-                    if attr_key_m:
-                        key = attr_key_m.group(1)
-                        name = camel_to_snake_hint(prop_name)
-                        if key not in params:
-                            params[key] = {"name": name, "note": "", "resolveAs": resolve_hint(name)}
-                    break
+# Old dump carried a mislabeled buildingObjectId on these generic ops; drop the stale guess.
+REQUEST_SKIP_CARRY = {"RegisterToObject", "UnRegisterFromObject"}
 
+_DASHES = {"‒": "-", "–": "-", "—": "-", "―": "-"}
+
+
+def sanitize(params):
+    """Carried-forward notes: normalize en/em dashes to plain hyphen (standing no-dash rule)."""
+    for entry in params.values():
+        note = entry.get("note", "")
+        for bad, good in _DASHES.items():
+            note = note.replace(bad, good)
+        entry["note"] = note
     return params
 
 
-def camel_to_snake_hint(name: str) -> str:
-    """Convert CamelCase to camelCase for display (keep first char lower)."""
-    if not name:
-        return name
-    return name[0].lower() + name[1:]
-
-
-ITEM_HINT_WORDS = {"itemid", "itemindex", "itemidx", "item"}
-ITEM_RESOLVE_NAMES = {"itemId", "itemIndex", "itemIdx"}
-
-def resolve_hint(name: str) -> str:
-    """Return 'itemIndex' if the name suggests an item ID, else empty string."""
-    lower = name.lower()
-    if any(w in lower for w in ITEM_HINT_WORDS):
-        return "itemIndex"
-    return ""
-
-
-def find_event_code_for_handler(text: str, event_codes: dict[str, int]) -> tuple[str, int] | None:
-    """Try to find which event code a handler file handles."""
-    # Look for: EventCodes.SomeName or OperationCodes.SomeName
-    for pattern, kind in [
-        (re.compile(r'EventCodes\.(\w+)'), "EVENT"),
-        (re.compile(r'OperationCodes\.(\w+)'), None),
-    ]:
-        for m in pattern.finditer(text):
-            name = m.group(1)
-            if kind == "EVENT" and name in event_codes:
-                return ("EVENT", event_codes[name])
-    return None
-
-
-def find_request_response_code(text: str, op_codes: dict[str, int]) -> list[tuple[str, int]]:
-    results = []
-    for m in re.finditer(r'OperationCodes\.(\w+)', text):
-        name = m.group(1)
-        if name in op_codes:
-            # determine if REQUEST or RESPONSE from class name / comments
-            if "Request" in text[:500]:
-                results.append(("REQUEST", op_codes[name]))
-            if "Response" in text[:500]:
-                results.append(("RESPONSE", op_codes[name]))
-            if not results:
-                results.append(("REQUEST", op_codes[name]))
-                results.append(("RESPONSE", op_codes[name]))
-    return results
-
-
-# Manually curated high-confidence entries from research (fills gaps regex misses)
-MANUAL_ENTRIES: dict[str, dict] = {
-    "EVENT:6": {
-        "name": "HealthUpdate",
-        "params": {
-            "0": {"name": "affectedObjectId", "note": "", "resolveAs": ""},
-            "1": {"name": "timestamp",         "note": ".NET ticks", "resolveAs": ""},
-            "2": {"name": "healthChange",      "note": "", "resolveAs": ""},
-            "3": {"name": "newHealthValue",    "note": "", "resolveAs": ""},
-            "4": {"name": "effectType",        "note": "", "resolveAs": ""},
-            "5": {"name": "effectOrigin",      "note": "", "resolveAs": ""},
-            "6": {"name": "causerId",          "note": "", "resolveAs": ""},
-            "7": {"name": "causingSpellIndex", "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:25": {
-        "name": "NewCharacter",
-        "params": {
-            "0":  {"name": "objectId",   "note": "", "resolveAs": ""},
-            "1":  {"name": "name",       "note": "Character name", "resolveAs": ""},
-            "7":  {"name": "guid",       "note": "16-byte player GUID", "resolveAs": ""},
-            "8":  {"name": "guildName",  "note": "", "resolveAs": ""},
-            "40": {"name": "equipment",  "note": "Array of equipped item indices", "resolveAs": ""},
-        }
-    },
-    "EVENT:27": {
-        "name": "NewEquipmentItem",
-        "params": {
-            "0": {"name": "objectId",    "note": "", "resolveAs": ""},
-            "1": {"name": "itemId",      "note": "Item index — maps to IndexedItems", "resolveAs": "itemIndex"},
-            "2": {"name": "quantity",    "note": "", "resolveAs": ""},
-            "4": {"name": "emv",         "note": "Estimated market value in silver", "resolveAs": ""},
-            "6": {"name": "quality",     "note": "0=Normal 1=Good 2=Outstanding 3=Excellent 4=Masterpiece", "resolveAs": ""},
-            "7": {"name": "durability",  "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:32": {
-        "name": "NewSimpleItem",
-        "params": {
-            "0": {"name": "objectId",   "note": "", "resolveAs": ""},
-            "1": {"name": "itemIndex",  "note": "Item ID — maps to IndexedItems", "resolveAs": "itemIndex"},
-            "2": {"name": "quantity",   "note": "", "resolveAs": ""},
-            "4": {"name": "emv",        "note": "Estimated market value in silver", "resolveAs": ""},
-            "7": {"name": "durability", "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:35": {
-        "name": "LaborerObjectJobInfo",
-        "params": {
-            "0": {"name": "objectId",        "note": "", "resolveAs": ""},
-            "1": {"name": "journalItemId",   "note": "Item ID of the laborer's journal", "resolveAs": "itemIndex"},
-            "2": {"name": "isLootReady",     "note": "", "resolveAs": ""},
-            "4": {"name": "returnTime",      "note": ".NET ticks", "resolveAs": ""},
-            "5": {"name": "owner",           "note": "Owner character name", "resolveAs": ""},
-            "6": {"name": "capacity",        "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:30": {
-        "name": "LaborerObjectInfo",
-        "params": {
-            "0":  {"name": "objectId",     "note": "", "resolveAs": ""},
-            "1":  {"name": "itemId",       "note": "Laborer item ID", "resolveAs": "itemIndex"},
-            "2":  {"name": "tier",         "note": "", "resolveAs": ""},
-            "4":  {"name": "returnTime",   "note": ".NET ticks", "resolveAs": ""},
-            "5":  {"name": "owner",        "note": "Owner character name", "resolveAs": ""},
-            "6":  {"name": "lootState",    "note": "0=empty 1=ready", "resolveAs": ""},
-            "7":  {"name": "capacity",     "note": "", "resolveAs": ""},
-            "8":  {"name": "itemIds",      "note": "Array of item IDs in loot", "resolveAs": ""},
-            "9":  {"name": "quantities",   "note": "Array of quantities matching itemIds", "resolveAs": ""},
-            "10": {"name": "isAwayOnJob",  "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:56": {
-        "name": "NewBuilding",
-        "params": {
-            "0": {"name": "objectId",    "note": "", "resolveAs": ""},
-            "1": {"name": "firstName",   "note": "Laborer first name", "resolveAs": ""},
-            "2": {"name": "lastName",    "note": "Laborer last name", "resolveAs": ""},
-            "3": {"name": "uniqueName",  "note": "Building UniqueName (optional)", "resolveAs": ""},
-            "6": {"name": "lastHarvest", "note": ".NET ticks", "resolveAs": ""},
-            "7": {"name": "plantedAt",   "note": ".NET ticks", "resolveAs": ""},
-        }
-    },
-    "EVENT:57": {
-        "name": "FarmableObjectInfo",
-        "params": {
-            "0": {"name": "objectId",  "note": "", "resolveAs": ""},
-            "1": {"name": "isReady",   "note": "", "resolveAs": ""},
-            "2": {"name": "itemId",    "note": "Farmable item ID", "resolveAs": "itemIndex"},
-            "3": {"name": "growTime",  "note": "Total grow time in seconds", "resolveAs": ""},
-            "5": {"name": "plantedAt", "note": ".NET ticks", "resolveAs": ""},
-        }
-    },
-    "EVENT:55": {
-        "name": "TakeSilver",
-        "params": {
-            "0": {"name": "objectId",      "note": "", "resolveAs": ""},
-            "1": {"name": "timestamp",     "note": ".NET ticks", "resolveAs": ""},
-            "2": {"name": "targetEntityId","note": "", "resolveAs": ""},
-            "3": {"name": "yieldPreTax",   "note": "Silver before tax", "resolveAs": ""},
-            "5": {"name": "guildTax",      "note": "Guild tax amount", "resolveAs": ""},
-            "6": {"name": "clusterTax",    "note": "Zone tax amount", "resolveAs": ""},
-            "7": {"name": "isPremiumBonus","note": "", "resolveAs": ""},
-            "8": {"name": "multiplier",    "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:71": {
-        "name": "UpdateMoney",
-        "params": {
-            "1": {"name": "currentSilver", "note": "Total silver of player", "resolveAs": ""},
-        }
-    },
-    "EVENT:72": {
-        "name": "UpdateFame",
-        "params": {
-            "1":  {"name": "totalFame",          "note": "", "resolveAs": ""},
-            "2":  {"name": "fameWithMultiplier", "note": "", "resolveAs": ""},
-            "3":  {"name": "zoneFame",           "note": "", "resolveAs": ""},
-            "4":  {"name": "multiplier",         "note": "", "resolveAs": ""},
-            "5":  {"name": "isPremiumBonus",     "note": "", "resolveAs": ""},
-            "8":  {"name": "bagInsightItemIndex","note": "", "resolveAs": "itemIndex"},
-            "10": {"name": "satchelFame",        "note": "", "resolveAs": ""},
-            "17": {"name": "bonusFactor",        "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:129": {
-        "name": "NewMob",
-        "params": {
-            "0":  {"name": "objectId",           "note": "", "resolveAs": ""},
-            "1":  {"name": "mobIndex",           "note": "", "resolveAs": ""},
-            "11": {"name": "moveSpeed",          "note": "", "resolveAs": ""},
-            "13": {"name": "hitPoints",          "note": "", "resolveAs": ""},
-            "14": {"name": "hitPointsMax",       "note": "", "resolveAs": ""},
-            "17": {"name": "energy",             "note": "", "resolveAs": ""},
-            "18": {"name": "energyMax",          "note": "", "resolveAs": ""},
-            "19": {"name": "energyRegeneration", "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:171": {
-        "name": "Died",
-        "params": {
-            "2":  {"name": "diedName",         "note": "Name of player who died", "resolveAs": ""},
-            "3":  {"name": "diedGuild",        "note": "", "resolveAs": ""},
-            "10": {"name": "killedBy",         "note": "Killer name", "resolveAs": ""},
-            "11": {"name": "killedByGuild",    "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:212": {
-        "name": "PartyJoined",
-        "params": {
-            "4": {"name": "partyLead",       "note": "", "resolveAs": ""},
-            "5": {"name": "partyUserGuids",  "note": "Array of party member GUIDs", "resolveAs": ""},
-            "6": {"name": "partyUserNames",  "note": "Array of party member names", "resolveAs": ""},
-        }
-    },
-    "EVENT:214": {
-        "name": "PartyPlayerJoined",
-        "params": {
-            "1": {"name": "userGuid",  "note": "16-byte GUID", "resolveAs": ""},
-            "2": {"name": "username",  "note": "", "resolveAs": ""},
-        }
-    },
-    "REQUEST:45": {
-        "name": "ActionOnBuildingStart",
-        "params": {
-            "0": {"name": "ticks",            "note": ".NET ticks", "resolveAs": ""},
-            "1": {"name": "buildingObjectId", "note": "", "resolveAs": ""},
-            "2": {"name": "actionType",       "note": "Enum value — TBD", "resolveAs": ""},
-            "4": {"name": "costs",            "note": "Silver cost", "resolveAs": ""},
-            "7": {"name": "itemIndex",        "note": "Item being used", "resolveAs": "itemIndex"},
-            "9": {"name": "quantity",         "note": "", "resolveAs": ""},
-        }
-    },
-    "EVENT:103": {
-        "name": "GuildUpdate",
-        "params": {
-            "0":  {"name": "objectId",        "note": "", "resolveAs": ""},
-            "10": {"name": "guildMemberCount","note": "", "resolveAs": ""},
-            "11": {"name": "timestamp",       "note": ".NET ticks", "resolveAs": ""},
-            "14": {"name": "",                "note": "", "resolveAs": ""},
-            "15": {"name": "guildName",       "note": "Guild display name", "resolveAs": ""},
-            "16": {"name": "guildTag",        "note": "Guild tag/abbreviation (e.g. HOG)", "resolveAs": ""},
-            "17": {"name": "guildMembers",    "note": "Array of member data", "resolveAs": ""},
-            "19": {"name": "guildData",       "note": "Dictionary of guild properties", "resolveAs": ""},
-            "20": {"name": "",                "note": "", "resolveAs": ""},
-            "21": {"name": "",                "note": "", "resolveAs": ""},
-            "22": {"name": "",                "note": "", "resolveAs": ""},
-            "23": {"name": "",                "note": "", "resolveAs": ""},
-            "24": {"name": "silver",          "note": "Silver amount (FixPoint internal)", "resolveAs": ""},
-            "25": {"name": "",                "note": "", "resolveAs": ""},
-            "26": {"name": "",                "note": "Float/percentage value", "resolveAs": ""},
-            "27": {"name": "timestamp2",      "note": ".NET ticks", "resolveAs": ""},
-            "28": {"name": "guildBanner",     "note": "Guild banner UniqueName (e.g. GUILD_FINDER_BANNER_24)", "resolveAs": ""},
-            "29": {"name": "",                "note": "", "resolveAs": ""},
-            "31": {"name": "",                "note": "", "resolveAs": ""},
-            "32": {"name": "hideoutLocation", "note": "Hideout location string (HIDEOUT@id@guid)", "resolveAs": ""},
-            "33": {"name": "timestamp3",      "note": ".NET ticks", "resolveAs": ""},
-            "34": {"name": "allianceName",    "note": "Alliance display name", "resolveAs": ""},
-            "37": {"name": "timestamp4",      "note": ".NET ticks", "resolveAs": ""},
-        }
-    },
-    "REQUEST:46": {
-        "name": "ActionOnBuildingEnd",
-        "params": {
-            "0": {"name": "buildingObjectId", "note": "", "resolveAs": ""},
-        }
-    },
-}
+def best_params_by_name(old, kind):
+    """name -> richest param dict among existing `kind:code` entries."""
+    best = {}
+    for key, val in old.items():
+        k, _, _code = key.partition(":")
+        if k != kind:
+            continue
+        name = val.get("name", "")
+        params = val.get("params", {}) or {}
+        if not name:
+            continue
+        if name not in best or len(params) > len(best[name]):
+            best[name] = sanitize(params)
+    return best
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--sat-path", default=str(SAT_DEFAULT))
+    parser.add_argument(
+        "--sat-path",
+        default=os.environ.get("APX_SAT_REPO", str(APX.parent / "AlbionOnline-StatisticsAnalysis")),
+    )
     args = parser.parse_args()
 
-    sat_root = Path(args.sat_path)
-    print(f"SAT root: {sat_root}")
-    print(f"Output:   {OUT_PATH}")
+    sat = Path(args.sat_path)
+    eventcodes = sat / "src/StatisticsAnalysisTool/Network/EventCodes.cs"
+    opcodes = sat / "src/StatisticsAnalysisTool/Network/OperationCodes.cs"
+    for f in (eventcodes, opcodes):
+        if not f.exists():
+            sys.exit(f"ERROR: {f} not found (pass --sat-path or set APX_SAT_REPO)")
 
-    event_codes = parse_event_codes(sat_root)
-    op_codes = parse_op_codes(sat_root)
-    print(f"Loaded {len(event_codes)} event codes, {len(op_codes)} op codes")
+    old = json.loads(OUT.read_text(encoding="utf-8-sig"))
+    ev_best = best_params_by_name(old, "EVENT")
+    req_best = best_params_by_name(old, "REQUEST")
+    resp_best = best_params_by_name(old, "RESPONSE")
 
-    schema: dict[str, dict] = {}
+    events = parse_enum(eventcodes)
+    ops = parse_enum(opcodes)
 
-    # Start with manual curated entries
-    schema.update(MANUAL_ENTRIES)
-    print(f"Seeded {len(MANUAL_ENTRIES)} manual entries")
+    out = {}
+    carried_ev = set()
+    for ordinal, name in events:
+        if name in EVENT_OVERRIDE:
+            params = EVENT_OVERRIDE[name]
+        else:
+            params = ev_best.get(name, {})
+            if params:
+                carried_ev.add(name)
+        out[f"EVENT:{ordinal}"] = {"name": name, "params": params}
 
-    # Seed skeleton entries for ALL known event and op codes (name only, no params)
-    # Manual entries above already have params — skeletons fill the rest
-    for name, code in sorted(event_codes.items(), key=lambda x: x[1]):
-        key = f"EVENT:{code}"
-        if key not in schema:
-            schema[key] = {"name": name, "params": {}}
-        elif not schema[key].get("name"):
-            schema[key]["name"] = name
+    for ordinal, name in ops:
+        if name in REQUEST_OVERRIDE:
+            rparams = REQUEST_OVERRIDE[name]
+        elif name in REQUEST_SKIP_CARRY:
+            rparams = {}
+        else:
+            rparams = req_best.get(name, {})
+        out[f"REQUEST:{ordinal}"] = {"name": name, "params": rparams}
+    for ordinal, name in ops:
+        out[f"RESPONSE:{ordinal}"] = {"name": name, "params": resp_best.get(name, {})}
 
-    for name, code in sorted(op_codes.items(), key=lambda x: x[1]):
-        for kind in ("REQUEST", "RESPONSE"):
-            key = f"{kind}:{code}"
-            if key not in schema:
-                schema[key] = {"name": name, "params": {}}
-            elif not schema[key].get("name"):
-                schema[key]["name"] = name
+    OUT.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    print(f"After skeleton seed: {len(schema)} entries")
-
-    # Auto-extract from SAT handler files
-    handler_dirs = [
-        sat_root / "src/StatisticsAnalysisTool/Network/Handler",
-        sat_root / "src/StatisticsAnalysisTool/Network/Events",
-        sat_root / "src/StatisticsAnalysisTool/Network/Operations",
-    ]
-
-    auto_count = 0
-    for d in handler_dirs:
-        if not d.exists():
-            print(f"  SKIP (missing): {d}")
-            continue
-        for cs_file in sorted(d.glob("*.cs")):
-            text = cs_file.read_text(encoding="utf-8", errors="replace")
-            params = extract_params_from_file(cs_file)
-            if not params:
-                continue
-
-            # Try to find event code
-            entry = find_event_code_for_handler(text, event_codes)
-            if entry:
-                kind, code = entry
-                key = f"{kind}:{code}"
-                if key not in schema:
-                    schema[key] = {"name": entry_name_from_file(cs_file), "params": {}}
-                for pk, pv in params.items():
-                    if pk not in schema[key].get("params", {}):
-                        schema[key].setdefault("params", {})[pk] = pv
-                        auto_count += 1
-
-    print(f"Auto-extracted {auto_count} additional param entries")
-    print(f"Total schema entries: {len(schema)}")
-
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(OUT_PATH, "w", encoding="utf-8") as f:
-        json.dump(schema, f, indent=2, ensure_ascii=False)
-    print(f"Written: {OUT_PATH}")
-
-
-def entry_name_from_file(path: Path) -> str:
-    name = path.stem
-    for suffix in ["EventHandler", "Handler", "Event", "Operation", "Request", "Response"]:
-        if name.endswith(suffix):
-            name = name[:-len(suffix)]
-    return name[0].lower() + name[1:] if name else ""
+    ev_names = {n for _, n in events}
+    op_names = {n for _, n in ops}
+    dropped_ev = sorted(n for n in ev_best if n not in ev_names and ev_best[n])
+    dropped_req = sorted(n for n in req_best if n not in op_names and req_best[n])
+    print(f"events: {len(events)}  ops: {len(ops)}  total keys: {len(out)}")
+    print(f"carried EVENT param-sets: {len(carried_ev)}")
+    if dropped_ev:
+        print(f"DROPPED EVENT param-sets (name not in current enum): {dropped_ev}")
+    if dropped_req:
+        print(f"DROPPED REQUEST param-sets: {dropped_req}")
 
 
 if __name__ == "__main__":
