@@ -162,15 +162,48 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ToggleSidebar() => SidebarVisible = !SidebarVisible;
 
+    /// <summary>One-time welcome banner shown until the user dismisses it.</summary>
+    [ObservableProperty] private bool _showWelcome;
+
+    /// <summary>Available UI language codes (whatever lang/*.json ships or is dropped in).</summary>
+    public IReadOnlyList<string> AvailableCultures => LocalizationService.Instance.Available;
+
+    public string Culture
+    {
+        get => LocalizationService.Instance.CurrentCulture;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value) || value == Culture) return;
+            LocalizationService.Instance.SetCulture(value);
+            OnPropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    [RelayCommand]
+    private void DismissWelcome()
+    {
+        ShowWelcome = false;
+        SaveSettings();
+    }
+
+    /// <summary>Raised to open Settings on a given section (e.g. from the welcome banner).</summary>
+    public event Action<string>? OpenSettingsSectionRequested;
+
+    [RelayCommand]
+    private void OpenGlossary() => OpenSettingsSectionRequested?.Invoke("Glossary");
+
     public SettingsViewModel Settings => new(this);
 
     private void SaveSettings() =>
         AppSettingsStore.Save(new AppSettings(ResolveItemNames, ResolveIcons, SidebarVisible, MinimizeToTray,
             ThemeService.Instance.IsDark, ForceExpandRows,
             AutoStartCapture, AutoSaveLogs, Density,
+            Culture: LocalizationService.Instance.CurrentCulture,
             SidebarToggleGesture: SidebarToggleGesture,
             AutoSelectNewestGesture: AutoSelectNewestGesture,
-            ToggleRowExpandGesture: ToggleRowExpandGesture));
+            ToggleRowExpandGesture: ToggleRowExpandGesture,
+            HasSeenWelcome: !ShowWelcome));
 
     public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
@@ -193,6 +226,7 @@ public partial class MainViewModel : ObservableObject
         SidebarToggleGesture = string.IsNullOrWhiteSpace(saved.SidebarToggleGesture) ? "F5" : saved.SidebarToggleGesture;
         AutoSelectNewestGesture = string.IsNullOrWhiteSpace(saved.AutoSelectNewestGesture) ? "Ctrl+L" : saved.AutoSelectNewestGesture;
         ToggleRowExpandGesture = string.IsNullOrWhiteSpace(saved.ToggleRowExpandGesture) ? "Space" : saved.ToggleRowExpandGesture;
+        ShowWelcome = !saved.HasSeenWelcome;
 
         ThemeService.Instance.Initialize(saved.IsDarkMode, null);
         ThemeService.Instance.Changed += SaveSettings;

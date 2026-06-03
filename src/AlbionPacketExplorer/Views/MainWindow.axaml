@@ -12,7 +12,7 @@
         x:DataType="vm:MainViewModel">
 
     <Panel>
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- ═══════════ TOOLBAR ═══════════ -->
         <DockPanel Grid.Row="0" Background="{DynamicResource Apx.Surface}" ZIndex="1"
@@ -102,8 +102,37 @@
             </WrapPanel>
         </DockPanel>
 
+        <!-- ═══════════ FIRST-RUN WELCOME BANNER ═══════════ -->
+        <Border Grid.Row="1" Background="{DynamicResource Apx.Card}"
+                BorderBrush="{DynamicResource Apx.Accent}" BorderThickness="0,0,0,2"
+                Padding="12,8" IsVisible="{Binding ShowWelcome}">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Path Grid.Column="0" Classes="icon" Data="{StaticResource Icon.Info}"
+                      Stroke="{DynamicResource Apx.Accent}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="{loc:T welcome.title}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Apx.Text}" />
+                    <TextBlock Text="{loc:T welcome.body}" FontSize="12"
+                               Foreground="{DynamicResource Apx.TextMuted}" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
+                            VerticalAlignment="Center" Margin="10,0,0,0">
+                    <ComboBox ItemsSource="{Binding AvailableCultures}"
+                              SelectedItem="{Binding Culture}"
+                              MinWidth="80" VerticalAlignment="Center"
+                              ToolTip.Tip="{loc:T settings.theme.language}" />
+                    <Button Classes="ghost" Command="{Binding OpenGlossaryCommand}" Padding="10,6">
+                        <TextBlock Text="{loc:T welcome.glossary}" />
+                    </Button>
+                    <Button Classes="accent" Command="{Binding DismissWelcomeCommand}" Padding="10,6">
+                        <TextBlock Text="{loc:T welcome.dismiss}" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <!-- ═══════════ WORKSPACE: sidebar | table + detail ═══════════ -->
-        <Grid Grid.Row="1" x:Name="WorkspaceGrid" ColumnDefinitions="260,2,*" ClipToBounds="True">
+        <Grid Grid.Row="2" x:Name="WorkspaceGrid" ColumnDefinitions="260,2,*" ClipToBounds="True">
 
             <!-- FILTER SIDEBAR -->
             <Grid Grid.Column="0" x:Name="SidebarPanel" RowDefinitions="Auto,Auto,Auto,*"
@@ -214,7 +243,7 @@
         </Grid>
 
         <!-- ═══════════ STATUS BAR ═══════════ -->
-        <Border Grid.Row="2" Background="{DynamicResource Apx.Surface}"
+        <Border Grid.Row="3" Background="{DynamicResource Apx.Surface}"
                 BorderBrush="{DynamicResource Apx.Border}" BorderThickness="0,1,0,0" Padding="10,3">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">

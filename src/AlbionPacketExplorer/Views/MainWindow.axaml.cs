@@ -114,6 +114,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.PacketDetail.ViewFullValueRequested += OnViewFullValueRequested;
             vm.PropertyChanged += OnViewModelPropertyChanged;
             vm.ShortcutsChanged += ApplyShortcuts;
+            vm.OpenSettingsSectionRequested += OpenSettings;
             ApplySidebarVisibility(vm.SidebarVisible);
             ApplyShortcuts();
         }
@@ -318,7 +319,9 @@ public partial class MainWindow : ApxWindow, IFilePicker
 
     private SettingsWindow? _settingsWindow;
 
-    private void OnSettingsClicked(object? sender, RoutedEventArgs e)
+    private void OnSettingsClicked(object? sender, RoutedEventArgs e) => OpenSettings(null);
+
+    private void OpenSettings(string? section)
     {
         if (_settingsWindow != null)
         {
@@ -327,7 +330,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
         }
 
         var vm = (MainViewModel)DataContext!;
-        _settingsWindow = new SettingsWindow(new SettingsViewModel(vm));
+        _settingsWindow = new SettingsWindow(new SettingsViewModel(vm), section);
         _settingsWindow.Closed += (_, _) => _settingsWindow = null;
         _settingsWindow.Show(this);
     }
