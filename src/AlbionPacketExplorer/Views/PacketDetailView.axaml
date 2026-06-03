@@ -6,254 +6,283 @@
              x:Class="AlbionPacketExplorer.Views.PacketDetailView"
              x:DataType="vm:PacketDetailViewModel">
 
-    <DockPanel>
+    <TabControl>
 
-        <!-- Hide preset toolbar -->
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="4,2,4,4">
-            <TextBox Text="{Binding NewHidePresetName}" Width="130" PlaceholderText="{loc:T detail.hide.placeholder}" FontSize="11" />
-            <Button Classes="iconbtn" Command="{Binding SaveHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.save.tip}">
-                <Path Classes="icon sm" Data="{StaticResource Icon.Check}" />
-            </Button>
-            <ComboBox ItemsSource="{Binding HidePresets}"
-                      SelectedItem="{Binding SelectedHidePreset, Mode=TwoWay}"
-                      DisplayMemberBinding="{Binding Name}"
-                      PlaceholderText="{loc:T detail.hide.load.placeholder}"
-                      MinWidth="140" FontSize="11" />
-            <Button Classes="iconbtn" Command="{Binding LoadHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.apply.tip}">
-                <Path Classes="icon sm" Data="{StaticResource Icon.ChevronRight}" />
-            </Button>
-            <Button Classes="iconbtn" Command="{Binding DeleteHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.delete.tip}">
-                <Path Classes="icon sm" Data="{StaticResource Icon.Trash}" />
-            </Button>
-            <Button Classes="ghost" Command="{Binding UnhideAllRowsCommand}" Padding="8,4" ToolTip.Tip="{loc:T detail.hide.showAll.tip}">
-                <TextBlock Text="{loc:T common.showAll}" FontSize="11" />
-            </Button>
-        </StackPanel>
+        <!-- ═══════════ PARAMS ═══════════ -->
+        <TabItem Header="{loc:T detail.tab.params}">
+            <DockPanel>
 
-    <DataGrid x:Name="MainGrid" ItemsSource="{Binding Rows}"
-              SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
-              AutoGenerateColumns="False"
-              IsReadOnly="True"
-              CanUserSortColumns="True"
-              CanUserResizeColumns="True"
-              FontSize="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}"
-              HorizontalScrollBarVisibility="Disabled"
-              GridLinesVisibility="Horizontal">
-            <!-- Density: MinHeight (not fixed RowHeight) so expanded collection rows can grow.
-                 Cell FontSize is bound explicitly because DataGrid.FontSize does not cascade
-                 to cell content. -->
-            <DataGrid.Styles>
-                <Style Selector="DataGridRow">
-                    <Setter Property="MinHeight"
-                            Value="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=26}" />
-                </Style>
-                <Style Selector="DataGridCell TextBlock">
-                    <Setter Property="FontSize"
-                            Value="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}" />
-                </Style>
-            </DataGrid.Styles>
-            <DataGrid.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="{loc:T detail.menu.copyValue}"    Command="{Binding CopyValueCommand}" />
-                    <MenuItem Header="{loc:T detail.menu.viewFull}" Command="{Binding ViewFullValueCommand}" />
-                    <MenuItem Header="{loc:T detail.menu.copyRow}"      Command="{Binding CopyRowCommand}" />
-                    <Separator />
-                    <MenuItem Header="{loc:T detail.menu.copyAll}" Command="{Binding CopyAllRowsCommand}" />
-                    <Separator />
-                    <MenuItem Header="{loc:T detail.menu.previewResolve}" Command="{Binding PreviewResolveCommand}" />
-                    <Separator />
-                    <MenuItem Header="{loc:T detail.menu.editParam}" Command="{Binding EditParamCommand}" />
-                    <Separator />
-                    <MenuItem Header="{loc:T detail.menu.hideRow}"         Command="{Binding HideRowCommand}" />
-                    <MenuItem Header="{loc:T detail.menu.unhideRow}"       Command="{Binding UnhideRowCommand}" />
-                    <MenuItem Header="{loc:T detail.menu.showAll}"    Command="{Binding UnhideAllRowsCommand}" />
-                </ContextMenu>
-            </DataGrid.ContextMenu>
-            <DataGrid.Columns>
+                <!-- Hide preset toolbar -->
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="4,2,4,4">
+                    <TextBox Text="{Binding NewHidePresetName}" Width="130" PlaceholderText="{loc:T detail.hide.placeholder}" FontSize="11" />
+                    <Button Classes="iconbtn" Command="{Binding SaveHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.save.tip}">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Check}" />
+                    </Button>
+                    <ComboBox ItemsSource="{Binding HidePresets}"
+                              SelectedItem="{Binding SelectedHidePreset, Mode=TwoWay}"
+                              DisplayMemberBinding="{Binding Name}"
+                              PlaceholderText="{loc:T detail.hide.load.placeholder}"
+                              MinWidth="140" FontSize="11" />
+                    <Button Classes="iconbtn" Command="{Binding LoadHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.apply.tip}">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.ChevronRight}" />
+                    </Button>
+                    <Button Classes="iconbtn" Command="{Binding DeleteHidePresetCommand}" Padding="6" ToolTip.Tip="{loc:T detail.hide.delete.tip}">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Trash}" />
+                    </Button>
+                    <Button Classes="ghost" Command="{Binding UnhideAllRowsCommand}" Padding="8,4" ToolTip.Tip="{loc:T detail.hide.showAll.tip}">
+                        <TextBlock Text="{loc:T common.showAll}" FontSize="11" />
+                    </Button>
+                </StackPanel>
 
-                <DataGridTemplateColumn Width="160" SortMemberPath="Key" CanUserSort="True">
-                    <DataGridTemplateColumn.Header>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="{loc:T detail.col.key}" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
-                                <Button.Flyout>
-                                    <Flyout Placement="Bottom">
-                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKey, Mode=TwoWay}"
-                                                 PlaceholderText="{loc:T detail.filterKey.placeholder}" Width="180" />
-                                    </Flyout>
-                                </Button.Flyout>
-                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
-                            </Button>
-                        </Grid>
-                    </DataGridTemplateColumn.Header>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:ParamRow">
-                            <Panel VerticalAlignment="Center">
-                                <!-- Normal view -->
-                                <StackPanel Orientation="Horizontal" Spacing="6"
-                                            Margin="4,0"
-                                            ToolTip.Tip="{Binding Note}"
-                                            IsVisible="{Binding IsVisible}">
-                                    <TextBlock Text="{Binding Key}"
-                                               FontWeight="SemiBold"
-                                               VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding SchemaName}"
-                                               Foreground="#aaaacc" FontSize="13"
-                                               VerticalAlignment="Center"
-                                               IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                                    <Ellipse Width="7" Height="7" VerticalAlignment="Center"
-                                             Fill="{DynamicResource Apx.TextFaint}"
-                                             ToolTip.Tip="{loc:T detail.source.base.tip}">
-                                        <Ellipse.IsVisible>
-                                            <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsBase}" />
-                                        </Ellipse.IsVisible>
-                                    </Ellipse>
-                                    <Ellipse Width="7" Height="7" VerticalAlignment="Center"
-                                             Fill="{DynamicResource ThemeAccentBrush}"
-                                             ToolTip.Tip="{loc:T detail.source.user.tip}">
-                                        <Ellipse.IsVisible>
-                                            <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsUser}" />
-                                        </Ellipse.IsVisible>
-                                    </Ellipse>
-                                </StackPanel>
-                                <!-- Hidden / collapsed view -->
-                                <TextBlock Text="{Binding Key}" FontSize="10"
-                                           FontStyle="Italic" Margin="4,0"
-                                           Foreground="{DynamicResource Apx.TextFaint}"
-                                           VerticalAlignment="Center"
-                                           IsVisible="{Binding IsHidden}" />
-                            </Panel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGrid x:Name="MainGrid" ItemsSource="{Binding Rows}"
+                          SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserSortColumns="True"
+                          CanUserResizeColumns="True"
+                          FontSize="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}"
+                          HorizontalScrollBarVisibility="Disabled"
+                          GridLinesVisibility="Horizontal">
+                    <!-- Density: MinHeight (not fixed RowHeight) so expanded collection rows can grow.
+                         Cell FontSize is bound explicitly because DataGrid.FontSize does not cascade
+                         to cell content. -->
+                    <DataGrid.Styles>
+                        <Style Selector="DataGridRow">
+                            <Setter Property="MinHeight"
+                                    Value="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=26}" />
+                        </Style>
+                        <Style Selector="DataGridCell TextBlock">
+                            <Setter Property="FontSize"
+                                    Value="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}" />
+                        </Style>
+                    </DataGrid.Styles>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{loc:T detail.menu.copyValue}"    Command="{Binding CopyValueCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.viewFull}" Command="{Binding ViewFullValueCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.copyRow}"      Command="{Binding CopyRowCommand}" />
+                            <Separator />
+                            <MenuItem Header="{loc:T detail.menu.copyAll}" Command="{Binding CopyAllRowsCommand}" />
+                            <Separator />
+                            <MenuItem Header="{loc:T detail.menu.previewResolve}" Command="{Binding PreviewResolveCommand}" />
+                            <Separator />
+                            <MenuItem Header="{loc:T detail.menu.editParam}" Command="{Binding EditParamCommand}" />
+                            <Separator />
+                            <MenuItem Header="{loc:T detail.menu.hideRow}"         Command="{Binding HideRowCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.unhideRow}"       Command="{Binding UnhideRowCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.showAll}"    Command="{Binding UnhideAllRowsCommand}" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.Columns>
 
-                <DataGridTemplateColumn Width="100" SortMemberPath="Type" CanUserSort="True">
-                    <DataGridTemplateColumn.Header>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="{loc:T detail.col.type}" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
-                                <Button.Flyout>
-                                    <Flyout Placement="Bottom">
-                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterType, Mode=TwoWay}"
-                                                 PlaceholderText="{loc:T detail.filterType.placeholder}" Width="160" />
-                                    </Flyout>
-                                </Button.Flyout>
-                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
-                            </Button>
-                        </Grid>
-                    </DataGridTemplateColumn.Header>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:ParamRow">
-                            <TextBlock Text="{Binding Type}" Margin="12,0" VerticalAlignment="Center"
-                                       IsVisible="{Binding IsVisible}"
-                                       Foreground="{DynamicResource Apx.Text}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Width="1.2*" MinWidth="80" SortMemberPath="Value" CanUserSort="True">
-                    <DataGridTemplateColumn.Header>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="{loc:T detail.col.value}" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
-                                <Button.Flyout>
-                                    <Flyout Placement="Bottom">
-                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterValue, Mode=TwoWay}"
-                                                 PlaceholderText="{loc:T detail.filterValue.placeholder}" Width="200" />
-                                    </Flyout>
-                                </Button.Flyout>
-                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
-                            </Button>
-                        </Grid>
-                    </DataGridTemplateColumn.Header>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:ParamRow">
-                            <Panel VerticalAlignment="Center">
-                                <!-- Normal: collections show a chevron to expand inline;
-                                     the value text collapses to "[N items]" until expanded. -->
-                                <StackPanel Orientation="Horizontal" Spacing="2" Margin="8,4"
-                                            IsVisible="{Binding IsVisible}">
-                                    <Button Classes="iconbtn" Padding="2" Width="20" Height="20"
-                                            VerticalAlignment="Top"
-                                            Command="{Binding $parent[UserControl].DataContext.ToggleRowExpandCommand}"
-                                            CommandParameter="{Binding}"
-                                            IsVisible="{Binding IsCollection}"
-                                            ToolTip.Tip="{loc:T detail.expand.tip}">
-                                        <Panel>
-                                            <Path Classes="icon muted sm" Data="{StaticResource Icon.ChevronRight}"
-                                                  IsVisible="{Binding !IsExpanded}" />
-                                            <Path Classes="icon muted sm" Data="{StaticResource Icon.ChevronDown}"
-                                                  IsVisible="{Binding IsExpanded}" />
-                                        </Panel>
+                        <DataGridTemplateColumn Width="200" SortMemberPath="Key" CanUserSort="True">
+                            <DataGridTemplateColumn.Header>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Text="{loc:T detail.col.key}" VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                        <Button.Flyout>
+                                            <Flyout Placement="Bottom">
+                                                <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKey, Mode=TwoWay}"
+                                                         PlaceholderText="{loc:T detail.filterKey.placeholder}" Width="180" />
+                                            </Flyout>
+                                        </Button.Flyout>
+                                        <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
                                     </Button>
-                                    <TextBlock Text="{Binding DisplayValue}"
-                                               TextWrapping="Wrap" FontFamily="Monospace"
-                                               VerticalAlignment="Center" />
-                                </StackPanel>
-                                <!-- Hidden / collapsed: inline, ellipsis -->
-                                <TextBlock Text="{Binding Value}" Margin="12,0"
-                                           FontSize="10" FontFamily="Monospace" FontStyle="Italic"
-                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
-                                           Foreground="{DynamicResource Apx.TextFaint}"
-                                           IsVisible="{Binding IsHidden}" />
-                            </Panel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Width="2*" MinWidth="160" SortMemberPath="ResolvedName" CanUserSort="True">
-                    <DataGridTemplateColumn.Header>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="{loc:T detail.col.resolved}" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
-                                <Button.Flyout>
-                                    <Flyout Placement="Bottom">
-                                        <TextBox Text="{Binding $parent[UserControl].DataContext.FilterResolved, Mode=TwoWay}"
-                                                 PlaceholderText="{loc:T detail.filterResolved.placeholder}" Width="200" />
-                                    </Flyout>
-                                </Button.Flyout>
-                                <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
-                            </Button>
-                        </Grid>
-                    </DataGridTemplateColumn.Header>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:ParamRow">
-                            <StackPanel Margin="4,2" VerticalAlignment="Center"
-                                        IsVisible="{Binding IsVisible}">
-                                <!-- Single resolved item -->
-                                <StackPanel Orientation="Horizontal" Spacing="6"
-                                            IsVisible="{Binding HasSingleResolved}">
-                                    <Image Source="{Binding Icon}" Width="28" Height="28"
-                                           IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                           RenderOptions.BitmapInterpolationMode="MediumQuality"
-                                           VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding ResolvedName}" VerticalAlignment="Center"
-                                               TextWrapping="Wrap" />
-                                </StackPanel>
-                                <!-- Multi-item array resolution -->
-                                <ItemsControl ItemsSource="{Binding ResolvedItems}"
-                                              IsVisible="{Binding HasResolvedItems}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ResolvedItem">
-                                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,1,0,1">
-                                                <Image Source="{Binding Icon}" Width="22" Height="22"
-                                                       IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                                       RenderOptions.BitmapInterpolationMode="MediumQuality"
+                                </Grid>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:ParamRow">
+                                    <Panel VerticalAlignment="Center">
+                                        <!-- Normal view -->
+                                        <StackPanel Orientation="Horizontal" Spacing="6"
+                                                    Margin="4,0"
+                                                    ToolTip.Tip="{Binding Note}"
+                                                    IsVisible="{Binding IsVisible}">
+                                            <TextBlock Text="{Binding Key}"
+                                                       FontWeight="SemiBold"
                                                        VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding DisplayName}"
-                                                           FontSize="11" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                            <TextBlock Text="{Binding SchemaName}"
+                                                       Foreground="#aaaacc" FontSize="13"
+                                                       VerticalAlignment="Center"
+                                                       IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                            <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                                                     Fill="{DynamicResource Apx.TextFaint}"
+                                                     ToolTip.Tip="{loc:T detail.source.base.tip}">
+                                                <Ellipse.IsVisible>
+                                                    <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsBase}" />
+                                                </Ellipse.IsVisible>
+                                            </Ellipse>
+                                            <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                                                     Fill="{DynamicResource ThemeAccentBrush}"
+                                                     ToolTip.Tip="{loc:T detail.source.user.tip}">
+                                                <Ellipse.IsVisible>
+                                                    <Binding Path="Source" Converter="{x:Static views:ParamSourceConverters.IsUser}" />
+                                                </Ellipse.IsVisible>
+                                            </Ellipse>
+                                        </StackPanel>
+                                        <!-- Hidden / collapsed view -->
+                                        <TextBlock Text="{Binding Key}" FontSize="10"
+                                                   FontStyle="Italic" Margin="4,0"
+                                                   Foreground="{DynamicResource Apx.TextFaint}"
+                                                   VerticalAlignment="Center"
+                                                   IsVisible="{Binding IsHidden}" />
+                                    </Panel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-            </DataGrid.Columns>
-    </DataGrid>
+                        <DataGridTemplateColumn Width="110" SortMemberPath="Type" CanUserSort="True">
+                            <DataGridTemplateColumn.Header>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Text="{loc:T detail.col.type}" VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                        <Button.Flyout>
+                                            <Flyout Placement="Bottom">
+                                                <TextBox Text="{Binding $parent[UserControl].DataContext.FilterType, Mode=TwoWay}"
+                                                         PlaceholderText="{loc:T detail.filterType.placeholder}" Width="160" />
+                                            </Flyout>
+                                        </Button.Flyout>
+                                        <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
+                                    </Button>
+                                </Grid>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:ParamRow">
+                                    <TextBlock Text="{Binding Type}" Margin="12,0" VerticalAlignment="Center"
+                                               IsVisible="{Binding IsVisible}"
+                                               Foreground="{DynamicResource Apx.Text}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-    </DockPanel>
+                        <DataGridTemplateColumn Width="*" MinWidth="120" SortMemberPath="Value" CanUserSort="True">
+                            <DataGridTemplateColumn.Header>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Text="{loc:T detail.col.value}" VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
+                                        <Button.Flyout>
+                                            <Flyout Placement="Bottom">
+                                                <TextBox Text="{Binding $parent[UserControl].DataContext.FilterValue, Mode=TwoWay}"
+                                                         PlaceholderText="{loc:T detail.filterValue.placeholder}" Width="200" />
+                                            </Flyout>
+                                        </Button.Flyout>
+                                        <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
+                                    </Button>
+                                </Grid>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:ParamRow">
+                                    <Panel VerticalAlignment="Center">
+                                        <!-- Normal: collections show a chevron to expand inline;
+                                             the value text collapses to "[N items]" until expanded. -->
+                                        <StackPanel Orientation="Horizontal" Spacing="2" Margin="8,4"
+                                                    IsVisible="{Binding IsVisible}">
+                                            <Button Classes="iconbtn" Padding="2" Width="20" Height="20"
+                                                    VerticalAlignment="Top"
+                                                    Command="{Binding $parent[UserControl].DataContext.ToggleRowExpandCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    IsVisible="{Binding IsCollection}"
+                                                    ToolTip.Tip="{loc:T detail.expand.tip}">
+                                                <Panel>
+                                                    <Path Classes="icon muted sm" Data="{StaticResource Icon.ChevronRight}"
+                                                          IsVisible="{Binding !IsExpanded}" />
+                                                    <Path Classes="icon muted sm" Data="{StaticResource Icon.ChevronDown}"
+                                                          IsVisible="{Binding IsExpanded}" />
+                                                </Panel>
+                                            </Button>
+                                            <TextBlock Text="{Binding DisplayValue}"
+                                                       TextWrapping="Wrap" FontFamily="Monospace"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <!-- Hidden / collapsed: inline, ellipsis -->
+                                        <TextBlock Text="{Binding Value}" Margin="12,0"
+                                                   FontSize="10" FontFamily="Monospace" FontStyle="Italic"
+                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                                                   Foreground="{DynamicResource Apx.TextFaint}"
+                                                   IsVisible="{Binding IsHidden}" />
+                                    </Panel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </TabItem>
+
+        <!-- ═══════════ RESOLVED ═══════════ -->
+        <TabItem Header="{loc:T detail.tab.resolved}">
+            <Panel>
+                <!-- Empty state -->
+                <TextBlock Text="{loc:T detail.resolved.empty}"
+                           Foreground="{DynamicResource Apx.TextMuted}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           TextWrapping="Wrap" Margin="24"
+                           IsVisible="{Binding !HasAnyResolved}" />
+
+                <ScrollViewer IsVisible="{Binding HasAnyResolved}">
+                    <ItemsControl ItemsSource="{Binding ResolvedRows}" Margin="8">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ParamRow">
+                                <Border Classes="card" Padding="10,8" Margin="0,0,0,6">
+                                    <StackPanel Spacing="6">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="{Binding Key}" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource Apx.Accent}" />
+                                            <TextBlock Text="{Binding SchemaName}"
+                                                       Foreground="{DynamicResource Apx.TextMuted}"
+                                                       IsVisible="{Binding SchemaName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                        </StackPanel>
+                                        <!-- Single resolved item -->
+                                        <StackPanel Orientation="Horizontal" Spacing="8"
+                                                    IsVisible="{Binding HasSingleResolved}">
+                                            <Image Source="{Binding Icon}" Width="32" Height="32"
+                                                   IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                                   RenderOptions.BitmapInterpolationMode="MediumQuality"
+                                                   VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding ResolvedName}" VerticalAlignment="Center"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <!-- Multi-item array resolution -->
+                                        <ItemsControl ItemsSource="{Binding ResolvedItems}"
+                                                      IsVisible="{Binding HasResolvedItems}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:ResolvedItem">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,1">
+                                                        <Image Source="{Binding Icon}" Width="24" Height="24"
+                                                               IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                                               RenderOptions.BitmapInterpolationMode="MediumQuality"
+                                                               VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding DisplayName}"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Panel>
+        </TabItem>
+
+        <!-- ═══════════ RAW JSON ═══════════ -->
+        <TabItem Header="{loc:T detail.tab.rawJson}">
+            <TextBox Text="{Binding RawJson}"
+                     IsReadOnly="True"
+                     AcceptsReturn="True"
+                     TextWrapping="NoWrap"
+                     FontFamily="Consolas,Monospace"
+                     FontSize="12"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     VerticalAlignment="Stretch"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto" />
+        </TabItem>
+
+    </TabControl>
 
 </UserControl>
