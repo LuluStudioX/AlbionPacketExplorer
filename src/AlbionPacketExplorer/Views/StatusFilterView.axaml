@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+             xmlns:views="using:AlbionPacketExplorer.Views"
+             xmlns:loc="using:AlbionPacketExplorer.Markup"
+             x:Class="AlbionPacketExplorer.Views.StatusFilterView"
+             x:DataType="vm:PacketListViewModel">
+
+    <StackPanel Spacing="2">
+        <Button Classes="ghost"
+                Classes.navactive="{Binding ActiveStatusFilter, Converter={x:Static views:ViewConverters.EqualsParam}, ConverterParameter=All}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                Padding="10,6"
+                Command="{Binding FilterStatusCommand}" CommandParameter="All">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="{loc:T sidebar.status.all}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding CountAll}" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Apx.TextMuted}" />
+            </Grid>
+        </Button>
+        <Button Classes="ghost"
+                Classes.navactive="{Binding ActiveStatusFilter, Converter={x:Static views:ViewConverters.EqualsParam}, ConverterParameter=EVENT}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                Padding="10,6"
+                Command="{Binding FilterStatusCommand}" CommandParameter="EVENT">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="{loc:T sidebar.status.event}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding CountEvent}" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Apx.TextMuted}" />
+            </Grid>
+        </Button>
+        <Button Classes="ghost"
+                Classes.navactive="{Binding ActiveStatusFilter, Converter={x:Static views:ViewConverters.EqualsParam}, ConverterParameter=REQUEST}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                Padding="10,6"
+                Command="{Binding FilterStatusCommand}" CommandParameter="REQUEST">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="{loc:T sidebar.status.request}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding CountRequest}" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Apx.TextMuted}" />
+            </Grid>
+        </Button>
+        <Button Classes="ghost"
+                Classes.navactive="{Binding ActiveStatusFilter, Converter={x:Static views:ViewConverters.EqualsParam}, ConverterParameter=RESPONSE}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                Padding="10,6"
+                Command="{Binding FilterStatusCommand}" CommandParameter="RESPONSE">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="{loc:T sidebar.status.response}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding CountResponse}" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Apx.TextMuted}" />
+            </Grid>
+        </Button>
+    </StackPanel>
+
+</UserControl>

@@ -84,9 +84,6 @@
                     <MenuItem Header="{loc:T list.menu.copyParams}"   Command="{Binding CopyParamSummaryCommand}" />
                     <MenuItem Header="{loc:T list.menu.copyJson}"  Command="{Binding CopyAsJsonCommand}" />
                     <Separator />
-                    <MenuItem Header="{loc:T list.menu.autoSelectNewest}"
-                              IsChecked="{Binding AutoSelectNewest, Mode=TwoWay}"
-                              ToggleType="CheckBox" />
                     <MenuItem Header="{loc:T list.menu.unknownFirst}"
                               IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}"
                               ToggleType="CheckBox" />

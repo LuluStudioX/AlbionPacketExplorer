@@ -9,6 +9,8 @@ namespace AlbionPacketExplorer.Views;
 public partial class SettingsWindow : ApxWindow
 {
     private StackPanel? _sectionDisplay;
+    private StackPanel? _sectionCapture;
+    private StackPanel? _sectionShortcuts;
     private StackPanel? _sectionPaths;
     private StackPanel? _sectionSchema;
     private StackPanel? _sectionTheme;
@@ -23,8 +25,10 @@ public partial class SettingsWindow : ApxWindow
         vm.SaveExportRequested += OnSaveExportRequested;
         Loaded += (_, _) =>
         {
-            _sectionDisplay = this.FindControl<StackPanel>("SectionDisplay");
-            _sectionPaths   = this.FindControl<StackPanel>("SectionPaths");
+            _sectionDisplay   = this.FindControl<StackPanel>("SectionDisplay");
+            _sectionCapture   = this.FindControl<StackPanel>("SectionCapture");
+            _sectionShortcuts = this.FindControl<StackPanel>("SectionShortcuts");
+            _sectionPaths     = this.FindControl<StackPanel>("SectionPaths");
             _sectionSchema  = this.FindControl<StackPanel>("SectionSchema");
             _sectionTheme   = this.FindControl<StackPanel>("SectionTheme");
             _sectionAbout   = this.FindControl<StackPanel>("SectionAbout");
@@ -47,8 +51,10 @@ public partial class SettingsWindow : ApxWindow
     {
         if (sender is not Button btn) return;
         var tag = btn.Tag as string;
-        if (_sectionDisplay != null) _sectionDisplay.IsVisible = tag == "Display";
-        if (_sectionPaths   != null) _sectionPaths.IsVisible   = tag == "Paths";
+        if (_sectionDisplay   != null) _sectionDisplay.IsVisible   = tag == "Display";
+        if (_sectionCapture   != null) _sectionCapture.IsVisible   = tag == "Capture";
+        if (_sectionShortcuts != null) _sectionShortcuts.IsVisible = tag == "Shortcuts";
+        if (_sectionPaths     != null) _sectionPaths.IsVisible     = tag == "Paths";
         if (_sectionSchema  != null) _sectionSchema.IsVisible  = tag == "Schema";
         if (_sectionTheme   != null) _sectionTheme.IsVisible   = tag == "Theme";
         if (_sectionAbout   != null) _sectionAbout.IsVisible   = tag == "About";

@@ -202,6 +202,26 @@
         <Setter Property="Stroke" Value="{DynamicResource Apx.Accent}" />
     </Style>
 
+    <!-- Gesture capture box: looks like a read-only input field, click to record -->
+    <Style Selector="controls|GestureCaptureBox">
+        <Setter Property="Background" Value="{DynamicResource Apx.SurfaceAlt}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Apx.Radius.Sm}" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="Consolas,Monospace" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="controls|GestureCaptureBox:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Hover}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+    <Style Selector="controls|GestureCaptureBox:focus /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderBrush" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+
     <!-- Success / Danger buttons -->
     <Style Selector="Button.success">
         <Setter Property="Background" Value="{DynamicResource Apx.Success}" />

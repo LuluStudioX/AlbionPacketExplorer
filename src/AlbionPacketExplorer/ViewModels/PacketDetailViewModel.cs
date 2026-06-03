@@ -447,6 +447,10 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         row.IsExpanded = !row.IsExpanded;
     }
 
+    /// <summary>Expand/collapse the currently selected row (Space shortcut in the Params grid).</summary>
+    [RelayCommand]
+    private void ToggleSelectedRowExpand() => ToggleRowExpand(SelectedRow);
+
     private string BuildExpandedText(ParamRow row)
     {
         var raw = row.Value;
