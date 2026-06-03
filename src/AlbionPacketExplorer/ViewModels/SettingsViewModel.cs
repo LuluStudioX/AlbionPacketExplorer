@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
 using Avalonia.Input.Platform;
@@ -193,6 +194,47 @@ public partial class SettingsViewModel : ObservableObject
 
     [RelayCommand]
     private void OpenIconCacheFolder() => OpenInExplorer(IconCachePath);
+
+    // ── Smart "reuse existing icons" detector ──────────────────────────────────
+    [ObservableProperty] private bool _isScanningIcons;
+    [ObservableProperty] private ObservableCollection<IconCacheCandidate> _iconCandidates = [];
+    [ObservableProperty] private bool _iconScanDone;
+
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task FindExistingIconsAsync()
+    {
+        IsScanningIcons = true;
+        IconScanDone = false;
+        try
+        {
+            var found = await Task.Run(() => IconCacheLocator.Find());
+            IconCandidates = new ObservableCollection<IconCacheCandidate>(found);
+        }
+        finally
+        {
+            IsScanningIcons = false;
+            IconScanDone = true;
+        }
+    }
+
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task UseIconCandidateAsync(IconCacheCandidate? candidate)
+    {
+        if (candidate == null) return;
+        // Point at the found folder without migrating — reuse its icons in place.
+        string? error = null;
+        var ok = await Task.Run(() => AppPaths.SetIconCacheDir(candidate.Path, migrate: false, out error));
+        if (ok)
+        {
+            RefreshPaths();
+            IconCandidates = [];
+            IconScanDone = false;
+            _main.ToastManager.Show(Loc.T("toast.path.set.title"),
+                Loc.Format("toast.path.set.body", AppPaths.IconCacheDir), ToastSeverity.Success);
+        }
+        else
+            ReportPathError(error);
+    }
 
     private static void OpenInExplorer(string path)
     {
