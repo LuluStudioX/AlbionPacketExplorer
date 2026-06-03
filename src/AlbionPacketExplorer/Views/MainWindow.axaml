@@ -111,8 +111,14 @@
                 <!-- Status group -->
                 <Border Grid.Row="0" Background="{DynamicResource Apx.Card}"
                         BorderBrush="{DynamicResource Apx.Accent}" BorderThickness="0,0,0,2" Padding="8,4">
-                    <TextBlock Text="{loc:T sidebar.status}" FontWeight="Bold"
-                               Foreground="{DynamicResource Apx.Text}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="{loc:T sidebar.status}" FontWeight="Bold"
+                                   VerticalAlignment="Center" Foreground="{DynamicResource Apx.Text}" />
+                        <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
+                                ToolTip.Tip="{loc:T sidebar.status.help}">
+                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
+                        </Border>
+                    </StackPanel>
                 </Border>
                 <views:StatusFilterView Grid.Row="1" Margin="6,6,6,10"
                                         DataContext="{Binding PacketList}" />
