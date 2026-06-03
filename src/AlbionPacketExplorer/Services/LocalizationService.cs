@@ -51,6 +51,10 @@ public sealed class LocalizationService
     /// <summary>Convenience accessor for view-models: <c>Loc.T("nav.capture")</c>.</summary>
     public string T(string key) => this[key];
 
+    /// <summary>Resolves a key whose value is a composite format string, then formats it.</summary>
+    public string Format(string key, params object?[] args) =>
+        string.Format(this[key], args);
+
     public void SetCulture(string culture)
     {
         if (string.IsNullOrWhiteSpace(culture)) culture = FallbackCulture;

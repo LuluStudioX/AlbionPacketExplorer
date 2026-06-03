@@ -28,7 +28,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string? _updateVersion;
     [ObservableProperty] private bool _isUpdating;
     [ObservableProperty] private int _updateProgress;
-    [ObservableProperty] private string _statusText = "Select a network device and click Start, or open a file.";
+    [ObservableProperty] private string _statusText = Loc.T("status.ready");
     [ObservableProperty] private ObservableCollection<NetworkDeviceInfo> _availableDevices = [];
     [ObservableProperty] private NetworkDeviceInfo? _selectedDevice;
 
@@ -219,7 +219,7 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"Could not list devices (Npcap installed?): {ex.Message}";
+            StatusText = Loc.Format("status.devicesFailed", ex.Message);
         }
     }
 
@@ -237,16 +237,17 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"Capture failed to start: {ex.Message}";
+            StatusText = Loc.Format("status.captureFailed", ex.Message);
             _session.Dispose();
             _session = null;
             return;
         }
 
         IsCapturing = true;
-        StatusText = $"Capturing on {SelectedDevice?.DisplayName ?? "all devices"}…";
-        _toasts.Show("Capture Started",
-            $"Listening on {SelectedDevice?.DisplayName ?? "all devices"}",
+        var deviceLabel = SelectedDevice?.DisplayName ?? Loc.T("status.allDevices");
+        StatusText = Loc.Format("status.capturing", deviceLabel);
+        _toasts.Show(Loc.T("toast.captureStarted.title"),
+            Loc.Format("toast.captureStarted.body", deviceLabel),
             ToastSeverity.Success);
     }
 
@@ -259,9 +260,10 @@ public partial class MainViewModel : ObservableObject
         _session = null;
         IsCapturing = false;
         Aggregator.Flush();
-        StatusText = $"Capture stopped. {_capturedPackets.Count:N0} packets captured.";
-        _toasts.Show("Capture Stopped",
-            $"{_capturedPackets.Count:N0} packets captured",
+        var count = _capturedPackets.Count.ToString("N0");
+        StatusText = Loc.Format("status.captureStopped", count);
+        _toasts.Show(Loc.T("toast.captureStopped.title"),
+            Loc.Format("toast.captureStopped.body", count),
             ToastSeverity.Info);
     }
 
@@ -300,11 +302,11 @@ public partial class MainViewModel : ObservableObject
             await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             await JsonSerializer.SerializeAsync(stream, payload, opts);
 
-            StatusText = $"Saved {_allPackets.Count:N0} packets to {Path.GetFileName(path)}";
+            StatusText = Loc.Format("status.saved", _allPackets.Count.ToString("N0"), Path.GetFileName(path));
         }
         catch (Exception ex)
         {
-            StatusText = $"Save failed: {ex.Message}";
+            StatusText = Loc.Format("status.saveFailed", ex.Message);
         }
     }
 
@@ -314,7 +316,7 @@ public partial class MainViewModel : ObservableObject
     {
         IsLoading = true;
         LoadProgress = 0;
-        StatusText = $"Loading {Path.GetFileName(path)}…";
+        StatusText = Loc.Format("status.loading", Path.GetFileName(path));
         ResetData();
 
         var reader = new PacketFileReader();
@@ -333,17 +335,19 @@ public partial class MainViewModel : ObservableObject
             _allPackets.AddRange(loaded);
             PacketList.SetSource(loaded);
             SaveFileCommand.NotifyCanExecuteChanged();
-            StatusText = $"Loaded {loaded.Count:N0} packets from {Path.GetFileName(path)}";
-            _toasts.Show("File Loaded",
-                $"{loaded.Count:N0} packets from {Path.GetFileName(path)}",
+            var fileName = Path.GetFileName(path);
+            var loadedCount = loaded.Count.ToString("N0");
+            StatusText = Loc.Format("status.loaded", loadedCount, fileName);
+            _toasts.Show(Loc.T("toast.fileLoaded.title"),
+                Loc.Format("toast.fileLoaded.body", loadedCount, fileName),
                 ToastSeverity.Success);
         }
         catch (Exception ex)
         {
             Aggregator.Reset();
             PacketList.SetSource([]);
-            StatusText = $"Error loading file: {ex.Message}";
-            _toasts.Show("Load Failed", ex.Message, ToastSeverity.Error);
+            StatusText = Loc.Format("status.loadError", ex.Message);
+            _toasts.Show(Loc.T("toast.loadFailed.title"), ex.Message, ToastSeverity.Error);
         }
         finally
         {

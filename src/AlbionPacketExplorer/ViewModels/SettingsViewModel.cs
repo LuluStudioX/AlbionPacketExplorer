@@ -81,6 +81,9 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void OpenSatFolder() => OpenInExplorer(SatPacketSnifferPath);
 
+    [RelayCommand]
+    private void OpenItemCacheFolder() => OpenInExplorer(DataFolderPath);
+
     private static void OpenInExplorer(string path)
     {
         try

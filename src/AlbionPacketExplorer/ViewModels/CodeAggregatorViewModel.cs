@@ -83,8 +83,8 @@ public partial class CodeAggregatorViewModel : ObservableObject
     {
         if (SelectedCode == null || Clipboard == null) return;
         await Clipboard.SetTextAsync(ConstructorExporter.Export(SelectedCode));
-        Toasts?.Show("Copied to Clipboard",
-            $"{SelectedCode.Kind} {SelectedCode.Code} constructor stub",
+        Toasts?.Show(Loc.T("toast.copied.keySummary.title"),
+            Loc.Format("toast.exportStub.body", SelectedCode.Kind, SelectedCode.Code),
             ToastSeverity.Success);
     }
 

@@ -188,6 +188,20 @@
         <Setter Property="Background" Value="{DynamicResource Apx.AccentPressed}" />
     </Style>
 
+    <!-- Active nav item (Settings left rail): tinted background + accent text -->
+    <Style Selector="Button.navactive /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Apx.Selected}" />
+    </Style>
+    <Style Selector="Button.navactive">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+    <Style Selector="Button.navactive TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+    <Style Selector="Button.navactive Path.icon">
+        <Setter Property="Stroke" Value="{DynamicResource Apx.Accent}" />
+    </Style>
+
     <!-- Success / Danger buttons -->
     <Style Selector="Button.success">
         <Setter Property="Background" Value="{DynamicResource Apx.Success}" />
