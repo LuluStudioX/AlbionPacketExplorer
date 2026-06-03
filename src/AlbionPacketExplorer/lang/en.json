@@ -31,6 +31,12 @@
 
   "panel.eventSummary": "Event Summary",
   "panel.eventSummary.help": "Each row = one packet type (e.g. EVENT 32).\nCount = how many times seen.\nKeys = which param indices were present, with % showing how often.\n100% = always present (required field). Less = optional or conditional.\n\nClick a row to filter the packet list below.",
+  "empty.noData.title": "No packets yet",
+  "empty.noData.message": "Start a live capture, or open a saved JSON capture, to begin exploring packets.",
+  "empty.noSelection.title": "No packet selected",
+  "empty.noSelection.message": "Pick a packet in the list above to inspect its fields here.",
+  "empty.byCode": "Codes appear here once packets are captured or loaded.",
+
   "panel.packetList": "Packet List",
   "panel.packetList.help": "All individual packets matching the current filter.\nFilter is set automatically when you click a row in Event Summary.\nClick a packet row to inspect its fields in the detail panel.",
   "panel.packetDetail": "Packet Detail",
@@ -38,6 +44,7 @@
   "panel.packetDetail.helpShort": "Right-click a row to edit a param name or note.",
 
   "status.ready": "Select a network device and click Start, or open a file.",
+  "status.dataReady": "Item data ready ({0} items, {1} icons on disk, {2}).",
   "status.devicesFailed": "Could not list devices (is Npcap installed?): {0}",
   "status.captureFailed": "Capture failed to start: {0}",
   "status.capturing": "Capturing on {0}…",

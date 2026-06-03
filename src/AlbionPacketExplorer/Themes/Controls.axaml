@@ -11,6 +11,36 @@
 
     <Styles.Resources>
 
+        <!-- ═══════════════ EmptyState (placeholder for empty panels) ═══════════════ -->
+        <ControlTheme x:Key="{x:Type controls:EmptyState}" TargetType="controls:EmptyState">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{DynamicResource Apx.Bg}" Padding="24">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    MaxWidth="360" Spacing="10">
+                            <Path Data="{TemplateBinding Icon}"
+                                  Stroke="{DynamicResource Apx.TextFaint}"
+                                  StrokeThickness="1.5"
+                                  StrokeLineCap="Round" StrokeJoin="Round"
+                                  Fill="Transparent"
+                                  Width="48" Height="48"
+                                  Stretch="Uniform"
+                                  HorizontalAlignment="Center" />
+                            <TextBlock Text="{TemplateBinding Title}"
+                                       FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Apx.TextMuted}"
+                                       HorizontalAlignment="Center" TextAlignment="Center" />
+                            <TextBlock Text="{TemplateBinding Message}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource Apx.TextFaint}"
+                                       HorizontalAlignment="Center" TextAlignment="Center"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
         <!-- ═══════════════ ApxSpinner (indeterminate arc) ═══════════════ -->
         <ControlTheme x:Key="{x:Type controls:ApxSpinner}" TargetType="controls:ApxSpinner">
             <Setter Property="Width" Value="16" />

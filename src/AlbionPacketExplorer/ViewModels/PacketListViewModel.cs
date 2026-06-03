@@ -419,6 +419,7 @@ public partial class PacketListViewModel : ObservableObject
             }
         }
         OnPropertyChanged(nameof(CountText));
+        OnPropertyChanged(nameof(HasData));
     }
 
     public void FilterTo(string kind, int code)
@@ -466,6 +467,9 @@ public partial class PacketListViewModel : ObservableObject
     // ── Status (Kind) quick-filter, surfaced in the filter sidebar ──────────────
     // Counts are over the full source, independent of the active filter, so the
     // sidebar always shows how many of each kind exist.
+    /// <summary>True once any packets are loaded or captured (drives the empty-state overlay).</summary>
+    public bool HasData => _allPackets.Count > 0;
+
     public int CountAll      => _allPackets.Count;
     public int CountEvent    => _allPackets.Count(p => p.Kind == "EVENT");
     public int CountRequest  => _allPackets.Count(p => p.Kind == "REQUEST");
@@ -485,6 +489,7 @@ public partial class PacketListViewModel : ObservableObject
 
     private void NotifyStatusCounts()
     {
+        OnPropertyChanged(nameof(HasData));
         OnPropertyChanged(nameof(CountAll));
         OnPropertyChanged(nameof(CountEvent));
         OnPropertyChanged(nameof(CountRequest));

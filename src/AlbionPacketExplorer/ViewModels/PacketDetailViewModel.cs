@@ -135,6 +135,9 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _forceExpandRows;
     [ObservableProperty] private ParamRow? _selectedRow;
 
+    /// <summary>True when a packet is selected (drives the detail empty-state overlay).</summary>
+    public bool HasPacket => Packet != null;
+
     /// <summary>Rows that resolved to one or more item names (for the Resolved tab).</summary>
     public IEnumerable<ParamRow> ResolvedRows => Rows.Where(r => r.IsVisible && r.HasResolved);
     public bool HasAnyResolved => Rows.Any(r => r.HasResolved);
@@ -229,6 +232,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(FilterValue));
         OnPropertyChanged(nameof(FilterResolved));
         OnPropertyChanged(nameof(RawJson));
+        OnPropertyChanged(nameof(HasPacket));
         RebuildRows();
     }
 
