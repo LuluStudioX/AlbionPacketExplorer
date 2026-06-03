@@ -1,6 +1,11 @@
 {
   "app.title": "Albion Packet Explorer",
 
+  "welcome.title": "Welcome to Albion Packet Explorer",
+  "welcome.body": "Start a live capture or open a saved JSON log to begin. New to packets? See the Glossary in Settings for plain-language definitions.",
+  "welcome.dismiss": "Got it",
+  "welcome.glossary": "Open Glossary",
+
   "common.showAll": "Show all",
   "common.clear": "Clear",
 
@@ -246,6 +251,8 @@
   "settings.theme.dark.desc": "Switch between dark and light base theme.",
   "settings.theme.color": "Color Theme",
   "settings.theme.color.desc": "Pick a color accent for the UI.",
+  "settings.theme.language": "Language",
+  "settings.theme.language.desc": "Interface language. More languages can be added by dropping a JSON file into the app's lang folder.",
 
   "settings.about.name": "Albion Packet Explorer",
   "settings.about.desc": "Inspect and decode Albion Online network packets from a live capture or a saved log. Explore every field of every packet to understand the game's network protocol."

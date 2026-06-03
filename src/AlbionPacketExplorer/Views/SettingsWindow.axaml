@@ -472,6 +472,21 @@
                         </StackPanel>
                     </Border>
 
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="{loc:T settings.theme.language}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.theme.language.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding AvailableCultures}"
+                                      SelectedItem="{Binding Culture}"
+                                      MinWidth="120"
+                                      VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
                 </StackPanel>
 
                 <!-- Glossary section -->

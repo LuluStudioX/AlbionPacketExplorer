@@ -63,6 +63,14 @@ public partial class SettingsViewModel : ObservableObject
         set { _main.Density = value; OnPropertyChanged(); }
     }
 
+    public IReadOnlyList<string> AvailableCultures => _main.AvailableCultures;
+
+    public string Culture
+    {
+        get => _main.Culture;
+        set { _main.Culture = value; OnPropertyChanged(); }
+    }
+
     public string SidebarToggleGesture
     {
         get => _main.SidebarToggleGesture;
