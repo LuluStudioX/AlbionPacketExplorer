@@ -7,9 +7,7 @@ public sealed class GameDataService
     private const string RemoteUrl = "https://raw.githubusercontent.com/ao-data/ao-bin-dumps/master/formatted/items.json";
     private static readonly TimeSpan CacheMaxAge = TimeSpan.FromDays(7);
 
-    private static readonly string CachePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "items.json");
+    private static string CachePath => AppPaths.ItemCache;
 
     private Dictionary<int, (string UniqueName, string DisplayName)>? _items;
     private Dictionary<string, string>? _displayByUniqueName;

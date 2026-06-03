@@ -11,6 +11,7 @@ namespace AlbionPacketExplorer.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IFilePicker _filePicker;
+    public IFilePicker FilePicker => _filePicker;
     private readonly ToastService _toasts;
     private readonly GameDataService _gameData = new();
     private readonly IconCacheService _iconCache = new();
@@ -430,9 +431,7 @@ public partial class MainViewModel : ObservableObject
         if (!AutoSaveLogs || _allPackets.Count == 0) return;
         try
         {
-            var dir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "AlbionPacketExplorer", "logs");
+            var dir = AppPaths.LogsDir;
             Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, $"packets_{DateTime.Now:yyyyMMdd_HHmmss}.json");
             var opts = new JsonSerializerOptions { WriteIndented = false };
