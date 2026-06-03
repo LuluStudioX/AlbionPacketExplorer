@@ -1,0 +1,19 @@
+{
+  "app.title": "Albion Packet Explorer",
+
+  "toolbar.capture": "Capture",
+  "toolbar.stop": "Stop",
+  "toolbar.saveJson": "Save JSON",
+  "toolbar.openJson": "Open JSON",
+
+  "panel.eventSummary": "Event Summary",
+  "panel.packetList": "Packet List",
+  "panel.packetDetail": "Packet Detail",
+
+  "settings.title": "Settings",
+  "settings.nav.display": "Display",
+  "settings.nav.paths": "Paths",
+  "settings.nav.schema": "Schema Export",
+  "settings.nav.theme": "Theme",
+  "settings.nav.about": "About"
+}
