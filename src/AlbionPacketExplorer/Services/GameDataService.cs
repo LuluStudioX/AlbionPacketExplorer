@@ -24,7 +24,7 @@ public sealed class GameDataService
 
         if (needsFetch)
         {
-            statusCallback?.Invoke("Downloading item data from ao-bin-dumps…");
+            statusCallback?.Invoke("Downloading item data from public Albion data sources…");
             await TryFetchAndCacheAsync(statusCallback);
         }
 

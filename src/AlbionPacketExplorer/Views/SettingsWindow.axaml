@@ -450,7 +450,23 @@
                                        Foreground="Gray" FontSize="12" />
                             <ListBox ItemsSource="{Binding AvailableThemes}"
                                      SelectedItem="{Binding SelectedTheme}"
-                                     SelectionMode="Single">
+                                     SelectionMode="Single"
+                                     Background="Transparent" BorderThickness="0">
+                                <ListBox.Styles>
+                                    <!-- No blue selection chrome; the swatch shows selection via
+                                         its own accent ring + check instead. -->
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                </ListBox.Styles>
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel Orientation="Horizontal" />
@@ -458,13 +474,29 @@
                                 </ListBox.ItemsPanel>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="80" Height="36" CornerRadius="6" Margin="4"
-                                                Background="{Binding AccentBrush}">
-                                            <TextBlock Text="{Binding DisplayName}"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"
-                                                       Foreground="White"
-                                                       FontSize="12" FontWeight="SemiBold" />
+                                        <!-- Selected swatch: accent ring + black label (unselected
+                                             swatches use white) so the active accent reads clearly. -->
+                                        <Border CornerRadius="9" Margin="4" Padding="3"
+                                                BorderThickness="2" BorderBrush="Transparent">
+                                            <Border.Styles>
+                                                <Style Selector="ListBoxItem:selected Border">
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Apx.Text}" />
+                                                </Style>
+                                            </Border.Styles>
+                                            <Border Width="80" Height="36" CornerRadius="6"
+                                                    Background="{Binding AccentBrush}">
+                                                <TextBlock Text="{Binding DisplayName}"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           FontSize="12" FontWeight="SemiBold"
+                                                           Foreground="White">
+                                                    <TextBlock.Styles>
+                                                        <Style Selector="ListBoxItem:selected TextBlock">
+                                                            <Setter Property="Foreground" Value="Black" />
+                                                        </Style>
+                                                    </TextBlock.Styles>
+                                                </TextBlock>
+                                            </Border>
                                         </Border>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
