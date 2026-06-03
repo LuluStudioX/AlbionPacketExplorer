@@ -36,9 +36,21 @@
               CanUserSortColumns="True"
               CanUserResizeColumns="True"
               FontSize="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}"
-              RowHeight="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=26}"
               HorizontalScrollBarVisibility="Disabled"
               GridLinesVisibility="Horizontal">
+            <!-- Density: MinHeight (not fixed RowHeight) so expanded collection rows can grow.
+                 Cell FontSize is bound explicitly because DataGrid.FontSize does not cascade
+                 to cell content. -->
+            <DataGrid.Styles>
+                <Style Selector="DataGridRow">
+                    <Setter Property="MinHeight"
+                            Value="{Binding $parent[Window].((vm:MainViewModel)DataContext).RowHeight, FallbackValue=26}" />
+                </Style>
+                <Style Selector="DataGridCell TextBlock">
+                    <Setter Property="FontSize"
+                            Value="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}" />
+                </Style>
+            </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy Value"    Command="{Binding CopyValueCommand}" />
