@@ -14,6 +14,7 @@ public partial class SettingsWindow : ApxWindow
     private StackPanel? _sectionPaths;
     private StackPanel? _sectionSchema;
     private StackPanel? _sectionTheme;
+    private StackPanel? _sectionGlossary;
     private StackPanel? _sectionAbout;
     private Button? _activeNavButton;
 
@@ -31,6 +32,7 @@ public partial class SettingsWindow : ApxWindow
             _sectionPaths     = this.FindControl<StackPanel>("SectionPaths");
             _sectionSchema  = this.FindControl<StackPanel>("SectionSchema");
             _sectionTheme   = this.FindControl<StackPanel>("SectionTheme");
+            _sectionGlossary = this.FindControl<StackPanel>("SectionGlossary");
             _sectionAbout   = this.FindControl<StackPanel>("SectionAbout");
 
             // Highlight Display as default active
@@ -57,6 +59,7 @@ public partial class SettingsWindow : ApxWindow
         if (_sectionPaths     != null) _sectionPaths.IsVisible     = tag == "Paths";
         if (_sectionSchema  != null) _sectionSchema.IsVisible  = tag == "Schema";
         if (_sectionTheme   != null) _sectionTheme.IsVisible   = tag == "Theme";
+        if (_sectionGlossary != null) _sectionGlossary.IsVisible = tag == "Glossary";
         if (_sectionAbout   != null) _sectionAbout.IsVisible   = tag == "About";
         SetActiveNav(btn);
     }

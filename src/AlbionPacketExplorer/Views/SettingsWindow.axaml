@@ -13,7 +13,7 @@
                 CanResize="True"
                 WindowStartupLocation="CenterOwner">
 
-    <Grid ColumnDefinitions="180,*">
+    <Grid ColumnDefinitions="2*,8*" ClipToBounds="True">
 
         <!-- Left nav -->
         <Border Grid.Column="0" Background="{DynamicResource Apx.Surface}" Padding="0,8"
@@ -85,6 +85,17 @@
                         <TextBlock Text="{loc:T settings.nav.theme}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                <Button Name="NavGlossary"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="Glossary">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.HelpCircle}" />
+                        <TextBlock Text="{loc:T settings.nav.glossary}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
                 <Button Name="NavAbout"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -100,8 +111,17 @@
         </Border>
 
         <!-- Right content -->
-        <ScrollViewer Grid.Column="1" Padding="24,20,16,0">
-            <StackPanel Spacing="16" Margin="0,0,8,24">
+        <!-- Always reserve the scrollbar gutter (AllowAutoHide=False) so card widths are
+             identical whether or not a tab scrolls. -->
+        <!-- Proportional layout: equal left/right gutters that scale with the window so cards
+             keep the same margins on every tab. Vertical scrollbar always visible so its gutter
+             is reserved identically whether or not a tab scrolls. -->
+        <ScrollViewer Grid.Column="1"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Visible">
+            <Grid ColumnDefinitions="6*,88*,6*">
+                <StackPanel Grid.Column="1" Spacing="16" Margin="0,20,0,24"
+                            HorizontalAlignment="Stretch">
 
                 <!-- Display section -->
                 <StackPanel Name="SectionDisplay" Spacing="12">
@@ -454,6 +474,63 @@
 
                 </StackPanel>
 
+                <!-- Glossary section -->
+                <StackPanel Name="SectionGlossary" Spacing="12" IsVisible="False">
+                    <TextBlock Text="{loc:T settings.nav.glossary}" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{loc:T glossary.intro}"
+                               Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+
+                    <Border Classes="card" Padding="16">
+                        <StackPanel Spacing="12">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.packet.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.packet.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.event.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.event.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.request.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.request.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.response.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.response.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.code.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.code.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.key.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.key.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.param.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.param.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.resolve.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.resolve.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:T glossary.schema.term}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Apx.Accent}" />
+                                <TextBlock Text="{loc:T glossary.schema.def}" Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
                 <!-- About section -->
                 <StackPanel Name="SectionAbout" Spacing="12" IsVisible="False">
                     <TextBlock Text="{loc:T settings.nav.about}" FontSize="18" FontWeight="SemiBold" />
@@ -469,6 +546,7 @@
                 </StackPanel>
 
             </StackPanel>
+            </Grid>
         </ScrollViewer>
 
     </Grid>
