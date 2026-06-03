@@ -2,9 +2,10 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
                 xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+                xmlns:loc="using:AlbionPacketExplorer.Markup"
                 x:Class="AlbionPacketExplorer.Views.SettingsWindow"
                 x:DataType="vm:SettingsViewModel"
-                Title="Settings"
+                Title="{loc:T settings.title}"
                 Icon="/Assets/app-icon.ico"
                 Width="800" Height="640"
                 MinWidth="640" MinHeight="420"
@@ -26,7 +27,7 @@
                         Tag="Display">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Path Classes="icon sm" Data="{StaticResource Icon.Monitor}" />
-                        <TextBlock Text="Display" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T settings.nav.display}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button Name="NavPaths"
@@ -37,7 +38,7 @@
                         Tag="Paths">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Path Classes="icon sm" Data="{StaticResource Icon.Folder}" />
-                        <TextBlock Text="Paths" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T settings.nav.paths}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button Name="NavSchema"
@@ -48,7 +49,7 @@
                         Tag="Schema">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Path Classes="icon sm" Data="{StaticResource Icon.FileCode}" />
-                        <TextBlock Text="Schema Export" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T settings.nav.schema}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button Name="NavTheme"
@@ -59,7 +60,7 @@
                         Tag="Theme">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Path Classes="icon sm" Data="{StaticResource Icon.Palette}" />
-                        <TextBlock Text="Theme" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T settings.nav.theme}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button Name="NavAbout"
@@ -70,7 +71,7 @@
                         Tag="About">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Path Classes="icon sm" Data="{StaticResource Icon.Info}" />
-                        <TextBlock Text="About" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T settings.nav.about}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -82,15 +83,15 @@
 
                 <!-- Display section -->
                 <StackPanel Name="SectionDisplay" Spacing="12">
-                    <TextBlock Text="Display" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{loc:T settings.nav.display}" FontSize="18" FontWeight="SemiBold" />
 
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="Resolve Item Names" FontWeight="SemiBold" />
-                                <TextBlock Text="Show UniqueName + EN display name for numeric param values."
+                                <TextBlock Text="{loc:T settings.display.resolveNames}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.resolveNames.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
-                                <TextBlock Text="Data fetched from ao-bin-dumps on first launch, cached 7 days."
+                                <TextBlock Text="{loc:T settings.display.resolveNames.note}"
                                            Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1"
@@ -103,8 +104,8 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="Grid Density" FontWeight="SemiBold" />
-                                <TextBlock Text="Row height and font size for the summary, list and detail grids."
+                                <TextBlock Text="{loc:T settings.display.density}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.density.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
                             </StackPanel>
                             <ComboBox Grid.Column="1"
@@ -118,8 +119,8 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="Close button hides to system tray" FontWeight="SemiBold" />
-                                <TextBlock Text="Clicking X hides the window instead of closing. Use tray icon to show or exit."
+                                <TextBlock Text="{loc:T settings.display.tray}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.tray.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1"
@@ -131,10 +132,10 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="Resolve Item Icons" FontWeight="SemiBold" />
-                                <TextBlock Text="Show item icons in the Packet Detail panel."
+                                <TextBlock Text="{loc:T settings.display.resolveIcons}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.resolveIcons.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
-                                <TextBlock Text="Fetched from render.albiononline.com, cached permanently to disk."
+                                <TextBlock Text="{loc:T settings.display.resolveIcons.note}"
                                            Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1"
@@ -147,10 +148,10 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="Force Expand All Rows" FontWeight="SemiBold" />
-                                <TextBlock Text="Automatically expand all Packet Detail rows to show full decoded values."
+                                <TextBlock Text="{loc:T settings.display.forceExpand}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.forceExpand.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
-                                <TextBlock Text="Arrays and dicts shown one entry per line with item index resolution."
+                                <TextBlock Text="{loc:T settings.display.forceExpand.note}"
                                            Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1"
@@ -162,10 +163,10 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="Auto-start capture on launch" FontWeight="SemiBold" />
-                                <TextBlock Text="Start network capture automatically when the app opens."
+                                <TextBlock Text="{loc:T settings.display.autoStart}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.autoStart.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
-                                <TextBlock Text="Uses the last selected device (or all adapters if set to Automatic)."
+                                <TextBlock Text="{loc:T settings.display.autoStart.note}"
                                            Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1"
@@ -177,10 +178,10 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="Auto-save capture log on exit" FontWeight="SemiBold" />
-                                <TextBlock Text="Save all captured packets to a JSON file when closing the app."
+                                <TextBlock Text="{loc:T settings.display.autoSave}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.autoSave.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
-                                <TextBlock Text="Saved to AppData\AlbionPacketExplorer\logs\ with a timestamp filename."
+                                <TextBlock Text="{loc:T settings.display.autoSave.note}"
                                            Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1"
@@ -192,12 +193,12 @@
 
                 <!-- Paths section -->
                 <StackPanel Name="SectionPaths" Spacing="12" IsVisible="False">
-                    <TextBlock Text="Paths" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{loc:T settings.nav.paths}" FontSize="18" FontWeight="SemiBold" />
 
                     <Border Classes="card" Padding="16">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="App Data Folder" FontWeight="SemiBold" />
-                            <TextBlock Text="Settings, layout and item cache are stored here."
+                            <TextBlock Text="{loc:T settings.paths.appData}" FontWeight="SemiBold" />
+                            <TextBlock Text="{loc:T settings.paths.appData.desc}"
                                        Foreground="Gray" FontSize="12" />
                             <TextBlock Text="{Binding DataFolderPath}"
                                        Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
@@ -205,7 +206,7 @@
                             <Button Classes="ghost" Command="{Binding OpenDataFolderCommand}" Margin="0,4,0,0">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
-                                    <TextBlock Text="Open in Explorer" VerticalAlignment="Center" />
+                                    <TextBlock Text="{loc:T settings.paths.openInExplorer}" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -213,16 +214,16 @@
 
                     <Border Classes="card" Padding="16">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="SAT Instances Folder" FontWeight="SemiBold" />
-                            <TextBlock Text="packet_sniffer.json files are inside one of the instance subfolders."
-                                       Foreground="Gray" FontSize="12" />
+                            <TextBlock Text="{loc:T settings.paths.logFolder}" FontWeight="SemiBold" />
+                            <TextBlock Text="{loc:T settings.paths.logFolder.desc}"
+                                       Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
                             <TextBlock Text="{Binding SatPacketSnifferPath}"
                                        Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
                                        TextWrapping="Wrap" Opacity="0.8" />
                             <Button Classes="ghost" Command="{Binding OpenSatFolderCommand}" Margin="0,4,0,0">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
-                                    <TextBlock Text="Open in Explorer" VerticalAlignment="Center" />
+                                    <TextBlock Text="{loc:T settings.paths.openInExplorer}" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -230,35 +231,41 @@
 
                     <Border Classes="card" Padding="16">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Item Name Cache" FontWeight="SemiBold" />
-                            <TextBlock Text="Fetched from ao-bin-dumps, refreshed every 7 days."
+                            <TextBlock Text="{loc:T settings.paths.itemCache}" FontWeight="SemiBold" />
+                            <TextBlock Text="{loc:T settings.paths.itemCache.desc}"
                                        Foreground="Gray" FontSize="12" />
                             <TextBlock Text="{Binding ItemCachePath}"
                                        Foreground="Gray" FontSize="11" FontFamily="Consolas,Monospace"
                                        TextWrapping="Wrap" Opacity="0.8" />
+                            <Button Classes="ghost" Command="{Binding OpenItemCacheFolderCommand}" Margin="0,4,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
+                                    <TextBlock Text="{loc:T settings.paths.openInExplorer}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </Border>
                 </StackPanel>
 
                 <!-- Schema Export section -->
                 <StackPanel Name="SectionSchema" Spacing="12" IsVisible="False">
-                    <TextBlock Text="Schema Export" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{loc:T settings.nav.schema}" FontSize="18" FontWeight="SemiBold" />
 
                     <Border Classes="card" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Export merged param schema for an event/request as standalone JSON, ready for SAT PR submission."
+                            <TextBlock Text="{loc:T settings.schema.desc}"
                                        Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
 
                             <Grid ColumnDefinitions="Auto,8,120,8,Auto,8,*">
-                                <TextBlock Grid.Column="0" Text="Kind:" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="{loc:T settings.schema.kind}" VerticalAlignment="Center" />
                                 <ComboBox Grid.Column="2" SelectedItem="{Binding ExportKind}">
                                     <ComboBoxItem Content="EVENT" />
                                     <ComboBoxItem Content="REQUEST" />
                                     <ComboBoxItem Content="RESPONSE" />
                                 </ComboBox>
-                                <TextBlock Grid.Column="4" Text="Code:" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="4" Text="{loc:T settings.schema.code}" VerticalAlignment="Center" />
                                 <TextBox Grid.Column="6" Text="{Binding ExportCode}"
-                                         PlaceholderText="e.g. 32" MaxLength="5" />
+                                         PlaceholderText="{loc:T settings.schema.code.placeholder}" MaxLength="5" />
                             </Grid>
 
                             <TextBox Text="{Binding ExportPreview}"
@@ -268,19 +275,19 @@
                                      AcceptsReturn="True"
                                      Height="200"
                                      TextWrapping="NoWrap"
-                                     PlaceholderText="Enter kind + code above to preview schema…" />
+                                     PlaceholderText="{loc:T settings.schema.preview.placeholder}" />
 
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <Button Classes="ghost" Command="{Binding CopyExportCommand}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <Path Classes="icon sm" Data="{StaticResource Icon.Copy}" />
-                                        <TextBlock Text="Copy to Clipboard" VerticalAlignment="Center" />
+                                        <TextBlock Text="{loc:T settings.schema.copy}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
                                 <Button Classes="ghost" Command="{Binding SaveExportCommand}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
-                                        <TextBlock Text="Save as JSON" VerticalAlignment="Center" />
+                                        <TextBlock Text="{loc:T settings.schema.save}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
@@ -290,13 +297,13 @@
 
                 <!-- Theme section -->
                 <StackPanel Name="SectionTheme" Spacing="12" IsVisible="False">
-                    <TextBlock Text="Theme" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{loc:T settings.nav.theme}" FontSize="18" FontWeight="SemiBold" />
 
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="Dark Mode" FontWeight="SemiBold" />
-                                <TextBlock Text="Switch between dark and light base theme."
+                                <TextBlock Text="{loc:T settings.theme.dark}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.theme.dark.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1"
@@ -307,8 +314,8 @@
 
                     <Border Classes="card" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Color Theme" FontWeight="SemiBold" />
-                            <TextBlock Text="Pick a color accent for the UI."
+                            <TextBlock Text="{loc:T settings.theme.color}" FontWeight="SemiBold" />
+                            <TextBlock Text="{loc:T settings.theme.color.desc}"
                                        Foreground="Gray" FontSize="12" />
                             <ListBox ItemsSource="{Binding AvailableThemes}"
                                      SelectedItem="{Binding SelectedTheme}"
@@ -338,13 +345,13 @@
 
                 <!-- About section -->
                 <StackPanel Name="SectionAbout" Spacing="12" IsVisible="False">
-                    <TextBlock Text="About" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{loc:T settings.nav.about}" FontSize="18" FontWeight="SemiBold" />
 
                     <Border Classes="card" Padding="16">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Albion Packet Explorer" FontWeight="Bold" FontSize="15" />
+                            <TextBlock Text="{loc:T settings.about.name}" FontWeight="Bold" FontSize="15" />
                             <TextBlock Text="{Binding Version}" Foreground="Gray" FontSize="12" />
-                            <TextBlock Text="Reads packet_sniffer.json from AlbionOnline-StatisticsAnalysis and decodes raw Albion Online network packets. Useful for exploring every field of every packet to write better event constructors in SAT."
+                            <TextBlock Text="{loc:T settings.about.desc}"
                                        Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>

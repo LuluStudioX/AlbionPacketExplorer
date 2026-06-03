@@ -2,15 +2,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              xmlns:views="using:AlbionPacketExplorer.Views"
+             xmlns:loc="using:AlbionPacketExplorer.Markup"
              x:Class="AlbionPacketExplorer.Views.CodeAggregatorView"
              x:DataType="vm:CodeAggregatorViewModel">
 
     <DockPanel>
 
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4,2">
-            <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,3">
-                <ToolTip.Tip>Sort codes with no known name to top</ToolTip.Tip>
-                <TextBlock Text="? First" FontSize="11" VerticalAlignment="Center" />
+            <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,3"
+                          ToolTip.Tip="{loc:T summary.unknownFirst.tip}">
+                <TextBlock Text="{loc:T summary.unknownFirst}" FontSize="11" VerticalAlignment="Center" />
             </ToggleButton>
         </StackPanel>
 
@@ -34,8 +35,8 @@
             </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Copy Keys Summary"          Command="{Binding CopyKeySummaryCommand}" />
-                    <MenuItem Header="Export C# Constructor Stub" Command="{Binding ExportCommand}" />
+                    <MenuItem Header="{loc:T summary.menu.copyKeys}"          Command="{Binding CopyKeySummaryCommand}" />
+                    <MenuItem Header="{loc:T summary.menu.exportStub}" Command="{Binding ExportCommand}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
@@ -43,12 +44,12 @@
                 <DataGridTemplateColumn Width="80" SortMemberPath="Kind" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Kind" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T summary.col.kind}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKind, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Kind…" Width="160" />
+                                                 PlaceholderText="{loc:T summary.filterKind.placeholder}" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
@@ -65,12 +66,12 @@
                 <DataGridTemplateColumn Width="60" SortMemberPath="Code" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Code" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T summary.col.code}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterCode, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Code…" Width="160" />
+                                                 PlaceholderText="{loc:T summary.filterCode.placeholder}" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
@@ -86,7 +87,7 @@
 
                 <DataGridTemplateColumn Width="180" SortMemberPath="EventName" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
-                        <TextBlock Text="Name" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T summary.col.name}" VerticalAlignment="Center" />
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:CodeStatsRow">
@@ -99,7 +100,7 @@
 
                 <DataGridTemplateColumn Width="80" SortMemberPath="Count" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
-                        <TextBlock Text="Count" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T summary.col.count}" VerticalAlignment="Center" />
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:CodeStatsRow">
@@ -111,12 +112,12 @@
                 <DataGridTemplateColumn Width="*" SortMemberPath="KeySummary" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Keys" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T summary.col.keys}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKeys, Mode=TwoWay}"
-                                                 PlaceholderText="Filter Keys…" Width="240" />
+                                                 PlaceholderText="{loc:T summary.filterKeys.placeholder}" Width="240" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />

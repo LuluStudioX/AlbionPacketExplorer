@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:AlbionPacketExplorer.ViewModels"
              xmlns:views="using:AlbionPacketExplorer.Views"
+             xmlns:loc="using:AlbionPacketExplorer.Markup"
              x:Class="AlbionPacketExplorer.Views.PacketListView"
              x:DataType="vm:PacketListViewModel">
 
@@ -12,11 +13,11 @@
 
                 <!-- Filter edit button — shows label or placeholder, opens flyout to edit query -->
                 <Button Classes="ghost" Padding="8,4" MinWidth="120"
-                        ToolTip.Tip="Click to edit filter query&#xA;Syntax: term  kind:X  code:32  name:X  params:X  prefix - to exclude">
+                        ToolTip.Tip="{loc:T list.filter.edit.tip}">
                     <Button.Flyout>
                         <Flyout Placement="Bottom" ShowMode="TransientWithDismissOnPointerMoveAway">
                             <TextBox Text="{Binding FilterQuery, Mode=TwoWay}"
-                                     PlaceholderText="kind:EVENT code:32 -code:45 name:Leave …"
+                                     PlaceholderText="{loc:T list.filter.placeholder}"
                                      MinWidth="420" />
                         </Flyout>
                     </Button.Flyout>
@@ -26,35 +27,35 @@
                     </StackPanel>
                 </Button>
 
-                <Button Classes="iconbtn" Command="{Binding ClearFilterCommand}">
-                    <ToolTip.Tip>Clear filter</ToolTip.Tip>
+                <Button Classes="iconbtn" Command="{Binding ClearFilterCommand}"
+                        ToolTip.Tip="{loc:T list.filter.clear.tip}">
                     <Path Classes="icon" Data="{StaticResource Icon.X}" />
                 </Button>
-                <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,4">
-                    <ToolTip.Tip>Sort unknown codes to top</ToolTip.Tip>
-                    <TextBlock Text="? First" FontSize="11" VerticalAlignment="Center" />
+                <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,4"
+                              ToolTip.Tip="{loc:T list.unknownFirst.tip}">
+                    <TextBlock Text="{loc:T list.unknownFirst}" FontSize="11" VerticalAlignment="Center" />
                 </ToggleButton>
                 <TextBlock VerticalAlignment="Center" Text="{Binding CountText}"
                            Foreground="{DynamicResource Apx.TextMuted}" />
             </StackPanel>
             <!-- Preset row -->
             <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBox Text="{Binding NewPresetName}" Width="140" PlaceholderText="Preset name…" />
-                <Button Classes="iconbtn" Command="{Binding SavePresetCommand}">
-                    <ToolTip.Tip>Save current filter as preset</ToolTip.Tip>
+                <TextBox Text="{Binding NewPresetName}" Width="140" PlaceholderText="{loc:T list.preset.placeholder}" />
+                <Button Classes="iconbtn" Command="{Binding SavePresetCommand}"
+                        ToolTip.Tip="{loc:T list.preset.save.tip}">
                     <Path Classes="icon" Data="{StaticResource Icon.Check}" />
                 </Button>
                 <ComboBox ItemsSource="{Binding Presets}"
                           SelectedItem="{Binding SelectedPreset, Mode=TwoWay}"
                           DisplayMemberBinding="{Binding Name}"
-                          PlaceholderText="Load preset…"
+                          PlaceholderText="{loc:T list.preset.load.placeholder}"
                           MinWidth="160" />
-                <Button Classes="iconbtn" Command="{Binding LoadPresetCommand}">
-                    <ToolTip.Tip>Apply selected preset</ToolTip.Tip>
+                <Button Classes="iconbtn" Command="{Binding LoadPresetCommand}"
+                        ToolTip.Tip="{loc:T list.preset.apply.tip}">
                     <Path Classes="icon" Data="{StaticResource Icon.ChevronRight}" />
                 </Button>
-                <Button Classes="iconbtn" Command="{Binding DeletePresetCommand}">
-                    <ToolTip.Tip>Delete selected preset</ToolTip.Tip>
+                <Button Classes="iconbtn" Command="{Binding DeletePresetCommand}"
+                        ToolTip.Tip="{loc:T list.preset.delete.tip}">
                     <Path Classes="icon" Data="{StaticResource Icon.Trash}" />
                 </Button>
             </StackPanel>
@@ -80,13 +81,13 @@
             </DataGrid.Styles>
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Copy Params"   Command="{Binding CopyParamSummaryCommand}" />
-                    <MenuItem Header="Copy as JSON"  Command="{Binding CopyAsJsonCommand}" />
+                    <MenuItem Header="{loc:T list.menu.copyParams}"   Command="{Binding CopyParamSummaryCommand}" />
+                    <MenuItem Header="{loc:T list.menu.copyJson}"  Command="{Binding CopyAsJsonCommand}" />
                     <Separator />
-                    <MenuItem Header="Auto-select Newest"
+                    <MenuItem Header="{loc:T list.menu.autoSelectNewest}"
                               IsChecked="{Binding AutoSelectNewest, Mode=TwoWay}"
                               ToggleType="CheckBox" />
-                    <MenuItem Header="Unknown codes first"
+                    <MenuItem Header="{loc:T list.menu.unknownFirst}"
                               IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}"
                               ToggleType="CheckBox" />
                 </ContextMenu>
@@ -95,7 +96,7 @@
 
                 <DataGridTemplateColumn Width="100" SortMemberPath="Timestamp" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
-                        <TextBlock Text="Timestamp" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T list.col.timestamp}" VerticalAlignment="Center" />
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PacketRow">
@@ -108,12 +109,12 @@
                 <DataGridTemplateColumn Width="90" SortMemberPath="Kind" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Kind" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T list.col.kind}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterKind, Mode=TwoWay}"
-                                                 PlaceholderText="EVENT  -REQUEST …" Width="160" />
+                                                 PlaceholderText="{loc:T list.filterKind.placeholder}" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
@@ -130,12 +131,12 @@
                 <DataGridTemplateColumn Width="55" SortMemberPath="Code" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Code" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T list.col.code}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterCode, Mode=TwoWay}"
-                                                 PlaceholderText="32  -45  -103 …" Width="160" />
+                                                 PlaceholderText="{loc:T list.filterCode.placeholder}" Width="160" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
@@ -152,12 +153,12 @@
                 <DataGridTemplateColumn Width="220" SortMemberPath="EventName" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Name" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T list.col.name}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterName, Mode=TwoWay}"
-                                                 PlaceholderText="Leave  -NewChar …" Width="200" />
+                                                 PlaceholderText="{loc:T list.filterName.placeholder}" Width="200" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
@@ -175,7 +176,7 @@
 
                 <DataGridTemplateColumn Width="60" SortMemberPath="KeyCount" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
-                        <TextBlock Text="# Keys" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T list.col.keys}" VerticalAlignment="Center" />
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PacketRow">
@@ -187,12 +188,12 @@
                 <DataGridTemplateColumn Width="*" SortMemberPath="ParamSummary" CanUserSort="True">
                     <DataGridTemplateColumn.Header>
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Params" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{loc:T list.col.params}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Background="Transparent" Padding="2" Width="22" Height="22" VerticalAlignment="Center">
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <TextBox Text="{Binding $parent[UserControl].DataContext.FilterParams, Mode=TwoWay}"
-                                                 PlaceholderText="objectId  T8_FARM …" Width="240" />
+                                                 PlaceholderText="{loc:T list.filterParams.placeholder}" Width="240" />
                                     </Flyout>
                                 </Button.Flyout>
                                 <Path Classes="icon muted sm" Data="{StaticResource Icon.Search}" />
