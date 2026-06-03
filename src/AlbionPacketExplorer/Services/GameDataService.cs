@@ -14,6 +14,9 @@ public sealed class GameDataService
 
     public bool IsLoaded => _items != null;
 
+    /// <summary>Number of items in the loaded data set.</summary>
+    public int ItemCount => _items?.Count ?? 0;
+
     public async Task LoadAsync(Action<string>? statusCallback = null)
     {
         var cacheFile = new FileInfo(CachePath);

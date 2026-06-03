@@ -227,10 +227,31 @@ public partial class MainViewModel : ObservableObject
         await _schema.LoadAsync();
         await _gameData.LoadAsync(msg => StatusText = msg);
         OnPropertyChanged(nameof(GameDataLoaded));
+        UpdateDataReadyStatus();
         if (_packetDetail.Packet != null)
             _packetDetail.ForceRebuild();
         if (_allPackets.Count > 0 && ResolveItemNames)
             PacketList.SetResolveItemNames(true);
+    }
+
+    // Compose the "data ready" status with item count plus on-disk icon count and size.
+    private void UpdateDataReadyStatus()
+    {
+        if (!_gameData.IsLoaded) return;
+        var (iconCount, iconBytes) = IconCacheService.GetDiskStats();
+        StatusText = Loc.Format("status.dataReady",
+            _gameData.ItemCount.ToString("N0"),
+            iconCount.ToString("N0"),
+            FormatBytes(iconBytes));
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        string[] units = ["B", "KB", "MB", "GB", "TB"];
+        double size = bytes;
+        int u = 0;
+        while (size >= 1024 && u < units.Length - 1) { size /= 1024; u++; }
+        return u == 0 ? $"{size:0} {units[u]}" : $"{size:0.#} {units[u]}";
     }
 
     private async Task CheckForUpdateAsync()
