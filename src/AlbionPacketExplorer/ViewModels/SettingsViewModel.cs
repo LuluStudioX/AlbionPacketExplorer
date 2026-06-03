@@ -24,10 +24,13 @@ public partial class SettingsViewModel : ObservableObject
         set => _main.ResolveItemNames = value;
     }
 
-    public bool ResolveIcons
+    public IReadOnlyList<IconCacheMode> IconModeOptions { get; } =
+        [IconCacheMode.Off, IconCacheMode.Memory, IconCacheMode.Disk];
+
+    public IconCacheMode IconMode
     {
-        get => _main.ResolveIcons;
-        set => _main.ResolveIcons = value;
+        get => _main.IconMode;
+        set { _main.IconMode = value; OnPropertyChanged(); }
     }
 
     public bool MinimizeToTray
@@ -253,8 +256,8 @@ public partial class SettingsViewModel : ObservableObject
                 case nameof(MainViewModel.ResolveItemNames):
                     OnPropertyChanged(nameof(ResolveItemNames));
                     break;
-                case nameof(MainViewModel.ResolveIcons):
-                    OnPropertyChanged(nameof(ResolveIcons));
+                case nameof(MainViewModel.IconMode):
+                    OnPropertyChanged(nameof(IconMode));
                     break;
                 case nameof(MainViewModel.MinimizeToTray):
                     OnPropertyChanged(nameof(MinimizeToTray));

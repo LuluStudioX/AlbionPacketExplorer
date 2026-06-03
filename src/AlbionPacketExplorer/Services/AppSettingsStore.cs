@@ -9,9 +9,20 @@ public enum DetailDensity
     Comfortable
 }
 
+/// <summary>How resolved item icons are handled.</summary>
+public enum IconCacheMode
+{
+    /// <summary>Don't show icons at all.</summary>
+    Off,
+    /// <summary>Fetch icons but keep them in memory only for the session (no disk writes).</summary>
+    Memory,
+    /// <summary>Fetch icons and cache them to disk for reuse across sessions.</summary>
+    Disk
+}
+
 public record AppSettings(
     bool ResolveItemNames = false,
-    bool ResolveIcons = false,
+    IconCacheMode IconMode = IconCacheMode.Disk,
     bool SidebarVisible = true,
     bool MinimizeToTray = false,
     bool IsDarkMode = true,
