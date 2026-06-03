@@ -11,6 +11,10 @@ public static class ViewConverters
     /// <summary>True when the bound value equals the converter parameter (string compare).</summary>
     public static readonly IValueConverter EqualsParam =
         new FuncValueConverter<string?, string?, bool>((v, p) => v == p);
+
+    /// <summary>True when the bound integer is zero (e.g. an empty collection count).</summary>
+    public static readonly IValueConverter IsZero =
+        new FuncValueConverter<int, bool>(n => n == 0);
 }
 
 public static class ParamSourceConverters

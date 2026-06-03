@@ -1,6 +1,7 @@
 <controls:ApxWindow xmlns="https://github.com/avaloniaui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
+                xmlns:views="clr-namespace:AlbionPacketExplorer.Views"
                 xmlns:vm="using:AlbionPacketExplorer.ViewModels"
                 xmlns:loc="using:AlbionPacketExplorer.Markup"
                 x:Class="AlbionPacketExplorer.Views.SettingsWindow"
@@ -9,7 +10,6 @@
                 Icon="/Assets/app-icon.ico"
                 Width="800" Height="640"
                 MinWidth="640" MinHeight="420"
-                MaxHeight="820"
                 CanResize="True"
                 WindowStartupLocation="CenterOwner">
 
@@ -402,7 +402,48 @@
                                         <TextBlock Text="{loc:T settings.paths.openInExplorer}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
+                                <Button Classes="ghost" Command="{Binding FindExistingIconsCommand}"
+                                        IsEnabled="{Binding IsScanningIcons, Converter={x:Static BoolConverters.Not}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <controls:ApxSpinner Width="12" Height="12" IsVisible="{Binding IsScanningIcons}" />
+                                        <Path Classes="icon sm" Data="{StaticResource Icon.Search}"
+                                              IsVisible="{Binding IsScanningIcons, Converter={x:Static BoolConverters.Not}}" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Text="{loc:T settings.paths.findIcons}"
+                                                   IsVisible="{Binding IsScanningIcons, Converter={x:Static BoolConverters.Not}}" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Text="{loc:T settings.paths.findIcons.scanning}"
+                                                   IsVisible="{Binding IsScanningIcons}" />
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
+
+                            <!-- Detected icon folders -->
+                            <TextBlock Text="{loc:T settings.paths.findIcons.none}"
+                                       Foreground="Gray" FontSize="11" Margin="0,4,0,0">
+                                <TextBlock.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="IconScanDone" />
+                                        <Binding Path="IconCandidates.Count" Converter="{x:Static views:ViewConverters.IsZero}" />
+                                    </MultiBinding>
+                                </TextBlock.IsVisible>
+                            </TextBlock>
+                            <ItemsControl ItemsSource="{Binding IconCandidates}" Margin="0,4,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                                            <SelectableTextBlock Grid.Column="0" Text="{Binding Path}"
+                                                                 FontFamily="Consolas,Monospace" FontSize="11"
+                                                                 VerticalAlignment="Center" TextWrapping="Wrap"
+                                                                 Foreground="{DynamicResource Apx.TextMuted}" />
+                                            <Button Grid.Column="1" Classes="ghost" Margin="8,0,0,0"
+                                                    Command="{Binding $parent[ItemsControl].DataContext.UseIconCandidateCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="{Binding IconCount, StringFormat='Use ({0})'}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </Border>
                 </StackPanel>
