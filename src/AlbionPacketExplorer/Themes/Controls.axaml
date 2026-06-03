@@ -509,5 +509,14 @@
     <Style Selector="DataGridRow:selected /template/ DataGridCellsPresenter">
         <Setter Property="Background" Value="{DynamicResource Apx.Selected}" />
     </Style>
+    <!-- Fluent paints the selected cell with its own accent; override to the Apx selected tint
+         (and keep a left accent bar for affordance) so selection follows the chosen theme. -->
+    <Style Selector="DataGridCell:selected">
+        <Setter Property="Background" Value="{DynamicResource Apx.Selected}" />
+        <Setter Property="Foreground" Value="{DynamicResource Apx.Text}" />
+    </Style>
+    <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
 
 </Styles>
