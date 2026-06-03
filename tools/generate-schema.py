@@ -20,11 +20,28 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 APX = Path(__file__).resolve().parents[1]
 OUT = APX / "src/AlbionPacketExplorer/Assets/packet-schema.base.json"
+
+# Bump when the schema's shape or curation method changes (not on routine SAT resyncs).
+SCHEMA_VERSION = "1"
+
+
+def sat_commit(sat: Path) -> str:
+    """Short SAT commit the schema was generated from; 'unknown' if git is unavailable."""
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(sat), "rev-parse", "--short", "HEAD"],
+            capture_output=True, text=True, timeout=10,
+        )
+        return out.stdout.strip() or "unknown"
+    except Exception:
+        return "unknown"
 
 
 def parse_enum(path: Path):
@@ -188,7 +205,14 @@ def main():
     events = parse_enum(eventcodes)
     ops = parse_enum(opcodes)
 
-    out = {}
+    # Provenance stamp (first key). Inert to PacketSchemaService: it only looks up by "KIND:code".
+    out = {
+        "$schemaMeta": {
+            "schemaVersion": SCHEMA_VERSION,
+            "satCommit": sat_commit(sat),
+            "generatedAt": datetime.now(timezone.utc).date().isoformat(),
+        }
+    }
     carried_ev = set()
     for ordinal, name in events:
         if name in EVENT_OVERRIDE:
