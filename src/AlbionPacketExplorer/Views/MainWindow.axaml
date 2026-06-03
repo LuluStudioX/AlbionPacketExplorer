@@ -38,11 +38,6 @@
                     </Button>
                 </StackPanel>
                 <controls:ApxSpinner Width="16" Height="16" IsVisible="{Binding IsLoading}" />
-                <TextBlock Text="{Binding StatusText}"
-                           VerticalAlignment="Center" FontSize="12"
-                           TextTrimming="CharacterEllipsis"
-                           ToolTip.Tip="{Binding StatusText}"
-                           Foreground="{DynamicResource Apx.Text}" />
             </StackPanel>
 
             <WrapPanel Orientation="Horizontal" Margin="6,4" VerticalAlignment="Center">
@@ -134,7 +129,17 @@
                         </Border>
                     </StackPanel>
                 </Border>
-                <views:CodeAggregatorView Grid.Row="3" DataContext="{Binding Aggregator}" />
+                <Panel Grid.Row="3">
+                    <views:CodeAggregatorView DataContext="{Binding Aggregator}" />
+                    <Border Background="{DynamicResource Apx.Surface}" Padding="16"
+                            IsHitTestVisible="False"
+                            IsVisible="{Binding !PacketList.HasData}">
+                        <TextBlock Text="{loc:T empty.byCode}"
+                                   Foreground="{DynamicResource Apx.TextFaint}"
+                                   FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </Panel>
             </Grid>
 
             <GridSplitter Grid.Column="1" ResizeDirection="Columns"
@@ -165,7 +170,14 @@
                             </Border>
                         </StackPanel>
                     </Border>
-                    <views:PacketListView x:Name="PacketListViewHost" DataContext="{Binding PacketList}" />
+                    <Panel>
+                        <views:PacketListView x:Name="PacketListViewHost" DataContext="{Binding PacketList}" />
+                        <controls:EmptyState Icon="{StaticResource Icon.Radio}"
+                                             Title="{loc:T empty.noData.title}"
+                                             Message="{loc:T empty.noData.message}"
+                                             IsHitTestVisible="False"
+                                             IsVisible="{Binding !PacketList.HasData}" />
+                    </Panel>
                 </DockPanel>
 
                 <GridSplitter Grid.Row="1" ResizeDirection="Rows"
@@ -183,7 +195,14 @@
                             </Border>
                         </StackPanel>
                     </Border>
-                    <views:PacketDetailView x:Name="PacketDetailViewHost" DataContext="{Binding PacketDetail}" />
+                    <Panel>
+                        <views:PacketDetailView x:Name="PacketDetailViewHost" DataContext="{Binding PacketDetail}" />
+                        <controls:EmptyState Icon="{StaticResource Icon.Eye}"
+                                             Title="{loc:T empty.noSelection.title}"
+                                             Message="{loc:T empty.noSelection.message}"
+                                             IsHitTestVisible="False"
+                                             IsVisible="{Binding !PacketDetail.HasPacket}" />
+                    </Panel>
                 </DockPanel>
             </Grid>
         </Grid>

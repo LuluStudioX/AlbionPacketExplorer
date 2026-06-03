@@ -11,6 +11,28 @@ public sealed class IconCacheService : IDisposable
 
     private static string DiskCacheDir => AppPaths.IconCacheDir;
 
+    /// <summary>Number of cached icon files on disk and their total byte size.</summary>
+    public static (int Count, long Bytes) GetDiskStats()
+    {
+        try
+        {
+            if (!Directory.Exists(DiskCacheDir)) return (0, 0);
+            var files = Directory.EnumerateFiles(DiskCacheDir, "*.png");
+            int count = 0;
+            long bytes = 0;
+            foreach (var f in files)
+            {
+                count++;
+                bytes += new FileInfo(f).Length;
+            }
+            return (count, bytes);
+        }
+        catch
+        {
+            return (0, 0);
+        }
+    }
+
     private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(10) };
     private readonly ConcurrentDictionary<string, Bitmap?> _memCache = new();
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
