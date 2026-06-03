@@ -4,4 +4,5 @@ public interface IFilePicker
 {
     Task<string?> PickJsonFileAsync();
     Task<string?> PickSaveJsonFileAsync(string suggestedName);
+    Task<string?> PickFolderAsync(string title);
 }

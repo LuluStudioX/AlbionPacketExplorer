@@ -29,10 +29,7 @@ public record AppSettings(
 
 public static class AppSettingsStore
 {
-    private static string FilePath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer",
-        "settings.json");
+    private static string FilePath => AppPaths.SettingsFile;
 
     public static AppSettings Load()
     {

@@ -34,10 +34,7 @@ public record LayoutState(
 
 public static class LayoutStore
 {
-    private static string FilePath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer",
-        "layout.json");
+    private static string FilePath => AppPaths.LayoutFile;
 
     public static LayoutState Load()
     {
