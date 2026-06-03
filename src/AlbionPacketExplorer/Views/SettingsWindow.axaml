@@ -30,6 +30,28 @@
                         <TextBlock Text="{loc:T settings.nav.display}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                <Button Name="NavCapture"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="Capture">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Radio}" />
+                        <TextBlock Text="{loc:T settings.nav.capture}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Name="NavShortcuts"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="Shortcuts">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Layers}" />
+                        <TextBlock Text="{loc:T settings.nav.shortcuts}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
                 <Button Name="NavPaths"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -119,19 +141,6 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="{loc:T settings.display.tray}" FontWeight="SemiBold" />
-                                <TextBlock Text="{loc:T settings.display.tray.desc}"
-                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
-                            </StackPanel>
-                            <ToggleSwitch Grid.Column="1"
-                                         IsChecked="{Binding MinimizeToTray}"
-                                         VerticalAlignment="Center" Margin="20,0,0,0" />
-                        </Grid>
-                    </Border>
-
-                    <Border Classes="card" Padding="16">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel Grid.Column="0" Spacing="3">
                                 <TextBlock Text="{loc:T settings.display.resolveIcons}" FontWeight="SemiBold" />
                                 <TextBlock Text="{loc:T settings.display.resolveIcons.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
@@ -159,6 +168,11 @@
                                          VerticalAlignment="Center" Margin="20,0,0,0" />
                         </Grid>
                     </Border>
+                </StackPanel>
+
+                <!-- Capture section -->
+                <StackPanel Name="SectionCapture" Spacing="12" IsVisible="False">
+                    <TextBlock Text="{loc:T settings.capture.title}" FontSize="18" FontWeight="SemiBold" />
 
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
@@ -187,6 +201,68 @@
                             <ToggleSwitch Grid.Column="1"
                                          IsChecked="{Binding AutoSaveLogs}"
                                          VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="{loc:T settings.display.tray}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.tray.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding MinimizeToTray}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Shortcuts section -->
+                <StackPanel Name="SectionShortcuts" Spacing="12" IsVisible="False">
+                    <TextBlock Text="{loc:T settings.nav.shortcuts}" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{loc:T settings.shortcuts.hint}"
+                               Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="{loc:T settings.shortcuts.sidebar}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.shortcuts.sidebar.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <controls:GestureCaptureBox Grid.Column="1"
+                                                        Gesture="{Binding SidebarToggleGesture, Mode=TwoWay}"
+                                                        MinWidth="120"
+                                                        VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="{loc:T settings.shortcuts.autoSelect}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.shortcuts.autoSelect.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <controls:GestureCaptureBox Grid.Column="1"
+                                                        Gesture="{Binding AutoSelectNewestGesture, Mode=TwoWay}"
+                                                        MinWidth="120"
+                                                        VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="{loc:T settings.shortcuts.rowExpand}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.shortcuts.rowExpand.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <controls:GestureCaptureBox Grid.Column="1"
+                                                        Gesture="{Binding ToggleRowExpandGesture, Mode=TwoWay}"
+                                                        MinWidth="120"
+                                                        VerticalAlignment="Center" Margin="20,0,0,0" />
                         </Grid>
                     </Border>
                 </StackPanel>

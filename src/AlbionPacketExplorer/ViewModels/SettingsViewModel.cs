@@ -63,6 +63,24 @@ public partial class SettingsViewModel : ObservableObject
         set { _main.Density = value; OnPropertyChanged(); }
     }
 
+    public string SidebarToggleGesture
+    {
+        get => _main.SidebarToggleGesture;
+        set { _main.SidebarToggleGesture = value; OnPropertyChanged(); }
+    }
+
+    public string AutoSelectNewestGesture
+    {
+        get => _main.AutoSelectNewestGesture;
+        set { _main.AutoSelectNewestGesture = value; OnPropertyChanged(); }
+    }
+
+    public string ToggleRowExpandGesture
+    {
+        get => _main.ToggleRowExpandGesture;
+        set { _main.ToggleRowExpandGesture = value; OnPropertyChanged(); }
+    }
+
     public string DataFolderPath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "AlbionPacketExplorer");

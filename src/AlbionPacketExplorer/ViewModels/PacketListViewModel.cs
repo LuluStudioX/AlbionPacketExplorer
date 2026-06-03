@@ -463,6 +463,34 @@ public partial class PacketListViewModel : ObservableObject
 
     private bool CanCopyRow() => SelectedRow != null;
 
+    // ── Status (Kind) quick-filter, surfaced in the filter sidebar ──────────────
+    // Counts are over the full source, independent of the active filter, so the
+    // sidebar always shows how many of each kind exist.
+    public int CountAll      => _allPackets.Count;
+    public int CountEvent    => _allPackets.Count(p => p.Kind == "EVENT");
+    public int CountRequest  => _allPackets.Count(p => p.Kind == "REQUEST");
+    public int CountResponse => _allPackets.Count(p => p.Kind == "RESPONSE");
+
+    [ObservableProperty] private string _activeStatusFilter = "All";
+
+    /// <summary>Sets the Kind scoped filter from the sidebar. "All" clears it.</summary>
+    public void SetStatusFilter(string status)
+    {
+        ActiveStatusFilter = status;
+        FilterKind = status == "All" ? string.Empty : status;
+    }
+
+    [RelayCommand]
+    private void FilterStatus(string status) => SetStatusFilter(status);
+
+    private void NotifyStatusCounts()
+    {
+        OnPropertyChanged(nameof(CountAll));
+        OnPropertyChanged(nameof(CountEvent));
+        OnPropertyChanged(nameof(CountRequest));
+        OnPropertyChanged(nameof(CountResponse));
+    }
+
     private void ApplyFilter()
     {
         var filtered = _allPackets.Where(_filter.Matches);
@@ -484,5 +512,6 @@ public partial class PacketListViewModel : ObservableObject
             ScrollToRowRequested?.Invoke(target);
         }
         OnPropertyChanged(nameof(CountText));
+        NotifyStatusCounts();
     }
 }
