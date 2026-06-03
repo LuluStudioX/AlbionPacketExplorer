@@ -233,6 +233,8 @@
   "settings.paths.itemCache": "Item Name Cache",
   "settings.paths.itemCache.desc": "Downloaded from public Albion data sources, refreshed every 7 days. Defaults to the App Data folder.",
   "settings.paths.itemCache.customNote": "Custom location set. The cache is normally kept inside the App Data folder; a separate folder means item data is downloaded and stored there instead.",
+  "settings.paths.iconCache": "Item Icon Cache",
+  "settings.paths.iconCache.desc": "Where downloaded item icons (PNGs) are stored when Item Icons is set to Disk. Point it at a folder that already holds Albion icons to reuse them.",
   "toast.path.moved.title": "Location Changed",
   "toast.path.moved.body": "Files moved to {0}",
   "toast.path.set.title": "Location Changed",

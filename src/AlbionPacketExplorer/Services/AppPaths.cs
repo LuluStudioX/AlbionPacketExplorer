@@ -31,7 +31,6 @@ public static class AppPaths
     public static string LastFilter       => Path.Combine(BaseDir, "filter-last.json");
     public static string RowHidden        => Path.Combine(BaseDir, "row-hidden.json");
     public static string RowHidePresets   => Path.Combine(BaseDir, "row-hide-presets.json");
-    public static string IconCacheDir     => Path.Combine(BaseDir, "icons");
     public static string LogsDir          => Path.Combine(BaseDir, "logs");
 
     /// <summary>The item-name cache. Defaults to the base folder; can be overridden separately.</summary>
@@ -39,6 +38,15 @@ public static class AppPaths
         string.IsNullOrWhiteSpace(_override.ItemCacheDir)
             ? Path.Combine(BaseDir, "items.json")
             : Path.Combine(_override.ItemCacheDir, "items.json");
+
+    /// <summary>The item-icon cache folder. Defaults to base/icons; can be overridden (e.g. to
+    /// reuse another app's already-downloaded Albion icons).</summary>
+    public static string IconCacheDir =>
+        string.IsNullOrWhiteSpace(_override.IconCacheDir)
+            ? Path.Combine(BaseDir, "icons")
+            : _override.IconCacheDir;
+
+    public static bool IconCacheIsCustom => !string.IsNullOrWhiteSpace(_override.IconCacheDir);
 
     /// <summary>Default folder where external Albion-traffic tools write their packet log.</summary>
     public static string DefaultLogFolder { get; } = Path.Combine(
@@ -150,6 +158,45 @@ public static class AppPaths
         catch (Exception ex) { error = ex.Message; return false; }
     }
 
+    /// <summary>
+    /// Overrides the icon cache folder. When <paramref name="migrate"/> is set the existing icon
+    /// PNGs are copied to the new folder. Empty/default clears the override. Pointing at a folder
+    /// that already holds icons (e.g. another app's cache) lets them be reused as-is.
+    /// </summary>
+    public static bool SetIconCacheDir(string? folder, bool migrate, out string? error)
+    {
+        error = null;
+        try
+        {
+            var oldDir = IconCacheDir;
+            var dir = string.IsNullOrWhiteSpace(folder) ? null : Path.GetFullPath(folder.Trim());
+            if (string.Equals(dir, Path.Combine(BaseDir, "icons"), StringComparison.OrdinalIgnoreCase)) dir = null;
+
+            if (dir != null) Directory.CreateDirectory(dir);
+
+            var migrateFrom = oldDir;
+            _override = _override with { IconCacheDir = dir };
+            SaveOverride();
+
+            if (migrate && Directory.Exists(migrateFrom) &&
+                !string.Equals(migrateFrom, IconCacheDir, StringComparison.OrdinalIgnoreCase))
+            {
+                Directory.CreateDirectory(IconCacheDir);
+                foreach (var file in Directory.EnumerateFiles(migrateFrom, "*.png"))
+                {
+                    var dst = Path.Combine(IconCacheDir, Path.GetFileName(file));
+                    File.Copy(file, dst, overwrite: true);
+                    // Verify the copy before removing the original, then move (not duplicate).
+                    if (File.Exists(dst)) TryDelete(file);
+                }
+                // Remove the now-empty source folder so nothing is left behind.
+                TryDeleteDir(migrateFrom);
+            }
+            return true;
+        }
+        catch (Exception ex) { error = ex.Message; return false; }
+    }
+
     // Copy everything to the new location and verify each file landed before deleting any
     // original, so a failure mid-move never destroys data. Throws if any copy fails or a
     // destination cannot be verified; the caller reports it and leaves the override unchanged.
@@ -196,7 +243,8 @@ public static class AppPaths
         Directory.CreateDirectory(DefaultBaseDir);
         if (string.IsNullOrWhiteSpace(_override.BaseDir) &&
             string.IsNullOrWhiteSpace(_override.LogFolder) &&
-            string.IsNullOrWhiteSpace(_override.ItemCacheDir))
+            string.IsNullOrWhiteSpace(_override.ItemCacheDir) &&
+            string.IsNullOrWhiteSpace(_override.IconCacheDir))
         {
             TryDelete(LocationFile);
             return;
@@ -220,5 +268,6 @@ public static class AppPaths
     private sealed record LocationOverride(
         string? BaseDir = null,
         string? LogFolder = null,
-        string? ItemCacheDir = null);
+        string? ItemCacheDir = null,
+        string? IconCacheDir = null);
 }

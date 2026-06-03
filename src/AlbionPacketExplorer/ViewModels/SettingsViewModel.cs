@@ -96,13 +96,17 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _satPacketSnifferPath = AppPaths.AlbionLogFolder;
     [ObservableProperty] private string _itemCachePath = AppPaths.ItemCache;
     [ObservableProperty] private bool _itemCacheIsCustom = AppPaths.ItemCacheIsCustom;
+    [ObservableProperty] private string _iconCachePath = AppPaths.IconCacheDir;
+    [ObservableProperty] private bool _iconCacheIsCustom = AppPaths.IconCacheIsCustom;
 
     [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task ChangeDataFolderAsync()
     {
         var folder = await _main.FilePicker.PickFolderAsync("Choose data folder");
         if (string.IsNullOrWhiteSpace(folder)) return;
-        if (AppPaths.Relocate(folder, migrate: true, out var error))
+        string? error = null;
+        var ok = await Task.Run(() => AppPaths.Relocate(folder, migrate: true, out error));
+        if (ok)
         {
             RefreshPaths();
             _main.ToastManager.Show(Loc.T("toast.path.moved.title"),
@@ -132,11 +136,33 @@ public partial class SettingsViewModel : ObservableObject
     {
         var folder = await _main.FilePicker.PickFolderAsync("Choose item cache folder");
         if (string.IsNullOrWhiteSpace(folder)) return;
-        if (AppPaths.SetItemCacheDir(folder, migrate: true, out var error))
+        string? error = null;
+        var ok = await Task.Run(() => AppPaths.SetItemCacheDir(folder, migrate: true, out error));
+        if (ok)
         {
             RefreshPaths();
             _main.ToastManager.Show(Loc.T("toast.path.moved.title"),
                 Loc.Format("toast.path.moved.body", AppPaths.ItemCache), ToastSeverity.Success);
+        }
+        else
+            ReportPathError(error);
+    }
+
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task ChangeIconCacheFolderAsync()
+    {
+        var folder = await _main.FilePicker.PickFolderAsync("Choose icon cache folder");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+
+        // The icon cache can hold thousands of files; move it off the UI thread so the window
+        // stays responsive while migrating.
+        string? error = null;
+        var ok = await Task.Run(() => AppPaths.SetIconCacheDir(folder, migrate: true, out error));
+        if (ok)
+        {
+            RefreshPaths();
+            _main.ToastManager.Show(Loc.T("toast.path.set.title"),
+                Loc.Format("toast.path.set.body", AppPaths.IconCacheDir), ToastSeverity.Success);
         }
         else
             ReportPathError(error);
@@ -152,6 +178,8 @@ public partial class SettingsViewModel : ObservableObject
         SatPacketSnifferPath = AppPaths.AlbionLogFolder;
         ItemCachePath = AppPaths.ItemCache;
         ItemCacheIsCustom = AppPaths.ItemCacheIsCustom;
+        IconCachePath = AppPaths.IconCacheDir;
+        IconCacheIsCustom = AppPaths.IconCacheIsCustom;
     }
 
     [RelayCommand]
@@ -162,6 +190,9 @@ public partial class SettingsViewModel : ObservableObject
 
     [RelayCommand]
     private void OpenItemCacheFolder() => OpenInExplorer(Path.GetDirectoryName(ItemCachePath) ?? DataFolderPath);
+
+    [RelayCommand]
+    private void OpenIconCacheFolder() => OpenInExplorer(IconCachePath);
 
     private static void OpenInExplorer(string path)
     {
