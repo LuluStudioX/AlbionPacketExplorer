@@ -140,6 +140,45 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     /// <summary>True when a packet is selected (drives the detail empty-state overlay).</summary>
     public bool HasPacket => Packet != null;
 
+    // ── Photon response status (RESPONSE packets carry OperationResponse.ReturnCode +
+    //    DebugMessage in framing; surfaced here as a banner above the param grid). ──
+    public bool HasResponseStatus => Packet?.HasResponseStatus == true;
+    public bool ReturnCodeIsError => Packet?.ReturnCode is { } rc && rc != 0;
+    public string ReturnCodeText =>
+        Packet?.ReturnCode is { } rc ? (rc == 0 ? Loc.Format("detail.returnCode.ok", rc) : rc.ToString()) : string.Empty;
+    public bool HasDebugMessage => !string.IsNullOrEmpty(Packet?.DebugMessage);
+    public string DebugMessageText => Packet?.DebugMessage ?? string.Empty;
+
+    // ── REQUEST/RESPONSE correlation (pair navigation). ──
+    public bool HasCorrelation => Packet?.Correlated != null;
+
+    /// <summary>Label for the paired packet, e.g. "RESPONSE 56  LeaveResponse  ReturnCode 0 (OK)".</summary>
+    public string CorrelatedLabel
+    {
+        get
+        {
+            if (Packet?.Correlated is not { } c) return string.Empty;
+            var name = Network.PacketNameResolver.Resolve(c.Kind, c.Code);
+            var label = string.IsNullOrEmpty(name) ? $"{c.Kind} {c.Code}" : $"{c.Kind} {c.Code}  {name}";
+            if (c.ReturnCode is { } rc)
+                label += $"  {(rc == 0 ? Loc.Format("detail.returnCode.ok", rc) : rc.ToString())}";
+            return label;
+        }
+    }
+
+    /// <summary>True when the banner has anything to show (response status and/or a paired packet).</summary>
+    public bool HasBanner => HasResponseStatus || HasCorrelation;
+
+    /// <summary>Raised when the user clicks through to the paired REQUEST/RESPONSE packet.</summary>
+    public event Action<PacketEntry>? CorrelatedPacketRequested;
+
+    [RelayCommand]
+    private void GoToCorrelated()
+    {
+        if (Packet?.Correlated is { } c)
+            CorrelatedPacketRequested?.Invoke(c);
+    }
+
     /// <summary>Rows that resolved to one or more item names (for the Resolved tab).</summary>
     public IEnumerable<ParamRow> ResolvedRows => Rows.Where(r => r.IsVisible && r.HasResolved);
     public bool HasAnyResolved => Rows.Any(r => r.HasResolved);
@@ -150,14 +189,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         get
         {
             if (Packet is not { } p) return string.Empty;
-            return System.Text.Json.JsonSerializer.Serialize(new
-            {
-                ts = p.Timestamp,
-                kind = p.Kind,
-                code = p.Code,
-                @params = p.Params.ToDictionary(kv => kv.Key,
-                    kv => new { type = kv.Value.Type, value = kv.Value.Value })
-            }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            return System.Text.Json.JsonSerializer.Serialize(PacketWire.ToJsonShape(p),
+                new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
         }
     }
 
@@ -235,6 +268,14 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(FilterResolved));
         OnPropertyChanged(nameof(RawJson));
         OnPropertyChanged(nameof(HasPacket));
+        OnPropertyChanged(nameof(HasResponseStatus));
+        OnPropertyChanged(nameof(ReturnCodeIsError));
+        OnPropertyChanged(nameof(ReturnCodeText));
+        OnPropertyChanged(nameof(HasDebugMessage));
+        OnPropertyChanged(nameof(DebugMessageText));
+        OnPropertyChanged(nameof(HasCorrelation));
+        OnPropertyChanged(nameof(CorrelatedLabel));
+        OnPropertyChanged(nameof(HasBanner));
         RebuildRows();
     }
 
