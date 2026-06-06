@@ -77,18 +77,20 @@ public sealed class PacketFilter
         var name      = PacketNameResolver.Resolve(p.Kind, p.Code);
         var paramStr  = PacketDisplayFormatter.FormatParamSummary(p);
         var resolved  = p.ResolvedSummary ?? string.Empty;
+        var paired    = p.Correlated != null;
+        var returnCode = p.ReturnCode;
 
         // Exclusions first — reject early
         foreach (var t in _exclusions)
         {
-            if (ColumnMatches(t.Col, t.Term, kind, codeStr, name, paramStr, resolved))
+            if (ColumnMatches(t.Col, t.Term, kind, codeStr, name, paramStr, resolved, paired, returnCode))
                 return false;
         }
 
         // Inclusions — ALL must match (AND semantics across tokens)
         foreach (var t in _inclusions)
         {
-            if (!ColumnMatches(t.Col, t.Term, kind, codeStr, name, paramStr, resolved))
+            if (!ColumnMatches(t.Col, t.Term, kind, codeStr, name, paramStr, resolved, paired, returnCode))
                 return false;
         }
 
@@ -114,18 +116,34 @@ public sealed class PacketFilter
     }
 
     private static bool ColumnMatches(string? col, string term,
-        string kind, string codeStr, string name, string paramStr, string resolved)
+        string kind, string codeStr, string name, string paramStr, string resolved,
+        bool paired, int? returnCode)
         => col switch
         {
             "kind"   => kind.Contains(term, StringComparison.OrdinalIgnoreCase),
             "code"   => codeStr == term,
             "name"   => name.Contains(term, StringComparison.OrdinalIgnoreCase),
             "params" => ParamMatches(term, paramStr, resolved),
+            // paired:yes|no — has a correlated request/response partner.
+            "paired" => IsAffirmative(term) ? paired : IsNegative(term) ? !paired : false,
+            // failed:yes — response with non-zero ReturnCode; failed:no — a successful response.
+            // Both are response-scoped: events/requests (no ReturnCode) match neither.
+            "failed" => IsAffirmative(term) ? returnCode is { } rc1 && rc1 != 0
+                      : IsNegative(term)    ? returnCode is { } rc0 && rc0 == 0
+                      : false,
+            // returncode:N — exact Photon ReturnCode match (responses only).
+            "returncode" => returnCode?.ToString() == term,
             _        => kind.Contains(term, StringComparison.OrdinalIgnoreCase)
                      || codeStr == term
                      || name.Contains(term, StringComparison.OrdinalIgnoreCase)
                      || ParamMatches(term, paramStr, resolved),
         };
+
+    private static bool IsAffirmative(string t) =>
+        t is "yes" or "true" or "1" or "y";
+
+    private static bool IsNegative(string t) =>
+        t is "no" or "false" or "0" or "n";
 }
 
 public partial class PacketListViewModel : ObservableObject
