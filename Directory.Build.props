@@ -6,6 +6,18 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <!-- Assembly / product metadata (stamped into every assembly; Version stays MinVer-driven).
+       License is intentionally omitted here while it is being finalised (GPL-3.0 pending). -->
+  <PropertyGroup>
+    <Product>AlbionPacketExplorer</Product>
+    <Authors>LuluStudioX</Authors>
+    <Company>LuluStudioX</Company>
+    <Description>Cross-platform desktop tool for decoding and exploring Albion Online network packets from SAT's packet_sniffer.json.</Description>
+    <Copyright>Copyright (c) 2026 LuluStudioX</Copyright>
+    <RepositoryUrl>https://github.com/LuluStudioX/AlbionPacketExplorer</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
   <!-- Version derived automatically from the nearest annotated git tag (e.g. v0.2.0).
        Never set Version/AssemblyVersion/FileVersion manually — create a git tag instead.
        Between tags: 0.2.1-alpha.0.<commits-since-tag> + commit hash in InformationalVersion. -->
