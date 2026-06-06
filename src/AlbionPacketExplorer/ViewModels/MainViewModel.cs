@@ -36,6 +36,7 @@ public partial class MainViewModel : ObservableObject
     private CaptureSession? _session;
     private readonly List<PacketEntry> _capturedPackets = [];
     private readonly List<PacketEntry> _allPackets = [];
+    private readonly PacketCorrelator _correlator = new();
 
     public bool ResolveItemNames
     {
@@ -211,6 +212,7 @@ public partial class MainViewModel : ObservableObject
         _filePicker = filePicker;
         _toasts = toasts;
         _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore);
+        _packetDetail.CorrelatedPacketRequested += PacketList.SelectPacket;
         PacketList.Configure(_gameData, false);
         PacketList.LoadPersistedState();
 
@@ -389,15 +391,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var opts = new JsonSerializerOptions { WriteIndented = true };
-            var payload = _allPackets.Select(p => new
-            {
-                ts = p.Timestamp,
-                kind = p.Kind,
-                code = p.Code,
-                @params = p.Params.ToDictionary(
-                    kv => kv.Key,
-                    kv => new { type = kv.Value.Type, value = kv.Value.Value })
-            });
+            var payload = _allPackets.Select(PacketWire.ToJsonShape);
 
             await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             await JsonSerializer.SerializeAsync(stream, payload, opts);
@@ -428,6 +422,7 @@ public partial class MainViewModel : ObservableObject
             await foreach (var packet in reader.ReadAsync(path, progress))
             {
                 Aggregator.Ingest(packet);
+                _correlator.Observe(packet);
                 loaded.Add(packet);
             }
 
@@ -461,6 +456,7 @@ public partial class MainViewModel : ObservableObject
         _capturedPackets.Add(packet);
         _allPackets.Add(packet);
         Aggregator.Ingest(packet);
+        _correlator.Observe(packet);
         PacketList.AddLivePacket(packet);
 
         if (_capturedPackets.Count % 100 == 0)
@@ -471,6 +467,7 @@ public partial class MainViewModel : ObservableObject
     {
         _capturedPackets.Clear();
         _allPackets.Clear();
+        _correlator.Reset();
         Aggregator.Reset();
         PacketList.SetSource([]);
         PacketDetail.Packet = null;
@@ -491,15 +488,7 @@ public partial class MainViewModel : ObservableObject
             Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, $"packets_{DateTime.Now:yyyyMMdd_HHmmss}.json");
             var opts = new JsonSerializerOptions { WriteIndented = false };
-            var payload = _allPackets.Select(p => new
-            {
-                ts = p.Timestamp,
-                kind = p.Kind,
-                code = p.Code,
-                @params = p.Params.ToDictionary(
-                    kv => kv.Key,
-                    kv => new { type = kv.Value.Type, value = kv.Value.Value })
-            });
+            var payload = _allPackets.Select(PacketWire.ToJsonShape);
             await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None,
                 bufferSize: 65536, useAsync: true);
             await JsonSerializer.SerializeAsync(stream, payload, opts);
