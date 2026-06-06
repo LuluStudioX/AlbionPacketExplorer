@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Velopack;
 using Velopack.Sources;
 
@@ -11,7 +12,23 @@ public sealed class UpdateService
 
     public UpdateService()
     {
-        _mgr = new UpdateManager(new GithubSource(GithubRepo, null, false));
+        // Each platform/arch is packed under its own Velopack channel (win-x64, linux-x64,
+        // osx-x64, osx-arm64) so the four release jobs no longer overwrite each other's
+        // identically-named assets. The updater must therefore ask for the channel that matches
+        // the running RID rather than Velopack's OS-only default.
+        _mgr = new UpdateManager(
+            new GithubSource(GithubRepo, null, false),
+            new UpdateOptions { ExplicitChannel = CurrentChannel() });
+    }
+
+    // os-arch channel id, matching the --channel passed to `vpk pack` in the release workflow.
+    private static string CurrentChannel()
+    {
+        var os = OperatingSystem.IsWindows() ? "win"
+               : OperatingSystem.IsMacOS()   ? "osx"
+               :                               "linux";
+        var arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "x64";
+        return $"{os}-{arch}";
     }
 
     // Returns the new version string if an update is available, null otherwise.
