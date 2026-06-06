@@ -37,6 +37,8 @@ jobs:
         run: >
           vpk pack
           --packId AlbionPacketExplorer
+          --packTitle "Albion Packet Explorer"
+          --packAuthors LuluStudioX
           --packVersion ${{ env.PACK_VERSION }}
           --packDir publish/win-x64
           --mainExe AlbionPacketExplorer.exe
@@ -80,11 +82,14 @@ jobs:
         run: >
           vpk pack
           --packId AlbionPacketExplorer
+          --packTitle "Albion Packet Explorer"
+          --packAuthors LuluStudioX
           --packVersion ${{ env.PACK_VERSION }}
           --packDir publish/linux-x64
           --mainExe AlbionPacketExplorer
           --outputDir releases/linux-x64
           --channel linux-x64
+          --icon src/AlbionPacketExplorer/Assets/app-icon.png
 
       - uses: actions/upload-artifact@v7
         with:
@@ -122,6 +127,8 @@ jobs:
         run: >
           vpk pack
           --packId AlbionPacketExplorer
+          --packTitle "Albion Packet Explorer"
+          --packAuthors LuluStudioX
           --packVersion ${{ env.PACK_VERSION }}
           --packDir publish/osx-x64
           --mainExe AlbionPacketExplorer
@@ -164,6 +171,8 @@ jobs:
         run: >
           vpk pack
           --packId AlbionPacketExplorer
+          --packTitle "Albion Packet Explorer"
+          --packAuthors LuluStudioX
           --packVersion ${{ env.PACK_VERSION }}
           --packDir publish/osx-arm64
           --mainExe AlbionPacketExplorer
