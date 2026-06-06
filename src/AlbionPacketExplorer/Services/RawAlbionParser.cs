@@ -38,15 +38,17 @@ public sealed class RawAlbionParser : PhotonParser, IPhotonReceiver
     {
         short opCode = ReadPhotonCode(parameters, 253);
         if (opCode < 0) opCode = operationCode;
-        PacketReceived?.Invoke(BuildEntry("RESPONSE", opCode, parameters));
+        PacketReceived?.Invoke(BuildEntry("RESPONSE", opCode, parameters, returnCode, debugMessage));
     }
 
-    private static PacketEntry BuildEntry(string kind, short code, Dictionary<byte, object> parameters)
+    private static PacketEntry BuildEntry(string kind, short code, Dictionary<byte, object> parameters,
+        short? returnCode = null, string? debugMessage = null)
     {
         var @params = new Dictionary<string, ParamValue>(parameters.Count);
         foreach (var (k, v) in parameters)
             @params[k.ToString()] = new ParamValue(GetTypeName(v), v);
-        return new PacketEntry(DateTime.UtcNow, kind, code, @params);
+        return new PacketEntry(DateTime.UtcNow, kind, code, @params,
+            returnCode, string.IsNullOrEmpty(debugMessage) ? null : debugMessage);
     }
 
     private static short ReadPhotonCode(Dictionary<byte, object> parameters, byte key)
