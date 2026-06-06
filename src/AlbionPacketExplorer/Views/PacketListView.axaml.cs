@@ -1,5 +1,8 @@
+using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
+using AlbionPacketExplorer.Services;
 using AlbionPacketExplorer.ViewModels;
 
 namespace AlbionPacketExplorer.Views;
@@ -30,5 +33,19 @@ public partial class PacketListView : UserControl
             MainGrid.SelectedItem = row;
             MainGrid.ScrollIntoView(row, null);
         }, DispatcherPriority.Background);
+    }
+
+    // Diff the two selected packets. The DataGrid's SelectedItems is not bindable, so the
+    // selection is read here and handed to the view model in pick order.
+    private void OnDiffSelectedClick(object? sender, RoutedEventArgs e)
+    {
+        if (_vm == null) return;
+        var picked = MainGrid.SelectedItems.OfType<PacketRow>().ToList();
+        if (picked.Count != 2)
+        {
+            _vm.Toasts?.Show(Loc.T("toast.diff.title"), Loc.T("toast.diff.needTwo"), ToastSeverity.Info);
+            return;
+        }
+        _vm.RequestDiff(picked[0].Packet, picked[1].Packet);
     }
 }

@@ -63,6 +63,7 @@
 
         <DataGrid x:Name="MainGrid" ItemsSource="{Binding Packets}"
                   SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                  SelectionMode="Extended"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserSortColumns="True"
@@ -83,6 +84,8 @@
                 <ContextMenu>
                     <MenuItem Header="{loc:T list.menu.copyParams}"   Command="{Binding CopyParamSummaryCommand}" />
                     <MenuItem Header="{loc:T list.menu.copyJson}"  Command="{Binding CopyAsJsonCommand}" />
+                    <Separator />
+                    <MenuItem Header="{loc:T list.menu.diffSelected}" Click="OnDiffSelectedClick" />
                     <Separator />
                     <MenuItem Header="{loc:T list.menu.unknownFirst}"
                               IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}"

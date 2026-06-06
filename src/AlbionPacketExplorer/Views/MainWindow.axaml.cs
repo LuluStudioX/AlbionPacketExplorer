@@ -112,6 +112,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.PacketDetail.Toasts = vm.ToastManager;
             vm.PacketDetail.EditParamRequested += OnEditParamRequested;
             vm.PacketDetail.ViewFullValueRequested += OnViewFullValueRequested;
+            vm.PacketList.DiffRequested += OnDiffRequested;
             vm.PropertyChanged += OnViewModelPropertyChanged;
             vm.ShortcutsChanged += ApplyShortcuts;
             vm.OpenSettingsSectionRequested += OpenSettings;
@@ -314,6 +315,13 @@ public partial class MainWindow : ApxWindow, IFilePicker
     private void OnViewFullValueRequested(ParamRow row, Services.GameDataService gameData)
     {
         var win = new ExpandedValueWindow(row, gameData);
+        win.Show(this);
+    }
+
+    private void OnDiffRequested(Models.PacketEntry left, Models.PacketEntry right)
+    {
+        if (DataContext is not MainViewModel vm) return;
+        var win = new PacketDiffWindow(left, right, vm.Schema);
         win.Show(this);
     }
 
