@@ -120,6 +120,24 @@ public sealed class ParamRow : ObservableObject
     }
 }
 
+/// <summary>
+/// One param key compared across a REQUEST/RESPONSE pair. <see cref="Status"/> drives the row
+/// tint: "response" (server-added, the fields a response constructor must model) is the payoff.
+/// </summary>
+public sealed class ParamDiffRow
+{
+    public required string Key { get; init; }
+    public required string Name { get; init; }
+    public string KeyDisplay => string.IsNullOrEmpty(Name) ? Key : $"{Key}  {Name}";
+    public required string RequestValue { get; init; }
+    public required string ResponseValue { get; init; }
+    public required string Status { get; init; }   // same | changed | request | response
+
+    public bool IsResponseOnly => Status == "response";
+    public bool IsRequestOnly  => Status == "request";
+    public bool IsChanged      => Status == "changed";
+}
+
 public partial class PacketDetailViewModel : ObservableObject, IDisposable
 {
     private readonly GameDataService _gameData;
@@ -130,6 +148,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
     [ObservableProperty] private PacketEntry? _packet;
     [ObservableProperty] private ObservableCollection<ParamRow> _rows = [];
+    [ObservableProperty] private ObservableCollection<ParamDiffRow> _diffRows = [];
     [ObservableProperty] private bool _resolveItemNames;
     [ObservableProperty] private IconCacheMode _iconMode = IconCacheMode.Disk;
 
@@ -168,6 +187,48 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
     /// <summary>True when the banner has anything to show (response status and/or a paired packet).</summary>
     public bool HasBanner => HasResponseStatus || HasCorrelation;
+
+    // ── REQUEST vs RESPONSE field diff (populates the Diff tab when a pair exists). ──
+    public bool HasDiff => HasCorrelation;
+
+    /// <summary>Builds the param diff for the current packet's pair, REQUEST on the left.</summary>
+    private void BuildDiff()
+    {
+        if (Packet?.Correlated is not { } partner)
+        {
+            DiffRows = [];
+            return;
+        }
+
+        var (request, response) = Packet.Kind == "REQUEST" ? (Packet, partner) : (partner, Packet);
+
+        // Drop the op-code echo key (transport, not payload) so it never shows as a diff row.
+        var keys = request.Params.Keys
+            .Union(response.Params.Keys)
+            .Where(k => k != "253")
+            .OrderBy(k => int.TryParse(k, out var n) ? n : int.MaxValue);
+
+        var rows = new List<ParamDiffRow>();
+        foreach (var key in keys)
+        {
+            request.Params.TryGetValue(key, out var a);
+            response.Params.TryGetValue(key, out var b);
+            var va = a is null ? string.Empty : PacketDisplayFormatter.FormatParamValue(a);
+            var vb = b is null ? string.Empty : PacketDisplayFormatter.FormatParamValue(b);
+            var status = a is null ? "response"
+                       : b is null ? "request"
+                       : va == vb  ? "same"
+                       :             "changed";
+            var name = _schema.GetParam("REQUEST", request.Code, key)?.Name
+                     ?? _schema.GetParam("RESPONSE", response.Code, key)?.Name
+                     ?? string.Empty;
+            rows.Add(new ParamDiffRow
+            {
+                Key = key, Name = name, RequestValue = va, ResponseValue = vb, Status = status,
+            });
+        }
+        DiffRows = new ObservableCollection<ParamDiffRow>(rows);
+    }
 
     /// <summary>Raised when the user clicks through to the paired REQUEST/RESPONSE packet.</summary>
     public event Action<PacketEntry>? CorrelatedPacketRequested;
@@ -276,6 +337,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HasCorrelation));
         OnPropertyChanged(nameof(CorrelatedLabel));
         OnPropertyChanged(nameof(HasBanner));
+        OnPropertyChanged(nameof(HasDiff));
+        BuildDiff();
         RebuildRows();
     }
 
