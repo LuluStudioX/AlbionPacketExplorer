@@ -9,15 +9,38 @@ namespace AlbionPacketExplorer.Services;
 /// </summary>
 public static class AppPaths
 {
-    private const string AppFolderName = "AlbionPacketExplorer";
+    // Velopack installs the app into %LocalAppData%\<PackId> (PackId == "AlbionPacketExplorer").
+    // App DATA must live in a SEPARATE folder: when it shared that directory, our logs/icons
+    // blocked Velopack's install/repair/uninstall ("failed to remove existing application
+    // directory"). Data now lives in a sibling folder and is migrated out of the legacy location.
+    private const string AppFolderName = "AlbionPacketExplorerData";
+    private const string LegacyAppFolderName = "AlbionPacketExplorer"; // == Velopack install dir
+
+    /// <summary>File names that belong to the app and are moved when the base is relocated.</summary>
+    private static readonly string[] DataFileNames =
+    [
+        "settings.json", "layout.json", "filter-presets.json", "filter-last.json",
+        "row-hidden.json", "row-hide-presets.json", "items.json", "packet-schema.user.json"
+    ];
+
+    private static readonly string[] DataSubDirs = ["icons", "logs", "lang"];
 
     /// <summary>The fixed default base, used when no override is set. Always under LocalAppData.</summary>
     public static string DefaultBaseDir { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         AppFolderName);
 
+    /// <summary>The pre-relocation data folder, which is also Velopack's install directory.</summary>
+    private static string LegacyBaseDir { get; } = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        LegacyAppFolderName);
+
     // The pointer to a relocated base lives at the fixed default, never inside the (movable) base.
     private static string LocationFile => Path.Combine(DefaultBaseDir, "location.json");
+
+    // One-time move of our data out of the Velopack-managed legacy folder. Runs before the override
+    // is loaded so a relocated location.json is read from the new base.
+    private static readonly bool _migrated = MigrateLegacyBaseIfNeeded();
 
     private static LocationOverride _override = LoadOverride();
 
@@ -31,6 +54,8 @@ public static class AppPaths
     public static string LastFilter       => Path.Combine(BaseDir, "filter-last.json");
     public static string RowHidden        => Path.Combine(BaseDir, "row-hidden.json");
     public static string RowHidePresets   => Path.Combine(BaseDir, "row-hide-presets.json");
+    public static string UserSchema       => Path.Combine(BaseDir, "packet-schema.user.json");
+    public static string LangDir          => Path.Combine(BaseDir, "lang");
     public static string LogsDir          => Path.Combine(BaseDir, "logs");
 
     /// <summary>The item-name cache. Defaults to the base folder; can be overridden separately.</summary>
@@ -58,15 +83,6 @@ public static class AppPaths
         string.IsNullOrWhiteSpace(_override.LogFolder) ? DefaultLogFolder : _override.LogFolder;
 
     public static bool ItemCacheIsCustom => !string.IsNullOrWhiteSpace(_override.ItemCacheDir);
-
-    /// <summary>File names that belong to the app and are moved when the base is relocated.</summary>
-    private static readonly string[] DataFileNames =
-    [
-        "settings.json", "layout.json", "filter-presets.json", "filter-last.json",
-        "row-hidden.json", "row-hide-presets.json", "items.json"
-    ];
-
-    private static readonly string[] DataSubDirs = ["icons", "logs"];
 
     private static LocationOverride LoadOverride()
     {
@@ -234,6 +250,69 @@ public static class AppPaths
         // All copies verified: now remove the originals.
         foreach (var (src, _) in copied) TryDelete(src);
         foreach (var sub in DataSubDirs) TryDeleteDir(Path.Combine(from, sub));
+    }
+
+    // One-time relocation of app data out of the Velopack-managed install folder (see AppFolderName
+    // remarks). Best-effort: any failure leaves data where it is and the app still runs.
+    private static bool MigrateLegacyBaseIfNeeded()
+    {
+        try
+        {
+            if (string.Equals(DefaultBaseDir, LegacyBaseDir, StringComparison.OrdinalIgnoreCase))
+                return false;
+            // New base already initialised (migrated earlier, or fresh install): nothing to do.
+            if (File.Exists(Path.Combine(DefaultBaseDir, "settings.json"))) return false;
+
+            var legacyHasData =
+                File.Exists(Path.Combine(LegacyBaseDir, "location.json")) ||
+                DataFileNames.Any(n => File.Exists(Path.Combine(LegacyBaseDir, n))) ||
+                DataSubDirs.Any(d => Directory.Exists(Path.Combine(LegacyBaseDir, d)));
+            if (!legacyHasData) return false;
+
+            Directory.CreateDirectory(DefaultBaseDir);
+            foreach (var name in DataFileNames)
+                TryMoveFile(Path.Combine(LegacyBaseDir, name), Path.Combine(DefaultBaseDir, name));
+            TryMoveFile(Path.Combine(LegacyBaseDir, "location.json"),
+                        Path.Combine(DefaultBaseDir, "location.json"));
+            foreach (var sub in DataSubDirs)
+                TryMoveDir(Path.Combine(LegacyBaseDir, sub), Path.Combine(DefaultBaseDir, sub));
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static void TryMoveFile(string src, string dst)
+    {
+        try
+        {
+            if (!File.Exists(src)) return;
+            File.Copy(src, dst, overwrite: true);
+            if (File.Exists(dst)) TryDelete(src);
+        }
+        catch { }
+    }
+
+    // Prefer an atomic rename (instant, same volume); fall back to per-file copy if the destination
+    // already exists.
+    private static void TryMoveDir(string srcDir, string dstDir)
+    {
+        try
+        {
+            if (!Directory.Exists(srcDir)) return;
+            if (!Directory.Exists(dstDir))
+            {
+                Directory.Move(srcDir, dstDir);
+                return;
+            }
+            foreach (var file in Directory.EnumerateFiles(srcDir))
+            {
+                var dst = Path.Combine(dstDir, Path.GetFileName(file));
+                try { File.Copy(file, dst, overwrite: true); if (File.Exists(dst)) TryDelete(file); }
+                catch { }
+            }
+            TryDeleteDir(srcDir);
+        }
+        catch { }
     }
 
     private static void SaveOverride()

@@ -144,7 +144,6 @@ public sealed class LocalizationService
         return culture.Contains('.') ? null : culture;
     }
 
-    private static string OverrideDir => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "lang");
+    // Drop-in translations live under the relocatable data folder, not Velopack's install dir.
+    private static string OverrideDir => AppPaths.LangDir;
 }
