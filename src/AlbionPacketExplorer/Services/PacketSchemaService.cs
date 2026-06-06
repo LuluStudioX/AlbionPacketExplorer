@@ -19,9 +19,9 @@ public sealed class PacketTypeSchema
 
 public sealed class PacketSchemaService
 {
-    private static readonly string UserFilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "AlbionPacketExplorer", "packet-schema.user.json");
+    // Routed through AppPaths so it lives in the relocatable data folder, never inside Velopack's
+    // install directory (which would block install/repair/uninstall).
+    private static string UserFilePath => AppPaths.UserSchema;
 
     private Dictionary<string, PacketTypeSchema> _base = new();
     private Dictionary<string, PacketTypeSchema> _user = new();
