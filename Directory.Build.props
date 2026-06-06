@@ -22,7 +22,7 @@
        Never set Version/AssemblyVersion/FileVersion manually — create a git tag instead.
        Between tags: 0.2.1-alpha.0.<commits-since-tag> + commit hash in InformationalVersion. -->
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="all" />
+    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup>
