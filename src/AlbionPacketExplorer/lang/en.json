@@ -80,7 +80,7 @@
   "toast.copied.keySummary.title": "Copied to Clipboard",
   "toast.exportStub.body": "{0} {1} constructor stub",
 
-  "list.filter.edit.tip": "Click to edit filter query\nSyntax: term  kind:X  code:32  name:X  params:X  prefix - to exclude",
+  "list.filter.edit.tip": "Click to edit filter query\nSyntax: term  kind:X  code:32  name:X  params:X  paired:yes|no  failed:yes|no  returncode:N  prefix - to exclude",
   "list.filter.placeholder": "kind:EVENT code:32 -code:45 name:Leave …",
   "list.filter.clear.tip": "Clear filter",
   "list.unknownFirst": "? First",
