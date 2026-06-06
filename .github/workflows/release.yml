@@ -41,6 +41,7 @@ jobs:
           --packDir publish/win-x64
           --mainExe AlbionPacketExplorer.exe
           --outputDir releases/win-x64
+          --channel win-x64
           --icon src/AlbionPacketExplorer/Assets/app-icon.ico
 
       - uses: actions/upload-artifact@v4
@@ -83,6 +84,7 @@ jobs:
           --packDir publish/linux-x64
           --mainExe AlbionPacketExplorer
           --outputDir releases/linux-x64
+          --channel linux-x64
 
       - uses: actions/upload-artifact@v4
         with:
@@ -124,6 +126,7 @@ jobs:
           --packDir publish/osx-x64
           --mainExe AlbionPacketExplorer
           --outputDir releases/osx-x64
+          --channel osx-x64
 
       - uses: actions/upload-artifact@v4
         with:
@@ -165,6 +168,7 @@ jobs:
           --packDir publish/osx-arm64
           --mainExe AlbionPacketExplorer
           --outputDir releases/osx-arm64
+          --channel osx-arm64
 
       - uses: actions/upload-artifact@v4
         with:
