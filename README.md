@@ -12,12 +12,31 @@ event constructors back in SAT.
 
 ---
 
+## Download
+
+Grab the latest build from the [Releases](https://github.com/LuluStudioX/AlbionPacketExplorer/releases) page:
+
+| Platform | Installer | Portable |
+|----------|-----------|----------|
+| Windows | `...-win-x64-Setup.exe` | `...-win-x64-Portable.zip` |
+| Linux | `...-linux-x64.AppImage` | — |
+| macOS (Apple Silicon) | `...-osx-arm64-Setup.pkg` | `...-osx-arm64-Portable.zip` |
+| macOS (Intel) | `...-osx-x64-Setup.pkg` | `...-osx-x64-Portable.zip` |
+
+Install via the Setup/AppImage to get **auto-update** (Velopack). The other assets
+(`*-full.nupkg`, `RELEASES-*`, `*.json`) are the per-platform update feed and are not meant to
+be downloaded directly. Builds are currently unsigned, so the OS may warn on first launch.
+
+---
+
 ## What it does
 
 - **Code Aggregator** — counts every event/op code seen and which byte keys each one carries,
   so you can spot structure at a glance.
-- **Packet List** — every decoded packet with a fast filter query
-  (`kind:EVENT code:32 name:NewSimpleItem -code:45 params:objectId`).
+- **Packet List** — every decoded packet with a fast filter query. Scope tokens:
+  `kind:` `code:` `name:` `params:`, plus exchange tokens `paired:yes|no`,
+  `failed:yes|no` (responses with non-zero / zero `ReturnCode`), and `returncode:N`. Prefix any
+  token with `-` to exclude, e.g. `kind:RESPONSE failed:yes -code:2`.
 - **Packet Detail** — per-packet param grid with:
   - a curated schema (param names, notes, `resolveAs` tags) shipped in
     `packet-schema.base.json`, editable per-param at runtime;
