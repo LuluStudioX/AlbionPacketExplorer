@@ -43,7 +43,9 @@ public static class PacketDisplayFormatter
 
         if (value is System.Collections.IDictionary dict)
         {
-            var parts = dict.Keys.Cast<object?>().Select(k => $"{k}:{dict[k]}");
+            var parts = new List<string>(dict.Count);
+            foreach (System.Collections.DictionaryEntry e in dict)
+                parts.Add($"{e.Key}:{e.Value}");
             return $"{{{string.Join(", ", parts)}}}";
         }
 
