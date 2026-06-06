@@ -75,6 +75,8 @@
   "toast.copied.allRows": "All rows copied to clipboard",
   "toast.copied.paramSummary": "Param summary copied to clipboard",
   "toast.copied.packetJson": "Packet JSON copied to clipboard",
+  "toast.diff.title": "Diff",
+  "toast.diff.needTwo": "Select exactly two rows to diff (Ctrl/Shift-click).",
   "toast.copied.keySummary.title": "Copied to Clipboard",
   "toast.exportStub.body": "{0} {1} constructor stub",
 
@@ -100,6 +102,7 @@
   "list.filterParams.placeholder": "objectId  T8_FARM …",
   "list.menu.copyParams": "Copy Params",
   "list.menu.copyJson": "Copy as JSON",
+  "list.menu.diffSelected": "Diff Selected (2 rows)",
   "list.menu.autoSelectNewest": "Auto-select Newest",
   "list.menu.unknownFirst": "Unknown codes first",
 
@@ -112,6 +115,8 @@
   "detail.diff.col.request": "Request",
   "detail.diff.col.response": "Response",
   "detail.diff.legend": "Green = response-only (server-added)   ·   Amber = changed   ·   Grey = request-only",
+  "diff.window.title": "Packet Diff",
+  "diff.legend": "Green = only in right   ·   Amber = changed   ·   Grey = only in left",
   "detail.response.returnCode": "Return code",
   "detail.response.debugMessage": "Server message",
   "detail.returnCode.ok": "{0} (OK)",

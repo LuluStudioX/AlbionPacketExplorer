@@ -228,6 +228,11 @@ public partial class PacketListViewModel : ObservableObject
 
     public event Action<PacketRow>? ScrollToRowRequested;
 
+    /// <summary>Raised when the user asks to diff two selected packets (left, right in pick order).</summary>
+    public event Action<PacketEntry, PacketEntry>? DiffRequested;
+
+    public void RequestDiff(PacketEntry left, PacketEntry right) => DiffRequested?.Invoke(left, right);
+
     private bool _suppressSelectedRowFeedback;
     private PacketRow? _selectedRow;
     public PacketRow? SelectedRow
