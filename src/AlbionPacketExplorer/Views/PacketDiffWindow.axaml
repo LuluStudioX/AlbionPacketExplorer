@@ -1,0 +1,71 @@
+<controls:ApxWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
+        xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+        xmlns:loc="using:AlbionPacketExplorer.Markup"
+        x:Class="AlbionPacketExplorer.Views.PacketDiffWindow"
+        x:DataType="vm:PacketDiffViewModel"
+        Title="{loc:T diff.window.title}"
+        Width="860" Height="560"
+        MinWidth="520" MinHeight="280"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <DockPanel Margin="12">
+
+        <TextBlock DockPanel.Dock="Bottom" Text="{loc:T diff.legend}"
+                   Foreground="{DynamicResource Apx.TextMuted}" FontSize="11"
+                   Margin="2,6,2,0" TextWrapping="Wrap" />
+
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="220,*,*" Margin="2,0,2,6">
+            <TextBlock Grid.Column="0" Text="{loc:T detail.diff.col.key}" FontWeight="SemiBold" />
+            <TextBlock Grid.Column="1" Text="{Binding LeftLabel}" FontWeight="SemiBold" Margin="6,0"
+                       TextTrimming="CharacterEllipsis" />
+            <TextBlock Grid.Column="2" Text="{Binding RightLabel}" FontWeight="SemiBold" Margin="6,0"
+                       TextTrimming="CharacterEllipsis" />
+        </Grid>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding DiffRows}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ParamDiffRow">
+                        <Border CornerRadius="3" Padding="4,2" Margin="0,1"
+                                Classes.resp="{Binding IsRightOnly}"
+                                Classes.req="{Binding IsLeftOnly}"
+                                Classes.chg="{Binding IsChanged}">
+                            <Border.Styles>
+                                <Style Selector="Border.resp">
+                                    <Setter Property="Background">
+                                        <SolidColorBrush Color="{DynamicResource Apx.SuccessColor}" Opacity="0.16" />
+                                    </Setter>
+                                </Style>
+                                <Style Selector="Border.chg">
+                                    <Setter Property="Background">
+                                        <SolidColorBrush Color="{DynamicResource Apx.AccentColor}" Opacity="0.16" />
+                                    </Setter>
+                                </Style>
+                                <Style Selector="Border.req">
+                                    <Setter Property="Background">
+                                        <SolidColorBrush Color="{DynamicResource Apx.DangerColor}" Opacity="0.12" />
+                                    </Setter>
+                                </Style>
+                            </Border.Styles>
+                            <Grid ColumnDefinitions="220,*,*">
+                                <TextBlock Grid.Column="0" Text="{Binding KeyDisplay}"
+                                           VerticalAlignment="Center" TextWrapping="Wrap" />
+                                <TextBlock Grid.Column="1" Text="{Binding LeftValue}"
+                                           FontFamily="Consolas,Monospace" Margin="6,0"
+                                           VerticalAlignment="Center" TextWrapping="Wrap" />
+                                <TextBlock Grid.Column="2" Text="{Binding RightValue}"
+                                           FontFamily="Consolas,Monospace" Margin="6,0"
+                                           VerticalAlignment="Center" TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+
+</controls:ApxWindow>
