@@ -6,6 +6,67 @@
              x:Class="AlbionPacketExplorer.Views.PacketDetailView"
              x:DataType="vm:PacketDetailViewModel">
 
+    <DockPanel>
+
+    <!-- Packet-level banner: Photon response status (OperationResponse.ReturnCode + DebugMessage,
+         RESPONSE only, error tint when != 0) and REQUEST/RESPONSE pair navigation. -->
+    <Border DockPanel.Dock="Top"
+            IsVisible="{Binding HasBanner}"
+            Background="{DynamicResource Apx.SurfaceAlt}"
+            BorderBrush="{DynamicResource Apx.Border}"
+            BorderThickness="0,0,0,1"
+            Padding="10,6">
+        <StackPanel Spacing="4">
+            <StackPanel Orientation="Horizontal" Spacing="8"
+                        IsVisible="{Binding HasResponseStatus}">
+                <TextBlock Text="{loc:T detail.response.returnCode}"
+                           Foreground="{DynamicResource Apx.TextMuted}"
+                           VerticalAlignment="Center" />
+                <Border CornerRadius="4" Padding="6,1" VerticalAlignment="Center"
+                        Classes.ok="{Binding !ReturnCodeIsError}"
+                        Classes.err="{Binding ReturnCodeIsError}">
+                    <Border.Styles>
+                        <Style Selector="Border.ok">
+                            <Setter Property="Background">
+                                <SolidColorBrush Color="{DynamicResource Apx.SuccessColor}" Opacity="0.18" />
+                            </Setter>
+                        </Style>
+                        <Style Selector="Border.err">
+                            <Setter Property="Background">
+                                <SolidColorBrush Color="{DynamicResource Apx.DangerColor}" Opacity="0.18" />
+                            </Setter>
+                        </Style>
+                    </Border.Styles>
+                    <TextBlock Text="{Binding ReturnCodeText}"
+                               FontFamily="Consolas,Monospace" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Apx.Text}" />
+                </Border>
+            </StackPanel>
+            <StackPanel Spacing="2" IsVisible="{Binding HasDebugMessage}">
+                <TextBlock Text="{loc:T detail.response.debugMessage}"
+                           Foreground="{DynamicResource Apx.TextMuted}" FontSize="11" />
+                <TextBlock Text="{Binding DebugMessageText}"
+                           FontFamily="Consolas,Monospace" TextWrapping="Wrap"
+                           Foreground="{DynamicResource Apx.Text}" />
+            </StackPanel>
+
+            <!-- Paired REQUEST/RESPONSE: click to jump to the partner packet. -->
+            <Button Classes="ghost" Padding="6,3"
+                    HorizontalAlignment="Left"
+                    IsVisible="{Binding HasCorrelation}"
+                    Command="{Binding GoToCorrelatedCommand}"
+                    ToolTip.Tip="{loc:T detail.correlation.tip}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Path Classes="icon muted sm" Data="{StaticResource Icon.ArrowLeftRight}" />
+                    <TextBlock Text="{Binding CorrelatedLabel}"
+                               FontFamily="Consolas,Monospace"
+                               Foreground="{DynamicResource Apx.Accent}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Border>
+
     <TabControl>
 
         <!-- ═══════════ PARAMS ═══════════ -->
@@ -284,5 +345,7 @@
         </TabItem>
 
     </TabControl>
+
+    </DockPanel>
 
 </UserControl>

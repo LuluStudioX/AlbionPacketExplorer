@@ -100,7 +100,13 @@ public class PacketFileReader
             parameters[param.Name] = new ParamValue(type, value);
         }
 
-        return new PacketEntry(ts, kind, code, parameters);
+        // Photon response framing (present only on RESPONSE packets we captured ourselves).
+        int? returnCode = root.TryGetProperty("returnCode", out var rcEl) && rcEl.ValueKind == JsonValueKind.Number
+            ? rcEl.GetInt32() : null;
+        string? debugMessage = root.TryGetProperty("debugMessage", out var dmEl) && dmEl.ValueKind == JsonValueKind.String
+            ? dmEl.GetString() : null;
+
+        return new PacketEntry(ts, kind, code, parameters, returnCode, debugMessage);
     }
 
     private static object? ExtractValue(JsonElement el) => el.ValueKind switch
