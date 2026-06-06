@@ -17,7 +17,7 @@ public static class PacketObjectExtensions
     {
         byte v                                           => v,
         short v                                          => v,
-        ushort v when v <= int.MaxValue                  => v,
+        ushort v                                         => v,
         int v                                            => v,
         uint v when v <= int.MaxValue                    => (int)v,
         long v when v is >= int.MinValue and <= int.MaxValue => (int)v,
