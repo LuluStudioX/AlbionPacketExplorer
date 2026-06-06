@@ -53,7 +53,7 @@ public sealed class PacketFilter
         var excl = new List<Token>();
         var incl = new List<Token>();
 
-        foreach (var raw in query.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        foreach (var raw in Query.Split(' ', StringSplitOptions.RemoveEmptyEntries))
         {
             bool exclude = raw.StartsWith('-') && raw.Length > 1;
             var tok = exclude ? raw[1..] : raw;
