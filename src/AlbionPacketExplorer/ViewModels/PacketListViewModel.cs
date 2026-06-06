@@ -45,6 +45,8 @@ public sealed class PacketFilter
 
     public string Query { get; }
 
+    public bool IsEmpty => _exclusions.Length == 0 && _inclusions.Length == 0;
+
     public PacketFilter(string? query)
     {
         Query = query ?? string.Empty;
@@ -429,6 +431,27 @@ public partial class PacketListViewModel : ObservableObject
         ApplyFilter();
     }
 
+    /// <summary>
+    /// Select and scroll to a specific packet (used for REQUEST/RESPONSE pair navigation). If the
+    /// target is hidden by the active filter, the filter is cleared so it becomes reachable.
+    /// </summary>
+    public void SelectPacket(PacketEntry packet)
+    {
+        var row = FindRow(packet);
+        if (row == null && !_filter.IsEmpty)
+        {
+            ClearFilterCommand.Execute(null);
+            row = FindRow(packet);
+        }
+        if (row == null) return;
+
+        SelectedRow = row;
+        ScrollToRowRequested?.Invoke(row);
+    }
+
+    private PacketRow? FindRow(PacketEntry packet) =>
+        Packets.FirstOrDefault(r => ReferenceEquals(r.Packet, packet));
+
     [RelayCommand]
     private void ClearFilter()
     {
@@ -451,13 +474,8 @@ public partial class PacketListViewModel : ObservableObject
     {
         if (SelectedRow == null || Clipboard == null) return;
         var p = SelectedRow.Packet;
-        var json = System.Text.Json.JsonSerializer.Serialize(new
-        {
-            ts = p.Timestamp,
-            kind = p.Kind,
-            code = p.Code,
-            @params = p.Params.ToDictionary(kv => kv.Key, kv => new { type = kv.Value.Type, value = kv.Value.Value })
-        }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        var json = System.Text.Json.JsonSerializer.Serialize(PacketWire.ToJsonShape(p),
+            new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
         await Clipboard.SetTextAsync(json);
         Toasts?.Show(Loc.T("toast.copied.title"), Loc.T("toast.copied.packetJson"), ToastSeverity.Success);
     }
