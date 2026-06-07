@@ -13,7 +13,8 @@ public record LayoutState(
     double? WindowY = null,
     double? WindowWidth = null,
     double? WindowHeight = null,
-    bool WindowMaximized = false)
+    bool WindowMaximized = false,
+    Dictionary<string, int[]>? HiddenColumns = null)
 {
     // TopPanelHeight = packet-table height; LeftPanelWidth = filter-sidebar width.
     public static readonly LayoutState Default = new(TopPanelHeight: 300, LeftPanelWidth: 260);
@@ -29,6 +30,15 @@ public record LayoutState(
     {
         var dict = new Dictionary<string, double[]>(ColumnWidths ?? []) { [gridKey] = widths };
         return this with { ColumnWidths = dict };
+    }
+
+    public int[]? GetHiddenColumns(string gridKey) =>
+        HiddenColumns?.TryGetValue(gridKey, out var h) == true ? h : null;
+
+    public LayoutState WithHiddenColumns(string gridKey, int[] hidden)
+    {
+        var dict = new Dictionary<string, int[]>(HiddenColumns ?? []) { [gridKey] = hidden };
+        return this with { HiddenColumns = dict };
     }
 }
 
