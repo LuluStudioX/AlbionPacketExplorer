@@ -18,6 +18,10 @@ public sealed class CaptureSession : IDisposable
 
     public bool IsRunning => _provider?.IsRunning ?? false;
 
+    /// <summary>When paused the device keeps sniffing but decoded packets are dropped, so the
+    /// session and everything captured so far stay intact and capture resumes without a restart.</summary>
+    public bool IsPaused { get; set; }
+
     public CaptureSession(Action<PacketEntry> onPacket, Action<string> onLog, Action<byte[]>? onRaw = null)
     {
         _onPacket = onPacket;
@@ -64,9 +68,16 @@ public sealed class CaptureSession : IDisposable
         _parser = null;
     }
 
-    private void OnParserPacketReceived(PacketEntry packet) =>
+    private void OnParserPacketReceived(PacketEntry packet)
+    {
+        if (IsPaused) return;
         Dispatcher.UIThread.Post(() => _onPacket(packet));
+    }
 
     // Raw arrives on the capture thread; the collector handles its own threading.
-    private void OnParserRawReceived(byte[] payload) => _onRaw?.Invoke(payload);
+    private void OnParserRawReceived(byte[] payload)
+    {
+        if (IsPaused) return;
+        _onRaw?.Invoke(payload);
+    }
 }

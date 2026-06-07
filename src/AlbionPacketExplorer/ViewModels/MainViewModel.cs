@@ -27,6 +27,11 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private double _loadProgress;
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _isCapturing;
+    [ObservableProperty] private bool _isPaused;
+
+    /// <summary>Toolbar label/tooltip for the pause-resume toggle, flips with <see cref="IsPaused"/>.</summary>
+    public string PauseLabel => Loc.T(IsPaused ? "toolbar.resume" : "toolbar.pause");
+    public string PauseTip => Loc.T(IsPaused ? "toolbar.resume.tip" : "toolbar.pause.tip");
     [ObservableProperty] private string? _updateVersion;
     [ObservableProperty] private bool _isUpdating;
     [ObservableProperty] private int _updateProgress;
@@ -399,6 +404,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         IsCapturing = true;
+        IsPaused = false;
         var deviceLabel = SelectedDevice?.DisplayName ?? Loc.T("status.allDevices");
         StatusText = Loc.Format("status.capturing", deviceLabel);
         _toasts.Show(Loc.T("toast.captureStarted.title"),
@@ -414,6 +420,7 @@ public partial class MainViewModel : ObservableObject
         _session?.Stop();
         _session = null;
         IsCapturing = false;
+        IsPaused = false;
         Aggregator.Flush();
         NotifySaveCommands();
         var count = _capturedPackets.Count.ToString("N0");
@@ -424,6 +431,28 @@ public partial class MainViewModel : ObservableObject
     }
 
     private bool CanStopCapture() => IsCapturing;
+
+    [RelayCommand(CanExecute = nameof(CanStopCapture))]
+    private void TogglePause()
+    {
+        if (_session == null) return;
+        IsPaused = !IsPaused;
+        _session.IsPaused = IsPaused;
+
+        if (IsPaused)
+        {
+            Aggregator.Flush();
+            NotifySaveCommands();
+            StatusText = Loc.Format("status.capturePaused", _capturedPackets.Count.ToString("N0"));
+            _toasts.Show(Loc.T("toast.capturePaused.title"), Loc.T("toast.capturePaused.body"), ToastSeverity.Info);
+        }
+        else
+        {
+            var deviceLabel = SelectedDevice?.DisplayName ?? Loc.T("status.allDevices");
+            StatusText = Loc.Format("status.capturing", deviceLabel);
+            _toasts.Show(Loc.T("toast.captureResumed.title"), Loc.T("toast.captureResumed.body"), ToastSeverity.Success);
+        }
+    }
 
     private void OnRawPacket(byte[] payload)
     {
@@ -665,6 +694,13 @@ public partial class MainViewModel : ObservableObject
         OpenFileCommand.NotifyCanExecuteChanged();
         StartCaptureCommand.NotifyCanExecuteChanged();
         StopCaptureCommand.NotifyCanExecuteChanged();
+        TogglePauseCommand.NotifyCanExecuteChanged();
         SaveFileCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnIsPausedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(PauseLabel));
+        OnPropertyChanged(nameof(PauseTip));
     }
 }
