@@ -134,28 +134,28 @@ public partial class CodeAggregatorViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(CanExport))]
-    private async Task DiffSatAsync()
+    private async Task DiffReferenceAsync()
     {
         if (SelectedCode is not { } stats || Clipboard == null) return;
 
         var name = PacketNameResolver.Resolve(stats.Kind, stats.Code);
         if (string.IsNullOrEmpty(name))
         {
-            Toasts?.Show(Loc.T("summary.satDiff.title"), Loc.T("summary.satDiff.unknownCode"), ToastSeverity.Warning);
+            Toasts?.Show(Loc.T("summary.refDiff.title"), Loc.T("summary.refDiff.unknownCode"), ToastSeverity.Warning);
             return;
         }
 
-        var repo = SatConstructorReader.FindRepo();
+        var repo = ReferenceConstructorReader.FindRepo();
         if (repo == null)
         {
-            Toasts?.Show(Loc.T("summary.satDiff.title"), Loc.T("summary.satDiff.noRepo"), ToastSeverity.Warning);
+            Toasts?.Show(Loc.T("summary.refDiff.title"), Loc.T("summary.refDiff.noRepo"), ToastSeverity.Warning);
             return;
         }
 
-        var res = SatConstructorReader.Read(repo, stats.Kind, name);
+        var res = ReferenceConstructorReader.Read(repo, stats.Kind, name);
         if (res == null)
         {
-            Toasts?.Show(Loc.T("summary.satDiff.title"), Loc.Format("summary.satDiff.noClass", name), ToastSeverity.Warning);
+            Toasts?.Show(Loc.T("summary.refDiff.title"), Loc.Format("summary.refDiff.noClass", name), ToastSeverity.Warning);
             return;
         }
 
@@ -165,21 +165,21 @@ public partial class CodeAggregatorViewModel : ObservableObject
             .Where(n => n >= 0)
             .ToHashSet();
 
-        var missing = observed.Where(k => !res.SatReads.Contains(k)).OrderBy(x => x).ToList();
-        var extra = res.SatReads.Where(k => !observed.Contains(k)).OrderBy(x => x).ToList();
+        var missing = observed.Where(k => !res.SourceReads.Contains(k)).OrderBy(x => x).ToList();
+        var extra = res.SourceReads.Where(k => !observed.Contains(k)).OrderBy(x => x).ToList();
 
         var report = new System.Text.StringBuilder();
-        report.AppendLine($"// {stats.Kind} {stats.Code} {name} vs SAT");
-        report.AppendLine($"// SAT class: {res.ClassName}");
+        report.AppendLine($"// {stats.Kind} {stats.Code} {name} vs reference source");
+        report.AppendLine($"// reference class: {res.ClassName}");
         report.AppendLine($"// {res.FilePath}");
-        report.AppendLine($"SAT reads keys:        {string.Join(", ", res.SatReads)}");
-        report.AppendLine($"Observed keys:         {string.Join(", ", observed.OrderBy(x => x))}");
-        report.AppendLine($"SAT does NOT read:     {(missing.Count == 0 ? "(none)" : string.Join(", ", missing))}   <- candidates to add to SAT");
-        report.AppendLine($"SAT reads, not seen:   {(extra.Count == 0 ? "(none)" : string.Join(", ", extra))}");
+        report.AppendLine($"reference reads keys:  {string.Join(", ", res.SourceReads)}");
+        report.AppendLine($"observed keys:         {string.Join(", ", observed.OrderBy(x => x))}");
+        report.AppendLine($"reference misses:      {(missing.Count == 0 ? "(none)" : string.Join(", ", missing))}   <- candidates to add");
+        report.AppendLine($"reference-only keys:   {(extra.Count == 0 ? "(none)" : string.Join(", ", extra))}");
 
         await Clipboard.SetTextAsync(report.ToString());
-        Toasts?.Show(Loc.T("summary.satDiff.title"),
-            Loc.Format("summary.satDiff.done", name, missing.Count == 0 ? "-" : string.Join(",", missing)),
+        Toasts?.Show(Loc.T("summary.refDiff.title"),
+            Loc.Format("summary.refDiff.done", name, missing.Count == 0 ? "-" : string.Join(",", missing)),
             ToastSeverity.Success);
     }
 
@@ -197,7 +197,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedCode));
         ExportCommand.NotifyCanExecuteChanged();
         CopyKeySummaryCommand.NotifyCanExecuteChanged();
-        DiffSatCommand.NotifyCanExecuteChanged();
+        DiffReferenceCommand.NotifyCanExecuteChanged();
 
         var keys = value?.Stats.Keys.Values
             .OrderBy(k => int.TryParse(k.Key, out var n) ? n : int.MaxValue)

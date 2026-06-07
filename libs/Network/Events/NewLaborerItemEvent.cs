@@ -3,7 +3,7 @@ using AlbionPacketExplorer.Network.Handlers;
 namespace AlbionPacketExplorer.Network.Events;
 
 // EVENT [32] NewLaborerItem (same code as NewSimpleItem — handler distinguishes by context)
-// SAT uses code 32 for both; laborer items are identified by ObjectId context
+// Code 32 is shared; laborer items are identified by ObjectId context
 // 0=objectId 1=itemId 2=quantity 4=estimatedMarketValue 7=durability 252=32
 public sealed class NewLaborerItemEvent
 {

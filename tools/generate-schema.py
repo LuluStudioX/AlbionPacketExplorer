@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-"""Resync packet-schema.base.json with the current SAT EventCodes / OperationCodes enums.
+"""Resync packet-schema.base.json with the current EventCodes / OperationCodes enums found in a
+reference C# source repo.
 
-Model: this tool RE-KEYS the existing schema to the current enum ordinals and applies the
-island field-map overrides below. It preserves curated param annotations by carrying them
-forward BY NAME (a param byte-index map is tied to the packet structure i.e. the event/op
-name, not the numeric code, so it survives code renumbering across game patches).
+Model: RE-KEYS the existing schema to the current enum ordinals and applies the island field-map
+overrides below. Curated param annotations carry forward BY NAME (a param byte-index map is tied
+to the packet structure i.e. the event/op name, not the numeric code, so it survives code
+renumbering across game patches).
 
-Why a rewrite (vs the old extractor): the previous generator skipped any enum member with an
-inline `// comment` (it only stripped trailing commas), which desynced the ordinal counter and
-mis-coded every packet after the first commented member. Enum ordinal == wire code == the
-`code` field in packet_sniffer.json (verified via SAT dispatch: handlers register with
-`(int)EventCodes.X` and EventPacketHandler compares that to the key-252 wire code).
+The parser strips inline `// comments` before reading each member and honors explicit `= N`
+resets, so the ordinal counter stays in sync. Enum ordinal == wire code == the `code` field in a
+captured packet.
 
 Usage:
-    python tools/generate-schema.py [--sat-path PATH]
-    (PATH defaults to env APX_SAT_REPO, else a sibling AlbionOnline-StatisticsAnalysis clone.)
+    python tools/generate-schema.py [--source-path PATH]
+    (PATH defaults to env APX_SOURCE_REPO, else a sibling reference-source clone.)
 """
 import argparse
 import json
@@ -28,20 +27,25 @@ from pathlib import Path
 APX = Path(__file__).resolve().parents[1]
 OUT = APX / "src/AlbionPacketExplorer/Assets/packet-schema.base.json"
 
-# Bump when the schema's shape or curation method changes (not on routine SAT resyncs).
+# Bump when the schema's shape or curation method changes (not on routine resyncs).
 SCHEMA_VERSION = "1"
 
 
-def sat_commit(sat: Path) -> str:
-    """Short SAT commit the schema was generated from; 'unknown' if git is unavailable."""
+def source_commit(repo: Path) -> str:
+    """Short commit of the reference source the schema was built from; 'unknown' if git fails."""
     try:
         out = subprocess.run(
-            ["git", "-C", str(sat), "rev-parse", "--short", "HEAD"],
+            ["git", "-C", str(repo), "rev-parse", "--short", "HEAD"],
             capture_output=True, text=True, timeout=10,
         )
         return out.stdout.strip() or "unknown"
     except Exception:
         return "unknown"
+
+
+def find_one(root: Path, name: str):
+    """First file named `name` anywhere under `root` (so the repo layout is not hardcoded)."""
+    return next(iter(sorted(root.rglob(name))), None)
 
 
 def parse_enum(path: Path):
@@ -74,7 +78,7 @@ def p(name, note="", resolve=""):
     return {"name": name, "note": note, "resolveAs": resolve}
 
 
-# ---- island / corrected overrides (from current SAT event constructors) ----
+# ---- island / corrected overrides (from current reference event constructors) ----
 EVENT_OVERRIDE = {
     "NewBuilding": {
         "0": p("objectId"),
@@ -129,7 +133,7 @@ EVENT_OVERRIDE = {
         "3": p("startTicks", "Int64[]; per-entry start (.NET ticks UTC)"),
         "4": p("endTicks", "Int64[]; per-entry end (.NET ticks UTC)"),
     },
-    # enum renamed MightAndFavorReceived -> MightAndFavorReceivedEvent; remap + correct from SAT.
+    # enum renamed MightAndFavorReceived -> MightAndFavorReceivedEvent; remap + correct from source.
     "MightAndFavorReceivedEvent": {
         "0": p("might", "Might"),
         "2": p("premiumOfMight", "Premium of might"),
@@ -185,17 +189,17 @@ def best_params_by_name(old, kind):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--sat-path",
-        default=os.environ.get("APX_SAT_REPO", str(APX.parent / "AlbionOnline-StatisticsAnalysis")),
+        "--source-path",
+        default=os.environ.get("APX_SOURCE_REPO", str(APX.parent / "reference-source")),
     )
     args = parser.parse_args()
 
-    sat = Path(args.sat_path)
-    eventcodes = sat / "src/StatisticsAnalysisTool/Network/EventCodes.cs"
-    opcodes = sat / "src/StatisticsAnalysisTool/Network/OperationCodes.cs"
-    for f in (eventcodes, opcodes):
-        if not f.exists():
-            sys.exit(f"ERROR: {f} not found (pass --sat-path or set APX_SAT_REPO)")
+    repo = Path(args.source_path)
+    eventcodes = find_one(repo, "EventCodes.cs")
+    opcodes = find_one(repo, "OperationCodes.cs")
+    for label, f in (("EventCodes.cs", eventcodes), ("OperationCodes.cs", opcodes)):
+        if f is None or not f.exists():
+            sys.exit(f"ERROR: {label} not found under {repo} (pass --source-path or set APX_SOURCE_REPO)")
 
     old = json.loads(OUT.read_text(encoding="utf-8-sig"))
     ev_best = best_params_by_name(old, "EVENT")
@@ -209,7 +213,7 @@ def main():
     out = {
         "$schemaMeta": {
             "schemaVersion": SCHEMA_VERSION,
-            "satCommit": sat_commit(sat),
+            "sourceCommit": source_commit(repo),
             "generatedAt": datetime.now(timezone.utc).date().isoformat(),
         }
     }

@@ -5,9 +5,9 @@ using AlbionPacketExplorer.Network;
 namespace AlbionPacketExplorer.Services;
 
 /// <summary>
-/// Generates a SAT-style event/operation class scaffold for a code from its observed fields and
-/// (when available) the curated schema. The result is meant to be pasted into SAT and adjusted,
-/// using the same Object-to-T helper style SAT's constructors use.
+/// Generates a C# event/operation class scaffold for a code from its observed fields and (when
+/// available) the curated schema, using the common Object-to-T helper style. The result is meant
+/// to be pasted into a consuming analysis tool and adjusted.
 /// </summary>
 public static class ConstructorExporter
 {
@@ -72,7 +72,7 @@ public static class ConstructorExporter
         };
     }
 
-    // (C# property type, value-read suffix using SAT-style ObjectToT helpers).
+    // (C# property type, value-read suffix using the common ObjectToT helpers).
     private static (string Type, string Read) MapType(KeyStats ks)
     {
         if (ks.Types.Contains("Byte[]")) return ("Guid?", ".ObjectToGuid()");
