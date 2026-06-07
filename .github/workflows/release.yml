@@ -201,3 +201,20 @@ jobs:
         with:
           files: artifacts/*
           generate_release_notes: true
+
+      # Nudge the update-feed hub to mirror this release immediately instead of waiting for its
+      # poll. No-ops until HUB_DISPATCH_TOKEN (a PAT with access to the hub repo) is configured.
+      - name: Notify update-feed hub
+        env:
+          HUB_DISPATCH_TOKEN: ${{ secrets.HUB_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$HUB_DISPATCH_TOKEN" ]; then
+            echo "HUB_DISPATCH_TOKEN not set; skipping (hub mirrors on its own schedule)."
+            exit 0
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $HUB_DISPATCH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/Lulu195/lulustudio-hub/dispatches \
+            -d '{"event_type":"apx-release"}'
+          echo "dispatched apx-release to the hub"
