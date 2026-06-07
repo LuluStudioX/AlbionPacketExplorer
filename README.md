@@ -2,11 +2,15 @@
 
 A cross-platform desktop tool for decoding and exploring Albion Online network packets.
 
-It reads the `packet_sniffer.json` produced by
+It captures Albion's Photon traffic **live off the wire** (or loads a previously saved capture)
+and decodes every raw event/request/response so you can inspect every field of every packet. The
+goal is to understand packet structure well enough to write more complete event constructors in
 [AlbionOnline-StatisticsAnalysis](https://github.com/Triky313/AlbionOnline-StatisticsAnalysis)
-(SAT), decodes every raw Photon event/request/response, and lets you inspect every field of
-every packet. The goal is to understand packet structure well enough to write more complete
-event constructors back in SAT.
+(SAT), whose Protocol18/Photon decoding this tool reuses.
+
+Captures are stored as newline-delimited JSON. That format began as an ad-hoc debug dump while
+investigating SAT's island-management events, which is what grew into this project; it is the
+app's own format, not something SAT produces.
 
 > Status: pre-1.0, under active development. Windows / Linux / macOS desktop.
 
@@ -53,9 +57,10 @@ be downloaded directly. Builds are currently unsigned, so the OS may warn on fir
 
 ---
 
-## The packet feed
+## The capture format
 
-SAT writes newline-delimited JSON, one packet per line:
+Captures are newline-delimited JSON, one packet per line (written by live capture, re-loadable
+later):
 
 ```json
 {"ts":"2026-05-29T05:36:23Z","kind":"EVENT","code":32,"params":{"0":{"type":"Int64","value":462},"1":{"type":"Int16","value":1050},"252":{"type":"Int16","value":32}}}
@@ -66,8 +71,9 @@ SAT writes newline-delimited JSON, one packet per line:
 - `params` — byte-indexed payload; key `252` (events) / `253` (requests, responses) is the
   code echo, not payload
 
-Default source path (Windows):
-`%LOCALAPPDATA%\StatisticsAnalysisTool\Instances\<id>\temp\packet_sniffer.json`
+The "Open log" picker defaults to the original debug-dump location
+(`%LOCALAPPDATA%\StatisticsAnalysisTool\Instances\<id>\temp\`) for convenience, but any capture
+saved by this app can be reloaded from anywhere.
 
 ---
 
