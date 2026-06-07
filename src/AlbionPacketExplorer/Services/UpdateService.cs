@@ -35,15 +35,21 @@ public sealed class UpdateService
         return $"{os}-{arch}";
     }
 
-    // Returns the new version string if an update is available, null otherwise.
-    public async Task<string?> CheckForUpdateAsync()
+    // NewVersion set when an update is available; Error set when the check itself failed (feed
+    // unreachable, bad URL, not installed via Velopack, ...). Both null = up to date.
+    public sealed record UpdateCheckResult(string? NewVersion, string? Error);
+
+    public async Task<UpdateCheckResult> CheckForUpdateAsync()
     {
         try
         {
             var info = await _mgr.CheckForUpdatesAsync();
-            return info?.TargetFullRelease.Version.ToString();
+            return new UpdateCheckResult(info?.TargetFullRelease.Version.ToString(), null);
         }
-        catch { return null; }
+        catch (Exception ex)
+        {
+            return new UpdateCheckResult(null, ex.Message);
+        }
     }
 
     // Downloads and applies update, then restarts the app.
