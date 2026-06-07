@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>DecodeDiff</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- old (GPL) decoder -->
+    <ProjectReference Include="../../libs/Abstractions/AlbionPacketExplorer.Abstractions.csproj" />
+    <ProjectReference Include="../../libs/Protocol18/AlbionPacketExplorer.Protocol18.csproj" />
+    <ProjectReference Include="../../libs/PhotonPackageParser/AlbionPacketExplorer.PhotonPackageParser.csproj" />
+    <!-- new (independent) decoder -->
+    <ProjectReference Include="../../libs/PhotonWire/AlbionPacketExplorer.PhotonWire.csproj" />
+  </ItemGroup>
+
+</Project>
