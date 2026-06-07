@@ -84,19 +84,29 @@
 
                 <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
 
-                <Button Classes="ghost" Command="{Binding SaveFileCommand}" Padding="10,8" Margin="0,0,4,0"
-                        ToolTip.Tip="{loc:T toolbar.saveJson.tip}">
+                <!-- Save: dropdown of formats (JSON / CSV / RAW). -->
+                <Button Classes="ghost" Padding="10,8" Margin="0,0,4,0"
+                        IsEnabled="{Binding CanSaveAnything}"
+                        ToolTip.Tip="{loc:T toolbar.save.tip}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Path Classes="icon sm" Data="{StaticResource Icon.Save}" />
-                        <TextBlock Text="{loc:T toolbar.saveJson}" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T toolbar.save}" VerticalAlignment="Center" />
+                        <Path Classes="icon sm muted" Data="{StaticResource Icon.ChevronDown}" />
                     </StackPanel>
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="{loc:T toolbar.save.json}" Command="{Binding SaveFileCommand}" />
+                            <MenuItem Header="{loc:T toolbar.save.csv}" Command="{Binding SaveCsvCommand}" />
+                            <MenuItem Header="{loc:T toolbar.save.raw}" Command="{Binding SaveRawCommand}" />
+                        </MenuFlyout>
+                    </Button.Flyout>
                 </Button>
 
                 <Button Classes="ghost" Command="{Binding OpenFileCommand}" Padding="10,8"
-                        ToolTip.Tip="{loc:T toolbar.openJson.tip}">
+                        ToolTip.Tip="{loc:T toolbar.open.tip}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
-                        <TextBlock Text="{loc:T toolbar.openJson}" VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:T toolbar.open}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </WrapPanel>

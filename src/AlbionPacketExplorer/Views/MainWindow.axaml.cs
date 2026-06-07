@@ -70,6 +70,35 @@ public partial class MainWindow : ApxWindow, IFilePicker
         return files.Count > 0 ? files[0].TryGetLocalPath() : null;
     }
 
+    public async Task<string?> PickOpenFileAsync()
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Open packet capture",
+            AllowMultiple = false,
+            FileTypeFilter =
+            [
+                new FilePickerFileType("Captures (JSON or raw)") { Patterns = ["*.json", "*.b64", "*.raw"] },
+                new FilePickerFileType("JSON") { Patterns = ["*.json"] },
+                new FilePickerFileType("Raw packets") { Patterns = ["*.b64", "*.raw"] },
+                new FilePickerFileType("All files") { Patterns = ["*"] }
+            ]
+        });
+        return files.Count > 0 ? files[0].TryGetLocalPath() : null;
+    }
+
+    public async Task<string?> PickSaveFileAsync(string suggestedName, string extension, string typeName)
+    {
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = $"Save packets as {typeName}",
+            SuggestedFileName = suggestedName,
+            DefaultExtension = extension,
+            FileTypeChoices = [new FilePickerFileType(typeName) { Patterns = [$"*.{extension}"] }]
+        });
+        return file?.TryGetLocalPath();
+    }
+
     public async Task<string?> PickFolderAsync(string title)
     {
         var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions

@@ -39,7 +39,11 @@ public partial class MainViewModel : ObservableObject
     private CaptureSession? _session;
     private readonly List<PacketEntry> _capturedPackets = [];
     private readonly List<PacketEntry> _allPackets = [];
+    private readonly List<byte[]> _rawPackets = [];   // raw payloads (live capture / loaded .b64) for Save as RAW
+    private readonly Lock _rawLock = new();
     private readonly PacketCorrelator _correlator = new();
+
+    private bool HasRaw { get { lock (_rawLock) return _rawPackets.Count > 0; } }
 
     public bool ResolveItemNames
     {
@@ -379,7 +383,7 @@ public partial class MainViewModel : ObservableObject
     {
         ResetData();
 
-        _session = new CaptureSession(OnLivePacket, msg => StatusText = msg);
+        _session = new CaptureSession(OnLivePacket, msg => StatusText = msg, OnRawPacket);
 
         try
         {
@@ -411,6 +415,7 @@ public partial class MainViewModel : ObservableObject
         _session = null;
         IsCapturing = false;
         Aggregator.Flush();
+        NotifySaveCommands();
         var count = _capturedPackets.Count.ToString("N0");
         StatusText = Loc.Format("status.captureStopped", count);
         _toasts.Show(Loc.T("toast.captureStopped.title"),
@@ -420,12 +425,24 @@ public partial class MainViewModel : ObservableObject
 
     private bool CanStopCapture() => IsCapturing;
 
+    private void OnRawPacket(byte[] payload)
+    {
+        lock (_rawLock) _rawPackets.Add(payload);
+    }
+
     [RelayCommand(CanExecute = nameof(CanOpenFile))]
     private async Task OpenFileAsync()
     {
-        var path = await _filePicker.PickJsonFileAsync();
+        var path = await _filePicker.PickOpenFileAsync();
         if (path == null) return;
-        await LoadFileAsync(path);
+        if (IsRawFile(path)) await LoadRawAsync(path);
+        else await LoadFileAsync(path);
+    }
+
+    private static bool IsRawFile(string path)
+    {
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        return ext is ".b64" or ".raw";
     }
 
     private bool CanOpenFile() => !IsLoading && !IsCapturing;
@@ -433,27 +450,110 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanSaveFile))]
     private async Task SaveFileAsync()
     {
-        var suggested = $"packets_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-        var path = await _filePicker.PickSaveJsonFileAsync(suggested);
+        var path = await _filePicker.PickSaveFileAsync($"packets_{DateTime.Now:yyyyMMdd_HHmmss}.json", "json", "JSON");
         if (path == null) return;
-
         try
         {
             var opts = new JsonSerializerOptions { WriteIndented = true };
             var payload = _allPackets.Select(PacketWire.ToJsonShape);
-
             await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             await JsonSerializer.SerializeAsync(stream, payload, opts);
-
             StatusText = Loc.Format("status.saved", _allPackets.Count.ToString("N0"), Path.GetFileName(path));
         }
-        catch (Exception ex)
+        catch (Exception ex) { StatusText = Loc.Format("status.saveFailed", ex.Message); }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSaveFile))]
+    private async Task SaveCsvAsync()
+    {
+        var path = await _filePicker.PickSaveFileAsync($"packets_{DateTime.Now:yyyyMMdd_HHmmss}.csv", "csv", "CSV");
+        if (path == null) return;
+        try
         {
-            StatusText = Loc.Format("status.saveFailed", ex.Message);
+            await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+            await PacketCsvExporter.WriteAsync(stream, _allPackets);
+            StatusText = Loc.Format("status.saved", _allPackets.Count.ToString("N0"), Path.GetFileName(path));
         }
+        catch (Exception ex) { StatusText = Loc.Format("status.saveFailed", ex.Message); }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSaveRaw))]
+    private async Task SaveRawAsync()
+    {
+        byte[][] raws;
+        lock (_rawLock) raws = _rawPackets.ToArray();
+        var path = await _filePicker.PickSaveFileAsync($"packets_{DateTime.Now:yyyyMMdd_HHmmss}.b64", "b64", "Raw packets");
+        if (path == null) return;
+        try
+        {
+            await using var w = new StreamWriter(path, append: false, System.Text.Encoding.ASCII);
+            foreach (var p in raws) await w.WriteLineAsync(Convert.ToBase64String(p));
+            StatusText = Loc.Format("status.saved", raws.Length.ToString("N0"), Path.GetFileName(path));
+        }
+        catch (Exception ex) { StatusText = Loc.Format("status.saveFailed", ex.Message); }
     }
 
     private bool CanSaveFile() => !IsLoading && _allPackets.Count > 0;
+    private bool CanSaveRaw() => !IsLoading && HasRaw;
+
+    /// <summary>Drives the toolbar Save button: enabled when any format is saveable.</summary>
+    public bool CanSaveAnything => !IsLoading && (_allPackets.Count > 0 || HasRaw);
+
+    private void NotifySaveCommands()
+    {
+        SaveFileCommand.NotifyCanExecuteChanged();
+        SaveCsvCommand.NotifyCanExecuteChanged();
+        SaveRawCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(CanSaveAnything));
+    }
+
+    // Replay a raw .b64 capture: decode each payload through the current parser into packets.
+    public async Task LoadRawAsync(string path)
+    {
+        IsLoading = true;
+        LoadProgress = 0;
+        StatusText = Loc.Format("status.loading", Path.GetFileName(path));
+        ResetData();
+
+        var loaded = new List<PacketEntry>();
+        var raws = new List<byte[]>();
+        try
+        {
+            var parser = new RawAlbionParser();
+            parser.PacketReceived += loaded.Add;
+            foreach (var line in await File.ReadAllLinesAsync(path))
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                byte[] payload;
+                try { payload = Convert.FromBase64String(line.Trim()); } catch { continue; }
+                raws.Add(payload);
+                try { parser.ReceivePacket(payload); } catch { /* skip undecodable */ }
+            }
+
+            foreach (var pe in loaded) { Aggregator.Ingest(pe); _correlator.Observe(pe); }
+            Aggregator.Flush();
+            lock (_rawLock) _rawPackets.AddRange(raws);
+            _allPackets.AddRange(loaded);
+            PacketList.SetSource(loaded);
+            NotifySaveCommands();
+            var fileName = Path.GetFileName(path);
+            var count = loaded.Count.ToString("N0");
+            StatusText = Loc.Format("status.loaded", count, fileName);
+            _toasts.Show(Loc.T("toast.fileLoaded.title"), Loc.Format("toast.fileLoaded.body", count, fileName), ToastSeverity.Success);
+        }
+        catch (Exception ex)
+        {
+            Aggregator.Reset();
+            PacketList.SetSource([]);
+            StatusText = Loc.Format("status.loadError", ex.Message);
+            _toasts.Show(Loc.T("toast.loadFailed.title"), ex.Message, ToastSeverity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+            LoadProgress = 1;
+        }
+    }
 
     public async Task LoadFileAsync(string path)
     {
@@ -478,7 +578,7 @@ public partial class MainViewModel : ObservableObject
             Aggregator.Flush();
             _allPackets.AddRange(loaded);
             PacketList.SetSource(loaded);
-            SaveFileCommand.NotifyCanExecuteChanged();
+            NotifySaveCommands();
             var fileName = Path.GetFileName(path);
             var loadedCount = loaded.Count.ToString("N0");
             StatusText = Loc.Format("status.loaded", loadedCount, fileName);
@@ -516,10 +616,12 @@ public partial class MainViewModel : ObservableObject
     {
         _capturedPackets.Clear();
         _allPackets.Clear();
+        lock (_rawLock) _rawPackets.Clear();
         _correlator.Reset();
         Aggregator.Reset();
         PacketList.SetSource([]);
         PacketDetail.Packet = null;
+        NotifySaveCommands();
     }
 
     public void TriggerAutoStart()
@@ -555,7 +657,7 @@ public partial class MainViewModel : ObservableObject
     {
         OpenFileCommand.NotifyCanExecuteChanged();
         StartCaptureCommand.NotifyCanExecuteChanged();
-        SaveFileCommand.NotifyCanExecuteChanged();
+        NotifySaveCommands();
     }
 
     partial void OnIsCapturingChanged(bool value)
