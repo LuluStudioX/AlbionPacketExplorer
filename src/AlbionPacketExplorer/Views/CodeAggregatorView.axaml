@@ -147,6 +147,16 @@
             <TextBlock DockPanel.Dock="Top" Margin="6,4,6,2" FontWeight="SemiBold"
                        Text="{loc:T summary.fields.title}"
                        Foreground="{DynamicResource Apx.TextMuted}" />
+            <!-- Per-code note (#9): persisted findings about the selected code. -->
+            <Grid DockPanel.Dock="Top" Margin="6,0,6,4" ColumnDefinitions="*,Auto"
+                  IsVisible="{Binding HasSelectedKeyStats}">
+                <TextBox Grid.Column="0" Text="{Binding NoteDraft, Mode=TwoWay}"
+                         PlaceholderText="{loc:T summary.note.placeholder}"
+                         AcceptsReturn="True" MaxLength="2000" MaxHeight="80"
+                         TextWrapping="Wrap" FontSize="12" />
+                <Button Grid.Column="1" Classes="ghost" VerticalAlignment="Top" Margin="6,0,0,0"
+                        Command="{Binding SaveNoteCommand}" Content="{loc:T summary.note.save}" />
+            </Grid>
             <TextBlock Text="{loc:T summary.fields.empty}" Margin="8"
                        Foreground="{DynamicResource Apx.TextMuted}" TextWrapping="Wrap"
                        IsVisible="{Binding !HasSelectedKeyStats}" />

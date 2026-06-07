@@ -33,6 +33,18 @@ public partial class CodeAggregatorViewModel : ObservableObject
     public CodeStats? SelectedCode => SelectedRow?.Stats;
 
     private readonly Dictionary<(string Kind, int Code), CodeStats> _map = [];
+    private readonly CodeNotesStore _notes = new();
+
+    public CodeAggregatorViewModel() => _notes.Load();
+
+    /// <summary>Editable note for the selected code; persisted on demand via <see cref="SaveNoteCommand"/>.</summary>
+    [ObservableProperty] private string _noteDraft = "";
+
+    [RelayCommand]
+    private void SaveNote()
+    {
+        if (SelectedCode is { } c) _notes.Set(c.Kind, c.Code, NoteDraft);
+    }
 
     private string _filterKind = "";
     private string _filterCode = "";
@@ -141,6 +153,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
             .ToList() ?? [];
         SelectedKeyStats = new ObservableCollection<KeyStats>(keys);
         OnPropertyChanged(nameof(HasSelectedKeyStats));
+        NoteDraft = value?.Stats is { } st ? _notes.Get(st.Kind, st.Code) : "";
     }
 
     private CodeStats GetOrCreateStats(string kind, int code)
