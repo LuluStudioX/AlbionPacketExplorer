@@ -214,6 +214,7 @@ public partial class MainViewModel : ObservableObject
         _toasts = toasts;
         _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore, _enumLabels);
         _packetDetail.CorrelatedPacketRequested += PacketList.SelectPacket;
+        _packetDetail.FollowValueRequested += PacketList.FollowValue;
         PacketList.Configure(_gameData, false);
         PacketList.LoadPersistedState();
 
