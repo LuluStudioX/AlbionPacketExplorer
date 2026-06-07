@@ -12,7 +12,7 @@
     <Product>AlbionPacketExplorer</Product>
     <Authors>LuluStudioX</Authors>
     <Company>LuluStudioX</Company>
-    <Description>Cross-platform desktop tool for decoding and exploring Albion Online network packets from SAT's packet_sniffer.json.</Description>
+    <Description>Cross-platform desktop tool for capturing, decoding and exploring Albion Online network packets.</Description>
     <Copyright>Copyright (c) 2026 LuluStudioX</Copyright>
     <RepositoryUrl>https://github.com/LuluStudioX/AlbionPacketExplorer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

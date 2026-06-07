@@ -7,7 +7,7 @@ public sealed record IconCacheCandidate(string Path, int IconCount);
 
 /// <summary>
 /// Best-effort scanner that hunts the machine for an existing Albion item-icon cache (from this
-/// app, SAT, ao-bin-dumps clones, other tools, etc.) so the user can reuse those PNGs instead of
+/// app, other Albion tools, ao-bin-dumps clones, etc.) so the user can reuse those PNGs instead of
 /// re-downloading thousands of files. Identifies a cache by sampling PNG names against Albion's
 /// item-name shape; cheap and bounded so it never walks the whole disk.
 /// </summary>
@@ -58,9 +58,8 @@ public static class IconCacheLocator
         var roaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-        // Known tool data dirs (shallow, high-signal).
-        yield return Path.Combine(local, "StatisticsAnalysisTool");
-        yield return Path.Combine(roaming, "StatisticsAnalysisTool");
+        // Tool data roots (shallow, high-signal); the depth-limited walk finds per-tool icon
+        // folders (including other Albion tools' caches) underneath these.
         yield return local;
         yield return roaming;
 

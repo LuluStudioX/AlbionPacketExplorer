@@ -1,7 +1,7 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "satCommit": "5022065a",
+    "sourceCommit": "5022065a",
     "generatedAt": "2026-06-03"
   },
   "EVENT:0": {

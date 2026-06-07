@@ -76,12 +76,10 @@ public static class AppPaths
 
     public static bool IconCacheIsCustom => !string.IsNullOrWhiteSpace(_override.IconCacheDir);
 
-    /// <summary>Default folder where external Albion-traffic tools write their packet log.</summary>
-    public static string DefaultLogFolder { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "StatisticsAnalysisTool", "Instances");
+    /// <summary>Default folder the "open capture" picker starts in (the app's own saved captures).</summary>
+    public static string DefaultLogFolder => LogsDir;
 
-    /// <summary>Folder the app points users to for opening external packet logs.</summary>
+    /// <summary>Folder the app points users to when opening a saved capture (override-able).</summary>
     public static string AlbionLogFolder =>
         string.IsNullOrWhiteSpace(_override.LogFolder) ? DefaultLogFolder : _override.LogFolder;
 
