@@ -1,0 +1,24 @@
+services:
+  apx-updates:
+    build: .
+    environment:
+      GITHUB_REPO: LuluStudioX/AlbionPacketExplorer
+      GITHUB_TOKEN: ${GITHUB_TOKEN}      # read-only Contents PAT; from .env, never committed
+      SYNC_INTERVAL: "300"
+    volumes:
+      - feed:/srv/feed
+    # Bind only to loopback; Cloudflare Tunnel (cloudflared) connects to it locally.
+    ports:
+      - "127.0.0.1:8080:80"
+    restart: unless-stopped
+
+  # Optional: run the tunnel in the same stack. Provide TUNNEL_TOKEN in .env.
+  # cloudflared:
+  #   image: cloudflare/cloudflared:latest
+  #   command: tunnel --no-autoupdate run
+  #   environment:
+  #     TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+  #   restart: unless-stopped
+
+volumes:
+  feed:
