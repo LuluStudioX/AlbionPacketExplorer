@@ -160,6 +160,7 @@
                     <DataGridTextColumn Header="{loc:T summary.field.col.types}"    Binding="{Binding TypesDisplay}" Width="120" />
                     <DataGridTextColumn Header="{loc:T summary.field.col.distinct}" Binding="{Binding DistinctDisplay}" Width="80" />
                     <DataGridTextColumn Header="{loc:T summary.field.col.range}"    Binding="{Binding MinMaxDisplay}" Width="150" />
+                    <DataGridTextColumn Header="{loc:T summary.field.col.guess}"    Binding="{Binding Heuristic}" Width="120" />
                     <DataGridTextColumn Header="{loc:T summary.field.col.top}"      Binding="{Binding TopValuesDisplay}" Width="*" />
                 </DataGrid.Columns>
             </DataGrid>
