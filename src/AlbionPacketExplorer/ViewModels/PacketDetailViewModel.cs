@@ -588,6 +588,16 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         PreviewResolveToggled?.Invoke();
     }
 
+    /// <summary>Raised to follow a value across all packets (filters the list to it).</summary>
+    public event Action<string>? FollowValueRequested;
+
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private void FollowValue()
+    {
+        if (SelectedRow == null) return;
+        FollowValueRequested?.Invoke(SelectedRow.Value);
+    }
+
     public event Action<EnumLabelViewModel>? LabelValueRequested;
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
@@ -716,6 +726,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         ViewFullValueCommand.NotifyCanExecuteChanged();
         EditParamCommand.NotifyCanExecuteChanged();
         LabelValueCommand.NotifyCanExecuteChanged();
+        FollowValueCommand.NotifyCanExecuteChanged();
         HideRowCommand.NotifyCanExecuteChanged();
         UnhideRowCommand.NotifyCanExecuteChanged();
     }

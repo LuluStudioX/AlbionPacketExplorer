@@ -129,6 +129,7 @@
                             <Separator />
                             <MenuItem Header="{loc:T detail.menu.editParam}" Command="{Binding EditParamCommand}" />
                             <MenuItem Header="{loc:T detail.menu.labelValue}" Command="{Binding LabelValueCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.followValue}" Command="{Binding FollowValueCommand}" />
                             <Separator />
                             <MenuItem Header="{loc:T detail.menu.hideRow}"         Command="{Binding HideRowCommand}" />
                             <MenuItem Header="{loc:T detail.menu.unhideRow}"       Command="{Binding UnhideRowCommand}" />

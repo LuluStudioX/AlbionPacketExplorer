@@ -455,6 +455,16 @@ public partial class PacketListViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Filter the list to every packet (any code) that carries <paramref name="value"/> in any
+    /// field, in capture order. Used to follow an entity (e.g. an objectId) across packets.
+    /// </summary>
+    public void FollowValue(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return;
+        FilterQuery = $"params:{value.Trim()}";
+    }
+
+    /// <summary>
     /// Select and scroll to a specific packet (used for REQUEST/RESPONSE pair navigation). If the
     /// target is hidden by the active filter, the filter is cleared so it becomes reachable.
     /// </summary>
