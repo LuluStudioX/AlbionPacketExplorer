@@ -12,6 +12,9 @@
   <Folder Name="/libs/Protocol18/">
     <Project Path="libs/Protocol18/AlbionPacketExplorer.Protocol18.csproj" />
   </Folder>
+  <Folder Name="/libs/PhotonWire/">
+    <Project Path="libs/PhotonWire/AlbionPacketExplorer.PhotonWire.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/AlbionPacketExplorer/AlbionPacketExplorer.csproj" />
   </Folder>
