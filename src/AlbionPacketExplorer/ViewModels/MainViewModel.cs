@@ -30,6 +30,8 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string? _updateVersion;
     [ObservableProperty] private bool _isUpdating;
     [ObservableProperty] private int _updateProgress;
+    [ObservableProperty] private string _updateStatus = "";
+    [ObservableProperty] private bool _isCheckingUpdate;
     [ObservableProperty] private string _statusText = Loc.T("status.ready");
     [ObservableProperty] private ObservableCollection<NetworkDeviceInfo> _availableDevices = [];
     [ObservableProperty] private NetworkDeviceInfo? _selectedDevice;
@@ -294,12 +296,44 @@ public partial class MainViewModel : ObservableObject
         return u == 0 ? $"{size:0} {units[u]}" : $"{size:0.#} {units[u]}";
     }
 
+    // Startup check: quiet. Only reveals the banner if an update exists; stays silent on
+    // "up to date" and on errors so launch is not noisy.
     private async Task CheckForUpdateAsync()
     {
-        var version = await _updater.CheckForUpdateAsync();
-        if (version != null)
-            UpdateVersion = version;
+        var r = await _updater.CheckForUpdateAsync();
+        if (r.NewVersion is { } v)
+            UpdateVersion = v;
     }
+
+    // Manual check from the toolbar: verbose, surfaces every outcome (including failures, which
+    // the startup check hides) so a misconfigured/offline feed is not a silent black box.
+    [RelayCommand(CanExecute = nameof(CanCheckForUpdate))]
+    private async Task CheckForUpdate()
+    {
+        IsCheckingUpdate = true;
+        CheckForUpdateCommand.NotifyCanExecuteChanged();
+        UpdateStatus = Loc.T("update.checking");
+        try
+        {
+            var r = await _updater.CheckForUpdateAsync();
+            if (r.Error is { } err)
+                UpdateStatus = Loc.Format("update.failed", err);
+            else if (r.NewVersion is { } v)
+            {
+                UpdateVersion = v;
+                UpdateStatus = Loc.Format("update.available", v);
+            }
+            else
+                UpdateStatus = Loc.T("update.upToDate");
+        }
+        finally
+        {
+            IsCheckingUpdate = false;
+            CheckForUpdateCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    private bool CanCheckForUpdate() => !IsCheckingUpdate;
 
     [RelayCommand]
     private async Task ApplyUpdateAsync()
