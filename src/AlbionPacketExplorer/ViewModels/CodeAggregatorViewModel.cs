@@ -23,6 +23,10 @@ public partial class CodeAggregatorViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<CodeStatsRow> _codeStats = [];
     [ObservableProperty] private CodeStatsRow? _selectedRow;
 
+    /// <summary>Per-key field stats for the selected code (drives the field-distribution panel).</summary>
+    [ObservableProperty] private ObservableCollection<KeyStats> _selectedKeyStats = [];
+    public bool HasSelectedKeyStats => SelectedKeyStats.Count > 0;
+
     public CodeStats? SelectedCode => SelectedRow?.Stats;
 
     private readonly Dictionary<(string Kind, int Code), CodeStats> _map = [];
@@ -102,6 +106,12 @@ public partial class CodeAggregatorViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedCode));
         ExportCommand.NotifyCanExecuteChanged();
         CopyKeySummaryCommand.NotifyCanExecuteChanged();
+
+        var keys = value?.Stats.Keys.Values
+            .OrderBy(k => int.TryParse(k.Key, out var n) ? n : int.MaxValue)
+            .ToList() ?? [];
+        SelectedKeyStats = new ObservableCollection<KeyStats>(keys);
+        OnPropertyChanged(nameof(HasSelectedKeyStats));
     }
 
     private CodeStats GetOrCreateStats(string kind, int code)
@@ -125,11 +135,38 @@ public partial class CodeAggregatorViewModel : ObservableObject
             ks.Types.Add(paramVal.Type);
             if (ks.SampleValues.Count < 5)
                 ks.SampleValues.Add(paramVal.Value);
+
+            // Value distribution: count distinct stringified values (capped) and track the
+            // numeric range so a field's shape (constant / enum-like / id / range) is visible.
+            var repr = PacketDisplayFormatter.FormatParamValue(paramVal);
+            if (ks.ValueCounts.TryGetValue(repr, out var c))
+                ks.ValueCounts[repr] = c + 1;
+            else if (ks.ValueCounts.Count < KeyStats.DistinctCap)
+                ks.ValueCounts[repr] = 1;
+            else
+                ks.DistinctCapped = true;
+
+            if (ToDouble(paramVal.Value) is { } d)
+            {
+                ks.NumericMin = ks.NumericMin is { } mn ? Math.Min(mn, d) : d;
+                ks.NumericMax = ks.NumericMax is { } mx ? Math.Max(mx, d) : d;
+            }
         }
 
         foreach (var ks in stats.Keys.Values)
             ks.TotalPackets = stats.Count;
     }
+
+    private static double? ToDouble(object? v) => v switch
+    {
+        byte b   => b,
+        short s  => s,
+        int i    => i,
+        long l   => l,
+        float f  => f,
+        double d => d,
+        _        => null
+    };
 
     private static KeyStats GetOrCreateKeyStats(CodeStats stats, string paramKey)
     {
