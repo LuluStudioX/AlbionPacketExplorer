@@ -128,6 +128,7 @@
                             <MenuItem Header="{loc:T detail.menu.previewResolve}" Command="{Binding PreviewResolveCommand}" />
                             <Separator />
                             <MenuItem Header="{loc:T detail.menu.editParam}" Command="{Binding EditParamCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.labelValue}" Command="{Binding LabelValueCommand}" />
                             <Separator />
                             <MenuItem Header="{loc:T detail.menu.hideRow}"         Command="{Binding HideRowCommand}" />
                             <MenuItem Header="{loc:T detail.menu.unhideRow}"       Command="{Binding UnhideRowCommand}" />
@@ -254,6 +255,13 @@
                                             <TextBlock Text="{Binding DisplayValue}"
                                                        TextWrapping="Wrap" FontFamily="Monospace"
                                                        VerticalAlignment="Center" />
+                                            <Border CornerRadius="3" Padding="5,1" VerticalAlignment="Center"
+                                                    IsVisible="{Binding HasEnumLabel}"
+                                                    Background="{DynamicResource Apx.SurfaceAlt}"
+                                                    ToolTip.Tip="{loc:T detail.enumLabel.tip}">
+                                                <TextBlock Text="{Binding EnumLabel}" FontSize="11"
+                                                           Foreground="{DynamicResource Apx.Accent}" />
+                                            </Border>
                                         </StackPanel>
                                         <!-- Hidden / collapsed: inline, ellipsis -->
                                         <TextBlock Text="{Binding Value}" Margin="12,0"
