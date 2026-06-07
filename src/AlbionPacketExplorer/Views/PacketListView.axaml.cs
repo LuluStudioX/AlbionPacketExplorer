@@ -22,8 +22,24 @@ public partial class PacketListView : UserControl
             _vm = DataContext as PacketListViewModel;
             if (_vm != null) _vm.ScrollToRowRequested += OnScrollToRowRequested;
         };
-        Loaded   += (_, _) => ColumnWidthHelper.Restore(MainGrid, "packetlist");
+        Loaded   += OnLoaded;
         Unloaded += (_, _) => ColumnWidthHelper.Save(MainGrid, "packetlist");
+    }
+
+    private bool _columnsMenuAdded;
+
+    private void OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        ColumnWidthHelper.Restore(MainGrid, "packetlist");
+        ColumnVisibilityHelper.Restore(MainGrid, "packetlist");
+
+        // Append a "Columns" toggle submenu to the grid's context menu, once.
+        if (!_columnsMenuAdded && MainGrid.ContextMenu is { } menu)
+        {
+            menu.Items.Add(new Separator());
+            menu.Items.Add(ColumnVisibilityHelper.BuildMenu(MainGrid, "packetlist", Loc.T("list.menu.columns")));
+            _columnsMenuAdded = true;
+        }
     }
 
     private void OnScrollToRowRequested(PacketRow row)

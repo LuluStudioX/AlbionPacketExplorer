@@ -108,6 +108,7 @@
   "list.menu.copyParams": "Copy Params",
   "list.menu.copyJson": "Copy as JSON",
   "list.menu.diffSelected": "Diff Selected (2 rows)",
+  "list.menu.columns": "Columns",
   "list.menu.autoSelectNewest": "Auto-select Newest",
   "list.menu.unknownFirst": "Unknown codes first",
 
