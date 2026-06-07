@@ -170,6 +170,7 @@
   "summary.filterKeys.placeholder": "Filter Keys…",
   "summary.menu.copyKeys": "Copy Keys Summary",
   "summary.menu.exportStub": "Export C# Constructor Stub",
+  "summary.coverage": "Codes {0} ({1}% named)   ·   Fields {2} ({3}% annotated)",
   "summary.fields.title": "Field values (selected code)",
   "summary.fields.empty": "Select a code above to see how each field's value varies (distinct count, range, most common).",
   "summary.field.col.key": "Key",
