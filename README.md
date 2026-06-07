@@ -4,13 +4,12 @@ A cross-platform desktop tool for decoding and exploring Albion Online network p
 
 It captures Albion's Photon traffic **live off the wire** (or loads a previously saved capture)
 and decodes every raw event/request/response so you can inspect every field of every packet. The
-goal is to understand packet structure well enough to write more complete event constructors in
-[AlbionOnline-StatisticsAnalysis](https://github.com/Triky313/AlbionOnline-StatisticsAnalysis)
-(SAT), whose Protocol18/Photon decoding this tool reuses.
+goal is to understand packet structure well enough to write more complete event constructors for
+analysis tools that consume this traffic.
 
 Captures are stored as newline-delimited JSON. That format began as an ad-hoc debug dump while
-investigating SAT's island-management events, which is what grew into this project; it is the
-app's own format, not something SAT produces.
+investigating island-management events, which is what grew into this project; it is the app's own
+format.
 
 > Status: pre-1.0, under active development. Windows / Linux / macOS desktop.
 
@@ -67,13 +66,12 @@ later):
 ```
 
 - `kind` — `EVENT` / `REQUEST` / `RESPONSE`
-- `code` — the Photon event/op code (equals the SAT `EventCodes` / `OperationCodes` enum ordinal)
+- `code` — the Photon event/op code (equals the `EventCodes` / `OperationCodes` enum ordinal)
 - `params` — byte-indexed payload; key `252` (events) / `253` (requests, responses) is the
   code echo, not payload
 
-The "Open log" picker defaults to the original debug-dump location
-(`%LOCALAPPDATA%\StatisticsAnalysisTool\Instances\<id>\temp\`) for convenience, but any capture
-saved by this app can be reloaded from anywhere.
+The "Open capture" picker defaults to the app's own saved-captures folder; any capture saved by
+this app can be reloaded from anywhere.
 
 ---
 
@@ -92,18 +90,18 @@ dotnet run --project src/AlbionPacketExplorer/AlbionPacketExplorer.csproj
 ```
 
 The codec libraries under `libs/` (`Abstractions`, `Protocol18`, `PhotonPackageParser`,
-`Network`) are derived from SAT and mirror its Photon/Protocol18 decoding.
+`Network`) are third-party GPL-3.0 components; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 ---
 
 ## Schema
 
-`tools/generate-schema.py` regenerates `packet-schema.base.json` from the current SAT enums,
-carrying curated param annotations forward by name. Re-run it after pulling SAT, since codes
-shift when SAT inserts enum members:
+`tools/generate-schema.py` regenerates `packet-schema.base.json` from the `EventCodes` /
+`OperationCodes` enums in a reference C# source repo, carrying curated param annotations forward by
+name. Re-run it after the reference updates, since codes shift when enum members are inserted:
 
 ```bash
-python tools/generate-schema.py --sat-path /path/to/AlbionOnline-StatisticsAnalysis
+python tools/generate-schema.py --source-path /path/to/reference-source
 ```
 
 ---
@@ -116,8 +114,8 @@ with Sandbox Interactive / Albion Online. See [DISCLAIMER.md](DISCLAIMER.md).
 
 ## License
 
-Not yet finalized. AlbionPacketExplorer currently incorporates code derived from
-AlbionOnline-StatisticsAnalysis, which is licensed **GPL-3.0**. Because GPL-3.0 is copyleft, any
-distributed build that includes those libraries must also be GPL-3.0 and retain that attribution.
-A final `LICENSE` will be set once the decode libraries are either kept under GPL-3.0 or replaced
-by an independent implementation.
+Not yet finalized. AlbionPacketExplorer currently includes third-party **GPL-3.0** components (the
+`libs/` decode layer; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)). Because GPL-3.0 is
+copyleft, any distributed build that includes them is governed by GPL-3.0. A final `LICENSE` will
+be set once those components are either kept under GPL-3.0 or replaced by an independent
+implementation.

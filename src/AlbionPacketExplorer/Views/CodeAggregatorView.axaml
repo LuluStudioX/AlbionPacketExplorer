@@ -41,7 +41,7 @@
                 <ContextMenu>
                     <MenuItem Header="{loc:T summary.menu.copyKeys}"          Command="{Binding CopyKeySummaryCommand}" />
                     <MenuItem Header="{loc:T summary.menu.exportStub}" Command="{Binding ExportCommand}" />
-                    <MenuItem Header="{loc:T summary.menu.diffSat}" Command="{Binding DiffSatCommand}" />
+                    <MenuItem Header="{loc:T summary.menu.diffRef}" Command="{Binding DiffReferenceCommand}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
