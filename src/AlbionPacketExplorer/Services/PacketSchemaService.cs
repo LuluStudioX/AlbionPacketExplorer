@@ -153,6 +153,22 @@ public sealed class PacketSchemaService
             .OrderBy(n => n)
             .ToList();
 
+    /// <summary>Every named packet code the schema knows (excludes the "Unused" enum placeholders).
+    /// The capture-coverage gap = these minus the codes actually seen in a session.</summary>
+    public IReadOnlyList<(string Kind, int Code, string Name)> GetKnownCodes()
+    {
+        var list = new List<(string, int, string)>();
+        foreach (var (key, schema) in _base)
+        {
+            if (key.StartsWith('$')) continue;
+            if (string.IsNullOrEmpty(schema.Name) || schema.Name == "Unused") continue;
+            var sep = key.IndexOf(':');
+            if (sep < 0 || !int.TryParse(key.AsSpan(sep + 1), out var code)) continue;
+            list.Add((key[..sep], code, schema.Name));
+        }
+        return list;
+    }
+
     public string ExportEventSchema(string kind, int code)
     {
         var schema = GetSchema(kind, code);

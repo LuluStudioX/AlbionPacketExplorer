@@ -30,6 +30,13 @@ public partial class CodeAggregatorViewModel : ObservableObject
     /// <summary>Annotation coverage across all seen codes (how much schema work is left).</summary>
     [ObservableProperty] private string _coverageText = "";
 
+    /// <summary>Capture-coverage gap: how many known packet codes were seen vs never captured.</summary>
+    [ObservableProperty] private string _gapText = "";
+
+    // Known codes the current session never captured: the grind checklist for full coverage.
+    private List<(string Kind, int Code, string Name)> _unseen = [];
+    public bool HasUnseen => _unseen.Count > 0;
+
     public CodeStats? SelectedCode => SelectedRow?.Stats;
 
     private readonly Dictionary<(string Kind, int Code), CodeStats> _map = [];
@@ -71,6 +78,36 @@ public partial class CodeAggregatorViewModel : ObservableObject
     {
         ApplyFilter();
         UpdateCoverage();
+        UpdateGap();
+    }
+
+    // Capture-coverage gap: of every named code the schema knows, how many this session actually
+    // captured. The unseen remainder is the checklist to grind toward full packet coverage.
+    private void UpdateGap()
+    {
+        var known = Schema?.GetKnownCodes();
+        if (known == null || known.Count == 0) { GapText = ""; _unseen = []; OnPropertyChanged(nameof(HasUnseen)); CopyUnseenCommand.NotifyCanExecuteChanged(); return; }
+
+        var seen = _map.Keys.ToHashSet();
+        var seenKnown = known.Count(k => seen.Contains((k.Kind, k.Code)));
+        _unseen = known.Where(k => !seen.Contains((k.Kind, k.Code)))
+                       .OrderBy(k => k.Kind).ThenBy(k => k.Code).ToList();
+
+        var pct = known.Count == 0 ? 0 : seenKnown * 100 / known.Count;
+        GapText = Loc.Format("summary.gap", seenKnown.ToString(), known.Count.ToString(),
+            pct.ToString(), _unseen.Count.ToString());
+        OnPropertyChanged(nameof(HasUnseen));
+        CopyUnseenCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(HasUnseen))]
+    private async Task CopyUnseenAsync()
+    {
+        if (Clipboard == null || _unseen.Count == 0) return;
+        var text = string.Join("\n", _unseen.Select(u => $"{u.Kind}\t{u.Code}\t{u.Name}"));
+        await Clipboard.SetTextAsync(text);
+        Toasts?.Show(Loc.T("summary.gap.title"),
+            Loc.Format("summary.gap.copied", _unseen.Count.ToString()), ToastSeverity.Success);
     }
 
     // Schema-annotation coverage over every code seen: how many codes resolve to a name and how
@@ -121,6 +158,10 @@ public partial class CodeAggregatorViewModel : ObservableObject
         CodeStats.Clear();
         SelectedRow = null;
         CoverageText = "";
+        GapText = "";
+        _unseen = [];
+        OnPropertyChanged(nameof(HasUnseen));
+        CopyUnseenCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand(CanExecute = nameof(CanExport))]
