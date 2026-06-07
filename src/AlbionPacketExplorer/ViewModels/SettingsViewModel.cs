@@ -19,6 +19,15 @@ public partial class SettingsViewModel : ObservableObject
 
     public bool GameDataLoaded => _main.GameDataLoaded;
 
+    // Update controls live on MainViewModel; surfaced here for the About section.
+    public System.Windows.Input.ICommand CheckForUpdateCommand => _main.CheckForUpdateCommand;
+    public System.Windows.Input.ICommand ApplyUpdateCommand => _main.ApplyUpdateCommand;
+    public string UpdateStatus => _main.UpdateStatus;
+    public bool IsCheckingUpdate => _main.IsCheckingUpdate;
+    public string? UpdateVersion => _main.UpdateVersion;
+    public bool HasUpdate => !string.IsNullOrEmpty(_main.UpdateVersion);
+    public bool IsUpdating => _main.IsUpdating;
+
     public bool ResolveItemNames
     {
         get => _main.ResolveItemNames;
@@ -325,6 +334,19 @@ public partial class SettingsViewModel : ObservableObject
             {
                 case nameof(MainViewModel.GameDataLoaded):
                     OnPropertyChanged(nameof(GameDataLoaded));
+                    break;
+                case nameof(MainViewModel.UpdateStatus):
+                    OnPropertyChanged(nameof(UpdateStatus));
+                    break;
+                case nameof(MainViewModel.IsCheckingUpdate):
+                    OnPropertyChanged(nameof(IsCheckingUpdate));
+                    break;
+                case nameof(MainViewModel.UpdateVersion):
+                    OnPropertyChanged(nameof(UpdateVersion));
+                    OnPropertyChanged(nameof(HasUpdate));
+                    break;
+                case nameof(MainViewModel.IsUpdating):
+                    OnPropertyChanged(nameof(IsUpdating));
                     break;
                 case nameof(MainViewModel.ResolveItemNames):
                     OnPropertyChanged(nameof(ResolveItemNames));
