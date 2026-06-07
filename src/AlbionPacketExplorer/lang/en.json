@@ -161,6 +161,14 @@
   "summary.filterKeys.placeholder": "Filter Keys…",
   "summary.menu.copyKeys": "Copy Keys Summary",
   "summary.menu.exportStub": "Export C# Constructor Stub",
+  "summary.fields.title": "Field values (selected code)",
+  "summary.fields.empty": "Select a code above to see how each field's value varies (distinct count, range, most common).",
+  "summary.field.col.key": "Key",
+  "summary.field.col.present": "% Present",
+  "summary.field.col.types": "Types",
+  "summary.field.col.distinct": "Distinct",
+  "summary.field.col.range": "Min / Max",
+  "summary.field.col.top": "Top values",
 
   "fullValue.title": "Full Value",
 
