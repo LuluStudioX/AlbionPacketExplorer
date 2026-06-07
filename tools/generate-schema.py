@@ -26,6 +26,7 @@ from pathlib import Path
 
 APX = Path(__file__).resolve().parents[1]
 OUT = APX / "src/AlbionPacketExplorer/Assets/packet-schema.base.json"
+OVERLAY = APX / "tools/inferred-overlay.json"
 
 # Bump when the schema's shape or curation method changes (not on routine resyncs).
 SCHEMA_VERSION = "1"
@@ -76,6 +77,131 @@ def parse_enum(path: Path):
 
 def p(name, note="", resolve=""):
     return {"name": name, "note": note, "resolveAs": resolve}
+
+
+# ---- decoder param extraction --------------------------------------------------------------
+# The reference source ships one decoder class per packet (Network/Events/*.cs,
+# Network/Operations/**/*.cs). Each reads a Dictionary<byte, object> via TryGetValue(N, ...) /
+# ContainsKey(N) / parameters[N] and assigns the value to a named field. We harvest key -> field
+# name + a type hint so every packet the reference source decodes gets authoritative field names,
+# not just the hand-curated island set. Keyed BY NAME (survives wire-code renumbering).
+_CONV = {
+    "ObjectToLongArray": "Int64[]", "ObjectToIntArray": "Int32[]", "ObjectToShortArray": "Int16[]",
+    "ObjectToByteArray": "Byte[]", "ObjectToFloatArray": "Single[]", "ObjectToDoubleArray": "Double[]",
+    "ObjectToStringArray": "String[]", "ObjectToBoolArray": "Bool[]",
+    "ObjectToLong": "Int64", "ObjectToInt": "Int32", "ObjectToShort": "Int16", "ObjectToByte": "Byte",
+    "ObjectToDouble": "Double", "ObjectToFloat": "Single", "ObjectToBool": "Bool",
+    "ObjectToGuid": "Guid", "ObjectToFixPoint": "FixPoint",
+}
+
+
+def _camel(s):
+    return s[0].lower() + s[1:] if s else s
+
+
+def _conv_note(snippet):
+    for tok, t in _CONV.items():
+        if tok in snippet:
+            return t
+    if "GameTimeStamp" in snippet:
+        return ".NET ticks (UTC)"
+    if "FixPoint" in snippet:
+        return "FixPoint internal"
+    return ""
+
+
+def _resolve_field(text, key, var):
+    """Find the member a captured value is assigned to, plus a type hint, near its key usage."""
+    if var:
+        m = re.search(r"(\w+)\s*=\s*([^;]*?\b" + re.escape(var) + r"\b[^;]*);", text)
+        if m:
+            return _camel(m.group(1)), _conv_note(m.group(2))
+        m2 = re.search(re.escape(var) + r"\.(\w+)\(", text)
+        return var, (_conv_note(var + "." + m2.group(1) + "(") if m2 else "")
+    m = re.search(r"(\w+)\s*=\s*([^;]*?parameters\[\s*" + key + r"\s*\][^;]*);", text)
+    if m:
+        return _camel(m.group(1)), _conv_note(m.group(2))
+    return None, ""
+
+
+def _extract_one(text):
+    res = {}
+
+    def record(key, name, note):
+        if not name:
+            name = f"key{key}"
+        cur = res.get(key)
+        if cur is None or (cur["name"].startswith("key") and not name.startswith("key")):
+            res[key] = p(name, note)
+        elif cur and not cur["note"] and note:
+            cur["note"] = note
+
+    for m in re.finditer(r"parameters\.TryGetValue\(\s*(\d+)\s*,\s*out\s+(?:object|var)\s+(\w+)\s*\)", text):
+        name, note = _resolve_field(text, m.group(1), m.group(2))
+        record(m.group(1), name, note)
+    for m in re.finditer(r"parameters\.ContainsKey\(\s*(\d+)\s*\)", text):
+        name, note = _resolve_field(text, m.group(1), None)
+        if name:
+            record(m.group(1), name, note)
+    for m in re.finditer(r"parameters\[\s*(\d+)\s*\]", text):
+        if m.group(1) in res:
+            continue
+        name, note = _resolve_field(text, m.group(1), None)
+        if name:
+            record(m.group(1), name, note)
+    return res
+
+
+def _enum_name(text, fallback):
+    for pat in (r"IsEventValid\(\s*EventCodes\.(\w+)",
+                r"(?:IsRequestValid|IsResponseValid)\([^)]*OperationCodes\.(\w+)",
+                r"OperationCodes\.(\w+)", r"EventCodes\.(\w+)"):
+        m = re.search(pat, text)
+        if m:
+            return m.group(1)
+    return fallback
+
+
+def extract_decoders(repo: Path):
+    """name -> ordered param dict, for EVENT / REQUEST / RESPONSE decoder classes under `repo`."""
+    ev, req, resp = {}, {}, {}
+
+    def files(segment):
+        for f in repo.rglob("*.cs"):
+            ps = f.as_posix()
+            if segment in ps and "/bin/" not in ps and "/obj/" not in ps and "UnitTests" not in ps:
+                yield f
+
+    for f in files("/Network/Events/"):
+        text = f.read_text(encoding="utf-8-sig")
+        params = _extract_one(text)
+        if not params:
+            continue
+        cm = re.search(r"public\s+(?:sealed\s+)?class\s+(\w+)", text)
+        name = _enum_name(text, re.sub(r"Event$", "", cm.group(1) if cm else f.stem))
+        ev.setdefault(name, {}).update(params)
+
+    for f in files("/Network/Operations/"):
+        text = f.read_text(encoding="utf-8-sig")
+        params = _extract_one(text)
+        if not params:
+            continue
+        cm = re.search(r"public\s+(?:sealed\s+)?class\s+(\w+)", text)
+        cls = cm.group(1) if cm else f.stem
+        name = _enum_name(text, re.sub(r"(Request|Response|Operation)$", "", cls))
+        bucket = resp if (cls.endswith("Response") or "/Responses/" in f.as_posix()) else req
+        bucket.setdefault(name, {}).update(params)
+
+    return ev, req, resp
+
+
+def merge_params(carried, decoded, override):
+    """Lowest -> highest precedence: carried (prior curation) < decoded (source) < override (hand)."""
+    if override:
+        return override
+    out = dict(carried or {})
+    out.update(decoded or {})
+    return out
 
 
 # ---- island / corrected overrides (from current reference event constructors) ----
@@ -276,6 +402,16 @@ def _harvest(label):
 
 
 WIRE_OVERRIDE.update({
+    # Move: verified against 5242+ real op-22 requests (movement-positioning-research.md). Pure
+    # positional, client->server, local player only. Keys 5/6 appear in newer captures (left to
+    # inference). Echo lives in key 253, not 252.
+    "REQUEST:22": _ev("Move", {
+        "0": p("time", "Int64 DateTime.Ticks; ~+1e6 ticks (0.1s) between sends"),
+        "1": p("position", "Single[2] current position {x, y} at send time"),
+        "2": p("direction", "Single heading in degrees (0-360), not radians"),
+        "3": p("newPosition", "Single[2] destination {x, y}"),
+        "4": p("speed", "Single move speed (world units/sec); discrete tiers by mount state"),
+    }),
     "RESPONSE:73": _harvest("FarmableHarvestResponse"),   # HerbGarden: crop/herb/fiber
     "RESPONSE:74": _harvest("PastureHarvestResponse"),    # grown animals
     "RESPONSE:76": _harvest("PastureProductHarvestResponse"),  # products (milk, eggs)
@@ -327,16 +463,22 @@ def sanitize(params):
     return params
 
 
+def _curated_only(params):
+    """Drop capture-inferred slots so carry-forward preserves hand curation only (keeps regen
+    idempotent: inference is re-applied solely from the overlay, never recycled through carry)."""
+    return {k: v for k, v in params.items() if not v.get("note", "").startswith("(inferred)")}
+
+
 def best_params_by_name(old, kind):
-    """name -> richest param dict among existing `kind:code` entries."""
+    """name -> richest curated param dict among existing `kind:code` entries."""
     best = {}
     for key, val in old.items():
         k, _, _code = key.partition(":")
         if k != kind:
             continue
         name = val.get("name", "")
-        params = val.get("params", {}) or {}
-        if not name:
+        params = _curated_only(val.get("params", {}) or {})
+        if not name or not params:
             continue
         if name not in best or len(params) > len(best[name]):
             best[name] = sanitize(params)
@@ -363,6 +505,8 @@ def main():
     req_best = best_params_by_name(old, "REQUEST")
     resp_best = best_params_by_name(old, "RESPONSE")
 
+    dec_ev, dec_req, dec_resp = extract_decoders(repo)
+
     events = parse_enum(eventcodes)
     ops = parse_enum(opcodes)
 
@@ -375,29 +519,42 @@ def main():
         }
     }
     carried_ev = set()
+    decoded_ev = set()
     for ordinal, name in events:
-        if name in EVENT_OVERRIDE:
-            params = EVENT_OVERRIDE[name]
-        else:
-            params = ev_best.get(name, {})
-            if params:
+        if name not in EVENT_OVERRIDE:
+            if name in dec_ev:
+                decoded_ev.add(name)
+            elif ev_best.get(name):
                 carried_ev.add(name)
+        params = merge_params(ev_best.get(name), dec_ev.get(name), EVENT_OVERRIDE.get(name))
         out[f"EVENT:{ordinal}"] = {"name": name, "params": params}
 
     for ordinal, name in ops:
-        if name in REQUEST_OVERRIDE:
-            rparams = REQUEST_OVERRIDE[name]
-        elif name in REQUEST_SKIP_CARRY:
-            rparams = {}
-        else:
-            rparams = req_best.get(name, {})
+        carried = {} if name in REQUEST_SKIP_CARRY else req_best.get(name)
+        rparams = merge_params(carried, dec_req.get(name), REQUEST_OVERRIDE.get(name))
         out[f"REQUEST:{ordinal}"] = {"name": name, "params": rparams}
     for ordinal, name in ops:
-        out[f"RESPONSE:{ordinal}"] = {"name": name, "params": resp_best.get(name, {})}
+        rparams = merge_params(resp_best.get(name), dec_resp.get(name), None)
+        out[f"RESPONSE:{ordinal}"] = {"name": name, "params": rparams}
 
     # Island-domain ground truth by REAL WIRE CODE (overrides the drifted enum ordinals above).
     for key, entry in WIRE_OVERRIDE.items():
         out[key] = entry
+
+    # Lowest precedence: fill still-empty key slots with capture-inferred shape descriptors so every
+    # observed field of every captured packet is documented. Never clobbers an authoritative name.
+    inferred_added = 0
+    if OVERLAY.exists():
+        overlay = json.loads(OVERLAY.read_text(encoding="utf-8-sig"))
+        for key, entry in overlay.items():
+            if key.startswith("$"):
+                continue
+            slot = out.setdefault(key, {"name": "", "params": {}})
+            params = slot.setdefault("params", {})
+            for pk, pv in (entry.get("params") or {}).items():
+                if pk not in params:
+                    params[pk] = pv
+                    inferred_added += 1
 
     OUT.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -406,7 +563,9 @@ def main():
     dropped_ev = sorted(n for n in ev_best if n not in ev_names and ev_best[n])
     dropped_req = sorted(n for n in req_best if n not in op_names and req_best[n])
     print(f"events: {len(events)}  ops: {len(ops)}  total keys: {len(out)}")
-    print(f"carried EVENT param-sets: {len(carried_ev)}")
+    print(f"decoder param-sets: EVENT={len(dec_ev)} REQUEST={len(dec_req)} RESPONSE={len(dec_resp)}")
+    print(f"applied: decoded EVENT={len(decoded_ev)}  carried EVENT={len(carried_ev)}")
+    print(f"inferred key-slots filled from overlay: {inferred_added}")
     if dropped_ev:
         print(f"DROPPED EVENT param-sets (name not in current enum): {dropped_ev}")
     if dropped_req:
