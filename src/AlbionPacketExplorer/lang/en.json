@@ -171,6 +171,8 @@
   "summary.menu.copyKeys": "Copy Keys Summary",
   "summary.menu.exportStub": "Export C# Constructor Stub",
   "summary.coverage": "Codes {0} ({1}% named)   ·   Fields {2} ({3}% annotated)",
+  "summary.note.placeholder": "Notes about this code (persisted)…",
+  "summary.note.save": "Save Note",
   "summary.fields.title": "Field values (selected code)",
   "summary.fields.empty": "Select a code above to see how each field's value varies (distinct count, range, most common).",
   "summary.field.col.key": "Key",

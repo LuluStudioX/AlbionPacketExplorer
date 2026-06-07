@@ -21,7 +21,7 @@ public static class AppPaths
     [
         "settings.json", "layout.json", "filter-presets.json", "filter-last.json",
         "row-hidden.json", "row-hide-presets.json", "items.json", "packet-schema.user.json",
-        "enum-labels.json"
+        "enum-labels.json", "code-notes.json"
     ];
 
     private static readonly string[] DataSubDirs = ["icons", "logs", "lang"];
@@ -57,6 +57,7 @@ public static class AppPaths
     public static string RowHidePresets   => Path.Combine(BaseDir, "row-hide-presets.json");
     public static string UserSchema       => Path.Combine(BaseDir, "packet-schema.user.json");
     public static string EnumLabels       => Path.Combine(BaseDir, "enum-labels.json");
+    public static string CodeNotes        => Path.Combine(BaseDir, "code-notes.json");
     public static string LangDir          => Path.Combine(BaseDir, "lang");
     public static string LogsDir          => Path.Combine(BaseDir, "logs");
 
