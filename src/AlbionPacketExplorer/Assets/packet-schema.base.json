@@ -394,7 +394,43 @@
   },
   "EVENT:36": {
     "name": "NewLaborerItem",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "itemIndex",
+        "note": "Resource item id (e.g. T5 plank/metalbar/leather/cloth)",
+        "resolveAs": "itemIndex"
+      },
+      "2": {
+        "name": "quantity",
+        "note": "",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "newlyCreated",
+        "note": "bool (sometimes)",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "estimatedMarketValue",
+        "note": "FixPoint internal",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "qualityDenominator",
+        "note": "10000 = 100.00% (when present)",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "durability",
+        "note": "FixPoint internal (when present)",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:37": {
     "name": "NewEquipmentItemLegendarySoul",
@@ -842,14 +878,19 @@
         "note": "",
         "resolveAs": ""
       },
+      "1": {
+        "name": "finishAtTicks",
+        "note": ".NET ticks (UTC)",
+        "resolveAs": ""
+      },
       "2": {
         "name": "buildingObjectId",
-        "note": "",
+        "note": "Often absent in captures (suspected model-index bug)",
         "resolveAs": ""
       },
       "4": {
         "name": "actionType",
-        "note": "",
+        "note": "ActionOnBuildingType enum; often absent in captures",
         "resolveAs": ""
       }
     }
@@ -1153,121 +1194,31 @@
     "params": {}
   },
   "EVENT:103": {
-    "name": "GuildUpdate",
+    "name": "NewCharacter",
     "params": {
-      "0": {
-        "name": "objectId",
-        "note": "",
-        "resolveAs": ""
-      },
-      "10": {
-        "name": "guildMemberCount",
-        "note": "",
-        "resolveAs": ""
-      },
-      "11": {
-        "name": "timestamp",
-        "note": ".NET ticks",
-        "resolveAs": ""
-      },
-      "14": {
-        "name": "",
-        "note": "",
-        "resolveAs": ""
-      },
       "15": {
-        "name": "guildName",
-        "note": "Guild display name",
+        "name": "nickname",
+        "note": "Player name (inferred)",
         "resolveAs": ""
       },
       "16": {
-        "name": "guildTag",
-        "note": "Guild tag/abbreviation (e.g. HOG)",
+        "name": "guildName",
+        "note": "Guild name (inferred)",
         "resolveAs": ""
       },
       "17": {
-        "name": "guildMembers",
-        "note": "Array of member data",
-        "resolveAs": ""
-      },
-      "19": {
-        "name": "guildData",
-        "note": "Dictionary of guild properties",
+        "name": "equipmentItems",
+        "note": "Byte[] equipment/item ids (inferred)",
         "resolveAs": ""
       },
       "20": {
-        "name": "",
-        "note": "",
+        "name": "stat20",
+        "note": "Int32 stat/health (inferred)",
         "resolveAs": ""
       },
       "21": {
-        "name": "",
-        "note": "",
-        "resolveAs": ""
-      },
-      "22": {
-        "name": "",
-        "note": "",
-        "resolveAs": ""
-      },
-      "23": {
-        "name": "",
-        "note": "",
-        "resolveAs": ""
-      },
-      "24": {
-        "name": "silver",
-        "note": "Silver amount (FixPoint internal)",
-        "resolveAs": ""
-      },
-      "25": {
-        "name": "",
-        "note": "",
-        "resolveAs": ""
-      },
-      "26": {
-        "name": "",
-        "note": "Float/percentage value",
-        "resolveAs": ""
-      },
-      "27": {
-        "name": "timestamp2",
-        "note": ".NET ticks",
-        "resolveAs": ""
-      },
-      "28": {
-        "name": "guildBanner",
-        "note": "Guild banner UniqueName (e.g. GUILD_FINDER_BANNER_24)",
-        "resolveAs": ""
-      },
-      "29": {
-        "name": "",
-        "note": "",
-        "resolveAs": ""
-      },
-      "31": {
-        "name": "",
-        "note": "",
-        "resolveAs": ""
-      },
-      "32": {
-        "name": "hideoutLocation",
-        "note": "Hideout location string (HIDEOUT@id@guid)",
-        "resolveAs": ""
-      },
-      "33": {
-        "name": "timestamp3",
-        "note": ".NET ticks",
-        "resolveAs": ""
-      },
-      "34": {
-        "name": "allianceName",
-        "note": "Alliance display name",
-        "resolveAs": ""
-      },
-      "37": {
-        "name": "timestamp4",
-        "note": ".NET ticks",
+        "name": "stat21",
+        "note": "Int32 stat/health (inferred)",
         "resolveAs": ""
       }
     }
@@ -1349,7 +1300,7 @@
     "params": {}
   },
   "EVENT:123": {
-    "name": "NewMob",
+    "name": "Mob",
     "params": {
       "0": {
         "name": "objectId",
@@ -1357,38 +1308,48 @@
         "resolveAs": ""
       },
       "1": {
-        "name": "mobIndex",
-        "note": "",
+        "name": "typeId",
+        "note": "Mob/entity type id (inferred)",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "flags",
+        "note": "Byte (often 255) (inferred)",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "name",
+        "note": "Name, usually empty for generic mobs (inferred)",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "position",
+        "note": "Single[] world position {x, y} (inferred)",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "targetPosition",
+        "note": "Single[] move target {x, y} (inferred)",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "heading",
+        "note": "Single facing/angle (inferred)",
         "resolveAs": ""
       },
       "11": {
-        "name": "moveSpeed",
-        "note": "",
+        "name": "speed",
+        "note": "Single move speed (inferred)",
         "resolveAs": ""
       },
       "13": {
-        "name": "hitPoints",
-        "note": "",
+        "name": "health",
+        "note": "Single current health (inferred)",
         "resolveAs": ""
       },
       "14": {
-        "name": "hitPointsMax",
-        "note": "",
-        "resolveAs": ""
-      },
-      "17": {
-        "name": "energy",
-        "note": "",
-        "resolveAs": ""
-      },
-      "18": {
-        "name": "energyMax",
-        "note": "",
-        "resolveAs": ""
-      },
-      "19": {
-        "name": "energyRegeneration",
-        "note": "",
+        "name": "maxHealth",
+        "note": "Single max health (inferred)",
         "resolveAs": ""
       }
     }
