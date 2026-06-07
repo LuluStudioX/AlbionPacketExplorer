@@ -111,6 +111,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.PacketDetail.Clipboard = clipboard;
             vm.PacketDetail.Toasts = vm.ToastManager;
             vm.PacketDetail.EditParamRequested += OnEditParamRequested;
+            vm.PacketDetail.LabelValueRequested += OnLabelValueRequested;
             vm.PacketDetail.ViewFullValueRequested += OnViewFullValueRequested;
             vm.PacketList.DiffRequested += OnDiffRequested;
             vm.PropertyChanged += OnViewModelPropertyChanged;
@@ -309,6 +310,12 @@ public partial class MainWindow : ApxWindow, IFilePicker
     private void OnEditParamRequested(EditParamViewModel vm)
     {
         var win = new EditParamWindow(vm);
+        win.Show(this);
+    }
+
+    private void OnLabelValueRequested(EnumLabelViewModel vm)
+    {
+        var win = new EnumLabelWindow(vm);
         win.Show(this);
     }
 

@@ -17,6 +17,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IconCacheService _iconCache = new();
     private readonly PacketSchemaService _schema = new();
     private readonly RowHideStore _rowHideStore = new();
+    private readonly EnumLabelStore _enumLabels = new();
     private readonly UpdateService _updater = new();
 
     [ObservableProperty] private CodeAggregatorViewModel _aggregator = new();
@@ -211,7 +212,7 @@ public partial class MainViewModel : ObservableObject
     {
         _filePicker = filePicker;
         _toasts = toasts;
-        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore);
+        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore, _enumLabels);
         _packetDetail.CorrelatedPacketRequested += PacketList.SelectPacket;
         PacketList.Configure(_gameData, false);
         PacketList.LoadPersistedState();

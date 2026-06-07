@@ -55,6 +55,10 @@ public sealed class ParamRow : ObservableObject
     public string PreviewText { get; set; } = string.Empty;
     public bool HasPreview => !string.IsNullOrEmpty(PreviewText);
 
+    /// <summary>User label for this exact value (enum-value catalog), shown next to the value.</summary>
+    public string EnumLabel { get; set; } = string.Empty;
+    public bool HasEnumLabel => !string.IsNullOrEmpty(EnumLabel);
+
     private bool _isExpanded;
     public bool IsExpanded
     {
@@ -145,6 +149,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     private readonly IconCacheService _icons;
     private readonly PacketSchemaService _schema;
     private readonly RowHideStore _hideStore;
+    private readonly EnumLabelStore _enumLabels;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
@@ -281,13 +286,16 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     public IClipboard? Clipboard { get; set; }
     public ToastService? Toasts { get; set; }
 
-    public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema, RowHideStore hideStore)
+    public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema,
+                                 RowHideStore hideStore, EnumLabelStore enumLabels)
     {
         _gameData = gameData;
         _icons = icons;
         _schema = schema;
         _hideStore = hideStore;
+        _enumLabels = enumLabels;
         _hideStore.Load();
+        _enumLabels.Load();
         RefreshHidePresets();
     }
 
@@ -388,7 +396,10 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                     (resolved, uniqueName) = TryResolveParam(pv);
             }
 
-            var row = new ParamRow(key, schemaName, pv.Type, formatted, resolved, uniqueName, note, source, resolveAs);
+            var row = new ParamRow(key, schemaName, pv.Type, formatted, resolved, uniqueName, note, source, resolveAs)
+            {
+                EnumLabel = _enumLabels.Get(Packet.Kind, Packet.Code, key, formatted) ?? string.Empty,
+            };
             if (resolvedItems != null)
                 foreach (var ri in resolvedItems)
                     row.ResolvedItems.Add(ri);
@@ -577,6 +588,18 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         PreviewResolveToggled?.Invoke();
     }
 
+    public event Action<EnumLabelViewModel>? LabelValueRequested;
+
+    [RelayCommand(CanExecute = nameof(CanCopyRow))]
+    private void LabelValue()
+    {
+        if (SelectedRow == null || Packet == null) return;
+        var current = _enumLabels.Get(Packet.Kind, Packet.Code, SelectedRow.Key, SelectedRow.Value) ?? string.Empty;
+        var vm = new EnumLabelViewModel(_enumLabels, Packet.Kind, Packet.Code,
+            SelectedRow.Key, SelectedRow.Value, current, () => RebuildRows());
+        LabelValueRequested?.Invoke(vm);
+    }
+
     public event Action<EditParamViewModel>? EditParamRequested;
 
     [RelayCommand(CanExecute = nameof(CanCopyRow))]
@@ -692,6 +715,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         PreviewResolveCommand.NotifyCanExecuteChanged();
         ViewFullValueCommand.NotifyCanExecuteChanged();
         EditParamCommand.NotifyCanExecuteChanged();
+        LabelValueCommand.NotifyCanExecuteChanged();
         HideRowCommand.NotifyCanExecuteChanged();
         UnhideRowCommand.NotifyCanExecuteChanged();
     }
