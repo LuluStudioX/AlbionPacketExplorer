@@ -290,6 +290,28 @@ WIRE_OVERRIDE.update({
     "REQUEST:258": _ev("ViewLaborer", {
         "0": p("laborerObjectId", "Open/inspect only, no collect"),
     }),
+    # World/combat events identified from captures (packet_sniffer.json) cross-referenced with
+    # radar-tool field semantics. INFERRED from samples (indices drifted from older protocol16
+    # references) - verify against live traffic before relying on the less-certain fields.
+    "EVENT:103": _ev("NewCharacter", {
+        "15": p("nickname", "Player name (inferred)"),
+        "16": p("guildName", "Guild name (inferred)"),
+        "17": p("equipmentItems", "Byte[] equipment/item ids (inferred)"),
+        "20": p("stat20", "Int32 stat/health (inferred)"),
+        "21": p("stat21", "Int32 stat/health (inferred)"),
+    }),
+    "EVENT:123": _ev("Mob", {
+        "0": p("objectId"),
+        "1": p("typeId", "Mob/entity type id (inferred)"),
+        "2": p("flags", "Byte (often 255) (inferred)"),
+        "6": p("name", "Name, usually empty for generic mobs (inferred)"),
+        "7": p("position", "Single[] world position {x, y} (inferred)"),
+        "8": p("targetPosition", "Single[] move target {x, y} (inferred)"),
+        "10": p("heading", "Single facing/angle (inferred)"),
+        "11": p("speed", "Single move speed (inferred)"),
+        "13": p("health", "Single current health (inferred)"),
+        "14": p("maxHealth", "Single max health (inferred)"),
+    }),
 })
 
 _DASHES = {"‒": "-", "–": "-", "—": "-", "―": "-"}
