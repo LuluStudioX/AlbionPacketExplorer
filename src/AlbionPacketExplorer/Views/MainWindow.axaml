@@ -37,20 +37,6 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                <!-- Manual update check: surfaces checking / up-to-date / failure (the startup check
-                     is silent), so a misconfigured or offline feed is not a black box. -->
-                <TextBlock VerticalAlignment="Center" FontSize="11" TextTrimming="CharacterEllipsis"
-                           MaxWidth="180" Foreground="{DynamicResource Apx.TextMuted}"
-                           IsVisible="{Binding UpdateStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                           Text="{Binding UpdateStatus}" ToolTip.Tip="{Binding UpdateStatus}" />
-                <Button Classes="iconbtn" Command="{Binding CheckForUpdateCommand}"
-                        ToolTip.Tip="{loc:T toolbar.checkUpdate.tip}">
-                    <Panel>
-                        <Path Classes="icon sm" Data="{StaticResource Icon.Download}"
-                              IsVisible="{Binding IsCheckingUpdate, Converter={x:Static BoolConverters.Not}}" />
-                        <controls:ApxSpinner Width="12" Height="12" IsVisible="{Binding IsCheckingUpdate}" />
-                    </Panel>
-                </Button>
                 <controls:ApxSpinner Width="16" Height="16" IsVisible="{Binding IsLoading}" />
             </StackPanel>
 

@@ -12,7 +12,6 @@
   "toolbar.update": "Update",
   "toolbar.updateAvailable": "v{0} available",
   "toolbar.update.tip": "Download and install update, then restart",
-  "toolbar.checkUpdate.tip": "Check for updates now",
   "update.checking": "Checking for updates…",
   "update.upToDate": "Up to date",
   "update.available": "v{0} available",
@@ -309,5 +308,7 @@
   "settings.theme.language.desc": "Interface language. More languages can be added by dropping a JSON file into the app's lang folder.",
 
   "settings.about.name": "Albion Packet Explorer",
-  "settings.about.desc": "Inspect and decode Albion Online network packets from a live capture or a saved log. Explore every field of every packet to understand the game's network protocol."
+  "settings.about.desc": "Inspect and decode Albion Online network packets from a live capture or a saved log. Explore every field of every packet to understand the game's network protocol.",
+  "settings.about.checkUpdate": "Check for Updates",
+  "settings.about.applyUpdate": "Download and Install"
 }
