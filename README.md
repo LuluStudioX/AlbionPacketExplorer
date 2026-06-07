@@ -108,11 +108,16 @@ python tools/generate-schema.py --sat-path /path/to/AlbionOnline-StatisticsAnaly
 
 ---
 
+## Disclaimer
+
+Provided "as is", without warranty; the authors are not liable for misuse. Use only on traffic you
+are authorised to capture, and comply with applicable laws and any service's terms. Not affiliated
+with Sandbox Interactive / Albion Online. See [DISCLAIMER.md](DISCLAIMER.md).
+
 ## License
 
-Not yet finalized. AlbionPacketExplorer incorporates code derived from
-AlbionOnline-StatisticsAnalysis, which is licensed **GPL-3.0**. Because GPL-3.0 is a copyleft
-license, any distributed build of this project that includes those libraries must also be
-GPL-3.0. A final `LICENSE` will be added accordingly before any public release.
-
-This project is not affiliated with or endorsed by Sandbox Interactive / Albion Online.
+Not yet finalized. AlbionPacketExplorer currently incorporates code derived from
+AlbionOnline-StatisticsAnalysis, which is licensed **GPL-3.0**. Because GPL-3.0 is copyleft, any
+distributed build that includes those libraries must also be GPL-3.0 and retain that attribution.
+A final `LICENSE` will be set once the decode libraries are either kept under GPL-3.0 or replaced
+by an independent implementation.
