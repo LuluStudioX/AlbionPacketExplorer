@@ -54,6 +54,34 @@ public class KeyStats
         }
     }
 
+    /// <summary>
+    /// Best-effort guess at what the field represents, from its observed types and value spread.
+    /// Hints only (the curated schema is authoritative); meant to speed annotation.
+    /// </summary>
+    public string Heuristic
+    {
+        get
+        {
+            if (Types.Contains("Byte[]")) return "bytes / GUID";
+            if (Types.Any(t => t.EndsWith("[]"))) return "array";
+            if (Types.Contains("String")) return "string / uniqueName";
+            if (Types.Contains("Boolean")) return "bool";
+            if (IsConstant) return "constant";
+
+            if (HasNumericRange)
+            {
+                var min = NumericMin!.Value;
+                var max = NumericMax!.Value;
+                if (min > 5e17 && max < 8e17) return "ticks (UTC)";       // .NET DateTime ticks, modern dates
+                if (min > 1e12 && max < 3e12) return "unix ms?";          // epoch milliseconds
+                var distinct = DistinctCapped ? int.MaxValue : ValueCounts.Count;
+                if (min >= 0 && max <= 255 && distinct <= 16) return "enum / flag";
+                if (min >= 0 && max > 1000 && (DistinctCapped || distinct > 50)) return "id";
+            }
+            return "";
+        }
+    }
+
     private static string Fmt(double d) =>
         d == Math.Floor(d) && Math.Abs(d) < 1e15
             ? ((long) d).ToString(System.Globalization.CultureInfo.InvariantCulture)
