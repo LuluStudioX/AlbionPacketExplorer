@@ -15,6 +15,14 @@
             </ToggleButton>
             <TextBlock Text="{Binding CoverageText}" FontSize="11" VerticalAlignment="Center"
                        Foreground="{DynamicResource Apx.TextMuted}" />
+            <Border Width="1" Background="{DynamicResource Apx.Border}" Margin="4,2"
+                    IsVisible="{Binding GapText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <TextBlock Text="{Binding GapText}" FontSize="11" VerticalAlignment="Center"
+                       Foreground="{DynamicResource Apx.TextMuted}" />
+            <Button Classes="ghost" Padding="8,3" Command="{Binding CopyUnseenCommand}"
+                    IsVisible="{Binding HasUnseen}"
+                    ToolTip.Tip="{loc:T summary.gap.copyUnseen.tip}"
+                    Content="{loc:T summary.gap.copyUnseen}" FontSize="11" />
         </StackPanel>
 
         <Grid RowDefinitions="2*,Auto,*">
