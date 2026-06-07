@@ -43,6 +43,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
 
     public IClipboard? Clipboard { get; set; }
     public ToastService? Toasts { get; set; }
+    public PacketSchemaService? Schema { get; set; }
 
     public void Ingest(PacketEntry packet)
     {
@@ -86,7 +87,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
     private async Task ExportAsync()
     {
         if (SelectedCode == null || Clipboard == null) return;
-        await Clipboard.SetTextAsync(ConstructorExporter.Export(SelectedCode));
+        await Clipboard.SetTextAsync(ConstructorExporter.Export(SelectedCode, Schema));
         Toasts?.Show(Loc.T("toast.copied.keySummary.title"),
             Loc.Format("toast.exportStub.body", SelectedCode.Kind, SelectedCode.Code),
             ToastSeverity.Success);
