@@ -168,6 +168,7 @@
   "summary.field.col.types": "Types",
   "summary.field.col.distinct": "Distinct",
   "summary.field.col.range": "Min / Max",
+  "summary.field.col.guess": "Looks like",
   "summary.field.col.top": "Top values",
 
   "fullValue.title": "Full Value",
