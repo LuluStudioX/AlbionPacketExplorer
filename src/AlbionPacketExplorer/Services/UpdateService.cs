@@ -9,7 +9,7 @@ public sealed class UpdateService
     // The update feed is served from our own site (a static Velopack feed behind a Cloudflare
     // tunnel), so the GitHub source repo can stay private and no token ever ships in the client.
     // Override per machine with APX_UPDATE_URL; otherwise the baked-in default is used.
-    private const string DefaultFeedUrl = "https://updates.lulustudio.dk/apx";
+    private const string DefaultFeedUrl = "https://projects.lulustudio.dk/apx/feed";
 
     private static string FeedUrl =>
         Environment.GetEnvironmentVariable("APX_UPDATE_URL") is { Length: > 0 } u ? u : DefaultFeedUrl;
