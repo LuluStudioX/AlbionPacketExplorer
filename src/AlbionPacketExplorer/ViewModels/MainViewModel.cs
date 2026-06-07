@@ -241,6 +241,7 @@ public partial class MainViewModel : ObservableObject
 
         _ = LoadGameDataAsync();
         _ = CheckForUpdateAsync();
+        StartPeriodicUpdateChecks();
         RefreshDevices();
 
         Aggregator.PropertyChanged += (_, args) =>
@@ -294,6 +295,17 @@ public partial class MainViewModel : ObservableObject
         int u = 0;
         while (size >= 1024 && u < units.Length - 1) { size /= 1024; u++; }
         return u == 0 ? $"{size:0} {units[u]}" : $"{size:0.#} {units[u]}";
+    }
+
+    // Re-check periodically so a long-running session notices a new release without a restart.
+    // Quiet (same as the startup check); fires on the UI thread via DispatcherTimer.
+    private Avalonia.Threading.DispatcherTimer? _updateTimer;
+
+    private void StartPeriodicUpdateChecks()
+    {
+        _updateTimer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromHours(6) };
+        _updateTimer.Tick += async (_, _) => await CheckForUpdateAsync();
+        _updateTimer.Start();
     }
 
     // Startup check: quiet. Only reveals the banner if an update exists; stays silent on
