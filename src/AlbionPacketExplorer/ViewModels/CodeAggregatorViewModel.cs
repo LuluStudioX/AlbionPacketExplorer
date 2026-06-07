@@ -27,6 +27,9 @@ public partial class CodeAggregatorViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<KeyStats> _selectedKeyStats = [];
     public bool HasSelectedKeyStats => SelectedKeyStats.Count > 0;
 
+    /// <summary>Annotation coverage across all seen codes (how much schema work is left).</summary>
+    [ObservableProperty] private string _coverageText = "";
+
     public CodeStats? SelectedCode => SelectedRow?.Stats;
 
     private readonly Dictionary<(string Kind, int Code), CodeStats> _map = [];
@@ -55,6 +58,30 @@ public partial class CodeAggregatorViewModel : ObservableObject
     public void Flush()
     {
         ApplyFilter();
+        UpdateCoverage();
+    }
+
+    // Schema-annotation coverage over every code seen: how many codes resolve to a name and how
+    // many byte keys have a curated param name. Surfaces how much annotation work remains.
+    private void UpdateCoverage()
+    {
+        if (_map.Count == 0) { CoverageText = ""; return; }
+
+        var codes = _map.Count;
+        var named = _map.Values.Count(s => !string.IsNullOrEmpty(PacketNameResolver.Resolve(s.Kind, s.Code)));
+        int totalKeys = 0, annotatedKeys = 0;
+        foreach (var s in _map.Values)
+            foreach (var k in s.Keys.Values)
+            {
+                totalKeys++;
+                if (!string.IsNullOrEmpty(Schema?.GetParam(s.Kind, s.Code, k.Key)?.Name))
+                    annotatedKeys++;
+            }
+
+        var codePct = codes == 0 ? 0 : named * 100 / codes;
+        var keyPct = totalKeys == 0 ? 0 : annotatedKeys * 100 / totalKeys;
+        CoverageText = Loc.Format("summary.coverage", codes.ToString(), codePct.ToString(),
+            totalKeys.ToString(), keyPct.ToString());
     }
 
     private void ApplyFilter()
@@ -81,6 +108,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
         _map.Clear();
         CodeStats.Clear();
         SelectedRow = null;
+        CoverageText = "";
     }
 
     [RelayCommand(CanExecute = nameof(CanExport))]
