@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "5022065a",
-    "generatedAt": "2026-06-03"
+    "sourceCommit": "4ac7ba3e",
+    "generatedAt": "2026-06-07"
   },
   "EVENT:0": {
     "name": "Unused",
@@ -160,8 +160,24 @@
     "params": {}
   },
   "EVENT:27": {
-    "name": "InventoryDeleteItem",
-    "params": {}
+    "name": "NewSimpleItem",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "despawnRef",
+        "note": "Small int; despawn/destroy marker (not a real item create)",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "estimatedMarketValue",
+        "note": "FixPoint internal (when full form)",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:28": {
     "name": "InventoryState",
@@ -237,7 +253,7 @@
     "params": {}
   },
   "EVENT:32": {
-    "name": "NewSimpleItem",
+    "name": "NewLaborerItem",
     "params": {
       "0": {
         "name": "objectId",
@@ -246,7 +262,7 @@
       },
       "1": {
         "name": "itemIndex",
-        "note": "Item ID - maps to IndexedItems",
+        "note": "Resource item id (e.g. T5 plank/metalbar/leather/cloth)",
         "resolveAs": "itemIndex"
       },
       "2": {
@@ -254,14 +270,24 @@
         "note": "",
         "resolveAs": ""
       },
+      "3": {
+        "name": "newlyCreated",
+        "note": "bool (sometimes)",
+        "resolveAs": ""
+      },
       "4": {
-        "name": "emv",
-        "note": "Estimated market value in silver",
+        "name": "estimatedMarketValue",
+        "note": "FixPoint internal",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "qualityDenominator",
+        "note": "10000 = 100.00% (when present)",
         "resolveAs": ""
       },
       "7": {
         "name": "durability",
-        "note": "",
+        "note": "FixPoint internal (when present)",
         "resolveAs": ""
       }
     }
@@ -328,7 +354,43 @@
   },
   "EVENT:35": {
     "name": "NewJournalItem",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "journalItemIndex",
+        "note": "Journal item id (11877-11906)",
+        "resolveAs": "itemIndex"
+      },
+      "2": {
+        "name": "quantity",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "estimatedMarketValue",
+        "note": "FixPoint internal",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "crafterName",
+        "note": "Crafter / filler name",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "qualityDenominator",
+        "note": "10000 = 100.00%",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "durability",
+        "note": "FixPoint internal",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:36": {
     "name": "NewLaborerItem",
@@ -376,32 +438,42 @@
       },
       "1": {
         "name": "buildingGuid",
-        "note": "16-byte building GUID (Byte[])",
+        "note": "16-byte GUID (Byte[])",
         "resolveAs": ""
       },
       "2": {
-        "name": "houseObjectId",
-        "note": "",
+        "name": "parentHouseObjectId",
+        "note": "Object sits inside this house",
         "resolveAs": ""
       },
       "3": {
         "name": "uniqueName",
-        "note": "Building UniqueName",
+        "note": "Type discriminator, e.g. T7_LABOURER_WOOD",
         "resolveAs": ""
       },
       "4": {
         "name": "position",
-        "note": "World position Single[] {X, Y}",
+        "note": "Single[2] tile coords {x, y}",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "rotation",
+        "note": "Degrees (0/90/180/270/custom)",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "placedFlag",
+        "note": "bool placed/visible",
         "resolveAs": ""
       },
       "7": {
         "name": "nutrition",
-        "note": "Current nutrition",
+        "note": "Current food units (FixPoint internal)",
         "resolveAs": ""
       },
       "8": {
-        "name": "plantedAt",
-        "note": ".NET ticks (UTC); lastActionAt",
+        "name": "lastActionTicks",
+        "note": ".NET ticks (UTC); PlantedAt / last interaction",
         "resolveAs": ""
       },
       "9": {
@@ -409,14 +481,24 @@
         "note": "16-byte plot GUID (Byte[])",
         "resolveAs": ""
       },
+      "10": {
+        "name": "ownerAccountGuid",
+        "note": "16-byte account GUID (Byte[])",
+        "resolveAs": ""
+      },
       "11": {
         "name": "islandOwnerName",
         "note": "",
         "resolveAs": ""
       },
+      "12": {
+        "name": "builderName",
+        "note": "Placer (usually == owner)",
+        "resolveAs": ""
+      },
       "13": {
         "name": "laborerFirstName",
-        "note": "",
+        "note": "Laborer houses only",
         "resolveAs": ""
       },
       "14": {
@@ -424,9 +506,54 @@
         "note": "",
         "resolveAs": ""
       },
+      "15": {
+        "name": "occupied",
+        "note": "bool occupied/hireable (stations)",
+        "resolveAs": ""
+      },
       "16": {
         "name": "hasPremium",
         "note": "bool",
+        "resolveAs": ""
+      },
+      "18": {
+        "name": "nutritionCapacity",
+        "note": "Max food",
+        "resolveAs": ""
+      },
+      "19": {
+        "name": "buildingItemTypeId",
+        "note": "-1 when n/a",
+        "resolveAs": ""
+      },
+      "20": {
+        "name": "placedAtTicks",
+        "note": ".NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "21": {
+        "name": "nutritionValue",
+        "note": "~capacity",
+        "resolveAs": ""
+      },
+      "22": {
+        "name": "lastUpdateTicks",
+        "note": ".NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "23": {
+        "name": "silverValue",
+        "note": "Station usage",
+        "resolveAs": ""
+      },
+      "24": {
+        "name": "usageFee",
+        "note": "Upkeep silver",
+        "resolveAs": ""
+      },
+      "29": {
+        "name": "stateTier",
+        "note": "State/tier byte (0/2/4)",
         "resolveAs": ""
       }
     }
@@ -468,17 +595,17 @@
     "params": {
       "0": {
         "name": "objectId",
-        "note": "",
+        "note": "NOTE: wire code 54 collides with HarvestFinished (LIFO handler wins)",
         "resolveAs": ""
       },
       "4": {
         "name": "elapsedGrowTime",
-        "note": "Elapsed grow time in 100us units",
+        "note": "Elapsed grow time (100us units); active form only",
         "resolveAs": ""
       },
       "5": {
         "name": "serverNow",
-        "note": ".NET ticks (UTC) server now; PlantedAt = serverNow - elapsed",
+        "note": ".NET ticks (UTC); PlantedAt = serverNow - elapsed; active form only",
         "resolveAs": ""
       }
     }
@@ -497,37 +624,42 @@
       },
       "1": {
         "name": "firstName",
-        "note": "Laborer first name",
+        "note": "",
         "resolveAs": ""
       },
       "2": {
         "name": "lastName",
-        "note": "Laborer last name",
+        "note": "",
         "resolveAs": ""
       },
       "3": {
         "name": "fameFill",
-        "note": "FixPoint internal value (FixPoint.FromInternalValue)",
+        "note": "FixPoint internal",
         "resolveAs": ""
       },
       "4": {
         "name": "happiness",
-        "note": "FixPoint internal value, truncated to int",
+        "note": "FixPoint internal",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "happinessDup",
+        "note": "Duplicate of key 4",
         "resolveAs": ""
       },
       "6": {
-        "name": "nextReturnAt",
-        "note": ".NET ticks (UTC)",
+        "name": "contractTimestamp1",
+        "note": ".NET ticks (UTC); static, ignored by app",
         "resolveAs": ""
       },
       "7": {
-        "name": "lastJobStartedAt",
-        "note": ".NET ticks (UTC)",
+        "name": "contractTimestamp2",
+        "note": ".NET ticks (UTC); static, ignored by app",
         "resolveAs": ""
       },
       "8": {
-        "name": "jobDispatchTime",
-        "note": ".NET ticks (UTC); present only while away on job",
+        "name": "returnAtTicks",
+        "note": ".NET ticks (UTC); present only while on a job",
         "resolveAs": ""
       },
       "9": {
@@ -537,7 +669,7 @@
       },
       "10": {
         "name": "sentByCharacter",
-        "note": "Dispatching character / zone name",
+        "note": "Dispatching character / zone (on-job only)",
         "resolveAs": ""
       }
     }
@@ -551,18 +683,18 @@
         "resolveAs": ""
       },
       "1": {
-        "name": "isLootReady",
-        "note": "bool; true = returned home, loot ready",
+        "name": "hasActiveJob",
+        "note": "bool; always true when present (NOT loot-ready)",
         "resolveAs": ""
       },
       "2": {
         "name": "journalItemId",
-        "note": "Journal item index",
+        "note": "Journal item id of the active job",
         "resolveAs": "itemIndex"
       },
       "3": {
         "name": "currentFameFill",
-        "note": "FixPoint internal value",
+        "note": "FixPoint internal",
         "resolveAs": ""
       },
       "5": {
@@ -581,8 +713,29 @@
     "params": {}
   },
   "EVENT:60": {
-    "name": "HarvestCancel",
-    "params": {}
+    "name": "ActionOnBuildingFinished",
+    "params": {
+      "0": {
+        "name": "userObjectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "finishAtTicks",
+        "note": ".NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "buildingObjectId",
+        "note": "Often absent in captures (suspected model-index bug)",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "actionType",
+        "note": "ActionOnBuildingType enum; often absent in captures",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:61": {
     "name": "HarvestFinished",
@@ -1632,28 +1785,73 @@
         "resolveAs": ""
       },
       "1": {
-        "name": "elapsedGrowTime",
-        "note": "Pasture/herb layout: elapsed grow time (100us units)",
+        "name": "pastureElapsedGrowTime",
+        "note": "Pasture layout: elapsed grow time (100us units)",
         "resolveAs": ""
       },
       "2": {
-        "name": "serverNow",
-        "note": "Pasture/herb layout: server now (.NET ticks UTC)",
+        "name": "pastureServerNow",
+        "note": "Pasture layout: server now (.NET ticks UTC)",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "activeFlag",
+        "note": "bool growing (pasture form)",
         "resolveAs": ""
       },
       "4": {
-        "name": "elapsedGrowTimeFarm",
-        "note": "Farm layout: elapsed grow time (100us units)",
+        "name": "cropElapsedGrowTime",
+        "note": "Crop/herb layout: elapsed grow time (100us units)",
         "resolveAs": ""
       },
       "5": {
-        "name": "serverNowFarm",
-        "note": "Farm layout: server now (.NET ticks UTC)",
+        "name": "cropServerNow",
+        "note": "Crop/herb layout: server now (.NET ticks UTC)",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "stateFlagBytes",
+        "note": "Byte[]; usually empty",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "stateFlagBytes2",
+        "note": "Byte[]; usually empty",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "arrayLeadingFlag",
+        "note": "Byte[]; array-form leading flag",
         "resolveAs": ""
       },
       "9": {
-        "name": "activityTimestamp",
-        "note": ".NET ticks (UTC); last activity. A string param holds the FARMABLE uniqueName",
+        "name": "arrayServerNow",
+        "note": "Int64[]; array-form server-now ticks (single element)",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "arrayElapsedGrowTime",
+        "note": "Array-form elapsed grow time (100us units)",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "arrayTicks2",
+        "note": "Int64[]; array-form secondary ticks",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "feedFraction",
+        "note": "Single; 1.0 crops/full, 0.5/0.25 animals by feed level",
+        "resolveAs": ""
+      },
+      "13": {
+        "name": "nextReadyTicks",
+        "note": ".NET ticks (UTC); min-long = none",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "slotCount",
+        "note": "Item/slot count (optional)",
         "resolveAs": ""
       }
     }
@@ -3982,8 +4180,14 @@
     "params": {}
   },
   "REQUEST:45": {
-    "name": "RegisterToObject",
-    "params": {}
+    "name": "OpenLaborerOrBuilding",
+    "params": {
+      "0": {
+        "name": "targetObjectId",
+        "note": "0 = own laborer; spawns preview items",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:46": {
     "name": "UnRegisterFromObject",
@@ -4856,12 +5060,29 @@
     "params": {}
   },
   "REQUEST:257": {
-    "name": "LaborerStartJob",
-    "params": {}
+    "name": "CollectLaborer",
+    "params": {
+      "0": {
+        "name": "laborerObjectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "storageObjectId",
+        "note": "Real collect -> storage stacks grow",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:258": {
-    "name": "LaborerTakeJobLoot",
-    "params": {}
+    "name": "ViewLaborer",
+    "params": {
+      "0": {
+        "name": "laborerObjectId",
+        "note": "Open/inspect only, no collect",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:259": {
     "name": "LaborerDismiss",
@@ -6354,35 +6575,88 @@
     "params": {}
   },
   "RESPONSE:73": {
-    "name": "FarmableHarvest",
+    "name": "FarmableHarvestResponse",
     "params": {
       "0": {
-        "name": "names",
-        "note": "Array of harvested item UniqueName strings",
+        "name": "itemUniqueNames",
+        "note": "String[]; harvested item unique names",
         "resolveAs": ""
       },
       "1": {
         "name": "quantities",
-        "note": "Quantities matching names array",
+        "note": "Quantities parallel to key 0",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "correlationId",
+        "note": "Request correlation id",
         "resolveAs": ""
       }
     }
   },
   "RESPONSE:74": {
-    "name": "FarmableFinishGrownItem",
-    "params": {}
+    "name": "PastureHarvestResponse",
+    "params": {
+      "0": {
+        "name": "itemUniqueNames",
+        "note": "String[]; harvested item unique names",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "quantities",
+        "note": "Quantities parallel to key 0",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "correlationId",
+        "note": "Request correlation id",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:75": {
     "name": "FarmableDestroy",
     "params": {}
   },
   "RESPONSE:76": {
-    "name": "FarmableGetProduct",
-    "params": {}
+    "name": "PastureProductHarvestResponse",
+    "params": {
+      "0": {
+        "name": "itemUniqueNames",
+        "note": "String[]; harvested item unique names",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "quantities",
+        "note": "Quantities parallel to key 0",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "correlationId",
+        "note": "Request correlation id",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:77": {
-    "name": "FarmableFill",
-    "params": {}
+    "name": "PastureFeedConsumedResponse",
+    "params": {
+      "0": {
+        "name": "itemUniqueNames",
+        "note": "String[]; harvested item unique names",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "quantities",
+        "note": "Quantities parallel to key 0",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "correlationId",
+        "note": "Request correlation id",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:78": {
     "name": "TearDownConstructionSite",
