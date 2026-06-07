@@ -9,6 +9,9 @@ public sealed class RawAlbionParser : PhotonParser, IPhotonReceiver
 {
     public event Action<PacketEntry>? PacketReceived;
 
+    /// <summary>Raised with the raw packet payload (before decode) so a session can be saved as RAW.</summary>
+    public event Action<byte[]>? RawReceived;
+
     private AlbionNetworkParser? _handlerParser;
 
     public void AttachHandlers(AlbionNetworkParser handlerParser)
@@ -17,6 +20,7 @@ public sealed class RawAlbionParser : PhotonParser, IPhotonReceiver
     public new void ReceivePacket(byte[] payload)
     {
         RawPacketLog.MaybeSave(payload);
+        RawReceived?.Invoke(payload);
         base.ReceivePacket(payload);
         _handlerParser?.ReceivePacket(payload);
     }
