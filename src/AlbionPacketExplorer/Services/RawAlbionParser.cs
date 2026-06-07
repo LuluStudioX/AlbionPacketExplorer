@@ -16,6 +16,7 @@ public sealed class RawAlbionParser : PhotonParser, IPhotonReceiver
 
     public new void ReceivePacket(byte[] payload)
     {
+        RawPacketLog.MaybeSave(payload);
         base.ReceivePacket(payload);
         _handlerParser?.ReceivePacket(payload);
     }
