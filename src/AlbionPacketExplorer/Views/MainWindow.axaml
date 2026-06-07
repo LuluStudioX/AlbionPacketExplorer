@@ -62,6 +62,18 @@
                     </StackPanel>
                 </Button>
 
+                <Button Classes="accent" Command="{Binding TogglePauseCommand}" Padding="10,8" Margin="0,0,4,0"
+                        IsVisible="{Binding IsCapturing}"
+                        ToolTip.Tip="{Binding PauseTip}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Pause}" Stroke="#FFFFFF"
+                              IsVisible="{Binding !IsPaused}" />
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Play}" Stroke="#FFFFFF"
+                              IsVisible="{Binding IsPaused}" />
+                        <TextBlock Text="{Binding PauseLabel}" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                    </StackPanel>
+                </Button>
+
                 <Button Classes="danger" Command="{Binding StopCaptureCommand}" Padding="10,8" Margin="0,0,4,0"
                         ToolTip.Tip="{loc:T toolbar.stop.tip}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
