@@ -89,8 +89,8 @@ Run the desktop app:
 dotnet run --project src/AlbionPacketExplorer/AlbionPacketExplorer.csproj
 ```
 
-The codec libraries under `libs/` (`Abstractions`, `Protocol18`, `PhotonPackageParser`,
-`Network`) are third-party GPL-3.0 components; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+Photon packet decoding lives in `libs/PhotonWire`, an independent in-house implementation written
+from the wire format (no third-party GPL code). See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 ---
 
@@ -114,8 +114,7 @@ with Sandbox Interactive / Albion Online. See [DISCLAIMER.md](DISCLAIMER.md).
 
 ## License
 
-Not yet finalized. AlbionPacketExplorer currently includes third-party **GPL-3.0** components (the
-`libs/` decode layer; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)). Because GPL-3.0 is
-copyleft, any distributed build that includes them is governed by GPL-3.0. A final `LICENSE` will
-be set once those components are either kept under GPL-3.0 or replaced by an independent
-implementation.
+Not yet finalized. The earlier GPL-3.0 decode components have been removed and replaced by the
+in-house `libs/PhotonWire` implementation, so the project no longer carries a copyleft obligation
+(see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)). Remaining dependencies are permissive
+(MIT / BSD). A final `LICENSE` will be added by the project owner.

@@ -1,18 +1,28 @@
 # Third-Party Notices
 
-AlbionPacketExplorer includes components from the third-party project listed below. This notice is
-required by that component's license and must be retained while the components are used.
+AlbionPacketExplorer builds on the third-party components listed below. Each is distributed under
+its own license; this notice is retained as attribution.
 
-## AlbionOnline-StatisticsAnalysis
+## Removed: AlbionOnline-StatisticsAnalysis (GPL-3.0)
 
-- Components: `libs/Abstractions`, `libs/Protocol18`, `libs/PhotonPackageParser`, `libs/Network`
-  (Photon / Protocol18 deserialization and packet handling).
-- Source: https://github.com/Triky313/AlbionOnline-StatisticsAnalysis
-- License: **GNU General Public License v3.0 (GPL-3.0)** — https://www.gnu.org/licenses/gpl-3.0.txt
+Earlier builds embedded copied decode/handler code from AlbionOnline-StatisticsAnalysis under
+`libs/Abstractions`, `libs/Protocol18`, `libs/PhotonPackageParser`, and `libs/Network`, which were
+**GNU General Public License v3.0 (GPL-3.0)**. Those components have been **removed**: the Photon
+wire decoding is now provided by `libs/PhotonWire`, an independent in-house implementation written
+from the wire format and verified for behavioural parity. No GPL-3.0 code remains in the project.
 
-Because GPL-3.0 is a copyleft license, any **distributed** build of AlbionPacketExplorer that
-includes these components is a combined work governed by GPL-3.0: recipients may use, study,
-modify, and redistribute it under the same terms, and the corresponding source must be made
-available to them. These obligations cannot be removed by renaming references elsewhere in the
-project; they end only if these components are removed or replaced by an independent
-implementation.
+## NuGet packages
+
+Referenced via NuGet and distributed under their respective permissive open-source licenses (MIT /
+BSD); refer to each package's metadata for the exact terms:
+
+- Avalonia, Avalonia.Desktop, Avalonia.Controls.DataGrid, Avalonia.Themes.Fluent
+- CommunityToolkit.Mvvm
+- Microsoft.Extensions.DependencyInjection
+- Velopack
+- SharpPcap (and its dependency PacketDotNet)
+
+## Lucide icons
+
+Icon geometries in `src/AlbionPacketExplorer/Themes/Icons.axaml` are from Lucide
+(https://lucide.dev), under the **MIT License**.
