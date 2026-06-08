@@ -67,6 +67,10 @@
   "panel.packetDetail.help": "Key/Type/Value breakdown of the selected packet.\nKey = param index (0-255). Type = wire type. Value = decoded value.\nRight-click a row to edit a param name or note.",
   "panel.packetDetail.helpShort": "Right-click a row to edit a param name or note.",
 
+  "detach.tip": "Pop this panel out into its own window",
+  "detach.dock.tip": "Dock this panel back into the main window",
+  "detach.reattach": "Reattach",
+
   "status.ready": "Select a network device and click Start, or open a file.",
   "status.dataReady": "Item data ready ({0} items, {1} icons on disk, {2}).",
   "status.devicesFailed": "Could not list devices (is Npcap installed?): {0}",
