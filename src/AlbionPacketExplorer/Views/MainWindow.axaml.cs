@@ -146,6 +146,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.PropertyChanged += OnViewModelPropertyChanged;
             vm.ShortcutsChanged += ApplyShortcuts;
             vm.OpenSettingsSectionRequested += OpenSettings;
+            vm.UpdateAvailableRequested += OnUpdateAvailableRequested;
             ApplySidebarVisibility(vm.SidebarVisible);
             ApplyShortcuts();
         }
@@ -352,6 +353,27 @@ public partial class MainWindow : ApxWindow, IFilePicker
     {
         var win = new ExpandedValueWindow(row, gameData);
         win.Show(this);
+    }
+
+    private async void OnUpdateAvailableRequested(string version, string? notes)
+    {
+        if (DataContext is not MainViewModel vm) return;
+
+        var dialogVm = new UpdateAvailableViewModel(version, notes);
+        var win = new UpdateAvailableWindow(dialogVm);
+        await win.ShowDialog(this);
+
+        switch (dialogVm.Choice)
+        {
+            case UpdateChoice.UpdateNow:
+                if (vm.ApplyUpdateCommand.CanExecute(null)) vm.ApplyUpdateCommand.Execute(null);
+                break;
+            case UpdateChoice.Skip:
+                vm.SkipUpdateVersion(version);
+                break;
+            case UpdateChoice.NotNow:
+                break;
+        }
     }
 
     private void OnDiffRequested(Models.PacketEntry left, Models.PacketEntry right)

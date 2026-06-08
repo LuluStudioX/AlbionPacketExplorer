@@ -37,6 +37,15 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private int _updateProgress;
     [ObservableProperty] private string _updateStatus = "";
     [ObservableProperty] private bool _isCheckingUpdate;
+
+    // A version the user chose to skip (never auto-prompt again), persisted in settings; and the
+    // version already prompted this session, so a periodic re-check does not re-open the dialog.
+    private string? _skippedUpdateVersion;
+    private string? _promptedUpdateVersion;
+
+    /// <summary>Raised when an update should be offered: (version, changelog notes). The view opens
+    /// the changelog dialog and routes the user's choice back via the methods below.</summary>
+    public event Action<string, string?>? UpdateAvailableRequested;
     [ObservableProperty] private string _statusText = Loc.T("status.ready");
     [ObservableProperty] private ObservableCollection<NetworkDeviceInfo> _availableDevices = [];
     [ObservableProperty] private NetworkDeviceInfo? _selectedDevice;
@@ -217,7 +226,8 @@ public partial class MainViewModel : ObservableObject
             AutoSelectNewestGesture: AutoSelectNewestGesture,
             ToggleRowExpandGesture: ToggleRowExpandGesture,
             HasSeenWelcome: !ShowWelcome,
-            AccentTheme: ThemeService.Instance.ActiveAccent.DisplayName));
+            AccentTheme: ThemeService.Instance.ActiveAccent.DisplayName,
+            SkippedUpdateVersion: _skippedUpdateVersion));
 
     public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
@@ -239,6 +249,7 @@ public partial class MainViewModel : ObservableObject
         MinimizeToTray = saved.MinimizeToTray;
         AutoStartCapture = saved.AutoStartCapture;
         AutoSaveLogs = saved.AutoSaveLogs;
+        _skippedUpdateVersion = saved.SkippedUpdateVersion;
         Density = saved.Density;
         SidebarToggleGesture = string.IsNullOrWhiteSpace(saved.SidebarToggleGesture) ? "F5" : saved.SidebarToggleGesture;
         AutoSelectNewestGesture = string.IsNullOrWhiteSpace(saved.AutoSelectNewestGesture) ? "Ctrl+L" : saved.AutoSelectNewestGesture;
@@ -323,7 +334,26 @@ public partial class MainViewModel : ObservableObject
     {
         var r = await _updater.CheckForUpdateAsync();
         if (r.NewVersion is { } v)
+        {
             UpdateVersion = v;
+            MaybePromptUpdate(v, r.Notes, manual: false);
+        }
+    }
+
+    // Offer the update via the changelog dialog. Auto checks respect the skipped version and only
+    // prompt once per version per session; a manual check always re-opens it.
+    private void MaybePromptUpdate(string version, string? notes, bool manual)
+    {
+        if (!manual && (version == _skippedUpdateVersion || version == _promptedUpdateVersion)) return;
+        _promptedUpdateVersion = version;
+        UpdateAvailableRequested?.Invoke(version, notes);
+    }
+
+    /// <summary>User chose "skip this version" in the dialog: persist it so auto checks stay quiet.</summary>
+    public void SkipUpdateVersion(string version)
+    {
+        _skippedUpdateVersion = version;
+        SaveSettings();
     }
 
     // Manual check from the toolbar: verbose, surfaces every outcome (including failures, which
@@ -343,6 +373,7 @@ public partial class MainViewModel : ObservableObject
             {
                 UpdateVersion = v;
                 UpdateStatus = Loc.Format("update.available", v);
+                MaybePromptUpdate(v, r.Notes, manual: true);
             }
             else
                 UpdateStatus = Loc.T("update.upToDate");
