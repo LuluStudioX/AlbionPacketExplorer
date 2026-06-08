@@ -26,7 +26,11 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        LocalizationService.Instance.SetCulture(AppSettingsStore.Load().Culture);
+        // Apply persisted culture AND theme before any window renders, so the saved accent / dark
+        // mode are in effect on the first paint (no flash of the XAML-default accent on startup).
+        var saved = AppSettingsStore.Load();
+        LocalizationService.Instance.SetCulture(saved.Culture);
+        ThemeService.Instance.Initialize(saved.IsDarkMode, saved.AccentTheme);
 
         var services = new ServiceCollection();
         services.AddSingleton<ToastService>();
