@@ -76,4 +76,9 @@
 
     <StreamGeometry x:Key="Icon.ArrowLeftRight">M8 3 4 7l4 4 M4 7h16 M16 21l4-4-4-4 M20 17H4</StreamGeometry>
 
+    <!-- external-link (detach panel into its own window) -->
+    <StreamGeometry x:Key="Icon.Detach">M15 3h6v6 M10 14 21 3 M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6</StreamGeometry>
+    <!-- log-in (dock panel back into the main window) -->
+    <StreamGeometry x:Key="Icon.Dock">M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4 M10 17l5-5-5-5 M15 12H3</StreamGeometry>
+
 </ResourceDictionary>

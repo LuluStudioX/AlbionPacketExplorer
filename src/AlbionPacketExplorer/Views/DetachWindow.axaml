@@ -1,0 +1,31 @@
+<controls:ApxWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
+        xmlns:loc="using:AlbionPacketExplorer.Markup"
+        x:Class="AlbionPacketExplorer.Views.DetachWindow"
+        Icon="/Assets/app-icon.ico"
+        Width="640" Height="460"
+        MinWidth="280" MinHeight="180"
+        WindowStartupLocation="CenterOwner">
+
+    <DockPanel>
+        <Border DockPanel.Dock="Top" Background="{DynamicResource Apx.Card}"
+                BorderBrush="{DynamicResource Apx.Accent}" BorderThickness="0,0,0,2" Padding="8,4">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock x:Name="TitleText" Grid.Column="0" FontWeight="Bold"
+                           VerticalAlignment="Center" Foreground="{DynamicResource Apx.Text}" />
+                <Button x:Name="DockButton" Grid.Column="1" Classes="ghost" Padding="8,4"
+                        ToolTip.Tip="{loc:T detach.dock.tip}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Path Classes="icon sm" Data="{DynamicResource Icon.Dock}" />
+                        <TextBlock Text="{loc:T detach.reattach}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <ContentControl x:Name="BodyHost" HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
+    </DockPanel>
+
+</controls:ApxWindow>

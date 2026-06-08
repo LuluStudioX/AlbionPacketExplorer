@@ -17,6 +17,10 @@ public partial class MainWindow : ApxWindow, IFilePicker
     private Grid? _workspaceGrid;   // [sidebar | splitter | content]
     private Grid? _contentGrid;     // [table | splitter | detail]
     private Control? _sidebarPanel;
+    private Grid? _sidebarGrid;     // [status | by-code]
+    private DetachableHost? _statusHost, _byCodeHost, _listHost, _detailHost;
+    private GridSplitter? _contentSplitter;
+    private double _savedContentTopHeight = 300;
     private bool _closing;
 
     public MainWindow(ToastService toastManager)
@@ -129,6 +133,17 @@ public partial class MainWindow : ApxWindow, IFilePicker
         _workspaceGrid = this.FindControl<Grid>("WorkspaceGrid");
         _contentGrid = this.FindControl<Grid>("ContentGrid");
         _sidebarPanel = this.FindControl<Control>("SidebarPanel");
+        _sidebarGrid = _sidebarPanel as Grid;
+        _contentSplitter = this.FindControl<GridSplitter>("ContentSplitter");
+
+        _statusHost = this.FindControl<DetachableHost>("StatusHost");
+        _byCodeHost = this.FindControl<DetachableHost>("ByCodeHost");
+        _listHost = this.FindControl<DetachableHost>("ListHost");
+        _detailHost = this.FindControl<DetachableHost>("DetailHost");
+        if (_statusHost is not null) _statusHost.DetachedChanged += OnSidebarDetachChanged;
+        if (_byCodeHost is not null) _byCodeHost.DetachedChanged += OnSidebarDetachChanged;
+        if (_listHost is not null) _listHost.DetachedChanged += OnContentDetachChanged;
+        if (_detailHost is not null) _detailHost.DetachedChanged += OnContentDetachChanged;
 
         if (DataContext is MainViewModel vm)
         {
@@ -147,23 +162,84 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.ShortcutsChanged += ApplyShortcuts;
             vm.OpenSettingsSectionRequested += OpenSettings;
             vm.UpdateAvailableRequested += OnUpdateAvailableRequested;
-            ApplySidebarVisibility(vm.SidebarVisible);
+            ApplyEffectiveSidebar();
             ApplyShortcuts();
         }
 
         var layout = LayoutStore.Load();
         RestoreWindowBounds(layout);
         ApplyLayout(layout);
+        _savedContentTopHeight = layout.TopPanelHeight > MinPanelSize ? layout.TopPanelHeight : 300;
 
         if (DataContext is MainViewModel vmAuto)
             vmAuto.TriggerAutoStart();
     }
 
+    private bool BothSidebarDetached =>
+        _statusHost?.IsDetached == true && _byCodeHost?.IsDetached == true;
+
+    // A sidebar panel (Status / By Code) was detached or docked back. Collapse a detached panel's
+    // row to zero so the other reclaims the sidebar; if both are detached, collapse the whole
+    // sidebar column too so the content area fills the width.
+    private void OnSidebarDetachChanged(object? sender, EventArgs e)
+    {
+        if (_sidebarGrid is not null)
+        {
+            var rows = _sidebarGrid.RowDefinitions;
+            rows[0].Height = _statusHost?.IsDetached == true ? new GridLength(0) : GridLength.Auto;
+            rows[1].Height = _byCodeHost?.IsDetached == true
+                ? new GridLength(0)
+                : new GridLength(1, GridUnitType.Star);
+        }
+        ApplyEffectiveSidebar();
+    }
+
+    // The sidebar column is shown only when the user hasn't toggled it off AND at least one of its
+    // panels is still docked. With both detached there is nothing to show, so reclaim the width.
+    private void ApplyEffectiveSidebar()
+    {
+        var wantsSidebar = (DataContext as MainViewModel)?.SidebarVisible != false;
+        ApplySidebarVisibility(wantsSidebar && !BothSidebarDetached);
+    }
+
+    // A content panel (Packet List / Packet Detail) was detached or docked back. Give the whole
+    // content area to whichever remains; hide the splitter unless both are docked.
+    private void OnContentDetachChanged(object? sender, EventArgs e)
+    {
+        if (_contentGrid is null) return;
+        var rows = _contentGrid.RowDefinitions;
+
+        // While both are docked the splitter is live; remember the table height before collapsing
+        // so it can be restored when the panel docks back.
+        if (_contentSplitter?.IsVisible == true && rows[0].ActualHeight > MinPanelSize)
+            _savedContentTopHeight = rows[0].ActualHeight;
+
+        var listDet = _listHost?.IsDetached == true;
+        var detailDet = _detailHost?.IsDetached == true;
+        var bothDocked = !listDet && !detailDet;
+
+        if (_contentSplitter is not null) _contentSplitter.IsVisible = bothDocked;
+        rows[1].Height = new GridLength(bothDocked ? 2 : 0);
+
+        if (bothDocked)
+        {
+            rows[0].MinHeight = MinPanelSize;
+            rows[0].Height = new GridLength(_savedContentTopHeight, GridUnitType.Pixel);
+            rows[2].MinHeight = MinPanelSize;
+            rows[2].Height = new GridLength(1, GridUnitType.Star);
+            return;
+        }
+
+        rows[0].MinHeight = listDet ? 0 : MinPanelSize;
+        rows[0].Height = listDet ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+        rows[2].MinHeight = detailDet ? 0 : MinPanelSize;
+        rows[2].Height = detailDet ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+    }
+
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.SidebarVisible) &&
-            DataContext is MainViewModel vm)
-            ApplySidebarVisibility(vm.SidebarVisible);
+        if (e.PropertyName == nameof(MainViewModel.SidebarVisible))
+            ApplyEffectiveSidebar();
     }
 
     // Collapse the sidebar column (and its splitter) to zero width when hidden, instead of
@@ -313,6 +389,9 @@ public partial class MainWindow : ApxWindow, IFilePicker
     {
         ApplyLayout(LayoutState.Default);
         LayoutStore.Save(LayoutState.Default);
+        // ApplyLayout rebuilds the row definitions, so re-collapse any currently-detached panels.
+        OnSidebarDetachChanged(this, EventArgs.Empty);
+        OnContentDetachChanged(this, EventArgs.Empty);
     }
 
     // Rebuild the configurable KeyBindings from the user's gestures. Invalid or empty
@@ -409,7 +488,13 @@ public partial class MainWindow : ApxWindow, IFilePicker
         // Only persist the sidebar width while it is visible (a hidden sidebar is 0-wide).
         var sidebarVisible = (DataContext as MainViewModel)?.SidebarVisible != false;
         var sidebarW = sidebarVisible ? (_workspaceGrid?.ColumnDefinitions[0].ActualWidth ?? 0) : 0;
-        var tableH   = _contentGrid?.RowDefinitions[0].ActualHeight ?? 0;
+
+        // A detached content panel collapses its row, so the live row height is meaningless then;
+        // fall back to the last good split height instead of persisting the collapsed value.
+        var contentDetached = _listHost?.IsDetached == true || _detailHost?.IsDetached == true;
+        var tableH = contentDetached
+            ? _savedContentTopHeight
+            : (_contentGrid?.RowDefinitions[0].ActualHeight ?? 0);
 
         // Only capture the normal (restored) bounds; when maximized keep the previous
         // normal bounds and just remember the maximized flag.
