@@ -1,17 +1,5 @@
 <Solution>
   <Folder Name="/libs/" />
-  <Folder Name="/libs/Abstractions/">
-    <Project Path="libs/Abstractions/AlbionPacketExplorer.Abstractions.csproj" />
-  </Folder>
-  <Folder Name="/libs/Network/">
-    <Project Path="libs/Network/AlbionPacketExplorer.Network.csproj" />
-  </Folder>
-  <Folder Name="/libs/PhotonPackageParser/">
-    <Project Path="libs/PhotonPackageParser/AlbionPacketExplorer.PhotonPackageParser.csproj" />
-  </Folder>
-  <Folder Name="/libs/Protocol18/">
-    <Project Path="libs/Protocol18/AlbionPacketExplorer.Protocol18.csproj" />
-  </Folder>
   <Folder Name="/libs/PhotonWire/">
     <Project Path="libs/PhotonWire/AlbionPacketExplorer.PhotonWire.csproj" />
   </Folder>
