@@ -1,6 +1,5 @@
 #nullable enable
 
-using AlbionPacketExplorer.Abstractions;
 using PacketDotNet;
 using SharpPcap;
 
@@ -10,7 +9,7 @@ public class LiveCaptureProvider : PacketProvider
 {
     private static readonly HashSet<int> PhotonUdpPorts = [5055, 5056, 5058];
 
-    private readonly IPhotonReceiver _photonReceiver;
+    private readonly IPacketReceiver _photonReceiver;
     private readonly string? _deviceName;
     private readonly Action<string>? _log;
 
@@ -19,7 +18,7 @@ public class LiveCaptureProvider : PacketProvider
 
     public override bool IsRunning => _running;
 
-    public LiveCaptureProvider(IPhotonReceiver photonReceiver, string? deviceName, Action<string>? log = null)
+    public LiveCaptureProvider(IPacketReceiver photonReceiver, string? deviceName, Action<string>? log = null)
     {
         _photonReceiver = photonReceiver ?? throw new ArgumentNullException(nameof(photonReceiver));
         _deviceName = deviceName;

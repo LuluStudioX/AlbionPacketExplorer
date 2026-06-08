@@ -74,12 +74,12 @@ public sealed class GpBinaryReader(byte[] data, int offset = 0)
         GpType.Long2Neg      => -(long) ReadUInt16(),
         GpType.ByteArray     => ReadByteArray(),
         GpType.BooleanArray  => ReadBooleanArray(),
-        GpType.ShortArray    => ReadArrayOf(GpType.Short),
-        GpType.FloatArray    => ReadArrayOf(GpType.Float),
-        GpType.DoubleArray   => ReadArrayOf(GpType.Double),
-        GpType.StringArray   => ReadArrayOf(GpType.String),
-        GpType.CompressedIntArray  => ReadArrayOf(GpType.CompressedInt),
-        GpType.CompressedLongArray => ReadArrayOf(GpType.CompressedLong),
+        GpType.ShortArray    => ReadShortArray(),
+        GpType.FloatArray    => ReadFloatArray(),
+        GpType.DoubleArray   => ReadDoubleArray(),
+        GpType.StringArray   => ReadStringArray(),
+        GpType.CompressedIntArray  => ReadIntArray(),
+        GpType.CompressedLongArray => ReadLongArray(),
         GpType.ObjectArray   => ReadObjectArray(),
         GpType.Array         => ReadArray(),
         GpType.Hashtable     => ReadHashtable(),
@@ -130,6 +130,56 @@ public sealed class GpBinaryReader(byte[] data, int offset = 0)
         var len = (int) ReadCompressedUInt32();
         var arr = new object?[len];
         for (var i = 0; i < len; i++) arr[i] = ReadValueOfType(elem);
+        return arr;
+    }
+
+    // Typed primitive arrays return CLR-typed arrays (short[], float[], ...) rather than object?[],
+    // so downstream code can name the element type from the array's runtime type.
+    private short[] ReadShortArray()
+    {
+        var len = (int) ReadCompressedUInt32();
+        var arr = new short[len];
+        for (var i = 0; i < len; i++) arr[i] = ReadInt16();
+        return arr;
+    }
+
+    private float[] ReadFloatArray()
+    {
+        var len = (int) ReadCompressedUInt32();
+        var arr = new float[len];
+        for (var i = 0; i < len; i++) arr[i] = ReadSingle();
+        return arr;
+    }
+
+    private double[] ReadDoubleArray()
+    {
+        var len = (int) ReadCompressedUInt32();
+        var arr = new double[len];
+        for (var i = 0; i < len; i++) arr[i] = ReadDouble();
+        return arr;
+    }
+
+    private string[] ReadStringArray()
+    {
+        var len = (int) ReadCompressedUInt32();
+        var arr = new string[len];
+        for (var i = 0; i < len; i++) arr[i] = ReadString();
+        return arr;
+    }
+
+    private int[] ReadIntArray()
+    {
+        var len = (int) ReadCompressedUInt32();
+        var arr = new int[len];
+        for (var i = 0; i < len; i++) arr[i] = ReadCompressedInt();
+        return arr;
+    }
+
+    private long[] ReadLongArray()
+    {
+        var len = (int) ReadCompressedUInt32();
+        var arr = new long[len];
+        for (var i = 0; i < len; i++) arr[i] = ReadCompressedLong();
         return arr;
     }
 
