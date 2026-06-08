@@ -1,0 +1,48 @@
+<controls:ApxWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
+        xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+        xmlns:loc="using:AlbionPacketExplorer.Markup"
+        x:Class="AlbionPacketExplorer.Views.UpdateAvailableWindow"
+        x:DataType="vm:UpdateAvailableViewModel"
+        Title="{Binding Title}"
+        Width="520" Height="420"
+        MinWidth="380" MinHeight="280"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <DockPanel Margin="20">
+
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Title}" FontSize="16" FontWeight="SemiBold"
+                   Foreground="{DynamicResource Apx.Text}" Margin="0,0,0,4" />
+
+        <TextBlock DockPanel.Dock="Top" Text="{loc:T update.dialog.whatsNew}" FontSize="12"
+                   Foreground="{DynamicResource Apx.TextMuted}" Margin="0,0,0,8" />
+
+        <Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,12,0,0">
+            <Button Grid.Column="0" Classes="ghost" Command="{Binding SkipCommand}"
+                    Content="{loc:T update.dialog.skip}"
+                    ToolTip.Tip="{loc:T update.dialog.skip.tip}" />
+            <Button Grid.Column="2" Classes="ghost" Command="{Binding NotNowCommand}"
+                    Content="{loc:T update.dialog.notNow}" Margin="0,0,8,0" />
+            <Button Grid.Column="3" Classes="accent" Command="{Binding UpdateNowCommand}"
+                    Content="{loc:T update.dialog.updateNow}" />
+        </Grid>
+
+        <Border Background="{DynamicResource Apx.Surface}" CornerRadius="6" Padding="10">
+            <ScrollViewer>
+                <Panel>
+                    <TextBox Text="{Binding Notes}" IsReadOnly="True" IsVisible="{Binding HasNotes}"
+                             BorderThickness="0" Background="Transparent" TextWrapping="Wrap"
+                             FontFamily="Consolas,Monospace" FontSize="12"
+                             Foreground="{DynamicResource Apx.Text}" />
+                    <TextBlock Text="{Binding NoNotesText}" IsVisible="{Binding !HasNotes}"
+                               Foreground="{DynamicResource Apx.TextMuted}" TextWrapping="Wrap" />
+                </Panel>
+            </ScrollViewer>
+        </Border>
+
+    </DockPanel>
+
+</controls:ApxWindow>
