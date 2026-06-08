@@ -223,7 +223,16 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          files: artifacts/*
+          # Curated set: installers + portable (downloads) and the Velopack-1 feed
+          # (releases.<rid>.json + *-full.nupkg). The legacy RELEASES-* index and the vpk-internal
+          # assets.<rid>.json are intentionally excluded; no client or the feed needs them.
+          files: |
+            artifacts/*Setup.exe
+            artifacts/*Setup.pkg
+            artifacts/*.AppImage
+            artifacts/*Portable.zip
+            artifacts/*-full.nupkg
+            artifacts/releases.*.json
           generate_release_notes: true
 
       # Nudge the update-feed hub to mirror this release immediately instead of waiting for its
