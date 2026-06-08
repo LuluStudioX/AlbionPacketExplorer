@@ -157,46 +157,54 @@
         <Grid Grid.Row="2" x:Name="WorkspaceGrid" ColumnDefinitions="260,2,*" ClipToBounds="True">
 
             <!-- FILTER SIDEBAR -->
-            <Grid Grid.Column="0" x:Name="SidebarPanel" RowDefinitions="Auto,Auto,Auto,*"
+            <Grid Grid.Column="0" x:Name="SidebarPanel" RowDefinitions="Auto,*"
                   Background="{DynamicResource Apx.Surface}" ClipToBounds="True">
-                <!-- Status group -->
-                <Border Grid.Row="0" Background="{DynamicResource Apx.Card}"
-                        BorderBrush="{DynamicResource Apx.Accent}" BorderThickness="0,0,0,2" Padding="8,4">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="{loc:T sidebar.status}" FontWeight="Bold"
-                                   VerticalAlignment="Center" Foreground="{DynamicResource Apx.Text}" />
-                        <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
-                                ToolTip.Tip="{loc:T sidebar.status.help}">
-                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
-                        </Border>
-                    </StackPanel>
-                </Border>
-                <views:StatusFilterView Grid.Row="1" Margin="6,6,6,10"
-                                        DataContext="{Binding PacketList}" />
 
-                <!-- By-code list header -->
-                <Border Grid.Row="2" Background="{DynamicResource Apx.Card}"
-                        BorderBrush="{DynamicResource Apx.Highlight}" BorderThickness="0,0,0,2" Padding="8,4">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="{loc:T sidebar.byCode}" FontWeight="Bold"
-                                   Foreground="{DynamicResource Apx.Text}" />
-                        <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
-                                ToolTip.Tip="{loc:T panel.eventSummary.help}">
-                            <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
+                <!-- Status group -->
+                <controls:DetachableHost x:Name="StatusHost" Grid.Row="0" Title="{loc:T sidebar.status}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource Apx.Card}"
+                                BorderBrush="{DynamicResource Apx.Accent}" BorderThickness="0,0,0,2" Padding="8,4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{loc:T sidebar.status}" FontWeight="Bold"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource Apx.Text}" />
+                                <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
+                                        ToolTip.Tip="{loc:T sidebar.status.help}">
+                                    <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
+                                </Border>
+                            </StackPanel>
                         </Border>
-                    </StackPanel>
-                </Border>
-                <Panel Grid.Row="3">
-                    <views:CodeAggregatorView DataContext="{Binding Aggregator}" />
-                    <Border Background="{DynamicResource Apx.Surface}" Padding="16"
-                            IsHitTestVisible="False"
-                            IsVisible="{Binding !PacketList.HasData}">
-                        <TextBlock Text="{loc:T empty.byCode}"
-                                   Foreground="{DynamicResource Apx.TextFaint}"
-                                   FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Panel>
+                        <views:StatusFilterView Margin="6,6,6,10" DataContext="{Binding PacketList}" />
+                    </DockPanel>
+                </controls:DetachableHost>
+
+                <!-- By-code group -->
+                <controls:DetachableHost x:Name="ByCodeHost" Grid.Row="1" Title="{loc:T sidebar.byCode}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource Apx.Card}"
+                                BorderBrush="{DynamicResource Apx.Highlight}" BorderThickness="0,0,0,2" Padding="8,4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{loc:T sidebar.byCode}" FontWeight="Bold"
+                                           Foreground="{DynamicResource Apx.Text}" />
+                                <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
+                                        ToolTip.Tip="{loc:T panel.eventSummary.help}">
+                                    <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <Panel>
+                            <views:CodeAggregatorView DataContext="{Binding Aggregator}" />
+                            <Border Background="{DynamicResource Apx.Surface}" Padding="16"
+                                    IsHitTestVisible="False"
+                                    IsVisible="{Binding !PacketList.HasData}">
+                                <TextBlock Text="{loc:T empty.byCode}"
+                                           Foreground="{DynamicResource Apx.TextFaint}"
+                                           FontSize="12" TextWrapping="Wrap" TextAlignment="Center"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                        </Panel>
+                    </DockPanel>
+                </controls:DetachableHost>
             </Grid>
 
             <GridSplitter Grid.Column="1" ResizeDirection="Columns"
@@ -204,7 +212,8 @@
 
             <!-- TABLE + DETAIL -->
             <Grid Grid.Column="2" x:Name="ContentGrid" RowDefinitions="*,2,2*" ClipToBounds="True">
-                <DockPanel Grid.Row="0" ClipToBounds="True">
+                <controls:DetachableHost x:Name="ListHost" Grid.Row="0" Title="{loc:T panel.packetList}">
+                <DockPanel ClipToBounds="True">
                     <Border DockPanel.Dock="Top" Background="{DynamicResource Apx.Card}"
                             BorderBrush="{DynamicResource Apx.Highlight}" BorderThickness="0,0,0,2" Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
@@ -236,11 +245,13 @@
                                              IsVisible="{Binding !PacketList.HasData}" />
                     </Panel>
                 </DockPanel>
+                </controls:DetachableHost>
 
-                <GridSplitter Grid.Row="1" ResizeDirection="Rows"
+                <GridSplitter x:Name="ContentSplitter" Grid.Row="1" ResizeDirection="Rows"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-                <DockPanel Grid.Row="2" ClipToBounds="True">
+                <controls:DetachableHost x:Name="DetailHost" Grid.Row="2" Title="{loc:T panel.packetDetail}">
+                <DockPanel ClipToBounds="True">
                     <Border DockPanel.Dock="Top" Background="{DynamicResource Apx.Card}"
                             BorderBrush="{DynamicResource Apx.Danger}" BorderThickness="0,0,0,2" Padding="6,3">
                         <StackPanel Orientation="Horizontal" Spacing="6">
@@ -261,6 +272,7 @@
                                              IsVisible="{Binding !PacketDetail.HasPacket}" />
                     </Panel>
                 </DockPanel>
+                </controls:DetachableHost>
             </Grid>
         </Grid>
 
