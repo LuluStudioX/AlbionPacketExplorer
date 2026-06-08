@@ -35,7 +35,8 @@ public record AppSettings(
     string AutoSelectNewestGesture = "Ctrl+L",
     string ToggleRowExpandGesture = "Space",
     bool HasSeenWelcome = false,
-    string AccentTheme = "Indigo")
+    string AccentTheme = "Indigo",
+    string? SkippedUpdateVersion = null)
 {
     public static readonly AppSettings Default = new();
 }

@@ -37,14 +37,18 @@ public sealed class UpdateService
 
     // NewVersion set when an update is available; Error set when the check itself failed (feed
     // unreachable, bad URL, not installed via Velopack, ...). Both null = up to date.
-    public sealed record UpdateCheckResult(string? NewVersion, string? Error);
+    // Notes carries the target release's changelog (markdown) when the package was built with
+    // release notes (vpk pack --releaseNotes); null/empty when none were attached.
+    public sealed record UpdateCheckResult(string? NewVersion, string? Error, string? Notes = null);
 
     public async Task<UpdateCheckResult> CheckForUpdateAsync()
     {
         try
         {
             var info = await _mgr.CheckForUpdatesAsync();
-            return new UpdateCheckResult(info?.TargetFullRelease.Version.ToString(), null);
+            if (info == null) return new UpdateCheckResult(null, null);
+            return new UpdateCheckResult(
+                info.TargetFullRelease.Version.ToString(), null, info.TargetFullRelease.NotesMarkdown);
         }
         catch (Exception ex)
         {
