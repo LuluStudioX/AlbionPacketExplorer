@@ -22,10 +22,11 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
     <PackageReference Include="Velopack" Version="1.2.0" />
+    <PackageReference Include="SharpPcap" Version="6.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\Network\AlbionPacketExplorer.Network.csproj" />
+    <ProjectReference Include="..\..\libs\PhotonWire\AlbionPacketExplorer.PhotonWire.csproj" />
   </ItemGroup>
 
   <ItemGroup>

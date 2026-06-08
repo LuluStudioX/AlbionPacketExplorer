@@ -1,66 +1,62 @@
-using AlbionPacketExplorer.Abstractions;
+using System.Globalization;
 using AlbionPacketExplorer.Models;
-using AlbionPacketExplorer.Network.Handlers;
-using AlbionPacketExplorer.PhotonPackageParser;
+using AlbionPacketExplorer.Network;
+using AlbionPacketExplorer.PhotonWire;
 
 namespace AlbionPacketExplorer.Services;
 
-public sealed class RawAlbionParser : PhotonParser, IPhotonReceiver
+/// <summary>
+/// Decodes raw Albion UDP payloads into <see cref="PacketEntry"/> via the independent PhotonWire
+/// reader. The real wire code lives in the parameter echo (key 252 on events, 253 on requests and
+/// responses); the message's own code byte is only a fallback.
+/// </summary>
+public sealed class RawAlbionParser : IPacketReceiver
 {
     public event Action<PacketEntry>? PacketReceived;
 
     /// <summary>Raised with the raw packet payload (before decode) so a session can be saved as RAW.</summary>
     public event Action<byte[]>? RawReceived;
 
-    private AlbionNetworkParser? _handlerParser;
+    private readonly PhotonPacketReader _reader = new();
 
-    public void AttachHandlers(AlbionNetworkParser handlerParser)
-        => _handlerParser = handlerParser;
+    public RawAlbionParser()
+    {
+        _reader.OnEvent += e => Emit("EVENT", WireCode(e.Parameters, 252, e.Code), e.Parameters);
+        _reader.OnRequest += e => Emit("REQUEST", WireCode(e.Parameters, 253, e.OperationCode), e.Parameters);
+        _reader.OnResponse += e =>
+            Emit("RESPONSE", WireCode(e.Parameters, 253, e.OperationCode), e.Parameters, e.ReturnCode, e.DebugMessage);
+    }
 
-    public new void ReceivePacket(byte[] payload)
+    public void ReceivePacket(byte[] payload)
     {
         RawPacketLog.MaybeSave(payload);
         RawReceived?.Invoke(payload);
-        base.ReceivePacket(payload);
-        _handlerParser?.ReceivePacket(payload);
+        try { _reader.ReadPacket(payload); }
+        catch { /* malformed / partial packet: skip, keep the capture alive */ }
     }
 
-    protected override void OnEvent(byte code, Dictionary<byte, object> parameters)
-    {
-        short eventCode = ReadPhotonCode(parameters, 252);
-        if (eventCode < 0) return;
-        PacketReceived?.Invoke(BuildEntry("EVENT", eventCode, parameters));
-    }
-
-    protected override void OnRequest(byte operationCode, Dictionary<byte, object> parameters)
-    {
-        short opCode = ReadPhotonCode(parameters, 253);
-        if (opCode < 0) opCode = operationCode;
-        PacketReceived?.Invoke(BuildEntry("REQUEST", opCode, parameters));
-    }
-
-    protected override void OnResponse(byte operationCode, short returnCode, string debugMessage, Dictionary<byte, object> parameters)
-    {
-        short opCode = ReadPhotonCode(parameters, 253);
-        if (opCode < 0) opCode = operationCode;
-        PacketReceived?.Invoke(BuildEntry("RESPONSE", opCode, parameters, returnCode, debugMessage));
-    }
-
-    private static PacketEntry BuildEntry(string kind, short code, Dictionary<byte, object> parameters,
+    private void Emit(string kind, short code, IReadOnlyDictionary<byte, object?> parameters,
         short? returnCode = null, string? debugMessage = null)
     {
+        if (code < 0) return;
+
         var @params = new Dictionary<string, ParamValue>(parameters.Count);
         foreach (var (k, v) in parameters)
-            @params[k.ToString()] = new ParamValue(GetTypeName(v), v);
-        return new PacketEntry(DateTime.UtcNow, kind, code, @params,
-            returnCode, string.IsNullOrEmpty(debugMessage) ? null : debugMessage);
+            @params[k.ToString(CultureInfo.InvariantCulture)] = new ParamValue(GetTypeName(v), v);
+
+        PacketReceived?.Invoke(new PacketEntry(DateTime.UtcNow, kind, code, @params,
+            returnCode, string.IsNullOrEmpty(debugMessage) ? null : debugMessage));
     }
 
-    private static short ReadPhotonCode(Dictionary<byte, object> parameters, byte key)
+    // Prefer the wire-code echo (key 252/253); fall back to the message's own code byte.
+    private static short WireCode(IReadOnlyDictionary<byte, object?> parameters, byte echoKey, byte fallback)
     {
-        if (!parameters.TryGetValue(key, out var v)) return -1;
-        try { return checked((short)Convert.ToInt32(v, System.Globalization.CultureInfo.InvariantCulture)); }
-        catch { return -1; }
+        if (parameters.TryGetValue(echoKey, out var v))
+        {
+            try { return checked((short) Convert.ToInt32(v, CultureInfo.InvariantCulture)); }
+            catch { /* fall through to the byte code */ }
+        }
+        return fallback;
     }
 
     private static string GetTypeName(object? v) => v switch
@@ -77,7 +73,11 @@ public sealed class RawAlbionParser : PhotonParser, IPhotonReceiver
         byte[] => "Byte[]",
         short[] => "Int16[]",
         int[] => "Int32[]",
+        long[] => "Int64[]",
         float[] => "Single[]",
+        double[] => "Double[]",
+        bool[] => "Boolean[]",
+        string[] => "String[]",
         _ => v.GetType().Name
     };
 }
