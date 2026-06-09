@@ -36,11 +36,23 @@ public class LiveCaptureProvider : PacketProvider
             return;
         }
 
+        int failed = 0;
         foreach (var dev in toOpen)
         {
             try
             {
                 dev.Open(DeviceModes.Promiscuous, 1000);
+
+                // VPN tunnels, 802.11-monitor and leftover libpcap pseudo-devices use a link-layer
+                // type that cannot carry (or cannot BPF-filter) IP/UDP. Skip them cleanly instead of
+                // letting the filter assignment throw "link-layer type filtering not implemented".
+                if (!IsFilterableLinkType(dev.LinkType))
+                {
+                    _log?.Invoke($"SharpPcap: skipping {dev.Name} (link type {dev.LinkType} not capturable)");
+                    dev.Close();
+                    continue;
+                }
+
                 dev.Filter = "udp port 5055 or udp port 5056 or udp port 5058";
                 dev.OnPacketArrival += OnPacketArrival;
                 dev.StartCapture();
@@ -49,13 +61,40 @@ public class LiveCaptureProvider : PacketProvider
             }
             catch (Exception ex)
             {
+                failed++;
+                try { dev.Close(); } catch { /* already closed / never opened */ }
                 _log?.Invoke($"SharpPcap: failed to open {dev.Name}: {ex.Message}");
             }
         }
 
         if (_devices.Count > 0)
+        {
             _running = true;
+        }
+        else if (failed > 0)
+        {
+            // Every candidate failed. On Linux this is almost always missing capture privileges.
+            _log?.Invoke(OperatingSystem.IsLinux()
+                ? "SharpPcap: no device could be opened. Capture needs root, or grant the dotnet/app binary capture rights: sudo setcap cap_net_raw,cap_net_admin+eip <path>."
+                : "SharpPcap: no device could be opened. Is Npcap (Windows) / libpcap (macOS) installed?");
+        }
     }
+
+    // Link-layer types whose payload is plain IP and on which a BPF "udp port" filter compiles:
+    // real NICs (Ethernet), the Linux cooked-capture path (SLL) and raw-IP tunnels/loopback.
+    private static bool IsFilterableLinkType(LinkLayers link) => link switch
+    {
+        LinkLayers.Ethernet => true,
+        LinkLayers.LinuxSll => true,
+        LinkLayers.LinuxSll2 => true,
+        LinkLayers.Raw => true,
+        LinkLayers.RawLegacy => true,
+        LinkLayers.IPv4 => true,
+        LinkLayers.IPv6 => true,
+        LinkLayers.Null => true,
+        LinkLayers.Loop => true,
+        _ => false
+    };
 
     public override void Stop()
     {
