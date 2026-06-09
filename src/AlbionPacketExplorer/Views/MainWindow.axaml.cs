@@ -451,6 +451,10 @@ public partial class MainWindow : ApxWindow, IFilePicker
                 vm.SkipUpdateVersion(version);
                 break;
             case UpdateChoice.NotNow:
+                vm.DismissUpdateVersion(version);
+                break;
+            case UpdateChoice.Closed:
+                // Dialog closed via X: keep the toolbar badge so the update stays one click away.
                 break;
         }
     }

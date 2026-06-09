@@ -11,7 +11,7 @@
 
   "toolbar.update": "Update",
   "toolbar.updateAvailable": "v{0} available",
-  "toolbar.update.tip": "Download and install update, then restart",
+  "toolbar.update.tip": "Show what's new and choose to update, skip or dismiss",
   "update.checking": "Checking for updates…",
   "update.upToDate": "Up to date",
   "update.available": "v{0} available",
