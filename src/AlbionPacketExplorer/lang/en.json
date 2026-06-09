@@ -85,6 +85,32 @@
   "status.loading": "Loading {0}…",
   "status.loaded": "Loaded {0} packets from {1}",
   "status.loadError": "Error loading file: {0}",
+  "status.captureNoDevice": "No capture device could be opened. See the dialog to grant capture permission.",
+
+  "capture.help.title": "Capture needs permission",
+  "capture.help.copy": "Copy",
+  "capture.help.copied.title": "Copied",
+  "capture.help.copied": "Command copied to clipboard",
+  "capture.help.close": "Close",
+  "capture.help.openGuide": "Open guide",
+
+  "capture.help.win.heading": "Windows: install Npcap",
+  "capture.help.win.intro": "Live capture needs the Npcap driver. No device could be opened, so it is likely missing or the app is not elevated.",
+  "capture.help.win.step.install": "Install Npcap, then restart Albion Packet Explorer. Keep \"WinPcap API-compatible mode\" checked during setup.",
+  "capture.help.win.step.admin": "If capture still fails after installing Npcap, run the app as Administrator (right-click the icon, then Run as administrator).",
+
+  "capture.help.mac.heading": "macOS: grant capture access",
+  "capture.help.mac.intro": "Capturing needs read access to the BPF devices (/dev/bpf*). No device could be opened, so those permissions are not granted.",
+  "capture.help.mac.step.chmodbpf": "Recommended: install Wireshark and its ChmodBPF helper for persistent access, then restart the app.",
+  "capture.help.mac.step.sudo": "Quick test: run the app from Terminal with sudo.",
+  "capture.help.mac.step.perms": "Or open BPF permissions for this session only (resets on reboot):",
+
+  "capture.help.linux.heading": "Linux: grant capture permission",
+  "capture.help.linux.intro": "Capturing raw packets needs the CAP_NET_RAW capability. The AppImage runs unprivileged, so no device could be opened. Pick one option.",
+  "capture.help.linux.step.root": "Quick test: run the AppImage as root.",
+  "capture.help.linux.step.setcap": "Permanent (no sudo each launch): extract the AppImage, grant capture rights to the binary, then run it.",
+  "capture.help.linux.step.installed": "If installed from a .deb or .rpm, grant rights to the installed binary instead.",
+  "capture.help.linux.step.libpcap": "If it still fails, make sure libpcap is installed: Debian/Ubuntu \"sudo apt install libpcap0.8\", Fedora \"sudo dnf install libpcap\".",
 
   "toast.captureStarted.title": "Capture Started",
   "toast.captureStarted.body": "Listening on {0}",

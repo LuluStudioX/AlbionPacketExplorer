@@ -58,6 +58,10 @@ public partial class MainViewModel : ObservableObject
     /// <summary>Raised when an update should be offered: (version, changelog notes). The view opens
     /// the changelog dialog and routes the user's choice back via the methods below.</summary>
     public event Action<string, string?>? UpdateAvailableRequested;
+
+    /// <summary>Raised when live capture opened no device (missing driver or capture privileges). The
+    /// view opens the platform-specific capture-permission help dialog.</summary>
+    public event Action? CapturePermissionHelpRequested;
     [ObservableProperty] private string _statusText = Loc.T("status.ready");
     [ObservableProperty] private ObservableCollection<NetworkDeviceInfo> _availableDevices = [];
     [ObservableProperty] private NetworkDeviceInfo? _selectedDevice;
@@ -486,6 +490,18 @@ public partial class MainViewModel : ObservableObject
             StatusText = Loc.Format("status.captureFailed", ex.Message);
             _session.Dispose();
             _session = null;
+            return;
+        }
+
+        // Start() does not throw when every candidate device fails to open (missing driver or, on
+        // Linux/macOS, no capture privileges) - it just opens nothing. Detect that and surface the
+        // platform-specific permission help instead of a misleading "capturing" state.
+        if (!_session.IsRunning)
+        {
+            _session.Dispose();
+            _session = null;
+            StatusText = Loc.T("status.captureNoDevice");
+            CapturePermissionHelpRequested?.Invoke();
             return;
         }
 
