@@ -767,9 +767,10 @@ public partial class MainViewModel : ObservableObject
         Aggregator.Reset();
         PacketList.SetSource([]);
         PacketDetail.Packet = null;
-        // Drop the previous dataset's param arena entirely. A fresh store means the old chunks become
-        // unreachable once the old PacketEntry lists are cleared above, so a reload does not stack
-        // two datasets' worth of param bytes in RAM.
+        // Drop the previous dataset's param arena entirely. Disposing the old store closes its spill
+        // file (DeleteOnClose removes it immediately), so the previous dataset's param bytes leave the
+        // process and disk at once; a reload does not stack two datasets' worth of param bytes.
+        _paramStore.Dispose();
         _paramStore = new PackedParamStore();
         NotifySaveCommands();
     }
