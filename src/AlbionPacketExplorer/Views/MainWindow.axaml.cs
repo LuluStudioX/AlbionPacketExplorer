@@ -478,6 +478,15 @@ public partial class MainWindow : ApxWindow, IFilePicker
         // A successful one-click grant (mac/linux) makes a device openable; re-scan so the picker
         // reflects it and the next Start succeeds.
         dialogVm.AccessGranted += () => vm.RefreshDevicesCommand.Execute(null);
+        // Linux relaunch-as-root has spawned the elevated instance; quit this one so only it remains.
+        dialogVm.RelaunchRequested += () =>
+        {
+            if (Avalonia.Application.Current?.ApplicationLifetime
+                is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                desktop.Shutdown();
+            else
+                Close();
+        };
 
         var win = new CapturePermissionWindow(dialogVm);
         await win.ShowDialog(this);

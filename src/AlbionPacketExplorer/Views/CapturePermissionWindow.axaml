@@ -24,13 +24,16 @@
         <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,12,0,0">
             <TextBlock Text="{Binding ActionStatus}" IsVisible="{Binding HasActionStatus}"
                        TextWrapping="Wrap" Foreground="{DynamicResource Apx.TextMuted}" />
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
                 <Button Grid.Column="0" Classes="ghost" Command="{Binding OpenGuideCommand}"
                         Content="{Binding OpenGuideLabel}" IsVisible="{Binding HasGuide}" />
-                <Button Grid.Column="2" Classes="accent" Command="{Binding RunPrimaryActionCommand}"
+                <Button Grid.Column="2" Classes="ghost" Command="{Binding RunSecondaryActionCommand}"
+                        Content="{Binding SecondaryActionLabel}" IsVisible="{Binding HasSecondaryAction}"
+                        Margin="0,0,8,0" />
+                <Button Grid.Column="3" Classes="accent" Command="{Binding RunPrimaryActionCommand}"
                         Content="{Binding PrimaryActionLabel}" IsVisible="{Binding HasPrimaryAction}"
                         Margin="0,0,8,0" />
-                <Button Grid.Column="3" Classes="ghost" Command="{Binding CloseCommand}"
+                <Button Grid.Column="4" Classes="ghost" Command="{Binding CloseCommand}"
                         Content="{Binding CloseLabel}" />
             </Grid>
         </StackPanel>

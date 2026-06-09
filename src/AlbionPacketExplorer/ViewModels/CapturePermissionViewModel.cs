@@ -18,14 +18,26 @@ public sealed class CaptureHelpStep
 /// Backs the dialog shown when live capture opened no device. Raw packet capture needs elevated
 /// privileges (or a driver) on every OS and the app cannot grant them to itself, so this surfaces
 /// the exact, platform-specific steps for the running OS and its shipped package formats, plus a
-/// one-click action that performs the fix where the OS allows it.
+/// one-click primary action (and, where useful, a secondary one) that performs the fix.
 /// </summary>
 public partial class CapturePermissionViewModel : ObservableObject
 {
-    private enum PrimaryAction { None, InstallNpcap, GrantMac, GrantLinux }
+    // One value per concrete one-click fix; a primary and an optional secondary slot are each set to
+    // one of these depending on the running OS / package form.
+    private enum CaptureFix
+    {
+        None,
+        InstallNpcap,       // Windows: download + run the Npcap installer
+        GrantMac,           // macOS: chmod /dev/bpf* for this boot (admin prompt)
+        GrantMacPermanent,  // macOS: install a ChmodBPF LaunchDaemon (survives reboot)
+        GrantLinux,         // Linux (on-disk build): setcap the running binary
+        RelaunchLinuxRoot,  // Linux AppImage: re-exec as root (instant, keeps auto-update)
+        SetupLinuxNoSudo,   // Linux AppImage: extract + setcap + menu entry (no password next time)
+    }
 
     private readonly CaptureSetupService _setup = new();
-    private readonly PrimaryAction _action;
+    private readonly CaptureFix _primary;
+    private readonly CaptureFix _secondary;
 
     public string Title => Loc.T("capture.help.title");
     public string CopyLabel => Loc.T("capture.help.copy");
@@ -38,14 +50,21 @@ public partial class CapturePermissionViewModel : ObservableObject
     public string GuideUrl { get; }
     public bool HasGuide => !string.IsNullOrWhiteSpace(GuideUrl);
 
-    public string PrimaryActionLabel { get; }
-    public bool HasPrimaryAction => _action != PrimaryAction.None;
+    public string PrimaryActionLabel => LabelFor(_primary);
+    public bool HasPrimaryAction => _primary != CaptureFix.None;
+    public string SecondaryActionLabel => LabelFor(_secondary);
+    public bool HasSecondaryAction => _secondary != CaptureFix.None;
 
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private string _actionStatus = "";
     public bool HasActionStatus => !string.IsNullOrEmpty(ActionStatus);
     partial void OnActionStatusChanged(string value) => OnPropertyChanged(nameof(HasActionStatus));
-    partial void OnIsBusyChanged(bool value) => RunPrimaryActionCommand.NotifyCanExecuteChanged();
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        RunPrimaryActionCommand.NotifyCanExecuteChanged();
+        RunSecondaryActionCommand.NotifyCanExecuteChanged();
+    }
 
     // Injected by the view so copy uses the real top-level clipboard and the toast goes to the same
     // host as the rest of the app.
@@ -58,6 +77,10 @@ public partial class CapturePermissionViewModel : ObservableObject
     /// <summary>Raised after a one-click grant succeeds so the host can re-scan capture devices.</summary>
     public event Action? AccessGranted;
 
+    /// <summary>Raised after a successful "relaunch as root" so the host can quit the unprivileged
+    /// instance, leaving only the elevated one.</summary>
+    public event Action? RelaunchRequested;
+
     public CapturePermissionViewModel()
     {
         if (OperatingSystem.IsWindows())
@@ -65,8 +88,8 @@ public partial class CapturePermissionViewModel : ObservableObject
             Heading = Loc.T("capture.help.win.heading");
             Intro = Loc.T("capture.help.win.intro");
             GuideUrl = CaptureSetupService.NpcapDownloadPage;
-            _action = PrimaryAction.InstallNpcap;
-            PrimaryActionLabel = Loc.T("capture.help.action.win");
+            _primary = CaptureFix.InstallNpcap;
+            _secondary = CaptureFix.None;
             Steps =
             [
                 new CaptureHelpStep { Text = Loc.T("capture.help.win.step.install") },
@@ -78,8 +101,8 @@ public partial class CapturePermissionViewModel : ObservableObject
             Heading = Loc.T("capture.help.mac.heading");
             Intro = Loc.T("capture.help.mac.intro");
             GuideUrl = "https://www.wireshark.org/download.html";
-            _action = PrimaryAction.GrantMac;
-            PrimaryActionLabel = Loc.T("capture.help.action.grant");
+            _primary = CaptureFix.GrantMac;
+            _secondary = CaptureFix.GrantMacPermanent;
             Steps =
             [
                 new CaptureHelpStep { Text = Loc.T("capture.help.mac.step.chmodbpf") },
@@ -91,7 +114,7 @@ public partial class CapturePermissionViewModel : ObservableObject
                 new CaptureHelpStep
                 {
                     Text = Loc.T("capture.help.mac.step.perms"),
-                    Command = "sudo chmod o+r /dev/bpf*",
+                    Command = "sudo chmod o+rw /dev/bpf*",
                 },
             ];
         }
@@ -100,10 +123,18 @@ public partial class CapturePermissionViewModel : ObservableObject
             Heading = Loc.T("capture.help.linux.heading");
             Intro = Loc.T("capture.help.linux.intro");
             GuideUrl = "";
-            // setcap cannot persist on the AppImage's FUSE mount, so only offer one-click grant when
-            // running from a real on-disk binary; otherwise the manual extract steps below are it.
-            _action = CaptureSetupService.IsLinuxAppImage() ? PrimaryAction.None : PrimaryAction.GrantLinux;
-            PrimaryActionLabel = Loc.T("capture.help.action.grant");
+            // AppImage: setcap can't touch the FUSE mount, so the quick fix is relaunch-as-root and
+            // the permanent fix is the extract+setcap setup. An on-disk build can just setcap itself.
+            if (CaptureSetupService.IsLinuxAppImage())
+            {
+                _primary = CaptureFix.RelaunchLinuxRoot;
+                _secondary = CaptureFix.SetupLinuxNoSudo;
+            }
+            else
+            {
+                _primary = CaptureFix.GrantLinux;
+                _secondary = CaptureFix.None;
+            }
             Steps =
             [
                 new CaptureHelpStep
@@ -128,6 +159,17 @@ public partial class CapturePermissionViewModel : ObservableObject
         }
     }
 
+    private static string LabelFor(CaptureFix fix) => fix switch
+    {
+        CaptureFix.InstallNpcap => Loc.T("capture.help.action.win"),
+        CaptureFix.GrantMac => Loc.T("capture.help.action.grant"),
+        CaptureFix.GrantMacPermanent => Loc.T("capture.help.action.grant.permanent"),
+        CaptureFix.GrantLinux => Loc.T("capture.help.action.grant"),
+        CaptureFix.RelaunchLinuxRoot => Loc.T("capture.help.action.relaunchRoot"),
+        CaptureFix.SetupLinuxNoSudo => Loc.T("capture.help.action.setupNoSudo"),
+        _ => "",
+    };
+
     [RelayCommand]
     private async Task Copy(string? command)
     {
@@ -142,15 +184,22 @@ public partial class CapturePermissionViewModel : ObservableObject
         if (HasGuide) OpenUrlRequested?.Invoke(GuideUrl);
     }
 
-    [RelayCommand(CanExecute = nameof(CanRunPrimaryAction))]
-    private async Task RunPrimaryAction()
+    [RelayCommand(CanExecute = nameof(CanRunAction))]
+    private Task RunPrimaryAction() => ExecuteAsync(_primary);
+
+    [RelayCommand(CanExecute = nameof(CanRunAction))]
+    private Task RunSecondaryAction() => ExecuteAsync(_secondary);
+
+    private bool CanRunAction() => !IsBusy;
+
+    private async Task ExecuteAsync(CaptureFix fix)
     {
         IsBusy = true;
         try
         {
-            switch (_action)
+            switch (fix)
             {
-                case PrimaryAction.InstallNpcap:
+                case CaptureFix.InstallNpcap:
                     ActionStatus = Loc.T("capture.help.action.busy.fetch");
                     var url = await _setup.GetLatestNpcapInstallerUrlAsync();
                     if (url == null)
@@ -164,14 +213,37 @@ public partial class CapturePermissionViewModel : ObservableObject
                     ActionStatus = Loc.T(started ? "capture.help.action.launched" : "capture.help.action.failed");
                     break;
 
-                case PrimaryAction.GrantMac:
+                case CaptureFix.GrantMac:
                     ActionStatus = Loc.T("capture.help.action.busy.grant");
                     await GrantThen(_setup.GrantMacBpfAccessAsync());
                     break;
 
-                case PrimaryAction.GrantLinux:
+                case CaptureFix.GrantMacPermanent:
+                    ActionStatus = Loc.T("capture.help.action.busy.daemon");
+                    await GrantThen(_setup.InstallMacBpfDaemonAsync(), "capture.help.action.daemon.ok");
+                    break;
+
+                case CaptureFix.GrantLinux:
                     ActionStatus = Loc.T("capture.help.action.busy.grant");
                     await GrantThen(_setup.GrantLinuxCaptureAsync());
+                    break;
+
+                case CaptureFix.SetupLinuxNoSudo:
+                    ActionStatus = Loc.T("capture.help.action.busy.setup");
+                    await GrantThen(_setup.SetupLinuxNoSudoCaptureAsync(), "capture.help.action.setup.ok");
+                    break;
+
+                case CaptureFix.RelaunchLinuxRoot:
+                    ActionStatus = Loc.T("capture.help.action.busy.relaunch");
+                    if (await _setup.RelaunchLinuxAsRootAsync())
+                    {
+                        ActionStatus = Loc.T("capture.help.action.relaunching");
+                        RelaunchRequested?.Invoke();
+                    }
+                    else
+                    {
+                        ActionStatus = Loc.T("capture.help.action.failed");
+                    }
                     break;
             }
         }
@@ -181,14 +253,12 @@ public partial class CapturePermissionViewModel : ObservableObject
         }
     }
 
-    private async Task GrantThen(Task<bool> grant)
+    private async Task GrantThen(Task<bool> grant, string okKey = "capture.help.action.granted")
     {
         var ok = await grant;
-        ActionStatus = Loc.T(ok ? "capture.help.action.granted" : "capture.help.action.failed");
+        ActionStatus = Loc.T(ok ? okKey : "capture.help.action.failed");
         if (ok) AccessGranted?.Invoke();
     }
-
-    private bool CanRunPrimaryAction() => !IsBusy;
 
     [RelayCommand]
     private void Close() => CloseRequested?.Invoke();
