@@ -1,118 +1,224 @@
+using System.Buffers;
+using System.IO.MemoryMappedFiles;
 using System.Text.Json;
+using System.Threading;
 
 namespace AlbionPacketExplorer.Models;
 
 /// <summary>
-/// A reference into a <see cref="PackedParamStore"/>: which chunk, the byte offset and length of a
-/// packet's raw params-JSON slice, plus the param count (so callers can size/Count without decoding).
-/// 16 bytes, a plain value type, so a <see cref="PacketEntry"/> holds it inline with no per-packet
+/// A reference into a <see cref="PackedParamStore"/>: the byte offset and length of a packet's raw
+/// params-JSON slice in the spill file, plus the param count (so callers can size/Count without
+/// decoding). A plain value type, so a <see cref="PacketEntry"/> holds it inline with no per-packet
 /// heap object for its params.
 /// </summary>
-public readonly record struct ParamRef(int Chunk, int Offset, int Length, int Count)
+public readonly record struct ParamRef(long Offset, int Length, int Count)
 {
-    public static readonly ParamRef Empty = new(-1, 0, 0, 0);
-    public bool IsEmpty => Chunk < 0;
+    public static readonly ParamRef Empty = new(-1, 0, 0);
+    public bool IsEmpty => Offset < 0;
 }
 
 /// <summary>
-/// A chunked in-RAM byte arena that holds each packet's params as their raw UTF-8 JSON object bytes
-/// (<c>{ "0": { "type": .., "value": .. }, .. }</c>) and decodes them lazily on demand.
+/// A byte arena that holds each packet's params as their raw UTF-8 JSON object bytes
+/// (<c>{ "0": { "type": .., "value": .. }, .. }</c>) and decodes them lazily on demand. The bytes
+/// live in a temporary memory-mapped FILE under the OS temp dir, NOT on the managed heap, so the
+/// arena's pages are file-backed and reclaimable by the OS - committed/private memory does not grow
+/// with the arena the way a managed <c>byte[]</c> chunk list does.
 ///
-/// <para>Why: at ~4M packets the eager per-packet <c>KeyValuePair&lt;string,ParamValue&gt;[]</c>
-/// arrays (and their boxed/ref payloads) dominated live memory. Storing the compact source bytes and
-/// re-parsing only when a row is actually viewed/filtered trades a little CPU on demand for a large
-/// drop in retained memory.</para>
+/// <para>Why: at ~4M packets the params bytes alone are ~1.8 GB. As managed LOH chunks that whole
+/// arena counts against private/committed memory and is never returned to the OS. Spilling it to a
+/// mmap file turns those bytes into clean file-backed pages the OS can evict under pressure, cutting
+/// the process's retained set substantially while keeping decode O(copy a few hundred bytes).</para>
 ///
-/// <para>Layout: a list of fixed-size chunks (16 MB) so the arena grows without a single giant LOH
-/// array. A slice never straddles a chunk - if it does not fit the current chunk's remaining space a
-/// new chunk starts; a slice larger than the chunk size gets its own oversized one-off chunk.</para>
+/// <para>File: a temp file <c>apx-params-{guid}.bin</c> opened with
+/// <see cref="FileOptions.DeleteOnClose"/> so it is removed on dispose or process exit on every OS.
+/// The map is created with <c>mapName: null</c> - named maps are Windows-only; a null name is
+/// file-path-backed and works on Windows, Linux and macOS.</para>
 ///
-/// <para>Threading: <see cref="Append"/> and chunk-list growth are guarded by a lock (appends happen
-/// on the single background load thread, or batched on the UI thread during live capture).
-/// <see cref="Decode"/> reads already-written, never-mutated bytes via a volatile snapshot of the
-/// chunk array, so it runs lock-free on the UI and background filter threads.</para>
+/// <para>Threading: a <see cref="ReaderWriterLockSlim"/>. <see cref="Append"/> and the grow that
+/// recreates the map take the WRITE lock (appends happen on the single background load thread XOR the
+/// batched live-capture path - never both at once). <see cref="Decode"/> takes the READ lock and
+/// copies the small slice out before parsing, so it stays correct against a concurrent grow that
+/// disposes and recreates the accessor.</para>
 /// </summary>
-public sealed class PackedParamStore
+public sealed class PackedParamStore : IDisposable
 {
-    private const int ChunkSize = 16 * 1024 * 1024; // 16 MB
+    // Start at 256 MB and double on overflow. A typical 3.9M-packet file spills ~1.8 GB, so growth
+    // runs a handful of times total (256 MB -> 512 MB -> 1 GB -> 2 GB), each grow O(1) work.
+    private const long InitialCapacity = 256L * 1024 * 1024;
 
-    private readonly Lock _lock = new();
+    private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.NoRecursion);
 
-    // Volatile so Decode observes a consistent chunk-array reference after growth on another thread.
-    private volatile byte[][] _chunks = [];
-    private int _chunkCount;     // number of live chunks in _chunks
-    private int _currentOffset;  // write cursor within the last chunk
+    private readonly string _path;
+    private FileStream _file;
+    private MemoryMappedFile _mmf;
+    private MemoryMappedViewAccessor _accessor;
+    private long _capacity;
+    private long _cursor;
+    private bool _disposed;
+
+    public PackedParamStore()
+    {
+        _path = Path.Combine(Path.GetTempPath(), $"apx-params-{Guid.NewGuid():N}.bin");
+        _capacity = InitialCapacity;
+        // DeleteOnClose: the temp file is removed when the FileStream closes (dispose) or the process
+        // exits - cross-platform, no leak on crash. We own the stream and pass leaveOpen: true to the
+        // map so disposing the mmf during a grow does NOT close it; a grow re-wraps the SAME open file
+        // handle at a larger capacity. The stream is closed explicitly in DisposeMap/Dispose.
+        _file = new FileStream(_path, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None,
+            bufferSize: 4096, FileOptions.DeleteOnClose);
+        (_mmf, _accessor) = CreateMap(_file, _capacity);
+    }
+
+    // Wraps the given (already open) FileStream in a mmf + view accessor at the requested capacity.
+    // mapName MUST be null for cross-platform; leaveOpen: true so disposing the mmf during a grow
+    // does NOT close our FileStream - we reuse the same open file handle for the larger map.
+    private static (MemoryMappedFile, MemoryMappedViewAccessor) CreateMap(FileStream file, long capacity)
+    {
+        var mmf = MemoryMappedFile.CreateFromFile(
+            file,
+            mapName: null,
+            capacity,
+            MemoryMappedFileAccess.ReadWrite,
+            HandleInheritability.None,
+            leaveOpen: true);
+        var accessor = mmf.CreateViewAccessor(0, capacity, MemoryMappedFileAccess.ReadWrite);
+        return (mmf, accessor);
+    }
 
     /// <summary>
-    /// Copies a packet's params-JSON UTF-8 bytes into the arena and returns a <see cref="ParamRef"/>
-    /// locating them. <paramref name="paramCount"/> is stored so callers can read the count without
-    /// decoding. An empty span yields <see cref="ParamRef.Empty"/> (no bytes stored).
+    /// Copies a packet's params-JSON UTF-8 bytes into the spill file and returns a
+    /// <see cref="ParamRef"/> locating them. <paramref name="paramCount"/> is stored so callers can
+    /// read the count without decoding. An empty span yields an empty ref (no bytes stored).
     /// </summary>
     public ParamRef Append(ReadOnlySpan<byte> paramJsonUtf8, int paramCount)
     {
         if (paramJsonUtf8.IsEmpty)
-            return new ParamRef(-1, 0, 0, paramCount);
+            return new ParamRef(-1, 0, paramCount);
 
-        lock (_lock)
+        int len = paramJsonUtf8.Length;
+
+        // WriteArray needs a byte[]; copy the span into a pooled buffer (Span can't be captured past
+        // the accessor call boundary cleanly, and a pooled array avoids a per-append allocation).
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(len);
+        paramJsonUtf8.CopyTo(buffer);
+
+        _lock.EnterWriteLock();
+        try
         {
-            // First write, or the slice does not fit the current chunk: start a fresh chunk. A slice
-            // bigger than ChunkSize gets a dedicated oversized chunk sized exactly to it.
-            if (_chunkCount == 0 || _currentOffset + paramJsonUtf8.Length > _chunks[_chunkCount - 1].Length)
-            {
-                int newChunkSize = Math.Max(ChunkSize, paramJsonUtf8.Length);
-                AddChunk(newChunkSize);
-                _currentOffset = 0;
-            }
+            if (_disposed) throw new ObjectDisposedException(nameof(PackedParamStore));
 
-            int chunkIndex = _chunkCount - 1;
-            int offset = _currentOffset;
-            paramJsonUtf8.CopyTo(_chunks[chunkIndex].AsSpan(offset));
-            _currentOffset += paramJsonUtf8.Length;
+            if (_cursor + len > _capacity)
+                Grow(_cursor + len);
 
-            return new ParamRef(chunkIndex, offset, paramJsonUtf8.Length, paramCount);
+            long offset = _cursor;
+            _accessor.WriteArray(offset, buffer, 0, len);
+            _cursor += len;
+            return new ParamRef(offset, len, paramCount);
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
+            ArrayPool<byte>.Shared.Return(buffer);
         }
     }
 
-    // Grows the chunk array (geometric, like List<T>) and appends a fresh chunk. Caller holds _lock.
-    private void AddChunk(int size)
+    // Doubles capacity until it fits the required total, then recreates the map over the SAME open
+    // FileStream at the new size. Runs under the write lock so no Decode observes a disposed accessor.
+    private void Grow(long required)
     {
-        if (_chunkCount == _chunks.Length)
-        {
-            int newCap = _chunks.Length == 0 ? 4 : _chunks.Length * 2;
-            var grown = new byte[newCap][];
-            System.Array.Copy(_chunks, grown, _chunkCount);
-            _chunks = grown; // publish the grown reference (volatile) before exposing the new chunk
-        }
-        _chunks[_chunkCount] = new byte[size];
-        _chunkCount++;
+        long newCapacity = _capacity;
+        while (newCapacity < required)
+            newCapacity *= 2;
+
+        _accessor.Dispose();
+        _mmf.Dispose(); // leaveOpen:true kept _file open; the larger map re-wraps that same handle
+        (_mmf, _accessor) = CreateMap(_file, newCapacity);
+        _capacity = newCapacity;
     }
 
     /// <summary>
     /// Decodes a stored slice back into a <see cref="ParamSet"/> using the shared
     /// <see cref="ParamCodec.ReadParams"/> - the exact same parser the file loader uses - so the
-    /// result is value-identical to parsing the original line. Reads immutable, already-written bytes
-    /// lock-free.
+    /// result is value-identical to parsing the original line. Reads immutable, already-written bytes.
     /// </summary>
     public ParamSet Decode(ParamRef r)
     {
         if (r.IsEmpty || r.Length == 0)
             return ParamSet.Empty;
 
-        var slice = _chunks[r.Chunk].AsSpan(r.Offset, r.Length);
-        var reader = new Utf8JsonReader(slice);
-        if (!reader.Read())
-            return ParamSet.Empty;
-        return ParamCodec.ReadParams(ref reader);
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(r.Length);
+        try
+        {
+            _lock.EnterReadLock();
+            try
+            {
+                if (_disposed) return ParamSet.Empty;
+                _accessor.ReadArray(r.Offset, buffer, 0, r.Length);
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
+
+            var reader = new Utf8JsonReader(buffer.AsSpan(0, r.Length));
+            if (!reader.Read())
+                return ParamSet.Empty;
+            return ParamCodec.ReadParams(ref reader);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
     }
 
-    /// <summary>Drops every chunk so a dataset reset releases the whole arena to the GC.</summary>
+    /// <summary>
+    /// Resets to a fresh empty spill file so a new dataset starts clean and the previous dataset's
+    /// bytes are released to the OS immediately. The old file is deleted (DeleteOnClose) when its
+    /// stream closes here.
+    /// </summary>
     public void Clear()
     {
-        lock (_lock)
+        _lock.EnterWriteLock();
+        try
         {
-            _chunks = [];
-            _chunkCount = 0;
-            _currentOffset = 0;
+            if (_disposed) return;
+            DisposeMap();
+
+            _capacity = InitialCapacity;
+            _cursor = 0;
+            // Reuse the same path: the previous file is already deleted by DisposeMap's stream close,
+            // so CreateNew on the same name succeeds.
+            _file = new FileStream(_path, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None,
+                bufferSize: 4096, FileOptions.DeleteOnClose);
+            (_mmf, _accessor) = CreateMap(_file, _capacity);
         }
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
+    }
+
+    // Disposes accessor + mmf + stream. DeleteOnClose removes the temp file when the stream closes.
+    private void DisposeMap()
+    {
+        _accessor.Dispose();
+        _mmf.Dispose();
+        _file.Dispose();
+    }
+
+    public void Dispose()
+    {
+        _lock.EnterWriteLock();
+        try
+        {
+            if (_disposed) return;
+            _disposed = true;
+            DisposeMap();
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
+        _lock.Dispose();
     }
 }
