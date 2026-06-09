@@ -43,6 +43,11 @@ public sealed class PacketFilter
     private readonly Token[] _exclusions;
     private readonly Token[] _inclusions;
 
+    // Whether ANY token can consult the (expensive) name / params columns. If not, Matches skips
+    // PacketNameResolver.Resolve / FormatParamSummary entirely. kind/code are always cheap.
+    private readonly bool _needsName;
+    private readonly bool _needsParams;
+
     public string Query { get; }
 
     public bool IsEmpty => _exclusions.Length == 0 && _inclusions.Length == 0;
@@ -66,6 +71,14 @@ public sealed class PacketFilter
 
         _exclusions = [.. excl];
         _inclusions = [.. incl];
+
+        // A null Col is the generic branch (kind || code || name || params), so it needs both.
+        // Otherwise only the matching scoped column is needed.
+        foreach (var t in excl.Concat(incl))
+        {
+            if (t.Col is null or "name") _needsName = true;
+            if (t.Col is null or "params") _needsParams = true;
+        }
     }
 
     public bool Matches(PacketEntry p)
@@ -74,9 +87,11 @@ public sealed class PacketFilter
 
         var codeStr   = p.Code.ToString();
         var kind      = p.Kind;
-        var name      = PacketNameResolver.Resolve(p.Kind, p.Code);
-        var paramStr  = PacketDisplayFormatter.FormatParamSummary(p);
-        var resolved  = p.ResolvedSummary ?? string.Empty;
+        // Only compute the expensive columns if a token can actually consult them. When a flag is
+        // false, no token's ColumnMatches branch reads the corresponding arg, so empty is safe.
+        var name      = _needsName ? PacketNameResolver.Resolve(p.Kind, p.Code) : string.Empty;
+        var paramStr  = _needsParams ? PacketDisplayFormatter.FormatParamSummary(p) : string.Empty;
+        var resolved  = _needsParams ? (p.ResolvedSummary ?? string.Empty) : string.Empty;
         var paired    = p.Correlated != null;
         var returnCode = p.ReturnCode;
 
@@ -402,6 +417,22 @@ public partial class PacketListViewModel : ObservableObject
     {
         _allPackets.Clear();
         _allPackets.AddRange(packets);
+
+        // Tally Kind counts in a single pass (empty source => all zeros).
+        _countAll = _allPackets.Count;
+        _countEvent = 0;
+        _countRequest = 0;
+        _countResponse = 0;
+        foreach (var p in _allPackets)
+        {
+            switch (p.Kind)
+            {
+                case "EVENT": _countEvent++; break;
+                case "REQUEST": _countRequest++; break;
+                case "RESPONSE": _countResponse++; break;
+            }
+        }
+
         if (_resolveItemNames && _gameData?.IsLoaded == true)
             _ = BuildResolvedIndexAsync(packets);
         ApplyFilter();
@@ -433,6 +464,13 @@ public partial class PacketListViewModel : ObservableObject
     public void AddLivePacket(PacketEntry packet)
     {
         _allPackets.Add(packet);
+        _countAll++;
+        switch (packet.Kind)
+        {
+            case "EVENT": _countEvent++; break;
+            case "REQUEST": _countRequest++; break;
+            case "RESPONSE": _countResponse++; break;
+        }
         if (_filter.Matches(packet))
         {
             var row = new PacketRow(packet);
@@ -521,10 +559,17 @@ public partial class PacketListViewModel : ObservableObject
     /// <summary>True once any packets are loaded or captured (drives the empty-state overlay).</summary>
     public bool HasData => _allPackets.Count > 0;
 
-    public int CountAll      => _allPackets.Count;
-    public int CountEvent    => _allPackets.Count(p => p.Kind == "EVENT");
-    public int CountRequest  => _allPackets.Count(p => p.Kind == "REQUEST");
-    public int CountResponse => _allPackets.Count(p => p.Kind == "RESPONSE");
+    // Cached Kind tallies - maintained in SetSource (one pass) and AddLivePacket (increment),
+    // so NotifyStatusCounts no longer triggers three O(n) scans of _allPackets per filter pass.
+    private int _countAll;
+    private int _countEvent;
+    private int _countRequest;
+    private int _countResponse;
+
+    public int CountAll      => _countAll;
+    public int CountEvent    => _countEvent;
+    public int CountRequest  => _countRequest;
+    public int CountResponse => _countResponse;
 
     [ObservableProperty] private string _activeStatusFilter = "All";
 
