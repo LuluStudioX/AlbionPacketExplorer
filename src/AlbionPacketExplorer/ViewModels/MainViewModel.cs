@@ -664,6 +664,7 @@ public partial class MainViewModel : ObservableObject
         {
             IsLoading = false;
             LoadProgress = 1;
+            CompactAfterLoad(); // release heap grown by transient parse/decode garbage
         }
     }
 
@@ -718,6 +719,7 @@ public partial class MainViewModel : ObservableObject
         {
             IsLoading = false;
             LoadProgress = 1;
+            CompactAfterLoad(); // release heap grown by transient parse garbage
         }
     }
 
@@ -738,6 +740,19 @@ public partial class MainViewModel : ObservableObject
         // One flush per batch instead of the old every-100-packets cadence.
         Aggregator.Flush();
     }
+
+    // One-shot compacting collection run once at the very end of a big file load. A multi-million
+    // packet load grows the GC heap with transient parse garbage (UTF-8 buffers, JSON tokens) that
+    // workstation GC keeps committed but does not return to the OS; this reclaims that slack so
+    // committed memory tracks the live retained set. Done OFF the UI thread so it never blocks UI
+    // setup, and ONLY here on the load completion path - never during live capture or filtering, and
+    // with no periodic/timer GC, so steady-state interactivity is untouched.
+    private static void CompactAfterLoad() => Task.Run(() =>
+    {
+        System.Runtime.GCSettings.LargeObjectHeapCompactionMode =
+            System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
+        GC.Collect(2, GCCollectionMode.Aggressive, blocking: true, compacting: true);
+    });
 
     private void ResetData()
     {
