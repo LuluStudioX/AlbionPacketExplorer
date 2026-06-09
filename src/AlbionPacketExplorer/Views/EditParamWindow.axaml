@@ -6,6 +6,7 @@
         xmlns:system="clr-namespace:System;assembly=System.Runtime"
         x:Class="AlbionPacketExplorer.Views.EditParamWindow"
         x:DataType="vm:EditParamViewModel"
+        Icon="/Assets/app-icon.ico"
         Title="{Binding Title}"
         Width="420" Height="400"
         MinWidth="320" MinHeight="380"
