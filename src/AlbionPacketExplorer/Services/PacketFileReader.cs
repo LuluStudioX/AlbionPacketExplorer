@@ -96,68 +96,81 @@ public class PacketFileReader
     // JsonDocument DOM per line. Produces a PacketEntry byte-for-byte equivalent to ParseElement.
     private static PacketEntry? ParseLine(string line)
     {
-        byte[] bytes = Encoding.UTF8.GetBytes(line);
-        var reader = new Utf8JsonReader(bytes);
-
-        if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
-            return null;
-
-        DateTime? ts = null;
-        bool sawKind = false;
-        string kind = "";
-        int? code = null;
-        ParamSet? parameters = null;
-        bool sawParams = false;
-        int? returnCode = null;
-        string? debugMessage = null;
-
-        while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
+        // Rent a scratch UTF-8 buffer from the shared pool instead of allocating a throwaway byte[]
+        // per line (~millions of arrays per big load). All retained data (GetString() results, param
+        // values) is COPIED out of the buffer during parse, so nothing keeps a span into it; the
+        // Utf8JsonReader is a local ref struct used only here. The buffer is always returned (finally).
+        int max = Encoding.UTF8.GetMaxByteCount(line.Length);
+        byte[] buf = System.Buffers.ArrayPool<byte>.Shared.Rent(max);
+        try
         {
-            string propName = reader.GetString()!;
-            reader.Read(); // advance to the value
+            int n = Encoding.UTF8.GetBytes(line, buf);
+            var reader = new Utf8JsonReader(buf.AsSpan(0, n));
 
-            switch (propName)
+            if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
+                return null;
+
+            DateTime? ts = null;
+            bool sawKind = false;
+            string kind = "";
+            int? code = null;
+            ParamSet? parameters = null;
+            bool sawParams = false;
+            int? returnCode = null;
+            string? debugMessage = null;
+
+            while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
             {
-                case "ts":
-                    ts = reader.GetDateTime();
-                    break;
-                case "kind":
-                    // Matches ParseElement: GetString() ?? "" (JSON null -> empty string).
-                    // Intern: the 3 Kind values (EVENT/REQUEST/RESPONSE) dedupe to single instances.
-                    kind = string.Intern(reader.GetString() ?? "");
-                    sawKind = true;
-                    break;
-                case "code":
-                    code = reader.GetInt32();
-                    break;
-                case "params":
-                    parameters = ReadParams(ref reader);
-                    sawParams = true;
-                    break;
-                case "returnCode":
-                    // Photon response framing: number only (mirrors JsonValueKind.Number guard).
-                    if (reader.TokenType == JsonTokenType.Number)
-                        returnCode = reader.GetInt32();
-                    else
+                string propName = reader.GetString()!;
+                reader.Read(); // advance to the value
+
+                switch (propName)
+                {
+                    case "ts":
+                        ts = reader.GetDateTime();
+                        break;
+                    case "kind":
+                        // Matches ParseElement: GetString() ?? "" (JSON null -> empty string).
+                        // Intern: the 3 Kind values (EVENT/REQUEST/RESPONSE) dedupe to single instances.
+                        kind = string.Intern(reader.GetString() ?? "");
+                        sawKind = true;
+                        break;
+                    case "code":
+                        code = reader.GetInt32();
+                        break;
+                    case "params":
+                        parameters = ReadParams(ref reader);
+                        sawParams = true;
+                        break;
+                    case "returnCode":
+                        // Photon response framing: number only (mirrors JsonValueKind.Number guard).
+                        if (reader.TokenType == JsonTokenType.Number)
+                            returnCode = reader.GetInt32();
+                        else
+                            reader.Skip();
+                        break;
+                    case "debugMessage":
+                        if (reader.TokenType == JsonTokenType.String)
+                            debugMessage = reader.GetString();
+                        else
+                            reader.Skip();
+                        break;
+                    default:
                         reader.Skip();
-                    break;
-                case "debugMessage":
-                    if (reader.TokenType == JsonTokenType.String)
-                        debugMessage = reader.GetString();
-                    else
-                        reader.Skip();
-                    break;
-                default:
-                    reader.Skip();
-                    break;
+                        break;
+                }
             }
+
+            // ParseElement requires ts, kind, code and params to all be present; otherwise null.
+            if (ts == null || !sawKind || code == null || !sawParams)
+                return null;
+
+            return new PacketEntry(ts.Value, kind, code.Value, parameters!.Value, returnCode, debugMessage);
         }
-
-        // ParseElement requires ts, kind, code and params to all be present; otherwise null.
-        if (ts == null || !sawKind || code == null || !sawParams)
-            return null;
-
-        return new PacketEntry(ts.Value, kind, code.Value, parameters!.Value, returnCode, debugMessage);
+        finally
+        {
+            System.Buffers.ArrayPool<byte>.Shared.Return(buf);
+        }
     }
 
     // Reads the "params" object: { "0": { "type": ..., "value": ... }, ... }
