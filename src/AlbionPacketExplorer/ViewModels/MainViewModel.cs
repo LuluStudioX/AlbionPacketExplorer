@@ -55,6 +55,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private NetworkDeviceInfo? _selectedDevice;
 
     private CaptureSession? _session;
+    // Packed arena holding every packet's raw params-JSON bytes; PacketEntry.Params decodes lazily
+    // from it. Replaced fresh on each load/capture (ResetData) so a new dataset never inherits the
+    // previous arena's chunks. One store backs the loader, the raw replay and the live session.
+    private PackedParamStore _paramStore = new();
     private readonly List<PacketEntry> _capturedPackets = [];
     private readonly List<PacketEntry> _allPackets = [];
     private readonly List<byte[]> _rawPackets = [];   // raw payloads (live capture / loaded .b64) for Save as RAW
@@ -462,7 +466,7 @@ public partial class MainViewModel : ObservableObject
     {
         ResetData();
 
-        _session = new CaptureSession(OnLivePacketBatch, msg => StatusText = msg, OnRawPacket);
+        _session = new CaptureSession(_paramStore, OnLivePacketBatch, msg => StatusText = msg, OnRawPacket);
 
         try
         {
@@ -626,7 +630,7 @@ public partial class MainViewModel : ObservableObject
             // not bound, so mutating them here is safe. Only the finalization touches bound state.
             await Task.Run(async () =>
             {
-                var parser = new RawAlbionParser();
+                var parser = new RawAlbionParser(_paramStore);
                 parser.PacketReceived += loaded.Add;
                 foreach (var line in await File.ReadAllLinesAsync(path))
                 {
@@ -686,7 +690,7 @@ public partial class MainViewModel : ObservableObject
             // and the local list are not bound, so mutating them here is safe.
             await Task.Run(async () =>
             {
-                await foreach (var packet in reader.ReadAsync(path, progress))
+                await foreach (var packet in reader.ReadAsync(path, progress, _paramStore))
                 {
                     Aggregator.Ingest(packet);
                     _correlator.Observe(packet);
@@ -763,6 +767,10 @@ public partial class MainViewModel : ObservableObject
         Aggregator.Reset();
         PacketList.SetSource([]);
         PacketDetail.Packet = null;
+        // Drop the previous dataset's param arena entirely. A fresh store means the old chunks become
+        // unreachable once the old PacketEntry lists are cleared above, so a reload does not stack
+        // two datasets' worth of param bytes in RAM.
+        _paramStore = new PackedParamStore();
         NotifySaveCommands();
     }
 
