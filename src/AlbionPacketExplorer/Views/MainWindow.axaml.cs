@@ -466,6 +466,30 @@ public partial class MainWindow : ApxWindow, IFilePicker
         win.Show(this);
     }
 
+    private ToolsWindow? _toolsWindow;
+
+    // Tools is a single-instance utility window (like Settings). Its Continue step loads the
+    // merged file into the main explorer and closes the window.
+    private void OnToolsClicked(object? sender, RoutedEventArgs e)
+    {
+        if (_toolsWindow != null)
+        {
+            _toolsWindow.Activate();
+            return;
+        }
+
+        var vm = (MainViewModel)DataContext!;
+        var tvm = new ToolsViewModel();
+        tvm.LoadRequested += async path =>
+        {
+            _toolsWindow?.Close();
+            await vm.LoadFileAsync(path);
+        };
+        _toolsWindow = new ToolsWindow(tvm);
+        _toolsWindow.Closed += (_, _) => _toolsWindow = null;
+        _toolsWindow.Show(this);
+    }
+
     private SettingsWindow? _settingsWindow;
 
     private void OnSettingsClicked(object? sender, RoutedEventArgs e) => OpenSettings(null);
