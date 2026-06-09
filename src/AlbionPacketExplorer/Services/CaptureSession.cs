@@ -6,9 +6,19 @@ namespace AlbionPacketExplorer.Services;
 
 public sealed class CaptureSession : IDisposable
 {
-    private readonly Action<PacketEntry> _onPacket;
+    // Buffer decoded packets on the capture thread and flush them to the UI as one batch on a
+    // timer, instead of posting one dispatcher callback per packet (which floods the UI thread at
+    // capture rate).
+    private const double FlushIntervalMs = 75;
+
+    private readonly Action<IReadOnlyList<PacketEntry>> _onPacketBatch;
     private readonly Action<string> _onLog;
     private readonly Action<byte[]>? _onRaw;
+    private readonly PackedParamStore _store;
+
+    private readonly Lock _bufferLock = new();
+    private List<PacketEntry> _buffer = [];
+    private System.Timers.Timer? _flushTimer;
 
     private LiveCaptureProvider? _provider;
     private RawAlbionParser? _parser;
@@ -19,25 +29,30 @@ public sealed class CaptureSession : IDisposable
     /// session and everything captured so far stay intact and capture resumes without a restart.</summary>
     public bool IsPaused { get; set; }
 
-    public CaptureSession(Action<PacketEntry> onPacket, Action<string> onLog, Action<byte[]>? onRaw = null)
+    public CaptureSession(PackedParamStore store, Action<IReadOnlyList<PacketEntry>> onPacketBatch, Action<string> onLog, Action<byte[]>? onRaw = null)
     {
-        _onPacket = onPacket;
+        _store = store;
+        _onPacketBatch = onPacketBatch;
         _onLog = onLog;
         _onRaw = onRaw;
     }
 
     public void Start(string? deviceName)
     {
-        _parser = new RawAlbionParser();
+        _parser = new RawAlbionParser(_store);
         _parser.PacketReceived += OnParserPacketReceived;
         if (_onRaw != null) _parser.RawReceived += OnParserRawReceived;
 
         _provider = new LiveCaptureProvider(_parser, deviceName, msg =>
             Dispatcher.UIThread.Post(() => _onLog(msg)));
 
+        _flushTimer = new System.Timers.Timer(FlushIntervalMs) { AutoReset = true };
+        _flushTimer.Elapsed += (_, _) => Flush();
+
         try
         {
             _provider.Start();
+            _flushTimer.Start();
         }
         catch
         {
@@ -59,15 +74,39 @@ public sealed class CaptureSession : IDisposable
             _parser.RawReceived -= OnParserRawReceived;
         }
 
+        if (_flushTimer != null)
+        {
+            _flushTimer.Stop();
+            _flushTimer.Dispose();
+            _flushTimer = null;
+        }
+
         _provider?.Stop();
         _provider = null;
         _parser = null;
+
+        // Deliver anything captured after the last timer tick so nothing is lost on stop.
+        Flush();
+    }
+
+    // Swap the buffer out under lock, then post the batch to the UI thread. Skips when empty.
+    private void Flush()
+    {
+        List<PacketEntry> batch;
+        lock (_bufferLock)
+        {
+            if (_buffer.Count == 0) return;
+            batch = _buffer;
+            _buffer = [];
+        }
+
+        Dispatcher.UIThread.Post(() => _onPacketBatch(batch));
     }
 
     private void OnParserPacketReceived(PacketEntry packet)
     {
         if (IsPaused) return;
-        Dispatcher.UIThread.Post(() => _onPacket(packet));
+        lock (_bufferLock) _buffer.Add(packet);
     }
 
     // Raw arrives on the capture thread; the collector handles its own threading.

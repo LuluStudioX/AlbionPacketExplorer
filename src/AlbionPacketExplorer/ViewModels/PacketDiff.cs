@@ -23,13 +23,14 @@ public static class PacketDiff
         var rows = new List<ParamDiffRow>();
         foreach (var key in keys)
         {
-            left.Params.TryGetValue(key, out var a);
-            right.Params.TryGetValue(key, out var b);
+            // ParamValue is a struct, so presence is the bool TryGetValue returns, not a null check.
+            bool hasLeft = left.Params.TryGetValue(key, out var a);
+            bool hasRight = right.Params.TryGetValue(key, out var b);
 
-            var va = a is null ? string.Empty : PacketDisplayFormatter.FormatParamValue(a);
-            var vb = b is null ? string.Empty : PacketDisplayFormatter.FormatParamValue(b);
-            var status = a is null ? "right"
-                       : b is null ? "left"
+            var va = hasLeft ? PacketDisplayFormatter.FormatParamValue(a) : string.Empty;
+            var vb = hasRight ? PacketDisplayFormatter.FormatParamValue(b) : string.Empty;
+            var status = !hasLeft ? "right"
+                       : !hasRight ? "left"
                        : va == vb  ? "same"
                        :             "changed";
 

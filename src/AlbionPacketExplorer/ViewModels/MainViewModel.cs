@@ -55,6 +55,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private NetworkDeviceInfo? _selectedDevice;
 
     private CaptureSession? _session;
+    // Packed arena holding every packet's raw params-JSON bytes; PacketEntry.Params decodes lazily
+    // from it. Replaced fresh on each load/capture (ResetData) so a new dataset never inherits the
+    // previous arena's chunks. One store backs the loader, the raw replay and the live session.
+    private PackedParamStore _paramStore = new();
     private readonly List<PacketEntry> _capturedPackets = [];
     private readonly List<PacketEntry> _allPackets = [];
     private readonly List<byte[]> _rawPackets = [];   // raw payloads (live capture / loaded .b64) for Save as RAW
@@ -462,7 +466,7 @@ public partial class MainViewModel : ObservableObject
     {
         ResetData();
 
-        _session = new CaptureSession(OnLivePacket, msg => StatusText = msg, OnRawPacket);
+        _session = new CaptureSession(_paramStore, OnLivePacketBatch, msg => StatusText = msg, OnRawPacket);
 
         try
         {
@@ -622,27 +626,36 @@ public partial class MainViewModel : ObservableObject
         var raws = new List<byte[]>();
         try
         {
-            var parser = new RawAlbionParser();
-            parser.PacketReceived += loaded.Add;
-            foreach (var line in await File.ReadAllLinesAsync(path))
+            // Decode + ingest off the UI thread: aggregator map, correlator and the local lists are
+            // not bound, so mutating them here is safe. Only the finalization touches bound state.
+            await Task.Run(async () =>
             {
-                if (string.IsNullOrWhiteSpace(line)) continue;
-                byte[] payload;
-                try { payload = Convert.FromBase64String(line.Trim()); } catch { continue; }
-                raws.Add(payload);
-                try { parser.ReceivePacket(payload); } catch { /* skip undecodable */ }
-            }
+                var parser = new RawAlbionParser(_paramStore);
+                parser.PacketReceived += loaded.Add;
+                foreach (var line in await File.ReadAllLinesAsync(path))
+                {
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    byte[] payload;
+                    try { payload = Convert.FromBase64String(line.Trim()); } catch { continue; }
+                    raws.Add(payload);
+                    try { parser.ReceivePacket(payload); } catch { /* skip undecodable */ }
+                }
 
-            foreach (var pe in loaded) { Aggregator.Ingest(pe); _correlator.Observe(pe); }
-            Aggregator.Flush();
-            lock (_rawLock) _rawPackets.AddRange(raws);
-            _allPackets.AddRange(loaded);
-            PacketList.SetSource(loaded);
-            NotifySaveCommands();
-            var fileName = Path.GetFileName(path);
-            var count = loaded.Count.ToString("N0");
-            StatusText = Loc.Format("status.loaded", count, fileName);
-            _toasts.Show(Loc.T("toast.fileLoaded.title"), Loc.Format("toast.fileLoaded.body", count, fileName), ToastSeverity.Success);
+                foreach (var pe in loaded) { Aggregator.Ingest(pe); _correlator.Observe(pe); }
+            });
+
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Aggregator.Flush();
+                lock (_rawLock) _rawPackets.AddRange(raws);
+                _allPackets.AddRange(loaded);
+                PacketList.SetSource(loaded);
+                NotifySaveCommands();
+                var fileName = Path.GetFileName(path);
+                var count = loaded.Count.ToString("N0");
+                StatusText = Loc.Format("status.loaded", count, fileName);
+                _toasts.Show(Loc.T("toast.fileLoaded.title"), Loc.Format("toast.fileLoaded.body", count, fileName), ToastSeverity.Success);
+            });
         }
         catch (Exception ex)
         {
@@ -655,6 +668,7 @@ public partial class MainViewModel : ObservableObject
         {
             IsLoading = false;
             LoadProgress = 1;
+            CompactAfterLoad(); // release heap grown by transient parse/decode garbage
         }
     }
 
@@ -671,23 +685,32 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await foreach (var packet in reader.ReadAsync(path, progress))
+            // Parse + ingest off the UI thread. The reader's Progress<double> was created on the UI
+            // thread, so LoadProgress updates still marshal automatically. Aggregator map, correlator
+            // and the local list are not bound, so mutating them here is safe.
+            await Task.Run(async () =>
             {
-                Aggregator.Ingest(packet);
-                _correlator.Observe(packet);
-                loaded.Add(packet);
-            }
+                await foreach (var packet in reader.ReadAsync(path, progress, _paramStore))
+                {
+                    Aggregator.Ingest(packet);
+                    _correlator.Observe(packet);
+                    loaded.Add(packet);
+                }
+            });
 
-            Aggregator.Flush();
-            _allPackets.AddRange(loaded);
-            PacketList.SetSource(loaded);
-            NotifySaveCommands();
-            var fileName = Path.GetFileName(path);
-            var loadedCount = loaded.Count.ToString("N0");
-            StatusText = Loc.Format("status.loaded", loadedCount, fileName);
-            _toasts.Show(Loc.T("toast.fileLoaded.title"),
-                Loc.Format("toast.fileLoaded.body", loadedCount, fileName),
-                ToastSeverity.Success);
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Aggregator.Flush();
+                _allPackets.AddRange(loaded);
+                PacketList.SetSource(loaded);
+                NotifySaveCommands();
+                var fileName = Path.GetFileName(path);
+                var loadedCount = loaded.Count.ToString("N0");
+                StatusText = Loc.Format("status.loaded", loadedCount, fileName);
+                _toasts.Show(Loc.T("toast.fileLoaded.title"),
+                    Loc.Format("toast.fileLoaded.body", loadedCount, fileName),
+                    ToastSeverity.Success);
+            });
         }
         catch (Exception ex)
         {
@@ -700,20 +723,40 @@ public partial class MainViewModel : ObservableObject
         {
             IsLoading = false;
             LoadProgress = 1;
+            CompactAfterLoad(); // release heap grown by transient parse garbage
         }
     }
 
-    private void OnLivePacket(PacketEntry packet)
+    // Live packets arrive as a batch (CaptureSession buffers them on the capture thread and posts
+    // one batch per timer tick on the UI thread), so touching the bound collections here is safe.
+    private void OnLivePacketBatch(IReadOnlyList<PacketEntry> batch)
     {
-        _capturedPackets.Add(packet);
-        _allPackets.Add(packet);
-        Aggregator.Ingest(packet);
-        _correlator.Observe(packet);
-        PacketList.AddLivePacket(packet);
+        foreach (var packet in batch)
+        {
+            _capturedPackets.Add(packet);
+            _allPackets.Add(packet);
+            Aggregator.Ingest(packet);
+            _correlator.Observe(packet);
+            // Keep per-packet so PacketList's cached Kind counts stay correct.
+            PacketList.AddLivePacket(packet);
+        }
 
-        if (_capturedPackets.Count % 100 == 0)
-            Aggregator.Flush();
+        // One flush per batch instead of the old every-100-packets cadence.
+        Aggregator.Flush();
     }
+
+    // One-shot compacting collection run once at the very end of a big file load. A multi-million
+    // packet load grows the GC heap with transient parse garbage (UTF-8 buffers, JSON tokens) that
+    // workstation GC keeps committed but does not return to the OS; this reclaims that slack so
+    // committed memory tracks the live retained set. Done OFF the UI thread so it never blocks UI
+    // setup, and ONLY here on the load completion path - never during live capture or filtering, and
+    // with no periodic/timer GC, so steady-state interactivity is untouched.
+    private static void CompactAfterLoad() => Task.Run(() =>
+    {
+        System.Runtime.GCSettings.LargeObjectHeapCompactionMode =
+            System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
+        GC.Collect(2, GCCollectionMode.Aggressive, blocking: true, compacting: true);
+    });
 
     private void ResetData()
     {
@@ -724,6 +767,11 @@ public partial class MainViewModel : ObservableObject
         Aggregator.Reset();
         PacketList.SetSource([]);
         PacketDetail.Packet = null;
+        // Drop the previous dataset's param arena entirely. Disposing the old store closes its spill
+        // file (DeleteOnClose removes it immediately), so the previous dataset's param bytes leave the
+        // process and disk at once; a reload does not stack two datasets' worth of param bytes.
+        _paramStore.Dispose();
+        _paramStore = new PackedParamStore();
         NotifySaveCommands();
     }
 
