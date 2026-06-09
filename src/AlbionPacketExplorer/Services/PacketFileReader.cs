@@ -1,10 +1,16 @@
 using AlbionPacketExplorer.Models;
+using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 
 namespace AlbionPacketExplorer.Services;
 
 public class PacketFileReader
 {
+    // Report progress at most this often so a multi-million line load does not flood the
+    // dispatcher with callbacks; a final Report(1.0) always fires when the stream ends.
+    private static readonly TimeSpan ProgressInterval = TimeSpan.FromMilliseconds(75);
+
     public async IAsyncEnumerable<PacketEntry> ReadAsync(string filePath, IProgress<double>? progress = null)
     {
         var fileInfo = new FileInfo(filePath);
@@ -17,7 +23,7 @@ public class PacketFileReader
 
         if (isArray)
         {
-            await foreach (var entry in ReadArrayAsync(stream, totalBytes, progress))
+            await foreach (var entry in ReadArrayAsync(stream, progress))
                 yield return entry;
         }
         else
@@ -42,13 +48,24 @@ public class PacketFileReader
     private static async IAsyncEnumerable<PacketEntry> ReadNdjsonAsync(Stream stream, long totalBytes, IProgress<double>? progress)
     {
         long bytesRead = 0;
-        using var reader = new StreamReader(stream, System.Text.Encoding.UTF8, leaveOpen: true);
+        using var reader = new StreamReader(stream, Encoding.UTF8, leaveOpen: true);
+
+        var sw = Stopwatch.StartNew();
+        var lastReport = TimeSpan.Zero;
 
         string? line;
         while ((line = await reader.ReadLineAsync()) != null)
         {
             bytesRead += line.Length + 1;
-            progress?.Report((double)bytesRead / totalBytes);
+            if (progress != null && totalBytes > 0)
+            {
+                var now = sw.Elapsed;
+                if (now - lastReport >= ProgressInterval)
+                {
+                    progress.Report((double)bytesRead / totalBytes);
+                    lastReport = now;
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(line)) continue;
 
@@ -56,28 +73,186 @@ public class PacketFileReader
             try { entry = ParseLine(line); } catch { }
             if (entry != null) yield return entry;
         }
-    }
-
-    private static async IAsyncEnumerable<PacketEntry> ReadArrayAsync(Stream stream, long totalBytes, IProgress<double>? progress)
-    {
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var entries = await JsonSerializer.DeserializeAsync<List<JsonElement>>(stream, options);
-        if (entries == null) yield break;
 
         progress?.Report(1.0);
+    }
 
-        foreach (var el in entries)
+    private static async IAsyncEnumerable<PacketEntry> ReadArrayAsync(Stream stream, IProgress<double>? progress)
+    {
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // Stream the array element-by-element so a giant array file is never fully materialized.
+        await foreach (var el in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(stream, options))
         {
             PacketEntry? entry = null;
             try { entry = ParseElement(el); } catch { }
             if (entry != null) yield return entry;
         }
+
+        progress?.Report(1.0);
     }
 
+    // NDJSON parse: tokenize one line's UTF-8 bytes with Utf8JsonReader instead of building a
+    // JsonDocument DOM per line. Produces a PacketEntry byte-for-byte equivalent to ParseElement.
     private static PacketEntry? ParseLine(string line)
     {
-        using var doc = JsonDocument.Parse(line);
-        return ParseElement(doc.RootElement);
+        byte[] bytes = Encoding.UTF8.GetBytes(line);
+        var reader = new Utf8JsonReader(bytes);
+
+        if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
+            return null;
+
+        DateTime? ts = null;
+        bool sawKind = false;
+        string kind = "";
+        int? code = null;
+        Dictionary<string, ParamValue>? parameters = null;
+        bool sawParams = false;
+        int? returnCode = null;
+        string? debugMessage = null;
+
+        while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
+        {
+            string propName = reader.GetString()!;
+            reader.Read(); // advance to the value
+
+            switch (propName)
+            {
+                case "ts":
+                    ts = reader.GetDateTime();
+                    break;
+                case "kind":
+                    // Matches ParseElement: GetString() ?? "" (JSON null -> empty string).
+                    kind = reader.GetString() ?? "";
+                    sawKind = true;
+                    break;
+                case "code":
+                    code = reader.GetInt32();
+                    break;
+                case "params":
+                    parameters = ReadParams(ref reader);
+                    sawParams = true;
+                    break;
+                case "returnCode":
+                    // Photon response framing: number only (mirrors JsonValueKind.Number guard).
+                    if (reader.TokenType == JsonTokenType.Number)
+                        returnCode = reader.GetInt32();
+                    else
+                        reader.Skip();
+                    break;
+                case "debugMessage":
+                    if (reader.TokenType == JsonTokenType.String)
+                        debugMessage = reader.GetString();
+                    else
+                        reader.Skip();
+                    break;
+                default:
+                    reader.Skip();
+                    break;
+            }
+        }
+
+        // ParseElement requires ts, kind, code and params to all be present; otherwise null.
+        if (ts == null || !sawKind || code == null || !sawParams)
+            return null;
+
+        return new PacketEntry(ts.Value, kind, code.Value, parameters!, returnCode, debugMessage);
+    }
+
+    // Reads the "params" object: { "0": { "type": ..., "value": ... }, ... }
+    private static Dictionary<string, ParamValue> ReadParams(ref Utf8JsonReader reader)
+    {
+        var parameters = new Dictionary<string, ParamValue>();
+        if (reader.TokenType != JsonTokenType.StartObject)
+        {
+            reader.Skip();
+            return parameters;
+        }
+
+        while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
+        {
+            string name = reader.GetString()!;
+            reader.Read(); // advance to the param value (expected an object)
+
+            string type = "";
+            object? value = null;
+            bool sawValue = false;
+
+            if (reader.TokenType == JsonTokenType.StartObject)
+            {
+                while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
+                {
+                    string inner = reader.GetString()!;
+                    reader.Read();
+                    switch (inner)
+                    {
+                        case "type":
+                            type = reader.TokenType == JsonTokenType.String ? reader.GetString() ?? "" : "";
+                            break;
+                        case "value":
+                            value = ExtractValue(ref reader);
+                            sawValue = true;
+                            break;
+                        default:
+                            reader.Skip();
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                // Not an object: skip whatever it is, keep the type/value defaults.
+                reader.Skip();
+            }
+
+            _ = sawValue; // value stays null when absent, matching ParseElement.
+            parameters[name] = new ParamValue(type, value);
+        }
+
+        return parameters;
+    }
+
+    // Mirrors ExtractValue(JsonElement) exactly: Int64 first, then Double, String, Bool, Null,
+    // Array (List<object?>), Object (Dictionary<string, object?>), else the raw token text.
+    private static object? ExtractValue(ref Utf8JsonReader reader) => reader.TokenType switch
+    {
+        JsonTokenType.Number when reader.TryGetInt64(out var l) => l,
+        JsonTokenType.Number when reader.TryGetDouble(out var d) => d,
+        JsonTokenType.String => reader.GetString(),
+        JsonTokenType.True => true,
+        JsonTokenType.False => false,
+        JsonTokenType.Null => null,
+        JsonTokenType.StartArray => ReadArray(ref reader),
+        JsonTokenType.StartObject => ReadObject(ref reader),
+        _ => TokenToString(ref reader)
+    };
+
+    private static List<object?> ReadArray(ref Utf8JsonReader reader)
+    {
+        var list = new List<object?>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+            list.Add(ExtractValue(ref reader));
+        return list;
+    }
+
+    private static Dictionary<string, object?> ReadObject(ref Utf8JsonReader reader)
+    {
+        var dict = new Dictionary<string, object?>();
+        while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
+        {
+            string name = reader.GetString()!;
+            reader.Read();
+            dict[name] = ExtractValue(ref reader);
+        }
+        return dict;
+    }
+
+    // Fallback for token kinds the switch does not special-case (mirrors JsonElement.ToString()).
+    private static string TokenToString(ref Utf8JsonReader reader)
+    {
+        if (reader.HasValueSequence)
+            return Encoding.UTF8.GetString(System.Buffers.BuffersExtensions.ToArray(reader.ValueSequence));
+        return Encoding.UTF8.GetString(reader.ValueSpan);
     }
 
     private static PacketEntry? ParseElement(JsonElement root)
