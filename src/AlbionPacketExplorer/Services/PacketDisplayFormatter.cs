@@ -6,9 +6,16 @@ public static class PacketDisplayFormatter
 {
     private static readonly long AlbionTicksThreshold = 637_000_000_000_000_000L;
 
-    public static string FormatParamSummary(PacketEntry packet)
+    public static string FormatParamSummary(PacketEntry packet) => FormatParamSummary(packet.Params);
+
+    /// <summary>
+    /// Overload that formats an already-decoded <see cref="ParamSet"/>. Callers that also need the
+    /// raw params for another pass (e.g. the filter's on-the-fly name resolution) decode once and
+    /// pass the set here so the memory-mapped store is not hit twice for the same packet.
+    /// </summary>
+    public static string FormatParamSummary(ParamSet @params)
     {
-        var parts = packet.Params
+        var parts = @params
             .Where(p => p.Key != "252" && p.Key != "253")
             .OrderBy(p => int.TryParse(p.Key, out var n) ? n : 999)
             .Select(p => $"{p.Key}={FormatValueShort(p.Value.Value)}");
