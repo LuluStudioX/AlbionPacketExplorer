@@ -28,7 +28,7 @@
                     <TextBlock VerticalAlignment="Center" FontSize="12"
                                Foreground="{DynamicResource Apx.Accent}"
                                Text="{Binding UpdateVersion, StringFormat='v{0} available'}" />
-                    <Button Classes="ghost" Command="{Binding ApplyUpdateCommand}"
+                    <Button Classes="ghost" Command="{Binding ShowUpdateCommand}"
                             Padding="8,4" IsEnabled="{Binding IsUpdating, Converter={x:Static BoolConverters.Not}}"
                             ToolTip.Tip="{loc:T toolbar.update.tip}">
                         <StackPanel Orientation="Horizontal" Spacing="4">

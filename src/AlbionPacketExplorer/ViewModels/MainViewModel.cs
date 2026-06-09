@@ -38,10 +38,14 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _updateStatus = "";
     [ObservableProperty] private bool _isCheckingUpdate;
 
-    // A version the user chose to skip (never auto-prompt again), persisted in settings; and the
-    // version already prompted this session, so a periodic re-check does not re-open the dialog.
+    // _skippedUpdateVersion: skipped forever (persisted) until a newer version or a manual check.
+    // _dismissedUpdateVersion: "Not now" hides the badge for this session only (back next launch).
+    // _promptedUpdateVersion: already shown this session, so a periodic re-check does not re-pop it.
+    // Closing the dialog with X keeps the badge (no version recorded), so it stays one click away.
     private string? _skippedUpdateVersion;
+    private string? _dismissedUpdateVersion;
     private string? _promptedUpdateVersion;
+    private string? _lastUpdateNotes;
 
     /// <summary>Raised when an update should be offered: (version, changelog notes). The view opens
     /// the changelog dialog and routes the user's choice back via the methods below.</summary>
@@ -330,12 +334,31 @@ public partial class MainViewModel : ObservableObject
 
     // Startup check: quiet. Only reveals the banner if an update exists; stays silent on
     // "up to date" and on errors so launch is not noisy.
+    // Velopack's update check throws unless the app is actually installed, so the popup/badge flow
+    // cannot be exercised from a dev build. In DEBUG only, setting APX_FAKE_UPDATE=<version> injects a
+    // synthetic "update available" so the dialog, badge and dismiss logic can be tested in place.
+    private async Task<UpdateService.UpdateCheckResult> CheckUpdaterAsync()
+    {
+#if DEBUG
+        var fake = Environment.GetEnvironmentVariable("APX_FAKE_UPDATE");
+        if (!string.IsNullOrWhiteSpace(fake))
+            return new UpdateService.UpdateCheckResult(
+                fake, null, $"## v{fake}\n\n- Simulated update (APX_FAKE_UPDATE) for testing");
+#endif
+        return await _updater.CheckForUpdateAsync();
+    }
+
     private async Task CheckForUpdateAsync()
     {
-        var r = await _updater.CheckForUpdateAsync();
+        var r = await CheckUpdaterAsync();
         if (r.NewVersion is { } v)
         {
+            // Skipped (persisted) or dismissed-this-session versions stay hidden (no badge, no popup)
+            // until a manual check. The auto popup is further rate-limited to once per session by
+            // MaybePromptUpdate.
+            if (v == _skippedUpdateVersion || v == _dismissedUpdateVersion) return;
             UpdateVersion = v;
+            _lastUpdateNotes = r.Notes;
             MaybePromptUpdate(v, r.Notes, manual: false);
         }
     }
@@ -349,11 +372,21 @@ public partial class MainViewModel : ObservableObject
         UpdateAvailableRequested?.Invoke(version, notes);
     }
 
-    /// <summary>User chose "skip this version" in the dialog: persist it so auto checks stay quiet.</summary>
+    /// <summary>User chose "skip this version": persist it so auto checks stay quiet, and clear the
+    /// toolbar badge. A newer version, or a manual check, surfaces the update again.</summary>
     public void SkipUpdateVersion(string version)
     {
         _skippedUpdateVersion = version;
+        UpdateVersion = null;
         SaveSettings();
+    }
+
+    /// <summary>User chose "Not now": hide the toolbar badge for this session. A fresh auto-check on
+    /// the next launch, or a manual check, surfaces it again.</summary>
+    public void DismissUpdateVersion(string version)
+    {
+        _dismissedUpdateVersion = version;
+        UpdateVersion = null;
     }
 
     // Manual check from the toolbar: verbose, surfaces every outcome (including failures, which
@@ -366,12 +399,13 @@ public partial class MainViewModel : ObservableObject
         UpdateStatus = Loc.T("update.checking");
         try
         {
-            var r = await _updater.CheckForUpdateAsync();
+            var r = await CheckUpdaterAsync();
             if (r.Error is { } err)
                 UpdateStatus = Loc.Format("update.failed", err);
             else if (r.NewVersion is { } v)
             {
                 UpdateVersion = v;
+                _lastUpdateNotes = r.Notes;
                 UpdateStatus = Loc.Format("update.available", v);
                 MaybePromptUpdate(v, r.Notes, manual: true);
             }
@@ -386,6 +420,15 @@ public partial class MainViewModel : ObservableObject
     }
 
     private bool CanCheckForUpdate() => !IsCheckingUpdate;
+
+    // Toolbar badge click: re-open the changelog dialog for the known update instead of installing
+    // straight away, so the user always sees "what's new" and can choose Update / Not now / Skip.
+    [RelayCommand]
+    private void ShowUpdate()
+    {
+        if (UpdateVersion is { } v)
+            UpdateAvailableRequested?.Invoke(v, _lastUpdateNotes);
+    }
 
     [RelayCommand]
     private async Task ApplyUpdateAsync()
