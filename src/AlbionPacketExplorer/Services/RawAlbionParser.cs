@@ -42,9 +42,10 @@ public sealed class RawAlbionParser : IPacketReceiver
 
         var @params = new Dictionary<string, ParamValue>(parameters.Count);
         foreach (var (k, v) in parameters)
-            @params[k.ToString(CultureInfo.InvariantCulture)] = new ParamValue(GetTypeName(v), v);
+            // Reuse the shared "0".."255" key and intern the type name so both dedupe across packets.
+            @params[ParamKeys.Get(k)] = new ParamValue(string.Intern(GetTypeName(v)), v);
 
-        PacketReceived?.Invoke(new PacketEntry(DateTime.UtcNow, kind, code, @params,
+        PacketReceived?.Invoke(new PacketEntry(DateTime.UtcNow, string.Intern(kind), code, @params,
             returnCode, string.IsNullOrEmpty(debugMessage) ? null : debugMessage));
     }
 

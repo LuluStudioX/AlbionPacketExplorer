@@ -123,7 +123,8 @@ public class PacketFileReader
                     break;
                 case "kind":
                     // Matches ParseElement: GetString() ?? "" (JSON null -> empty string).
-                    kind = reader.GetString() ?? "";
+                    // Intern: the 3 Kind values (EVENT/REQUEST/RESPONSE) dedupe to single instances.
+                    kind = string.Intern(reader.GetString() ?? "");
                     sawKind = true;
                     break;
                 case "code":
@@ -171,7 +172,8 @@ public class PacketFileReader
 
         while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
         {
-            string name = reader.GetString()!;
+            // Reuse a shared "0".."255" instance instead of allocating a fresh key string per packet.
+            string name = ParamKeys.Intern(reader.GetString()!);
             reader.Read(); // advance to the param value (expected an object)
 
             string type = "";
@@ -187,7 +189,8 @@ public class PacketFileReader
                     switch (inner)
                     {
                         case "type":
-                            type = reader.TokenType == JsonTokenType.String ? reader.GetString() ?? "" : "";
+                            // Intern: a handful of distinct type names dedupe to single instances.
+                            type = reader.TokenType == JsonTokenType.String ? string.Intern(reader.GetString() ?? "") : "";
                             break;
                         case "value":
                             value = ExtractValue(ref reader);
@@ -264,15 +267,15 @@ public class PacketFileReader
             return null;
 
         var ts = tsEl.GetDateTime();
-        var kind = kindEl.GetString() ?? "";
+        var kind = string.Intern(kindEl.GetString() ?? "");
         var code = codeEl.GetInt32();
         var parameters = new Dictionary<string, ParamValue>();
 
         foreach (var param in paramsEl.EnumerateObject())
         {
-            var type = param.Value.TryGetProperty("type", out var typeEl) ? typeEl.GetString() ?? "" : "";
+            var type = param.Value.TryGetProperty("type", out var typeEl) ? string.Intern(typeEl.GetString() ?? "") : "";
             object? value = param.Value.TryGetProperty("value", out var valueEl) ? ExtractValue(valueEl) : null;
-            parameters[param.Name] = new ParamValue(type, value);
+            parameters[ParamKeys.Intern(param.Name)] = new ParamValue(type, value);
         }
 
         // Photon response framing (present only on RESPONSE packets we captured ourselves).
