@@ -14,6 +14,7 @@ public sealed class CaptureSession : IDisposable
     private readonly Action<IReadOnlyList<PacketEntry>> _onPacketBatch;
     private readonly Action<string> _onLog;
     private readonly Action<byte[]>? _onRaw;
+    private readonly PackedParamStore _store;
 
     private readonly Lock _bufferLock = new();
     private List<PacketEntry> _buffer = [];
@@ -28,8 +29,9 @@ public sealed class CaptureSession : IDisposable
     /// session and everything captured so far stay intact and capture resumes without a restart.</summary>
     public bool IsPaused { get; set; }
 
-    public CaptureSession(Action<IReadOnlyList<PacketEntry>> onPacketBatch, Action<string> onLog, Action<byte[]>? onRaw = null)
+    public CaptureSession(PackedParamStore store, Action<IReadOnlyList<PacketEntry>> onPacketBatch, Action<string> onLog, Action<byte[]>? onRaw = null)
     {
+        _store = store;
         _onPacketBatch = onPacketBatch;
         _onLog = onLog;
         _onRaw = onRaw;
@@ -37,7 +39,7 @@ public sealed class CaptureSession : IDisposable
 
     public void Start(string? deviceName)
     {
-        _parser = new RawAlbionParser();
+        _parser = new RawAlbionParser(_store);
         _parser.PacketReceived += OnParserPacketReceived;
         if (_onRaw != null) _parser.RawReceived += OnParserRawReceived;
 
