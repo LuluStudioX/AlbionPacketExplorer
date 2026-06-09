@@ -5,6 +5,7 @@
         xmlns:loc="using:AlbionPacketExplorer.Markup"
         x:Class="AlbionPacketExplorer.Views.UpdateAvailableWindow"
         x:DataType="vm:UpdateAvailableViewModel"
+        Icon="/Assets/app-icon.ico"
         Title="{Binding Title}"
         Width="520" Height="420"
         MinWidth="380" MinHeight="280"
