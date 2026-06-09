@@ -5,6 +5,7 @@
         xmlns:loc="using:AlbionPacketExplorer.Markup"
         x:Class="AlbionPacketExplorer.Views.PacketDiffWindow"
         x:DataType="vm:PacketDiffViewModel"
+        Icon="/Assets/app-icon.ico"
         Title="{loc:T diff.window.title}"
         Width="860" Height="560"
         MinWidth="520" MinHeight="280"

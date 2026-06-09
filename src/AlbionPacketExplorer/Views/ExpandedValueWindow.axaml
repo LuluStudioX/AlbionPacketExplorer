@@ -3,6 +3,7 @@
         xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
         xmlns:loc="using:AlbionPacketExplorer.Markup"
         x:Class="AlbionPacketExplorer.Views.ExpandedValueWindow"
+        Icon="/Assets/app-icon.ico"
         Title="{loc:T fullValue.title}"
         Width="640" Height="460"
         MinWidth="320" MinHeight="200"

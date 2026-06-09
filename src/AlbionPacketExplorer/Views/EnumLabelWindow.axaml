@@ -5,6 +5,7 @@
         xmlns:loc="using:AlbionPacketExplorer.Markup"
         x:Class="AlbionPacketExplorer.Views.EnumLabelWindow"
         x:DataType="vm:EnumLabelViewModel"
+        Icon="/Assets/app-icon.ico"
         Title="{Binding Title}"
         Width="380" Height="220"
         MinWidth="300" MinHeight="200"
