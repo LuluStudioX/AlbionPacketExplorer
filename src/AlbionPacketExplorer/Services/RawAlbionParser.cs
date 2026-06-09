@@ -19,8 +19,13 @@ public sealed class RawAlbionParser : IPacketReceiver
 
     private readonly PhotonPacketReader _reader = new();
 
-    public RawAlbionParser()
+    // Params are packed into this shared arena (raw param-JSON bytes) and decoded lazily, so live
+    // packets carry no per-packet param array - matching the file-load path.
+    private readonly PackedParamStore _store;
+
+    public RawAlbionParser(PackedParamStore store)
     {
+        _store = store;
         _reader.OnEvent += e => Emit("EVENT", WireCode(e.Parameters, 252, e.Code), e.Parameters);
         _reader.OnRequest += e => Emit("REQUEST", WireCode(e.Parameters, 253, e.OperationCode), e.Parameters);
         _reader.OnResponse += e =>
@@ -40,11 +45,21 @@ public sealed class RawAlbionParser : IPacketReceiver
     {
         if (code < 0) return;
 
-        var @params = new Dictionary<string, ParamValue>(parameters.Count);
+        // Photon parameter keys are distinct bytes, so pack straight into the array (no dedupe needed).
+        var entries = new KeyValuePair<string, ParamValue>[parameters.Count];
+        int i = 0;
         foreach (var (k, v) in parameters)
-            @params[k.ToString(CultureInfo.InvariantCulture)] = new ParamValue(GetTypeName(v), v);
+            // Reuse the shared "0".."255" key and intern the type name so both dedupe across packets.
+            entries[i++] = new KeyValuePair<string, ParamValue>(ParamKeys.Get(k), new ParamValue(string.Intern(GetTypeName(v)), v));
 
-        PacketReceived?.Invoke(new PacketEntry(DateTime.UtcNow, kind, code, @params,
+        // Pack the parsed set straight into the store, which binary-encodes it into the mmap arena;
+        // the entry decodes it lazily, identical to the file-load path. (Typed byte/short arrays come
+        // back from the decoder as List<object?> of numbers - the same shape the loaded-file path and
+        // the display formatter already expect.)
+        var set = new ParamSet(entries);
+        var paramRef = _store.Append(set);
+
+        PacketReceived?.Invoke(new PacketEntry(DateTime.UtcNow, string.Intern(kind), code, _store, paramRef,
             returnCode, string.IsNullOrEmpty(debugMessage) ? null : debugMessage));
     }
 

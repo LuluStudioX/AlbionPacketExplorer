@@ -1,4 +1,5 @@
 using Avalonia.Input.Platform;
+using Avalonia.Threading;
 using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Network;
 using AlbionPacketExplorer.Services;
@@ -43,13 +44,23 @@ public sealed class PacketFilter
     private readonly Token[] _exclusions;
     private readonly Token[] _inclusions;
 
+    // Whether ANY token can consult the (expensive) name / params columns. If not, Matches skips
+    // PacketNameResolver.Resolve / FormatParamSummary entirely. kind/code are always cheap.
+    private readonly bool _needsName;
+    private readonly bool _needsParams;
+
+    // Maps a uniqueName -> item display name (or null if unresolved/disabled). When null, resolved
+    // display-name matching is off (same as resolve-off today). Used only on _needsParams queries.
+    private readonly Func<string, string?>? _resolveDisplay;
+
     public string Query { get; }
 
     public bool IsEmpty => _exclusions.Length == 0 && _inclusions.Length == 0;
 
-    public PacketFilter(string? query)
+    public PacketFilter(string? query, Func<string, string?>? resolveDisplay = null)
     {
         Query = query ?? string.Empty;
+        _resolveDisplay = resolveDisplay;
         var excl = new List<Token>();
         var incl = new List<Token>();
 
@@ -66,6 +77,14 @@ public sealed class PacketFilter
 
         _exclusions = [.. excl];
         _inclusions = [.. incl];
+
+        // A null Col is the generic branch (kind || code || name || params), so it needs both.
+        // Otherwise only the matching scoped column is needed.
+        foreach (var t in excl.Concat(incl))
+        {
+            if (t.Col is null or "name") _needsName = true;
+            if (t.Col is null or "params") _needsParams = true;
+        }
     }
 
     public bool Matches(PacketEntry p)
@@ -74,9 +93,16 @@ public sealed class PacketFilter
 
         var codeStr   = p.Code.ToString();
         var kind      = p.Kind;
-        var name      = PacketNameResolver.Resolve(p.Kind, p.Code);
-        var paramStr  = PacketDisplayFormatter.FormatParamSummary(p);
-        var resolved  = p.ResolvedSummary ?? string.Empty;
+        // Only compute the expensive columns if a token can actually consult them. When a flag is
+        // false, no token's ColumnMatches branch reads the corresponding arg, so empty is safe.
+        var name      = _needsName ? PacketNameResolver.Resolve(p.Kind, p.Code) : string.Empty;
+        // Decode params at most once: reuse the same ParamSet for both the formatted summary and the
+        // on-the-fly resolved display-names. paramStr already carries every raw value; resolved adds
+        // only the item display-names (built lazily here instead of from a retained per-packet index).
+        var hasParams = _needsParams;
+        var paramSet  = hasParams ? p.Params : default;
+        var paramStr  = hasParams ? PacketDisplayFormatter.FormatParamSummary(paramSet) : string.Empty;
+        var resolved  = hasParams ? ResolveDisplayNames(paramSet) : string.Empty;
         var paired    = p.Correlated != null;
         var returnCode = p.ReturnCode;
 
@@ -95,6 +121,30 @@ public sealed class PacketFilter
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Builds the space-joined resolved-display-name text for a packet's STRING params, on demand.
+    /// Replaces the old per-packet ResolvedSummary index: when the resolver is null (resolve off) this
+    /// returns "" (no resolved matching, exactly as before). Operates on the already-decoded set so
+    /// the packet's params are not decoded a second time. Includes both the raw uniqueName and its
+    /// display name (raw is also in paramStr, so it is harmless and mirrors the old behavior).
+    /// </summary>
+    private string ResolveDisplayNames(ParamSet @params)
+    {
+        if (_resolveDisplay is null) return string.Empty;
+
+        List<string>? parts = null;
+        foreach (var (_, pv) in @params)
+        {
+            if (pv.Type != "String" || pv.Value is not string s || string.IsNullOrEmpty(s))
+                continue;
+            var display = _resolveDisplay(s);
+            if (display is null) continue;
+            (parts ??= []).Add(s);
+            parts.Add(display);
+        }
+        return parts is null ? string.Empty : string.Join(' ', parts);
     }
 
     private static readonly char[] ParamDelimiters = [' ', '=', ',', '[', ']'];
@@ -148,8 +198,21 @@ public sealed class PacketFilter
 
 public partial class PacketListViewModel : ObservableObject
 {
+    // _allPackets is appended on the UI thread (AddLivePacket / SetSource) while a background
+    // filter pass reads a snapshot of it. All reads-for-snapshot and writes take this lock; the
+    // background pass then works only on the immutable PacketEntry[] snapshot, never the list.
+    private readonly object _sync = new();
     private readonly List<PacketEntry> _allPackets = [];
     private PacketFilter _filter = PacketFilter.Empty;
+
+    // Monotonic generation: each ApplyFilter bumps this; a background build that finishes after a
+    // newer pass started carries a stale generation and is dropped instead of clobbering Packets.
+    private int _filterGeneration;
+
+    // Debounce timer for the high-frequency FilterQuery setter only. Programmatic callers run
+    // ApplyFilter directly (no debounce).
+    private DispatcherTimer? _debounceTimer;
+    private const int FilterDebounceMs = 250;
 
     private GameDataService? _gameData;
     private bool _resolveItemNames;
@@ -162,7 +225,7 @@ public partial class PacketListViewModel : ObservableObject
     {
         var last = FilterPresetStore.LoadLastFilter();
         Presets = new ObservableCollection<FilterPreset>(FilterPresetStore.LoadPresets());
-        _filter = new PacketFilter(last.Query);
+        _filter = MakeFilter(last.Query);
         NotifyAllFilterProps();
     }
 
@@ -203,7 +266,7 @@ public partial class PacketListViewModel : ObservableObject
     private void LoadPreset()
     {
         if (SelectedPreset == null) return;
-        _filter = new PacketFilter(SelectedPreset.Query);
+        _filter = MakeFilter(SelectedPreset.Query);
         NotifyAllFilterProps();
         PersistLastFilter();
         ApplyFilter();
@@ -235,14 +298,39 @@ public partial class PacketListViewModel : ObservableObject
     public void SetResolveItemNames(bool value)
     {
         _resolveItemNames = value;
-        if (value && _gameData?.IsLoaded == true)
-            _ = BuildResolvedIndexAsync(_allPackets);
+        // Rebuild the active filter so its resolver reflects the new toggle: a params: query now
+        // matches (or stops matching) resolved item display-names on the next pass.
+        _filter = MakeFilter(_filter.Query);
         ApplyFilter();
     }
+
+    /// <summary>
+    /// The display-name resolver handed to every PacketFilter: a uniqueName -> display-name map that
+    /// is active only when item-name resolution is on AND game data is loaded; otherwise null, which
+    /// disables resolved-name matching in the filter (same as resolve-off). Built fresh per filter so
+    /// toggling resolve or (re)loading game data takes effect on the next constructed filter.
+    /// </summary>
+    private Func<string, string?>? CurrentResolver() =>
+        _resolveItemNames && _gameData?.IsLoaded == true
+            ? u => _gameData.TryResolveByUniqueName(u, out var d) ? d : null
+            : null;
+
+    /// <summary>Constructs a PacketFilter wired with the current resolver so every call site stays consistent.</summary>
+    private PacketFilter MakeFilter(string? query) => new(query, CurrentResolver());
 
     [ObservableProperty] private ObservableCollection<PacketRow> _packets = [];
     [ObservableProperty] private bool _autoSelectNewest;
     [ObservableProperty] private bool _sortUnknownFirst;
+
+    // Sorting a DataGridCollectionView happens on the UI thread; above a few hundred thousand rows a
+    // column-header sort freezes the app. Disable user column sort past this threshold.
+    private const int SortRowThreshold = 200_000;
+
+    /// <summary>
+    /// Whether DataGrid column-header sorting is allowed for the current row count. Bound to the
+    /// grid's CanUserSortColumns; re-evaluated whenever Packets is reassigned (see AssignRows).
+    /// </summary>
+    public bool CanSortColumns => Packets.Count <= SortRowThreshold;
 
     public event Action<PacketRow>? ScrollToRowRequested;
 
@@ -279,7 +367,7 @@ public partial class PacketListViewModel : ObservableObject
         get => _filter.Query;
         set
         {
-            _filter = new PacketFilter(value);
+            _filter = MakeFilter(value);
             OnPropertyChanged();
             OnPropertyChanged(nameof(FilterKind));
             OnPropertyChanged(nameof(FilterCode));
@@ -288,8 +376,30 @@ public partial class PacketListViewModel : ObservableObject
             OnPropertyChanged(nameof(FilterLabel));
             OnPropertyChanged(nameof(FilterDisplayText));
             PersistLastFilter();
-            ApplyFilter();
+            // High-frequency path (per keystroke): debounce so we don't fire a 4M-row filter pass
+            // on every character. Programmatic callers invoke ApplyFilter() directly.
+            DebouncedApplyFilter();
         }
+    }
+
+    /// <summary>
+    /// Resets a ~250 ms timer on each call; only the final keystroke in a burst triggers the
+    /// (background) filter pass. UI-thread only - DispatcherTimer ticks on the UI thread.
+    /// </summary>
+    private void DebouncedApplyFilter()
+    {
+        _debounceTimer ??= new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(FilterDebounceMs) };
+        _debounceTimer.Stop();
+        _debounceTimer.Tick -= OnDebounceTick;
+        _debounceTimer.Tick += OnDebounceTick;
+        _debounceTimer.Start();
+    }
+
+    private void OnDebounceTick(object? sender, EventArgs e)
+    {
+        _debounceTimer!.Stop();
+        _debounceTimer.Tick -= OnDebounceTick;
+        ApplyFilter();
     }
 
     // Per-column scoped filter helpers — read/write scoped tokens within the unified query.
@@ -353,7 +463,7 @@ public partial class PacketListViewModel : ObservableObject
             .Select(t => t.StartsWith('-') ? $"-{col}:{t[1..]}" : $"{col}:{t}");
 
         var newQuery = string.Join(" ", kept.Concat(added));
-        _filter = new PacketFilter(newQuery);
+        _filter = MakeFilter(newQuery);
         OnPropertyChanged(nameof(FilterQuery));
         OnPropertyChanged(nameof(FilterLabel));
         OnPropertyChanged(nameof(FilterDisplayText));
@@ -396,47 +506,51 @@ public partial class PacketListViewModel : ObservableObject
 
     public string FilterDisplayText => string.IsNullOrWhiteSpace(FilterLabel) ? "Filter…" : FilterLabel;
 
-    public string CountText => $"{Packets.Count:N0} / {_allPackets.Count:N0} packets";
+    public string CountText => $"{Packets.Count:N0} / {_countAll:N0} packets";
 
     public void SetSource(List<PacketEntry> packets)
     {
-        _allPackets.Clear();
-        _allPackets.AddRange(packets);
-        if (_resolveItemNames && _gameData?.IsLoaded == true)
-            _ = BuildResolvedIndexAsync(packets);
-        ApplyFilter();
-    }
-
-    private Task BuildResolvedIndexAsync(IEnumerable<PacketEntry> packets)
-    {
-        return Task.Run(() =>
+        lock (_sync)
         {
-            var gd = _gameData;
-            if (gd == null) return;
-            foreach (var p in packets)
+            _allPackets.Clear();
+            _allPackets.AddRange(packets);
+        }
+
+        // Tally Kind counts in a single pass (empty source => all zeros).
+        _countAll = packets.Count;
+        _countEvent = 0;
+        _countRequest = 0;
+        _countResponse = 0;
+        foreach (var p in packets)
+        {
+            switch (p.Kind)
             {
-                var parts = new List<string>();
-                foreach (var (_, pv) in p.Params)
-                {
-                    if (pv.Type != "String" || pv.Value is not string s || string.IsNullOrEmpty(s))
-                        continue;
-                    parts.Add(s);
-                    if (gd.TryResolveByUniqueName(s, out var display))
-                        parts.Add(display);
-                }
-                p.ResolvedSummary = string.Join(" ", parts);
+                case "EVENT": _countEvent++; break;
+                case "REQUEST": _countRequest++; break;
+                case "RESPONSE": _countResponse++; break;
             }
-            Avalonia.Threading.Dispatcher.UIThread.Post(ApplyFilter);
-        });
+        }
+
+        ApplyFilter();
     }
 
     public void AddLivePacket(PacketEntry packet)
     {
-        _allPackets.Add(packet);
+        lock (_sync)
+            _allPackets.Add(packet);
+        _countAll++;
+        switch (packet.Kind)
+        {
+            case "EVENT": _countEvent++; break;
+            case "REQUEST": _countRequest++; break;
+            case "RESPONSE": _countResponse++; break;
+        }
         if (_filter.Matches(packet))
         {
             var row = new PacketRow(packet);
             Packets.Add(row);
+            // Incremental append may cross SortRowThreshold during live capture.
+            OnPropertyChanged(nameof(CanSortColumns));
             if (AutoSelectNewest)
             {
                 SelectedRow = row;
@@ -449,9 +563,10 @@ public partial class PacketListViewModel : ObservableObject
 
     public void FilterTo(string kind, int code)
     {
-        _filter = new PacketFilter($"kind:{kind} code:{code}");
+        _filter = MakeFilter($"kind:{kind} code:{code}");
         OnPropertyChanged(nameof(FilterQuery));
-        ApplyFilter();
+        // Immediate-result path: callers locate/scroll to a row right after, so build synchronously.
+        ApplyFilterSync();
     }
 
     /// <summary>
@@ -461,7 +576,18 @@ public partial class PacketListViewModel : ObservableObject
     public void FollowValue(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) return;
-        FilterQuery = $"params:{value.Trim()}";
+        // Set the query and apply synchronously (not via the debounced FilterQuery setter): the
+        // caller follows up by scrolling, so Packets must be populated before this returns.
+        _filter = MakeFilter($"params:{value.Trim()}");
+        OnPropertyChanged(nameof(FilterQuery));
+        OnPropertyChanged(nameof(FilterKind));
+        OnPropertyChanged(nameof(FilterCode));
+        OnPropertyChanged(nameof(FilterName));
+        OnPropertyChanged(nameof(FilterParams));
+        OnPropertyChanged(nameof(FilterLabel));
+        OnPropertyChanged(nameof(FilterDisplayText));
+        PersistLastFilter();
+        ApplyFilterSync();
     }
 
     /// <summary>
@@ -473,7 +599,11 @@ public partial class PacketListViewModel : ObservableObject
         var row = FindRow(packet);
         if (row == null && !_filter.IsEmpty)
         {
-            ClearFilterCommand.Execute(null);
+            // Immediate-result path: clear synchronously so FindRow sees the repopulated Packets.
+            _filter = PacketFilter.Empty;
+            NotifyAllFilterProps();
+            PersistLastFilter();
+            ApplyFilterSync();
             row = FindRow(packet);
         }
         if (row == null) return;
@@ -519,12 +649,19 @@ public partial class PacketListViewModel : ObservableObject
     // Counts are over the full source, independent of the active filter, so the
     // sidebar always shows how many of each kind exist.
     /// <summary>True once any packets are loaded or captured (drives the empty-state overlay).</summary>
-    public bool HasData => _allPackets.Count > 0;
+    public bool HasData => _countAll > 0;
 
-    public int CountAll      => _allPackets.Count;
-    public int CountEvent    => _allPackets.Count(p => p.Kind == "EVENT");
-    public int CountRequest  => _allPackets.Count(p => p.Kind == "REQUEST");
-    public int CountResponse => _allPackets.Count(p => p.Kind == "RESPONSE");
+    // Cached Kind tallies - maintained in SetSource (one pass) and AddLivePacket (increment),
+    // so NotifyStatusCounts no longer triggers three O(n) scans of _allPackets per filter pass.
+    private int _countAll;
+    private int _countEvent;
+    private int _countRequest;
+    private int _countResponse;
+
+    public int CountAll      => _countAll;
+    public int CountEvent    => _countEvent;
+    public int CountRequest  => _countRequest;
+    public int CountResponse => _countResponse;
 
     [ObservableProperty] private string _activeStatusFilter = "All";
 
@@ -547,16 +684,35 @@ public partial class PacketListViewModel : ObservableObject
         OnPropertyChanged(nameof(CountResponse));
     }
 
-    private void ApplyFilter()
+    /// <summary>
+    /// Pure filter+order core. Runs over an immutable snapshot with no UI reads/writes, so it is
+    /// safe to call from a background thread. The filter and sort flag are captured by the caller on
+    /// the UI thread and passed in, so this method never touches mutable VM state.
+    /// </summary>
+    private static List<PacketRow> BuildRows(PacketEntry[] snapshot, PacketFilter filter, bool sortUnknownFirst)
     {
-        var filtered = _allPackets.Where(_filter.Matches);
+        IEnumerable<PacketEntry> filtered = snapshot.Where(filter.Matches);
 
-        IEnumerable<PacketEntry> ordered = SortUnknownFirst
+        IEnumerable<PacketEntry> ordered = sortUnknownFirst
             ? filtered.OrderBy(p => string.IsNullOrEmpty(PacketNameResolver.Resolve(p.Kind, p.Code)) ? 0 : 1)
             : filtered;
 
-        var rows = ordered.Select(p => new PacketRow(p));
+        var rows = new List<PacketRow>();
+        foreach (var p in ordered)
+            rows.Add(new PacketRow(p));
+        return rows;
+    }
 
+    /// <summary>Takes an immutable snapshot of the source under the lock (writes share _sync).</summary>
+    private PacketEntry[] Snapshot()
+    {
+        lock (_sync)
+            return _allPackets.ToArray();
+    }
+
+    /// <summary>Assigns the rebuilt rows to Packets and refreshes dependent UI state. UI-thread only.</summary>
+    private void AssignRows(List<PacketRow> rows)
+    {
         _suppressSelectedRowFeedback = true;
         Packets = new ObservableCollection<PacketRow>(rows);
         _suppressSelectedRowFeedback = false;
@@ -568,6 +724,44 @@ public partial class PacketListViewModel : ObservableObject
             ScrollToRowRequested?.Invoke(target);
         }
         OnPropertyChanged(nameof(CountText));
+        OnPropertyChanged(nameof(CanSortColumns));
         NotifyStatusCounts();
+    }
+
+    /// <summary>
+    /// Off-thread filter pass: snapshot the source, build rows in Task.Run, then marshal back to the
+    /// UI thread to assign Packets. A generation token drops stale results when a newer pass starts.
+    /// </summary>
+    private void ApplyFilter()
+    {
+        int generation = ++_filterGeneration;
+        var snapshot = Snapshot();
+        // Capture the filter + sort flag on the UI thread; the background pass reads neither directly.
+        var filter = _filter;
+        bool sortUnknownFirst = SortUnknownFirst;
+
+        _ = Task.Run(() =>
+        {
+            var rows = BuildRows(snapshot, filter, sortUnknownFirst);
+            Dispatcher.UIThread.Post(() =>
+            {
+                // Drop late results: a newer ApplyFilter / ApplyFilterSync already superseded this.
+                if (generation != _filterGeneration) return;
+                AssignRows(rows);
+            });
+        });
+    }
+
+    /// <summary>
+    /// Synchronous filter pass on the current (UI) thread. Used by deliberate one-off navigations
+    /// (SelectPacket / FollowValue / FilterTo) that must read Packets immediately after to locate a
+    /// row. Bumps the generation so any in-flight background pass is dropped.
+    /// </summary>
+    private void ApplyFilterSync()
+    {
+        ++_filterGeneration;
+        var snapshot = Snapshot();
+        var rows = BuildRows(snapshot, _filter, SortUnknownFirst);
+        AssignRows(rows);
     }
 }

@@ -66,7 +66,7 @@
                   SelectionMode="Extended"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  CanUserSortColumns="True"
+                  CanUserSortColumns="{Binding CanSortColumns}"
                   CanUserResizeColumns="True"
                   FontSize="{Binding $parent[Window].((vm:MainViewModel)DataContext).GridFontSize, FallbackValue=12}"
                   GridLinesVisibility="Horizontal">
