@@ -28,7 +28,6 @@ public record PacketEntry(
 
     /// <summary>Param count, read straight from the stored ref so the grid's Keys column never forces a decode.</summary>
     public int KeyCount => ParamRef.Count;
-    public string ResolvedSummary { get; set; } = string.Empty;
 
     /// <summary>True when this packet carries Photon response status (RESPONSE kind).</summary>
     public bool HasResponseStatus => ReturnCode.HasValue;
