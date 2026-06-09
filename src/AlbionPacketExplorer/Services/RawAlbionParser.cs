@@ -52,13 +52,12 @@ public sealed class RawAlbionParser : IPacketReceiver
             // Reuse the shared "0".."255" key and intern the type name so both dedupe across packets.
             entries[i++] = new KeyValuePair<string, ParamValue>(ParamKeys.Get(k), new ParamValue(string.Intern(GetTypeName(v)), v));
 
-        // Serialize the params to canonical param-JSON bytes via the shared codec and pack them into
-        // the store; the entry decodes them lazily, identical to the file-load path. (Typed byte/short
-        // arrays come back from the decoder as the JSON representation - List<object?> of numbers -
-        // which is the same shape the loaded-file path and the display formatter already expect.)
+        // Pack the parsed set straight into the store, which binary-encodes it into the mmap arena;
+        // the entry decodes it lazily, identical to the file-load path. (Typed byte/short arrays come
+        // back from the decoder as List<object?> of numbers - the same shape the loaded-file path and
+        // the display formatter already expect.)
         var set = new ParamSet(entries);
-        var bytes = ParamCodec.Write(set);
-        var paramRef = _store.Append(bytes, set.Count);
+        var paramRef = _store.Append(set);
 
         PacketReceived?.Invoke(new PacketEntry(DateTime.UtcNow, string.Intern(kind), code, _store, paramRef,
             returnCode, string.IsNullOrEmpty(debugMessage) ? null : debugMessage));
