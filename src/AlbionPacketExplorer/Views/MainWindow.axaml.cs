@@ -162,6 +162,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.ShortcutsChanged += ApplyShortcuts;
             vm.OpenSettingsSectionRequested += OpenSettings;
             vm.UpdateAvailableRequested += OnUpdateAvailableRequested;
+            vm.CapturePermissionHelpRequested += OnCapturePermissionHelpRequested;
             ApplyEffectiveSidebar();
             ApplyShortcuts();
         }
@@ -457,6 +458,26 @@ public partial class MainWindow : ApxWindow, IFilePicker
                 // Dialog closed via X: keep the toolbar badge so the update stays one click away.
                 break;
         }
+    }
+
+    private async void OnCapturePermissionHelpRequested()
+    {
+        if (DataContext is not MainViewModel vm) return;
+
+        var top = TopLevel.GetTopLevel(this);
+        var dialogVm = new CapturePermissionViewModel
+        {
+            Clipboard = top?.Clipboard,
+            Toasts = vm.ToastManager,
+        };
+        dialogVm.OpenUrlRequested += url =>
+        {
+            if (top?.Launcher is { } launcher && Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                _ = launcher.LaunchUriAsync(uri);
+        };
+
+        var win = new CapturePermissionWindow(dialogVm);
+        await win.ShowDialog(this);
     }
 
     private void OnDiffRequested(Models.PacketEntry left, Models.PacketEntry right)
