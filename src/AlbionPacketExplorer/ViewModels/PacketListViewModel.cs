@@ -273,6 +273,16 @@ public partial class PacketListViewModel : ObservableObject
     [ObservableProperty] private bool _autoSelectNewest;
     [ObservableProperty] private bool _sortUnknownFirst;
 
+    // Sorting a DataGridCollectionView happens on the UI thread; above a few hundred thousand rows a
+    // column-header sort freezes the app. Disable user column sort past this threshold.
+    private const int SortRowThreshold = 200_000;
+
+    /// <summary>
+    /// Whether DataGrid column-header sorting is allowed for the current row count. Bound to the
+    /// grid's CanUserSortColumns; re-evaluated whenever Packets is reassigned (see AssignRows).
+    /// </summary>
+    public bool CanSortColumns => Packets.Count <= SortRowThreshold;
+
     public event Action<PacketRow>? ScrollToRowRequested;
 
     /// <summary>Raised when the user asks to diff two selected packets (left, right in pick order).</summary>
@@ -515,6 +525,8 @@ public partial class PacketListViewModel : ObservableObject
         {
             var row = new PacketRow(packet);
             Packets.Add(row);
+            // Incremental append may cross SortRowThreshold during live capture.
+            OnPropertyChanged(nameof(CanSortColumns));
             if (AutoSelectNewest)
             {
                 SelectedRow = row;
@@ -688,6 +700,7 @@ public partial class PacketListViewModel : ObservableObject
             ScrollToRowRequested?.Invoke(target);
         }
         OnPropertyChanged(nameof(CountText));
+        OnPropertyChanged(nameof(CanSortColumns));
         NotifyStatusCounts();
     }
 
