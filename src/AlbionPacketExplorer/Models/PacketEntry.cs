@@ -4,7 +4,7 @@ public record PacketEntry(
     DateTime Timestamp,
     string Kind,
     int Code,
-    Dictionary<string, ParamValue> Params,
+    ParamSet Params,
     // Photon OperationResponse framing fields (RESPONSE only; null on EVENT/REQUEST).
     // ReturnCode 0 = success, non-zero = server-side failure; DebugMessage is the
     // server's optional error text. Decoded by PhotonWire's GpBinaryReader.ReadResponse.
