@@ -38,6 +38,16 @@ jobs:
           { echo "## ${GITHUB_REF_NAME}"; echo; git log --no-merges --pretty='- %s' $RANGE; } > notes.md
           echo "--- notes.md ---"; cat notes.md
 
+      # Pull the live feed into the pack dir first so releases.<channel>.json accumulates every
+      # version (with its notes) and a delta is built against the prior full package. Non-fatal:
+      # if the feed is empty or unreachable, pack falls back to a fresh single-version feed.
+      - name: Download existing feed for cumulative release
+        shell: bash
+        run: |
+          vpk download http --url https://projects.lulustudio.dk/apx/feed \
+            --channel win-x64 --outputDir releases/win-x64 \
+            || echo "no existing feed yet (first cumulative release or feed unreachable); packing fresh"
+
       - name: Package with Velopack
         run: >
           vpk pack
@@ -88,6 +98,13 @@ jobs:
           RANGE=""; [ -n "$PREV" ] && RANGE="$PREV..${GITHUB_REF_NAME}"
           { echo "## ${GITHUB_REF_NAME}"; echo; git log --no-merges --pretty='- %s' $RANGE; } > notes.md
           echo "--- notes.md ---"; cat notes.md
+
+      - name: Download existing feed for cumulative release
+        shell: bash
+        run: |
+          vpk download http --url https://projects.lulustudio.dk/apx/feed \
+            --channel linux-x64 --outputDir releases/linux-x64 \
+            || echo "no existing feed yet (first cumulative release or feed unreachable); packing fresh"
 
       - name: Package with Velopack
         run: >
@@ -140,6 +157,13 @@ jobs:
           { echo "## ${GITHUB_REF_NAME}"; echo; git log --no-merges --pretty='- %s' $RANGE; } > notes.md
           echo "--- notes.md ---"; cat notes.md
 
+      - name: Download existing feed for cumulative release
+        shell: bash
+        run: |
+          vpk download http --url https://projects.lulustudio.dk/apx/feed \
+            --channel osx-x64 --outputDir releases/osx-x64 \
+            || echo "no existing feed yet (first cumulative release or feed unreachable); packing fresh"
+
       - name: Package with Velopack
         run: >
           vpk pack
@@ -190,6 +214,13 @@ jobs:
           { echo "## ${GITHUB_REF_NAME}"; echo; git log --no-merges --pretty='- %s' $RANGE; } > notes.md
           echo "--- notes.md ---"; cat notes.md
 
+      - name: Download existing feed for cumulative release
+        shell: bash
+        run: |
+          vpk download http --url https://projects.lulustudio.dk/apx/feed \
+            --channel osx-arm64 --outputDir releases/osx-arm64 \
+            || echo "no existing feed yet (first cumulative release or feed unreachable); packing fresh"
+
       - name: Package with Velopack
         run: >
           vpk pack
@@ -232,6 +263,7 @@ jobs:
             artifacts/*.AppImage
             artifacts/*Portable.zip
             artifacts/*-full.nupkg
+            artifacts/*-delta.nupkg
             artifacts/releases.*.json
           generate_release_notes: true
 
