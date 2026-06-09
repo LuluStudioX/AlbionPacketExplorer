@@ -1,12 +1,24 @@
 using AlbionPacketExplorer.Models;
+using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 
 namespace AlbionPacketExplorer.Services;
 
 public class PacketFileReader
 {
-    public async IAsyncEnumerable<PacketEntry> ReadAsync(string filePath, IProgress<double>? progress = null)
+    // Report progress at most this often so a multi-million line load does not flood the
+    // dispatcher with callbacks; a final Report(1.0) always fires when the stream ends.
+    private static readonly TimeSpan ProgressInterval = TimeSpan.FromMilliseconds(75);
+
+    // store is optional and last: callers that retain packets (the main load path) pass their own
+    // arena so decoded params stay reachable; one-shot consumers that stream-and-discard (e.g. the
+    // merge/verify tool) omit it and get a private per-call store. Keeping it last leaves the
+    // existing (path, progress) call sites compiling unchanged.
+    public async IAsyncEnumerable<PacketEntry> ReadAsync(string filePath, IProgress<double>? progress = null, PackedParamStore? store = null)
     {
+        store ??= new PackedParamStore();
+
         var fileInfo = new FileInfo(filePath);
         long totalBytes = fileInfo.Length;
 
@@ -17,12 +29,12 @@ public class PacketFileReader
 
         if (isArray)
         {
-            await foreach (var entry in ReadArrayAsync(stream, totalBytes, progress))
+            await foreach (var entry in ReadArrayAsync(stream, store, progress))
                 yield return entry;
         }
         else
         {
-            await foreach (var entry in ReadNdjsonAsync(stream, totalBytes, progress))
+            await foreach (var entry in ReadNdjsonAsync(stream, store, totalBytes, progress))
                 yield return entry;
         }
     }
@@ -39,48 +51,148 @@ public class PacketFileReader
         return false;
     }
 
-    private static async IAsyncEnumerable<PacketEntry> ReadNdjsonAsync(Stream stream, long totalBytes, IProgress<double>? progress)
+    private static async IAsyncEnumerable<PacketEntry> ReadNdjsonAsync(Stream stream, PackedParamStore store, long totalBytes, IProgress<double>? progress)
     {
         long bytesRead = 0;
-        using var reader = new StreamReader(stream, System.Text.Encoding.UTF8, leaveOpen: true);
+        using var reader = new StreamReader(stream, Encoding.UTF8, leaveOpen: true);
+
+        var sw = Stopwatch.StartNew();
+        var lastReport = TimeSpan.Zero;
 
         string? line;
         while ((line = await reader.ReadLineAsync()) != null)
         {
             bytesRead += line.Length + 1;
-            progress?.Report((double)bytesRead / totalBytes);
+            if (progress != null && totalBytes > 0)
+            {
+                var now = sw.Elapsed;
+                if (now - lastReport >= ProgressInterval)
+                {
+                    progress.Report((double)bytesRead / totalBytes);
+                    lastReport = now;
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(line)) continue;
 
             PacketEntry? entry = null;
-            try { entry = ParseLine(line); } catch { }
+            try { entry = ParseLine(line, store); } catch { }
             if (entry != null) yield return entry;
         }
-    }
-
-    private static async IAsyncEnumerable<PacketEntry> ReadArrayAsync(Stream stream, long totalBytes, IProgress<double>? progress)
-    {
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        var entries = await JsonSerializer.DeserializeAsync<List<JsonElement>>(stream, options);
-        if (entries == null) yield break;
 
         progress?.Report(1.0);
+    }
 
-        foreach (var el in entries)
+    private static async IAsyncEnumerable<PacketEntry> ReadArrayAsync(Stream stream, PackedParamStore store, IProgress<double>? progress)
+    {
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // Stream the array element-by-element so a giant array file is never fully materialized.
+        await foreach (var el in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(stream, options))
         {
             PacketEntry? entry = null;
-            try { entry = ParseElement(el); } catch { }
+            try { entry = ParseElement(el, store); } catch { }
             if (entry != null) yield return entry;
+        }
+
+        progress?.Report(1.0);
+    }
+
+    // NDJSON parse: tokenize one line's UTF-8 bytes with Utf8JsonReader instead of building a
+    // JsonDocument DOM per line. Produces a PacketEntry byte-for-byte equivalent to ParseElement.
+    private static PacketEntry? ParseLine(string line, PackedParamStore store)
+    {
+        // Rent a scratch UTF-8 buffer from the shared pool instead of allocating a throwaway byte[]
+        // per line (~millions of arrays per big load). Retained data (GetString() results) is COPIED
+        // out during parse; the params bytes are copied into the store. The Utf8JsonReader is a local
+        // ref struct used only here. The buffer is always returned (finally).
+        int max = Encoding.UTF8.GetMaxByteCount(line.Length);
+        byte[] buf = System.Buffers.ArrayPool<byte>.Shared.Rent(max);
+        try
+        {
+            int n = Encoding.UTF8.GetBytes(line, buf);
+            var reader = new Utf8JsonReader(buf.AsSpan(0, n));
+
+            if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
+                return null;
+
+            DateTime? ts = null;
+            bool sawKind = false;
+            string kind = "";
+            int? code = null;
+            ParamRef paramRef = ParamRef.Empty;
+            bool sawParams = false;
+            int? returnCode = null;
+            string? debugMessage = null;
+
+            while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
+            {
+                string propName = reader.GetString()!;
+                reader.Read(); // advance to the value
+
+                switch (propName)
+                {
+                    case "ts":
+                        ts = reader.GetDateTime();
+                        break;
+                    case "kind":
+                        // Matches ParseElement: GetString() ?? "" (JSON null -> empty string).
+                        // Intern: the 3 Kind values (EVENT/REQUEST/RESPONSE) dedupe to single instances.
+                        kind = string.Intern(reader.GetString() ?? "");
+                        sawKind = true;
+                        break;
+                    case "code":
+                        code = reader.GetInt32();
+                        break;
+                    case "params":
+                        // Parse the params object to a ParamSet and pack it into the store, which
+                        // binary-encodes it into the arena. The source file is still JSON; only the
+                        // arena is binary. ReadParams advances the reader past the matching '}'.
+                        if (reader.TokenType == JsonTokenType.StartObject)
+                        {
+                            var parsed = ParamCodec.ReadParams(ref reader);
+                            paramRef = store.Append(parsed);
+                        }
+                        else
+                        {
+                            // params present but not an object: store nothing (decodes to empty).
+                            reader.Skip();
+                            paramRef = ParamRef.Empty;
+                        }
+                        sawParams = true;
+                        break;
+                    case "returnCode":
+                        // Photon response framing: number only (mirrors JsonValueKind.Number guard).
+                        if (reader.TokenType == JsonTokenType.Number)
+                            returnCode = reader.GetInt32();
+                        else
+                            reader.Skip();
+                        break;
+                    case "debugMessage":
+                        if (reader.TokenType == JsonTokenType.String)
+                            debugMessage = reader.GetString();
+                        else
+                            reader.Skip();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            // ParseElement requires ts, kind, code and params to all be present; otherwise null.
+            if (ts == null || !sawKind || code == null || !sawParams)
+                return null;
+
+            return new PacketEntry(ts.Value, kind, code.Value, store, paramRef, returnCode, debugMessage);
+        }
+        finally
+        {
+            System.Buffers.ArrayPool<byte>.Shared.Return(buf);
         }
     }
 
-    private static PacketEntry? ParseLine(string line)
-    {
-        using var doc = JsonDocument.Parse(line);
-        return ParseElement(doc.RootElement);
-    }
-
-    private static PacketEntry? ParseElement(JsonElement root)
+    private static PacketEntry? ParseElement(JsonElement root, PackedParamStore store)
     {
         if (!root.TryGetProperty("ts", out var tsEl) ||
             !root.TryGetProperty("kind", out var kindEl) ||
@@ -89,15 +201,24 @@ public class PacketFileReader
             return null;
 
         var ts = tsEl.GetDateTime();
-        var kind = kindEl.GetString() ?? "";
+        var kind = string.Intern(kindEl.GetString() ?? "");
         var code = codeEl.GetInt32();
-        var parameters = new Dictionary<string, ParamValue>();
 
-        foreach (var param in paramsEl.EnumerateObject())
+        // Parse the params object to a ParamSet via the shared ParamCodec (so it is value-identical
+        // to the NDJSON path) and pack it into the store, which binary-encodes it into the arena.
+        // GetRawText() yields valid UTF-8 JSON for the object; whitespace is irrelevant to the parser.
+        ParamRef paramRef;
+        if (paramsEl.ValueKind == JsonValueKind.Object)
         {
-            var type = param.Value.TryGetProperty("type", out var typeEl) ? typeEl.GetString() ?? "" : "";
-            object? value = param.Value.TryGetProperty("value", out var valueEl) ? ExtractValue(valueEl) : null;
-            parameters[param.Name] = new ParamValue(type, value);
+            byte[] bytes = Encoding.UTF8.GetBytes(paramsEl.GetRawText());
+            var reader = new Utf8JsonReader(bytes);
+            reader.Read(); // position at StartObject
+            var parsed = ParamCodec.ReadParams(ref reader);
+            paramRef = store.Append(parsed);
+        }
+        else
+        {
+            paramRef = ParamRef.Empty;
         }
 
         // Photon response framing (present only on RESPONSE packets we captured ourselves).
@@ -106,19 +227,6 @@ public class PacketFileReader
         string? debugMessage = root.TryGetProperty("debugMessage", out var dmEl) && dmEl.ValueKind == JsonValueKind.String
             ? dmEl.GetString() : null;
 
-        return new PacketEntry(ts, kind, code, parameters, returnCode, debugMessage);
+        return new PacketEntry(ts, kind, code, store, paramRef, returnCode, debugMessage);
     }
-
-    private static object? ExtractValue(JsonElement el) => el.ValueKind switch
-    {
-        JsonValueKind.Number when el.TryGetInt64(out var l) => l,
-        JsonValueKind.Number when el.TryGetDouble(out var d) => d,
-        JsonValueKind.String => el.GetString(),
-        JsonValueKind.True => true,
-        JsonValueKind.False => false,
-        JsonValueKind.Null => null,
-        JsonValueKind.Array => el.EnumerateArray().Select(ExtractValue).ToList(),
-        JsonValueKind.Object => el.EnumerateObject().ToDictionary(p => p.Name, p => ExtractValue(p.Value)),
-        _ => el.ToString()
-    };
 }
