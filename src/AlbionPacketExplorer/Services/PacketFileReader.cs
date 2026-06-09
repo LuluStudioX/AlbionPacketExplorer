@@ -106,7 +106,7 @@ public class PacketFileReader
         bool sawKind = false;
         string kind = "";
         int? code = null;
-        Dictionary<string, ParamValue>? parameters = null;
+        ParamSet? parameters = null;
         bool sawParams = false;
         int? returnCode = null;
         string? debugMessage = null;
@@ -157,18 +157,19 @@ public class PacketFileReader
         if (ts == null || !sawKind || code == null || !sawParams)
             return null;
 
-        return new PacketEntry(ts.Value, kind, code.Value, parameters!, returnCode, debugMessage);
+        return new PacketEntry(ts.Value, kind, code.Value, parameters!.Value, returnCode, debugMessage);
     }
 
     // Reads the "params" object: { "0": { "type": ..., "value": ... }, ... }
-    private static Dictionary<string, ParamValue> ReadParams(ref Utf8JsonReader reader)
+    private static ParamSet ReadParams(ref Utf8JsonReader reader)
     {
-        var parameters = new Dictionary<string, ParamValue>();
         if (reader.TokenType != JsonTokenType.StartObject)
         {
             reader.Skip();
-            return parameters;
+            return ParamSet.Empty;
         }
+
+        var parameters = new List<KeyValuePair<string, ParamValue>>();
 
         while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
         {
@@ -209,10 +210,23 @@ public class PacketFileReader
             }
 
             _ = sawValue; // value stays null when absent, matching ParseElement.
-            parameters[name] = new ParamValue(type, value);
+            Upsert(parameters, name, new ParamValue(type, value));
         }
 
-        return parameters;
+        return new ParamSet(parameters.ToArray());
+    }
+
+    // Mirrors the old Dictionary indexer's last-write-wins: a repeated key overwrites in place
+    // (duplicate keys within one packet's params object are not expected, but the behavior matches).
+    private static void Upsert(List<KeyValuePair<string, ParamValue>> entries, string key, ParamValue value)
+    {
+        for (int i = 0; i < entries.Count; i++)
+            if (entries[i].Key == key)
+            {
+                entries[i] = new KeyValuePair<string, ParamValue>(key, value);
+                return;
+            }
+        entries.Add(new KeyValuePair<string, ParamValue>(key, value));
     }
 
     // Mirrors ExtractValue(JsonElement) exactly: Int64 first, then Double, String, Bool, Null,
@@ -269,13 +283,13 @@ public class PacketFileReader
         var ts = tsEl.GetDateTime();
         var kind = string.Intern(kindEl.GetString() ?? "");
         var code = codeEl.GetInt32();
-        var parameters = new Dictionary<string, ParamValue>();
+        var parameters = new List<KeyValuePair<string, ParamValue>>();
 
         foreach (var param in paramsEl.EnumerateObject())
         {
             var type = param.Value.TryGetProperty("type", out var typeEl) ? string.Intern(typeEl.GetString() ?? "") : "";
             object? value = param.Value.TryGetProperty("value", out var valueEl) ? ExtractValue(valueEl) : null;
-            parameters[ParamKeys.Intern(param.Name)] = new ParamValue(type, value);
+            Upsert(parameters, ParamKeys.Intern(param.Name), new ParamValue(type, value));
         }
 
         // Photon response framing (present only on RESPONSE packets we captured ourselves).
@@ -284,7 +298,7 @@ public class PacketFileReader
         string? debugMessage = root.TryGetProperty("debugMessage", out var dmEl) && dmEl.ValueKind == JsonValueKind.String
             ? dmEl.GetString() : null;
 
-        return new PacketEntry(ts, kind, code, parameters, returnCode, debugMessage);
+        return new PacketEntry(ts, kind, code, new ParamSet(parameters.ToArray()), returnCode, debugMessage);
     }
 
     private static object? ExtractValue(JsonElement el) => el.ValueKind switch
