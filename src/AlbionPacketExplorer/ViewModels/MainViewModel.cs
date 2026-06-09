@@ -26,6 +26,14 @@ public partial class MainViewModel : ObservableObject
     public PacketDetailViewModel PacketDetail => _packetDetail;
     [ObservableProperty] private double _loadProgress;
     [ObservableProperty] private bool _isLoading;
+
+    /// <summary>Drives the full-window loader overlay (animated GIF). Shown only when a load runs
+    /// longer than <see cref="LoaderDelay"/>, then faded out as the packets appear, so quick loads
+    /// never flash it.</summary>
+    [ObservableProperty] private bool _showLoader;
+    private static readonly TimeSpan LoaderDelay = TimeSpan.FromMilliseconds(500);
+    private Avalonia.Threading.DispatcherTimer? _loaderDelayTimer;
+
     [ObservableProperty] private bool _isCapturing;
     [ObservableProperty] private bool _isPaused;
 
@@ -809,6 +817,24 @@ public partial class MainViewModel : ObservableObject
         OpenFileCommand.NotifyCanExecuteChanged();
         StartCaptureCommand.NotifyCanExecuteChanged();
         NotifySaveCommands();
+
+        _loaderDelayTimer?.Stop();
+        if (value)
+        {
+            // Only surface the overlay if the load is genuinely slow (> LoaderDelay); fast loads
+            // finish before the timer fires and never flash it.
+            _loaderDelayTimer = new Avalonia.Threading.DispatcherTimer { Interval = LoaderDelay };
+            _loaderDelayTimer.Tick += (_, _) =>
+            {
+                _loaderDelayTimer?.Stop();
+                if (IsLoading) ShowLoader = true;   // still loading after the delay -> fade in
+            };
+            _loaderDelayTimer.Start();
+        }
+        else
+        {
+            ShowLoader = false;   // load done -> fade out, revealing the packets behind
+        }
     }
 
     partial void OnIsCapturingChanged(bool value)
