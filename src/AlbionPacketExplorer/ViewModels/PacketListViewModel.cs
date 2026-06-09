@@ -49,13 +49,18 @@ public sealed class PacketFilter
     private readonly bool _needsName;
     private readonly bool _needsParams;
 
+    // Maps a uniqueName -> item display name (or null if unresolved/disabled). When null, resolved
+    // display-name matching is off (same as resolve-off today). Used only on _needsParams queries.
+    private readonly Func<string, string?>? _resolveDisplay;
+
     public string Query { get; }
 
     public bool IsEmpty => _exclusions.Length == 0 && _inclusions.Length == 0;
 
-    public PacketFilter(string? query)
+    public PacketFilter(string? query, Func<string, string?>? resolveDisplay = null)
     {
         Query = query ?? string.Empty;
+        _resolveDisplay = resolveDisplay;
         var excl = new List<Token>();
         var incl = new List<Token>();
 
@@ -91,8 +96,13 @@ public sealed class PacketFilter
         // Only compute the expensive columns if a token can actually consult them. When a flag is
         // false, no token's ColumnMatches branch reads the corresponding arg, so empty is safe.
         var name      = _needsName ? PacketNameResolver.Resolve(p.Kind, p.Code) : string.Empty;
-        var paramStr  = _needsParams ? PacketDisplayFormatter.FormatParamSummary(p) : string.Empty;
-        var resolved  = _needsParams ? (p.ResolvedSummary ?? string.Empty) : string.Empty;
+        // Decode params at most once: reuse the same ParamSet for both the formatted summary and the
+        // on-the-fly resolved display-names. paramStr already carries every raw value; resolved adds
+        // only the item display-names (built lazily here instead of from a retained per-packet index).
+        var hasParams = _needsParams;
+        var paramSet  = hasParams ? p.Params : default;
+        var paramStr  = hasParams ? PacketDisplayFormatter.FormatParamSummary(paramSet) : string.Empty;
+        var resolved  = hasParams ? ResolveDisplayNames(paramSet) : string.Empty;
         var paired    = p.Correlated != null;
         var returnCode = p.ReturnCode;
 
@@ -111,6 +121,30 @@ public sealed class PacketFilter
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Builds the space-joined resolved-display-name text for a packet's STRING params, on demand.
+    /// Replaces the old per-packet ResolvedSummary index: when the resolver is null (resolve off) this
+    /// returns "" (no resolved matching, exactly as before). Operates on the already-decoded set so
+    /// the packet's params are not decoded a second time. Includes both the raw uniqueName and its
+    /// display name (raw is also in paramStr, so it is harmless and mirrors the old behavior).
+    /// </summary>
+    private string ResolveDisplayNames(ParamSet @params)
+    {
+        if (_resolveDisplay is null) return string.Empty;
+
+        List<string>? parts = null;
+        foreach (var (_, pv) in @params)
+        {
+            if (pv.Type != "String" || pv.Value is not string s || string.IsNullOrEmpty(s))
+                continue;
+            var display = _resolveDisplay(s);
+            if (display is null) continue;
+            (parts ??= []).Add(s);
+            parts.Add(display);
+        }
+        return parts is null ? string.Empty : string.Join(' ', parts);
     }
 
     private static readonly char[] ParamDelimiters = [' ', '=', ',', '[', ']'];
@@ -191,7 +225,7 @@ public partial class PacketListViewModel : ObservableObject
     {
         var last = FilterPresetStore.LoadLastFilter();
         Presets = new ObservableCollection<FilterPreset>(FilterPresetStore.LoadPresets());
-        _filter = new PacketFilter(last.Query);
+        _filter = MakeFilter(last.Query);
         NotifyAllFilterProps();
     }
 
@@ -232,7 +266,7 @@ public partial class PacketListViewModel : ObservableObject
     private void LoadPreset()
     {
         if (SelectedPreset == null) return;
-        _filter = new PacketFilter(SelectedPreset.Query);
+        _filter = MakeFilter(SelectedPreset.Query);
         NotifyAllFilterProps();
         PersistLastFilter();
         ApplyFilter();
@@ -264,10 +298,25 @@ public partial class PacketListViewModel : ObservableObject
     public void SetResolveItemNames(bool value)
     {
         _resolveItemNames = value;
-        if (value && _gameData?.IsLoaded == true)
-            _ = BuildResolvedIndexAsync(_allPackets);
+        // Rebuild the active filter so its resolver reflects the new toggle: a params: query now
+        // matches (or stops matching) resolved item display-names on the next pass.
+        _filter = MakeFilter(_filter.Query);
         ApplyFilter();
     }
+
+    /// <summary>
+    /// The display-name resolver handed to every PacketFilter: a uniqueName -> display-name map that
+    /// is active only when item-name resolution is on AND game data is loaded; otherwise null, which
+    /// disables resolved-name matching in the filter (same as resolve-off). Built fresh per filter so
+    /// toggling resolve or (re)loading game data takes effect on the next constructed filter.
+    /// </summary>
+    private Func<string, string?>? CurrentResolver() =>
+        _resolveItemNames && _gameData?.IsLoaded == true
+            ? u => _gameData.TryResolveByUniqueName(u, out var d) ? d : null
+            : null;
+
+    /// <summary>Constructs a PacketFilter wired with the current resolver so every call site stays consistent.</summary>
+    private PacketFilter MakeFilter(string? query) => new(query, CurrentResolver());
 
     [ObservableProperty] private ObservableCollection<PacketRow> _packets = [];
     [ObservableProperty] private bool _autoSelectNewest;
@@ -318,7 +367,7 @@ public partial class PacketListViewModel : ObservableObject
         get => _filter.Query;
         set
         {
-            _filter = new PacketFilter(value);
+            _filter = MakeFilter(value);
             OnPropertyChanged();
             OnPropertyChanged(nameof(FilterKind));
             OnPropertyChanged(nameof(FilterCode));
@@ -414,7 +463,7 @@ public partial class PacketListViewModel : ObservableObject
             .Select(t => t.StartsWith('-') ? $"-{col}:{t[1..]}" : $"{col}:{t}");
 
         var newQuery = string.Join(" ", kept.Concat(added));
-        _filter = new PacketFilter(newQuery);
+        _filter = MakeFilter(newQuery);
         OnPropertyChanged(nameof(FilterQuery));
         OnPropertyChanged(nameof(FilterLabel));
         OnPropertyChanged(nameof(FilterDisplayText));
@@ -482,32 +531,7 @@ public partial class PacketListViewModel : ObservableObject
             }
         }
 
-        if (_resolveItemNames && _gameData?.IsLoaded == true)
-            _ = BuildResolvedIndexAsync(packets);
         ApplyFilter();
-    }
-
-    private Task BuildResolvedIndexAsync(IEnumerable<PacketEntry> packets)
-    {
-        return Task.Run(() =>
-        {
-            var gd = _gameData;
-            if (gd == null) return;
-            foreach (var p in packets)
-            {
-                var parts = new List<string>();
-                foreach (var (_, pv) in p.Params)
-                {
-                    if (pv.Type != "String" || pv.Value is not string s || string.IsNullOrEmpty(s))
-                        continue;
-                    parts.Add(s);
-                    if (gd.TryResolveByUniqueName(s, out var display))
-                        parts.Add(display);
-                }
-                p.ResolvedSummary = string.Join(" ", parts);
-            }
-            Avalonia.Threading.Dispatcher.UIThread.Post(ApplyFilter);
-        });
     }
 
     public void AddLivePacket(PacketEntry packet)
@@ -539,7 +563,7 @@ public partial class PacketListViewModel : ObservableObject
 
     public void FilterTo(string kind, int code)
     {
-        _filter = new PacketFilter($"kind:{kind} code:{code}");
+        _filter = MakeFilter($"kind:{kind} code:{code}");
         OnPropertyChanged(nameof(FilterQuery));
         // Immediate-result path: callers locate/scroll to a row right after, so build synchronously.
         ApplyFilterSync();
@@ -554,7 +578,7 @@ public partial class PacketListViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(value)) return;
         // Set the query and apply synchronously (not via the debounced FilterQuery setter): the
         // caller follows up by scrolling, so Packets must be populated before this returns.
-        _filter = new PacketFilter($"params:{value.Trim()}");
+        _filter = MakeFilter($"params:{value.Trim()}");
         OnPropertyChanged(nameof(FilterQuery));
         OnPropertyChanged(nameof(FilterKind));
         OnPropertyChanged(nameof(FilterCode));
