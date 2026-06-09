@@ -4,13 +4,13 @@ using System.Text.Json;
 namespace AlbionPacketExplorer.Models;
 
 /// <summary>
-/// Single source of truth for the params-object JSON shape
-/// (<c>{ "0": { "type": .., "value": .. }, .. }</c>). Both the file loader and the lazy
-/// <see cref="PackedParamStore"/> decoder read through <see cref="ReadParams"/>, and the live /
-/// array paths re-serialize through <see cref="Write"/>. Keeping read+write here guarantees a
-/// round-trip: <c>ReadParams(Write(set))</c> is value-equal to <c>set</c>, and the stored bytes
-/// decode back to the same <see cref="ParamSet"/> the loader produced, so save/CSV/wire output
-/// stays byte-identical across a load -&gt; save cycle.
+/// Single source of truth for PARSING the source params-object JSON shape
+/// (<c>{ "0": { "type": .., "value": .. }, .. }</c>). The NDJSON and JSON-array load paths read the
+/// input file through <see cref="ReadParams"/>, which yields a <see cref="ParamSet"/> with interned
+/// keys/types; that set is then handed to <see cref="PackedParamStore.Append"/>, which owns the
+/// arena's COMPACT-BINARY encoding (the arena is no longer JSON). Save/CSV/wire output is produced
+/// separately by <c>PacketWire</c> from the decoded <see cref="ParamSet"/>, so a load -&gt; save cycle
+/// stays byte-identical.
 /// </summary>
 public static class ParamCodec
 {
@@ -71,31 +71,6 @@ public static class ParamCodec
         return new ParamSet(parameters.ToArray());
     }
 
-    /// <summary>
-    /// Serializes a <see cref="ParamSet"/> back to the canonical params-object UTF-8 bytes
-    /// (<c>{ "0": { "type": .., "value": .. }, .. }</c>). Used by the live capture and JSON-array
-    /// load paths, which have a parsed set in hand rather than the original line bytes.
-    /// </summary>
-    public static byte[] Write(ParamSet set)
-    {
-        var buffer = new System.Buffers.ArrayBufferWriter<byte>(256);
-        using (var writer = new Utf8JsonWriter(buffer))
-        {
-            writer.WriteStartObject();
-            foreach (var (key, pv) in set)
-            {
-                writer.WritePropertyName(key);
-                writer.WriteStartObject();
-                writer.WriteString("type", pv.Type);
-                writer.WritePropertyName("value");
-                WriteValue(writer, pv.Value);
-                writer.WriteEndObject();
-            }
-            writer.WriteEndObject();
-        }
-        return buffer.WrittenSpan.ToArray();
-    }
-
     // Mirrors the old Dictionary indexer's last-write-wins: a repeated key overwrites in place
     // (duplicate keys within one packet's params object are not expected, but the behavior matches).
     private static void Upsert(List<KeyValuePair<string, ParamValue>> entries, string key, ParamValue value)
@@ -150,49 +125,5 @@ public static class ParamCodec
         if (reader.HasValueSequence)
             return Encoding.UTF8.GetString(System.Buffers.BuffersExtensions.ToArray(reader.ValueSequence));
         return Encoding.UTF8.GetString(reader.ValueSpan);
-    }
-
-    // Writes a value back in the same shape ExtractValue would re-read into an equal object graph.
-    // Integers go out as numbers (Int64), doubles as numbers, the rest by JSON kind. Nested
-    // List<object?> / Dictionary<string,object?> recurse. Anything unexpected stringifies, matching
-    // the reader's TokenToString fallback round-trip.
-    private static void WriteValue(Utf8JsonWriter writer, object? value)
-    {
-        switch (value)
-        {
-            case null:
-                writer.WriteNullValue();
-                break;
-            case long l:
-                writer.WriteNumberValue(l);
-                break;
-            case double d:
-                writer.WriteNumberValue(d);
-                break;
-            case bool b:
-                writer.WriteBooleanValue(b);
-                break;
-            case string s:
-                writer.WriteStringValue(s);
-                break;
-            case System.Collections.IDictionary dict:
-                writer.WriteStartObject();
-                foreach (System.Collections.DictionaryEntry kv in dict)
-                {
-                    writer.WritePropertyName(Convert.ToString(kv.Key, System.Globalization.CultureInfo.InvariantCulture) ?? "");
-                    WriteValue(writer, kv.Value);
-                }
-                writer.WriteEndObject();
-                break;
-            case System.Collections.IEnumerable seq:
-                writer.WriteStartArray();
-                foreach (var item in seq)
-                    WriteValue(writer, item);
-                writer.WriteEndArray();
-                break;
-            default:
-                writer.WriteStringValue(Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture));
-                break;
-        }
     }
 }

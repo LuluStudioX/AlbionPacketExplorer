@@ -145,16 +145,13 @@ public class PacketFileReader
                         code = reader.GetInt32();
                         break;
                     case "params":
-                        // Capture the params object's EXACT raw UTF-8 bytes (from its '{' to just past
-                        // its '}') and pack them into the store. We still parse it once here only to
-                        // (a) get the param count and (b) advance the reader past the object; the
-                        // parsed set is discarded - the stored bytes re-decode identically on demand.
+                        // Parse the params object to a ParamSet and pack it into the store, which
+                        // binary-encodes it into the arena. The source file is still JSON; only the
+                        // arena is binary. ReadParams advances the reader past the matching '}'.
                         if (reader.TokenType == JsonTokenType.StartObject)
                         {
-                            int start = (int)reader.TokenStartIndex;
-                            var parsed = ParamCodec.ReadParams(ref reader); // advances to matching EndObject
-                            int end = (int)reader.BytesConsumed;            // index just past '}'
-                            paramRef = store.Append(buf.AsSpan(start, end - start), parsed.Count);
+                            var parsed = ParamCodec.ReadParams(ref reader);
+                            paramRef = store.Append(parsed);
                         }
                         else
                         {
@@ -207,16 +204,17 @@ public class PacketFileReader
         var kind = string.Intern(kindEl.GetString() ?? "");
         var code = codeEl.GetInt32();
 
-        // Capture the params object's raw JSON and pack it into the store; it re-decodes through the
-        // shared ParamCodec.ReadParams to the same ParamSet the NDJSON path produces. GetRawText()
-        // yields valid UTF-8 JSON for the object; whitespace is irrelevant to the decoder.
+        // Parse the params object to a ParamSet via the shared ParamCodec (so it is value-identical
+        // to the NDJSON path) and pack it into the store, which binary-encodes it into the arena.
+        // GetRawText() yields valid UTF-8 JSON for the object; whitespace is irrelevant to the parser.
         ParamRef paramRef;
         if (paramsEl.ValueKind == JsonValueKind.Object)
         {
-            int count = 0;
-            foreach (var _ in paramsEl.EnumerateObject()) count++;
             byte[] bytes = Encoding.UTF8.GetBytes(paramsEl.GetRawText());
-            paramRef = store.Append(bytes, count);
+            var reader = new Utf8JsonReader(bytes);
+            reader.Read(); // position at StartObject
+            var parsed = ParamCodec.ReadParams(ref reader);
+            paramRef = store.Append(parsed);
         }
         else
         {
