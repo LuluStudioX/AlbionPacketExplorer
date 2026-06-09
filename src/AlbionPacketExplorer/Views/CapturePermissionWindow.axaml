@@ -1,0 +1,62 @@
+<controls:ApxWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
+        xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+        xmlns:loc="using:AlbionPacketExplorer.Markup"
+        x:Class="AlbionPacketExplorer.Views.CapturePermissionWindow"
+        x:DataType="vm:CapturePermissionViewModel"
+        Icon="/Assets/app-icon.ico"
+        Title="{Binding Title}"
+        Width="560" Height="460"
+        MinWidth="420" MinHeight="320"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <DockPanel Margin="20">
+
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Heading}" FontSize="16" FontWeight="SemiBold"
+                   Foreground="{DynamicResource Apx.Text}" Margin="0,0,0,4" />
+
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Intro}" FontSize="12" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Apx.TextMuted}" Margin="0,0,0,12" />
+
+        <Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,*,Auto" Margin="0,12,0,0">
+            <Button Grid.Column="0" Classes="ghost" Command="{Binding OpenGuideCommand}"
+                    Content="{Binding OpenGuideLabel}" IsVisible="{Binding HasGuide}" />
+            <Button Grid.Column="2" Classes="accent" Command="{Binding CloseCommand}"
+                    Content="{Binding CloseLabel}" />
+        </Grid>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Steps}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CaptureHelpStep">
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource Apx.Text}" />
+                            <Border IsVisible="{Binding HasCommand}"
+                                    Background="{DynamicResource Apx.Surface}" CornerRadius="6"
+                                    Padding="10,8" Margin="0,6,0,0">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding Command}" IsReadOnly="True"
+                                             BorderThickness="0" Background="Transparent" TextWrapping="NoWrap"
+                                             FontFamily="Consolas,Monospace" FontSize="12"
+                                             Foreground="{DynamicResource Apx.Text}"
+                                             VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Classes="ghost" VerticalAlignment="Top"
+                                            Margin="8,0,0,0"
+                                            Content="{Binding $parent[ItemsControl].((vm:CapturePermissionViewModel)DataContext).CopyLabel}"
+                                            Command="{Binding $parent[ItemsControl].((vm:CapturePermissionViewModel)DataContext).CopyCommand}"
+                                            CommandParameter="{Binding Command}" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </DockPanel>
+
+</controls:ApxWindow>
