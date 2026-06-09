@@ -79,8 +79,58 @@ public sealed class CaptureSetupService
             CreateNoWindow = true,
         };
         psi.ArgumentList.Add("-e");
-        psi.ArgumentList.Add("do shell script \"chmod o+r /dev/bpf*\" with administrator privileges");
+        // BPF devices are opened O_RDWR by libpcap, so read alone is not enough; grant o+rw.
+        psi.ArgumentList.Add("do shell script \"chmod o+rw /dev/bpf*\" with administrator privileges");
         return await RunAndCheckAsync(psi);
+    }
+
+    // macOS persistent: install a root LaunchDaemon (the same idea as Wireshark's ChmodBPF) that
+    // re-opens BPF access at every boot, so capture works without a prompt after a reboot. One admin
+    // authorization installs the script + plist and loads it (and runs it once for the current boot).
+    public async Task<bool> InstallMacBpfDaemonAsync()
+    {
+        try
+        {
+            const string label = "dk.lulustudio.apx.ChmodBPF";
+            const string supportDir = "/Library/Application Support/AlbionPacketExplorer";
+            const string scriptDest = supportDir + "/ChmodBPF";
+            const string plistDest = "/Library/LaunchDaemons/" + label + ".plist";
+
+            var tmpScript = Path.Combine(Path.GetTempPath(), "apx-chmodbpf.sh");
+            var tmpPlist = Path.Combine(Path.GetTempPath(), "apx-chmodbpf.plist");
+
+            await File.WriteAllTextAsync(tmpScript, "#!/bin/sh\nchmod o+rw /dev/bpf*\n");
+            await File.WriteAllTextAsync(tmpPlist,
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" +
+                "<plist version=\"1.0\"><dict>" +
+                "<key>Label</key><string>" + label + "</string>" +
+                "<key>RunAtLoad</key><true/>" +
+                "<key>ProgramArguments</key><array><string>" + scriptDest + "</string></array>" +
+                "</dict></plist>\n");
+
+            // All privileged moves in one authenticated shell call. Single-quoted paths only, joined
+            // with && so it stays a single AppleScript string.
+            var cmd = string.Join(" && ",
+                $"mkdir -p '{supportDir}'",
+                $"cp '{tmpScript}' '{scriptDest}'",
+                $"chown root:wheel '{scriptDest}'",
+                $"chmod 755 '{scriptDest}'",
+                $"cp '{tmpPlist}' '{plistDest}'",
+                $"chown root:wheel '{plistDest}'",
+                $"chmod 644 '{plistDest}'",
+                $"launchctl load -w '{plistDest}'",
+                $"'{scriptDest}'");
+
+            var psi = new ProcessStartInfo("osascript") { UseShellExecute = false, CreateNoWindow = true };
+            psi.ArgumentList.Add("-e");
+            psi.ArgumentList.Add($"do shell script \"{cmd}\" with administrator privileges");
+            return await RunAndCheckAsync(psi);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     // Linux: grant CAP_NET_RAW/CAP_NET_ADMIN to the running binary via pkexec (GUI auth). Only valid
@@ -100,6 +150,116 @@ public sealed class CaptureSetupService
         psi.ArgumentList.Add("cap_net_raw,cap_net_admin+eip");
         psi.ArgumentList.Add(binary);
         return await RunAndCheckAsync(psi);
+    }
+
+    // Linux quick path: re-exec the AppImage as root via pkexec, forwarding the X session so the GUI
+    // still draws, then the caller shuts the unprivileged instance down. Returns false if there is no
+    // AppImage to relaunch, or if pkexec exits with an error (cancelled auth) within the grace window
+    // so the caller does NOT close the app and leave the user with nothing.
+    public async Task<bool> RelaunchLinuxAsRootAsync()
+    {
+        try
+        {
+            var appImage = Environment.GetEnvironmentVariable("APPIMAGE");
+            if (string.IsNullOrEmpty(appImage)) return false;
+
+            var psi = new ProcessStartInfo("pkexec") { UseShellExecute = false };
+            psi.ArgumentList.Add("env");
+            var display = Environment.GetEnvironmentVariable("DISPLAY");
+            var xauth = Environment.GetEnvironmentVariable("XAUTHORITY");
+            if (!string.IsNullOrEmpty(display)) psi.ArgumentList.Add($"DISPLAY={display}");
+            if (!string.IsNullOrEmpty(xauth)) psi.ArgumentList.Add($"XAUTHORITY={xauth}");
+            psi.ArgumentList.Add(appImage);
+            psi.ArgumentList.Add("--appimage-extract-and-run");
+
+            using var proc = Process.Start(psi);
+            if (proc == null) return false;
+
+            // pkexec stays alive as the parent of the (long-running) root app; if the user cancels
+            // the auth dialog it exits quickly with a non-zero code. Wait briefly to tell the two
+            // apart before the caller decides whether to quit.
+            await Task.Delay(2500);
+            return !(proc.HasExited && proc.ExitCode != 0);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    // Linux persistent no-sudo path. AppImages run from a nosuid FUSE mount where file capabilities
+    // are ignored, so extract the payload to a stable on-disk location, setcap the real apphost there
+    // (one pkexec auth), and add a menu entry pointing at it. A non-AppImage build (dev/installed) can
+    // setcap its running binary directly. Returns false on any failure; caller shows the manual steps.
+    public async Task<bool> SetupLinuxNoSudoCaptureAsync()
+    {
+        try
+        {
+            var appImage = Environment.GetEnvironmentVariable("APPIMAGE");
+            if (string.IsNullOrEmpty(appImage))
+                return await GrantLinuxCaptureAsync();   // already on disk: just setcap it
+
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var libDir = Path.Combine(home, ".local", "lib");
+            var targetDir = Path.Combine(libDir, "AlbionPacketExplorer");
+            Directory.CreateDirectory(libDir);
+
+            // --appimage-extract always writes ./squashfs-root in the working dir. Extract straight
+            // into ~/.local/lib (same filesystem) so the rename to targetDir cannot cross devices.
+            var extracted = Path.Combine(libDir, "squashfs-root");
+            if (Directory.Exists(extracted)) Directory.Delete(extracted, recursive: true);
+            if (!await RunInDirAsync(libDir, appImage, "--appimage-extract")) return false;
+            if (!Directory.Exists(extracted)) return false;
+
+            if (Directory.Exists(targetDir)) Directory.Delete(targetDir, recursive: true);
+            Directory.Move(extracted, targetDir);
+
+            var apphost = Directory
+                .EnumerateFiles(targetDir, "AlbionPacketExplorer", SearchOption.AllDirectories)
+                .FirstOrDefault(p => Path.GetFileName(p) == "AlbionPacketExplorer");
+            if (apphost == null) return false;
+
+            if (!await RunWaitAsync("pkexec", "setcap", "cap_net_raw,cap_net_admin+eip", apphost))
+                return false;
+
+            WriteLinuxDesktopEntry(home, targetDir, apphost);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static void WriteLinuxDesktopEntry(string home, string targetDir, string apphost)
+    {
+        try
+        {
+            var appsDir = Path.Combine(home, ".local", "share", "applications");
+            Directory.CreateDirectory(appsDir);
+
+            var icon = Directory
+                .EnumerateFiles(targetDir, "*.png", SearchOption.AllDirectories)
+                .FirstOrDefault(p => Path.GetFileNameWithoutExtension(p)
+                    .Contains("icon", StringComparison.OrdinalIgnoreCase));
+
+            var entry =
+                "[Desktop Entry]\n" +
+                "Type=Application\n" +
+                "Name=Albion Packet Explorer\n" +
+                $"Exec=\"{apphost}\"\n" +
+                (icon != null ? $"Icon={icon}\n" : "") +
+                "Categories=Network;Utility;\n" +
+                "Terminal=false\n";
+
+            var desktopPath = Path.Combine(appsDir, "albionpacketexplorer.desktop");
+            File.WriteAllText(desktopPath, entry);
+            _ = RunWaitAsync("update-desktop-database", appsDir);   // best effort; ignore result
+        }
+        catch
+        {
+            // A missing menu entry is not fatal; the setcap binary still runs.
+        }
     }
 
     // True when running as an AppImage: setcap cannot be applied to the FUSE-mounted binary, so the
@@ -127,5 +287,24 @@ public sealed class CaptureSetupService
         {
             return false;
         }
+    }
+
+    private static Task<bool> RunWaitAsync(string file, params string[] args)
+    {
+        var psi = new ProcessStartInfo(file) { UseShellExecute = false, CreateNoWindow = true };
+        foreach (var a in args) psi.ArgumentList.Add(a);
+        return RunAndCheckAsync(psi);
+    }
+
+    private static Task<bool> RunInDirAsync(string workingDir, string file, params string[] args)
+    {
+        var psi = new ProcessStartInfo(file)
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = workingDir,
+        };
+        foreach (var a in args) psi.ArgumentList.Add(a);
+        return RunAndCheckAsync(psi);
     }
 }
