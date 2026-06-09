@@ -462,7 +462,7 @@ public partial class MainViewModel : ObservableObject
     {
         ResetData();
 
-        _session = new CaptureSession(OnLivePacket, msg => StatusText = msg, OnRawPacket);
+        _session = new CaptureSession(OnLivePacketBatch, msg => StatusText = msg, OnRawPacket);
 
         try
         {
@@ -721,16 +721,22 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private void OnLivePacket(PacketEntry packet)
+    // Live packets arrive as a batch (CaptureSession buffers them on the capture thread and posts
+    // one batch per timer tick on the UI thread), so touching the bound collections here is safe.
+    private void OnLivePacketBatch(IReadOnlyList<PacketEntry> batch)
     {
-        _capturedPackets.Add(packet);
-        _allPackets.Add(packet);
-        Aggregator.Ingest(packet);
-        _correlator.Observe(packet);
-        PacketList.AddLivePacket(packet);
+        foreach (var packet in batch)
+        {
+            _capturedPackets.Add(packet);
+            _allPackets.Add(packet);
+            Aggregator.Ingest(packet);
+            _correlator.Observe(packet);
+            // Keep per-packet so PacketList's cached Kind counts stay correct.
+            PacketList.AddLivePacket(packet);
+        }
 
-        if (_capturedPackets.Count % 100 == 0)
-            Aggregator.Flush();
+        // One flush per batch instead of the old every-100-packets cadence.
+        Aggregator.Flush();
     }
 
     private void ResetData()
