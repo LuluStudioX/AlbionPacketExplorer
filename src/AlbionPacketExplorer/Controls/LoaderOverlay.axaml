@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:gif="using:Avalonia.Labs.Gif"
+             x:Class="AlbionPacketExplorer.Controls.LoaderOverlay">
+    <!-- Dim backdrop + centered animated GIF. Opacity/hit-testing are driven from code-behind off
+         IsActive; the inline Opacity transition gives the fade in/out. -->
+    <Border Name="Backdrop" Background="#B0000000" Opacity="0" IsHitTestVisible="False">
+        <Border.Transitions>
+            <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.28" Easing="CubicEaseInOut" />
+            </Transitions>
+        </Border.Transitions>
+        <gif:GifImage Name="Gif"
+                      Width="180" Stretch="Uniform"
+                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Border>
+</UserControl>

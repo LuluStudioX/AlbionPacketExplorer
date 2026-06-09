@@ -1,0 +1,242 @@
+<controls:ApxWindow xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:controls="clr-namespace:AlbionPacketExplorer.Controls"
+                xmlns:vm="using:AlbionPacketExplorer.ViewModels"
+                x:Class="AlbionPacketExplorer.Views.ToolsWindow"
+                x:DataType="vm:ToolsViewModel"
+                Title="Tools"
+                Icon="/Assets/app-icon.ico"
+                Width="920" Height="660"
+                MinWidth="720" MinHeight="520"
+                CanResize="True"
+                WindowStartupLocation="CenterOwner">
+
+    <Grid RowDefinitions="Auto,*,Auto" Background="{DynamicResource Apx.Bg}">
+
+        <!-- ═══════════ HEADER + STEPPER ═══════════ -->
+        <Border Grid.Row="0" Background="{DynamicResource Apx.Surface}"
+                BorderBrush="{DynamicResource Apx.Border}" BorderThickness="0,0,0,1" Padding="16,12">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Path Classes="icon" Data="{StaticResource Icon.Layers}"
+                              Stroke="{DynamicResource Apx.Accent}" VerticalAlignment="Center" />
+                        <TextBlock Text="Packet Tools" FontSize="16" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Apx.Text}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="Merge capture files into one NDJSON, verify it round-trips, then load it."
+                               FontSize="12" Foreground="{DynamicResource Apx.TextMuted}" />
+                </StackPanel>
+
+                <!-- Step indicator: a green check lights up as each step completes. -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Border CornerRadius="10" Padding="10,4" Background="{DynamicResource Apx.Highlight}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="1 Merge" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Apx.Text}" VerticalAlignment="Center" />
+                            <Path Classes="icon sm" Data="{StaticResource Icon.Check}"
+                                  Stroke="{DynamicResource Apx.Success}" IsVisible="{Binding Merged}" />
+                        </StackPanel>
+                    </Border>
+                    <Path Classes="icon sm muted" Data="{StaticResource Icon.ChevronRight}" VerticalAlignment="Center" />
+                    <Border CornerRadius="10" Padding="10,4" Background="{DynamicResource Apx.Highlight}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="2 Verify" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Apx.Text}" VerticalAlignment="Center" />
+                            <Path Classes="icon sm" Data="{StaticResource Icon.Check}"
+                                  Stroke="{DynamicResource Apx.Success}" IsVisible="{Binding Verified}" />
+                        </StackPanel>
+                    </Border>
+                    <Path Classes="icon sm muted" Data="{StaticResource Icon.ChevronRight}" VerticalAlignment="Center" />
+                    <Border CornerRadius="10" Padding="10,4" Background="{DynamicResource Apx.Highlight}">
+                        <TextBlock Text="3 Load" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Apx.Text}" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════ BODY: inputs | results ═══════════ -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,2,*" Margin="16,12">
+
+            <!-- INPUTS -->
+            <DockPanel Grid.Column="0">
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                    <TextBlock Grid.Column="0" Text="Inputs" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Apx.Text}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                        <Button Classes="ghost" Command="{Binding AddFilesCommand}" Padding="8,5"
+                                ToolTip.Tip="Add capture files">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Path Classes="icon sm" Data="{StaticResource Icon.FileCode}" />
+                                <TextBlock Text="Files" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Classes="ghost" Command="{Binding AddFolderCommand}" Padding="8,5"
+                                ToolTip.Tip="Add every *.json in a folder">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Path Classes="icon sm" Data="{StaticResource Icon.FolderOpen}" />
+                                <TextBlock Text="Folder" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Classes="iconbtn" Command="{Binding ClearInputsCommand}" Padding="5"
+                                ToolTip.Tip="Remove all inputs">
+                            <Path Classes="icon sm" Data="{StaticResource Icon.Trash}" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Output row -->
+                <Grid DockPanel.Dock="Bottom" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
+                    <TextBlock Grid.Row="0" Text="Output" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Apx.Text}" Margin="0,0,0,4" />
+                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto">
+                        <TextBox Grid.Column="0" Text="{Binding OutputPath}" PlaceholderText="packets-merged.json"
+                                 VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <Button Grid.Column="1" Classes="ghost" Command="{Binding BrowseOutputCommand}" Padding="10,7"
+                                Margin="0,0,6,0" ToolTip.Tip="Choose where the merged file is written">
+                            <TextBlock Text="Browse" />
+                        </Button>
+                        <Button Grid.Column="2" Classes="ghost" Command="{Binding OpenExistingCommand}" Padding="10,7"
+                                ToolTip.Tip="Point at an existing merged file to verify or load">
+                            <TextBlock Text="Open..." />
+                        </Button>
+                    </Grid>
+                </Grid>
+
+                <Border Background="{DynamicResource Apx.Surface}" CornerRadius="4"
+                        BorderBrush="{DynamicResource Apx.Border}" BorderThickness="1">
+                    <Panel>
+                        <ListBox ItemsSource="{Binding Inputs}" Background="Transparent"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ToolsInputItem">
+                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                        <StackPanel Grid.Column="0" Spacing="1">
+                                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"
+                                                       Foreground="{DynamicResource Apx.Text}" />
+                                            <TextBlock Text="{Binding SizeText}" FontSize="11"
+                                                       Foreground="{DynamicResource Apx.TextFaint}" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding Status}" FontSize="12"
+                                                   VerticalAlignment="Center" Margin="8,0"
+                                                   Foreground="{DynamicResource Apx.Accent}" />
+                                        <Button Grid.Column="2" Classes="iconbtn" Padding="4"
+                                                Command="{Binding $parent[ListBox].((vm:ToolsViewModel)DataContext).RemoveInputCommand}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="Remove">
+                                            <Path Classes="icon sm" Data="{StaticResource Icon.X}" />
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <controls:EmptyState Icon="{StaticResource Icon.FileCode}"
+                                             Title="No inputs yet"
+                                             Message="Add capture files or a folder to merge."
+                                             IsHitTestVisible="False"
+                                             IsVisible="{Binding !HasInputs}" />
+                    </Panel>
+                </Border>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+            <!-- RESULTS / LOG -->
+            <DockPanel Grid.Column="2" Margin="10,0,0,0">
+                <TextBlock DockPanel.Dock="Top" Text="Results" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Apx.Text}" Margin="0,0,0,8" />
+
+                <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,8">
+                    <TextBlock Text="{Binding MergeSummary}" FontSize="12"
+                               Foreground="{DynamicResource Apx.TextMuted}" TextWrapping="Wrap"
+                               IsVisible="{Binding MergeSummary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                    <TextBlock Text="{Binding VerifySummary}" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Apx.Text}" TextWrapping="Wrap"
+                               IsVisible="{Binding VerifySummary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </StackPanel>
+
+                <Border Background="{DynamicResource Apx.Surface}" CornerRadius="4"
+                        BorderBrush="{DynamicResource Apx.Border}" BorderThickness="1" Padding="8">
+                    <ScrollViewer>
+                        <TextBlock Text="{Binding Log}" FontFamily="Cascadia Code,Consolas,monospace"
+                                   FontSize="12" Foreground="{DynamicResource Apx.TextMuted}"
+                                   TextWrapping="NoWrap" />
+                    </ScrollViewer>
+                </Border>
+            </DockPanel>
+        </Grid>
+
+        <!-- ═══════════ FOOTER: progress + actions ═══════════ -->
+        <Border Grid.Row="2" Background="{DynamicResource Apx.Surface}"
+                BorderBrush="{DynamicResource Apx.Border}" BorderThickness="0,1,0,0" Padding="16,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <controls:ApxSpinner Width="16" Height="16" IsVisible="{Binding IsBusy}" />
+                    <ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Width="220"
+                                 Height="6" VerticalAlignment="Center" IsVisible="{Binding IsBusy}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Button Classes="ghost" Name="CloseButton" Click="OnCloseClicked" Padding="12,8">
+                        <TextBlock Text="Close" />
+                    </Button>
+                    <Button Classes="accent" Command="{Binding MergeCommand}" Padding="14,8"
+                            ToolTip.Tip="Merge needs at least 2 files. Verify runs automatically after.">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Path Classes="icon sm" Data="{StaticResource Icon.Layers}" Stroke="#FFFFFF" />
+                            <TextBlock Text="Merge" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="accent" Command="{Binding VerifyCommand}" Padding="14,8">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Path Classes="icon sm" Data="{StaticResource Icon.Check}" Stroke="#FFFFFF" />
+                            <TextBlock Text="Verify" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="success" Command="{Binding LoadCommand}" Padding="14,8">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Path Classes="icon sm" Data="{StaticResource Icon.Upload}" Stroke="#FFFFFF" />
+                            <TextBlock Text="Load" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Loader overlay: covers the tools window while merge/verify runs -->
+        <controls:LoaderOverlay Grid.Row="0" Grid.RowSpan="3" IsActive="{Binding IsBusy}" />
+
+        <!-- ═══════════ DELETE-SOURCES PROMPT (shown only after a verified merge) ═══════════ -->
+        <Border Grid.Row="0" Grid.RowSpan="3" ZIndex="10" Background="#99000000"
+                IsVisible="{Binding ShowDeletePrompt}">
+            <Border Background="{DynamicResource Apx.Card}" BorderBrush="{DynamicResource Apx.Border}"
+                    BorderThickness="1" CornerRadius="8" Padding="20" MaxWidth="480"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Classes="icon" Data="{StaticResource Icon.Trash}"
+                              Stroke="{DynamicResource Apx.Danger}" VerticalAlignment="Center" />
+                        <TextBlock Text="Delete merged sources?" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Apx.Text}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding DeletePromptText}" TextWrapping="Wrap"
+                               Foreground="{DynamicResource Apx.TextMuted}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                        <Button Classes="ghost" Command="{Binding KeepSourcesCommand}" Padding="12,8">
+                            <TextBlock Text="No, keep" />
+                        </Button>
+                        <Button Classes="accent" Command="{Binding LoadThenDeleteSourcesCommand}" Padding="12,8">
+                            <TextBlock Text="Load first, then delete" Foreground="#FFFFFF" />
+                        </Button>
+                        <Button Classes="danger" Command="{Binding DeleteSourcesCommand}" Padding="12,8">
+                            <TextBlock Text="Yes, delete" Foreground="#FFFFFF" />
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+
+</controls:ApxWindow>
