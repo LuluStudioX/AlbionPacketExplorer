@@ -622,27 +622,36 @@ public partial class MainViewModel : ObservableObject
         var raws = new List<byte[]>();
         try
         {
-            var parser = new RawAlbionParser();
-            parser.PacketReceived += loaded.Add;
-            foreach (var line in await File.ReadAllLinesAsync(path))
+            // Decode + ingest off the UI thread: aggregator map, correlator and the local lists are
+            // not bound, so mutating them here is safe. Only the finalization touches bound state.
+            await Task.Run(async () =>
             {
-                if (string.IsNullOrWhiteSpace(line)) continue;
-                byte[] payload;
-                try { payload = Convert.FromBase64String(line.Trim()); } catch { continue; }
-                raws.Add(payload);
-                try { parser.ReceivePacket(payload); } catch { /* skip undecodable */ }
-            }
+                var parser = new RawAlbionParser();
+                parser.PacketReceived += loaded.Add;
+                foreach (var line in await File.ReadAllLinesAsync(path))
+                {
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    byte[] payload;
+                    try { payload = Convert.FromBase64String(line.Trim()); } catch { continue; }
+                    raws.Add(payload);
+                    try { parser.ReceivePacket(payload); } catch { /* skip undecodable */ }
+                }
 
-            foreach (var pe in loaded) { Aggregator.Ingest(pe); _correlator.Observe(pe); }
-            Aggregator.Flush();
-            lock (_rawLock) _rawPackets.AddRange(raws);
-            _allPackets.AddRange(loaded);
-            PacketList.SetSource(loaded);
-            NotifySaveCommands();
-            var fileName = Path.GetFileName(path);
-            var count = loaded.Count.ToString("N0");
-            StatusText = Loc.Format("status.loaded", count, fileName);
-            _toasts.Show(Loc.T("toast.fileLoaded.title"), Loc.Format("toast.fileLoaded.body", count, fileName), ToastSeverity.Success);
+                foreach (var pe in loaded) { Aggregator.Ingest(pe); _correlator.Observe(pe); }
+            });
+
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Aggregator.Flush();
+                lock (_rawLock) _rawPackets.AddRange(raws);
+                _allPackets.AddRange(loaded);
+                PacketList.SetSource(loaded);
+                NotifySaveCommands();
+                var fileName = Path.GetFileName(path);
+                var count = loaded.Count.ToString("N0");
+                StatusText = Loc.Format("status.loaded", count, fileName);
+                _toasts.Show(Loc.T("toast.fileLoaded.title"), Loc.Format("toast.fileLoaded.body", count, fileName), ToastSeverity.Success);
+            });
         }
         catch (Exception ex)
         {
@@ -671,23 +680,32 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await foreach (var packet in reader.ReadAsync(path, progress))
+            // Parse + ingest off the UI thread. The reader's Progress<double> was created on the UI
+            // thread, so LoadProgress updates still marshal automatically. Aggregator map, correlator
+            // and the local list are not bound, so mutating them here is safe.
+            await Task.Run(async () =>
             {
-                Aggregator.Ingest(packet);
-                _correlator.Observe(packet);
-                loaded.Add(packet);
-            }
+                await foreach (var packet in reader.ReadAsync(path, progress))
+                {
+                    Aggregator.Ingest(packet);
+                    _correlator.Observe(packet);
+                    loaded.Add(packet);
+                }
+            });
 
-            Aggregator.Flush();
-            _allPackets.AddRange(loaded);
-            PacketList.SetSource(loaded);
-            NotifySaveCommands();
-            var fileName = Path.GetFileName(path);
-            var loadedCount = loaded.Count.ToString("N0");
-            StatusText = Loc.Format("status.loaded", loadedCount, fileName);
-            _toasts.Show(Loc.T("toast.fileLoaded.title"),
-                Loc.Format("toast.fileLoaded.body", loadedCount, fileName),
-                ToastSeverity.Success);
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Aggregator.Flush();
+                _allPackets.AddRange(loaded);
+                PacketList.SetSource(loaded);
+                NotifySaveCommands();
+                var fileName = Path.GetFileName(path);
+                var loadedCount = loaded.Count.ToString("N0");
+                StatusText = Loc.Format("status.loaded", loadedCount, fileName);
+                _toasts.Show(Loc.T("toast.fileLoaded.title"),
+                    Loc.Format("toast.fileLoaded.body", loadedCount, fileName),
+                    ToastSeverity.Success);
+            });
         }
         catch (Exception ex)
         {
