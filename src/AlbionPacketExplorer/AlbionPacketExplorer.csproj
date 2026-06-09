@@ -12,6 +12,14 @@
     <Win32Resource Condition="'$(OS)'=='Windows_NT'">app.res</Win32Resource>
     <UseAppHost>true</UseAppHost>
     <SelfContained>false</SelfContained>
+    <!-- GC tuning: favor a low, releasable footprint without aggressive constant collection.
+         Workstation GC = lower memory (default, made explicit); background/concurrent GC keeps
+         pauses low so filtering/scrolling stay smooth; RetainVM=false returns freed heap segments
+         to the OS instead of holding them. Deliberately NOT setting GC.ConserveMemory: it forces
+         frequent gen2 collections that would re-introduce interactive lag. -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <RetainVMGarbageCollection>false</RetainVMGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>
