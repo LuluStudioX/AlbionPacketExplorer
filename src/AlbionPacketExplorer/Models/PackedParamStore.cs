@@ -308,9 +308,20 @@ public sealed class PackedParamStore : IDisposable
                 w.WriteByte(KindLong);
                 w.WriteLong(l);
                 break;
+            // Widen the narrower integer types to Int64 so typed numeric arrays (Byte[], Int16[],
+            // Int32[]) round-trip as numbers. Live capture yields byte/short/int elements here; without
+            // this they fall to the default branch and get stringified, breaking hex/GUID rendering.
+            case byte or sbyte or short or ushort or int or uint:
+                w.WriteByte(KindLong);
+                w.WriteLong(Convert.ToInt64(value, System.Globalization.CultureInfo.InvariantCulture));
+                break;
             case double d:
                 w.WriteByte(KindDouble);
                 w.WriteLong(BitConverter.DoubleToInt64Bits(d));
+                break;
+            case float f:
+                w.WriteByte(KindDouble);
+                w.WriteLong(BitConverter.DoubleToInt64Bits(f));
                 break;
             case bool bo:
                 w.WriteByte(KindBool);
