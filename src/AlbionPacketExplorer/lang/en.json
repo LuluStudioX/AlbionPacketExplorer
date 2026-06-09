@@ -34,6 +34,7 @@
   "toolbar.resume": "Resume",
   "toolbar.resume.tip": "Resume capture into the same session.",
   "toolbar.settings.tip": "Open settings.",
+  "toolbar.tools.tip": "Merge and verify packet capture files.",
   "toolbar.layout.tip": "Switch between side-by-side and stacked layout. (F5)",
   "toolbar.resetLayout.tip": "Reset panel sizes to default.",
   "toolbar.save": "Save",

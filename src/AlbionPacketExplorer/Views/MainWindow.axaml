@@ -84,6 +84,11 @@
 
                 <Separator Width="1" Background="{DynamicResource Apx.Border}" Margin="4,0" />
 
+                <Button Classes="iconbtn" Name="ToolsButton" Click="OnToolsClicked" Margin="0,0,4,0"
+                        ToolTip.Tip="{loc:T toolbar.tools.tip}">
+                    <Path Classes="icon" Data="{StaticResource Icon.Layers}" />
+                </Button>
+
                 <Button Classes="iconbtn" Name="SettingsButton" Click="OnSettingsClicked" Margin="0,0,4,0"
                         ToolTip.Tip="{loc:T toolbar.settings.tip}">
                     <Path Classes="icon" Data="{StaticResource Icon.Settings}" />
@@ -293,6 +298,9 @@
         </Border>
 
     </Grid>
+
+    <!-- Loader overlay: covers the workspace during slow (>1s) loads, fades in then out -->
+    <controls:LoaderOverlay IsActive="{Binding ShowLoader}" />
 
     <!-- Toast overlay -->
     <controls:ApxToastHost Manager="{Binding ToastManager}"
