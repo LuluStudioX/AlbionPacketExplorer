@@ -475,6 +475,9 @@ public partial class MainWindow : ApxWindow, IFilePicker
             if (top?.Launcher is { } launcher && Uri.TryCreate(url, UriKind.Absolute, out var uri))
                 _ = launcher.LaunchUriAsync(uri);
         };
+        // A successful one-click grant (mac/linux) makes a device openable; re-scan so the picker
+        // reflects it and the next Start succeeds.
+        dialogVm.AccessGranted += () => vm.RefreshDevicesCommand.Execute(null);
 
         var win = new CapturePermissionWindow(dialogVm);
         await win.ShowDialog(this);
