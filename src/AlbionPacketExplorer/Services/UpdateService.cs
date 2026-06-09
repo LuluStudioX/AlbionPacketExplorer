@@ -1,4 +1,7 @@
+using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Velopack;
 using Velopack.Sources;
 
@@ -47,14 +50,76 @@ public sealed class UpdateService
         {
             var info = await _mgr.CheckForUpdatesAsync();
             if (info == null) return new UpdateCheckResult(null, null);
-            return new UpdateCheckResult(
-                info.TargetFullRelease.Version.ToString(), null, info.TargetFullRelease.NotesMarkdown);
+
+            // Prefer the full changelog across every skipped version; fall back to the target's own
+            // notes when the feed lists a single release or can't be read.
+            var notes = await BuildAggregatedNotesAsync(info)
+                        ?? info.TargetFullRelease.NotesMarkdown;
+            return new UpdateCheckResult(info.TargetFullRelease.Version.ToString(), null, notes);
         }
         catch (Exception ex)
         {
             return new UpdateCheckResult(null, ex.Message);
         }
     }
+
+    // Concatenate the release notes of every Full release newer than the installed version, up to and
+    // including the target, newest first. A multi-version jump (e.g. v0.12.0 -> v0.12.3) then shows
+    // every intermediate version's changelog instead of only the latest. Returns null (caller falls
+    // back to the target notes) when the feed is unreachable, lists one release, or yields nothing.
+    private async Task<string?> BuildAggregatedNotesAsync(UpdateInfo info)
+    {
+        try
+        {
+            var current = ParseVersion(_mgr.CurrentVersion?.ToString());
+            var target = ParseVersion(info.TargetFullRelease.Version.ToString());
+            if (target == null) return null;
+
+            var url = $"{FeedUrl.TrimEnd('/')}/releases.{CurrentChannel()}.json";
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            await using var stream = await http.GetStreamAsync(url);
+            var feed = await JsonSerializer.DeserializeAsync<FeedDocument>(stream, FeedJson);
+            if (feed?.Assets is not { Count: > 1 }) return null;
+
+            var blocks = feed.Assets
+                .Where(a => string.Equals(a.Type, "Full", StringComparison.OrdinalIgnoreCase))
+                .Where(a => !string.IsNullOrWhiteSpace(a.NotesMarkdown))
+                .Select(a => (Version: ParseVersion(a.Version), a.NotesMarkdown))
+                .Where(a => a.Version != null
+                            && a.Version <= target
+                            && (current == null || a.Version > current))
+                .OrderByDescending(a => a.Version)
+                .Select(a => a.NotesMarkdown!.Trim())
+                .ToList();
+
+            var combined = string.Join("\n\n", blocks);
+            return string.IsNullOrWhiteSpace(combined) ? null : combined;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    // Compare on the numeric core only; released tags are clean X.Y.Z, and a stray pre-release/build
+    // suffix should not break ordering.
+    private static Version? ParseVersion(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var core = raw.Split('-', '+')[0];
+        return Version.TryParse(core, out var v) ? v : null;
+    }
+
+    private static readonly JsonSerializerOptions FeedJson = new() { PropertyNameCaseInsensitive = true };
+
+    // Minimal shape of Velopack's releases.<channel>.json: only the fields needed to aggregate notes.
+    private sealed record FeedDocument(
+        [property: JsonPropertyName("Assets")] List<FeedAsset>? Assets);
+
+    private sealed record FeedAsset(
+        [property: JsonPropertyName("Version")] string? Version,
+        [property: JsonPropertyName("Type")] string? Type,
+        [property: JsonPropertyName("NotesMarkdown")] string? NotesMarkdown);
 
     // Downloads and applies update, then restarts the app.
     public async Task ApplyUpdateAsync(IProgress<int>? progress = null)
