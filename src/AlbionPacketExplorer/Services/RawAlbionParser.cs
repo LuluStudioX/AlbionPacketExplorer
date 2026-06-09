@@ -40,12 +40,14 @@ public sealed class RawAlbionParser : IPacketReceiver
     {
         if (code < 0) return;
 
-        var @params = new Dictionary<string, ParamValue>(parameters.Count);
+        // Photon parameter keys are distinct bytes, so pack straight into the array (no dedupe needed).
+        var entries = new KeyValuePair<string, ParamValue>[parameters.Count];
+        int i = 0;
         foreach (var (k, v) in parameters)
             // Reuse the shared "0".."255" key and intern the type name so both dedupe across packets.
-            @params[ParamKeys.Get(k)] = new ParamValue(string.Intern(GetTypeName(v)), v);
+            entries[i++] = new KeyValuePair<string, ParamValue>(ParamKeys.Get(k), new ParamValue(string.Intern(GetTypeName(v)), v));
 
-        PacketReceived?.Invoke(new PacketEntry(DateTime.UtcNow, string.Intern(kind), code, @params,
+        PacketReceived?.Invoke(new PacketEntry(DateTime.UtcNow, string.Intern(kind), code, new ParamSet(entries),
             returnCode, string.IsNullOrEmpty(debugMessage) ? null : debugMessage));
     }
 
