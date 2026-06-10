@@ -6,7 +6,9 @@ name: digest-sync
 
 on:
   schedule:
-    - cron: "0 9 * * *"
+    # Every 2 hours during the beta (few dev users, low volume; a no-op run costs ~30s of
+    # the 2000 free private-repo minutes/month). Relax to daily once volume grows.
+    - cron: "0 */2 * * *"
   workflow_dispatch:
 
 permissions:
