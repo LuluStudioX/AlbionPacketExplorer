@@ -10,7 +10,14 @@ namespace AlbionPacketExplorer.Services;
 /// </summary>
 public static class PacketWire
 {
-    public static Dictionary<string, object?> ToJsonShape(PacketEntry p)
+    public static Dictionary<string, object?> ToJsonShape(PacketEntry p) => ToJsonShape(p, p.Params);
+
+    /// <summary>
+    /// Shape a packet using an explicitly supplied param set. The merge path passes the ParamSet the
+    /// reader just parsed, so serialization never re-decodes the mmap store - and because the set is
+    /// an immutable value, many packets can be shaped in parallel.
+    /// </summary>
+    public static Dictionary<string, object?> ToJsonShape(PacketEntry p, ParamSet ps)
     {
         var wire = new Dictionary<string, object?>(6)
         {
@@ -20,7 +27,7 @@ public static class PacketWire
         };
         if (p.ReturnCode is { } rc) wire["returnCode"] = rc;
         if (!string.IsNullOrEmpty(p.DebugMessage)) wire["debugMessage"] = p.DebugMessage;
-        wire["params"] = p.Params.ToDictionary(
+        wire["params"] = ps.ToDictionary(
             kv => kv.Key,
             kv => (object)new { type = kv.Value.Type, value = kv.Value.Value });
         return wire;
