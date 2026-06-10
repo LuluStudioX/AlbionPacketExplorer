@@ -7,9 +7,11 @@
  *                     requester identity.
  * GET  /v1/digests  - admin only (Authorization: Bearer <ADMIN_KEY>): returns every stored
  *                     digest with its metadata, for the repo's scheduled sync workflow.
+ * DELETE /v1/digest/<key> - admin only: removes one entry. The sync workflow uses this to
+ *                     clear entries it has already archived in the repo, keeping storage lean.
  *
- * Entries expire on their own (TTL), so no consumer ever needs to drain the namespace;
- * archives dedupe by the content hash embedded in the key.
+ * Entries also expire on their own (60-day TTL) as a backstop, and a full KV (storage or
+ * write budget) degrades to a clean 503 instead of an unhandled error.
  */
 
 const MAX_BODY_BYTES = 2 * 1024 * 1024; // a full "all codes" digest stays well under this
@@ -26,6 +28,10 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/v1/digests") {
       return listDigests(request, env);
+    }
+
+    if (request.method === "DELETE" && url.pathname.startsWith("/v1/digest/")) {
+      return deleteDigest(request, env, url);
     }
 
     if (request.method !== "POST" || url.pathname !== "/v1/digest") {
@@ -72,19 +78,38 @@ export default {
     // an existing entry; reads are 100x cheaper than writes on the free tier).
     const existing = await env.DIGESTS.get(key, { type: "stream" });
     if (existing === null) {
-      await env.DIGESTS.put(key, body, {
-        expirationTtl: TTL_SECONDS,
-        metadata: {
-          receivedAt: new Date().toISOString(),
-          app: String(digest.app).slice(0, 64),
-          codes: digest.codes.length,
-        },
-      });
+      try {
+        await env.DIGESTS.put(key, body, {
+          expirationTtl: TTL_SECONDS,
+          metadata: {
+            receivedAt: new Date().toISOString(),
+            app: String(digest.app).slice(0, 64),
+            codes: digest.codes.length,
+          },
+        });
+      } catch {
+        // KV write budget or storage exhausted: tell the client to retry later instead of
+        // surfacing an opaque 1101. The sync workflow's archive+delete keeps this rare.
+        return json({ ok: false, error: "storage busy, try again later" }, 503);
+      }
     }
 
     return json({ ok: true, id: hash.slice(0, 12) });
   },
 };
+
+async function deleteDigest(request, env, url) {
+  const auth = request.headers.get("Authorization") ?? "";
+  if (!env.ADMIN_KEY || auth !== `Bearer ${env.ADMIN_KEY}`) {
+    return json({ ok: false, error: "unauthorized" }, 401);
+  }
+  const key = decodeURIComponent(url.pathname.slice("/v1/digest/".length));
+  if (!key.startsWith("d:")) {
+    return json({ ok: false, error: "bad key" }, 400);
+  }
+  await env.DIGESTS.delete(key);
+  return json({ ok: true });
+}
 
 async function listDigests(request, env) {
   const auth = request.headers.get("Authorization") ?? "";
