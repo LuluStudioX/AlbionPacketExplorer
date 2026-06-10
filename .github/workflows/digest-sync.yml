@@ -1,0 +1,87 @@
+# Machine-independent digest sync: fetches user-shared schema digests from the apx-digest
+# Worker, archives new ones in the repo, folds them into the packet schema, and opens a PR.
+# Runs without any local machine: the only secret is the Worker admin key.
+# No artifacts are ever uploaded (repo policy).
+name: digest-sync
+
+on:
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch digests from worker
+        env:
+          ADMIN_KEY: ${{ secrets.APX_DIGEST_ADMIN_KEY }}
+        run: |
+          curl -sf -H "Authorization: Bearer $ADMIN_KEY" \
+            https://apx-digest.workpressfail2ban.workers.dev/v1/digests > /tmp/digests.json
+
+      - name: Archive new digests
+        id: archive
+        run: |
+          python3 - <<'EOF'
+          import json, os, pathlib
+          docs = json.load(open('/tmp/digests.json'))
+          outdir = pathlib.Path('tools/digest-worker/digests')
+          outdir.mkdir(parents=True, exist_ok=True)
+          new = 0
+          for d in docs:
+              parts = d['key'].split(':')  # d:<schemaCommit>:<mode>:<sha256>
+              if len(parts) != 4:
+                  continue
+              f = outdir / f"{parts[1]}-{parts[2]}-{parts[3][:12]}.json"
+              if not f.exists():
+                  f.write_text(json.dumps(d['body'], separators=(',', ':')) + '\n', encoding='utf-8')
+                  new += 1
+          print(f"stored {len(docs)} total, {new} new")
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write(f"new={new}\n")
+          EOF
+
+      - name: Rebuild digest overlay + schema
+        if: steps.archive.outputs.new != '0'
+        run: |
+          python3 tools/build-inference-overlay.py --out tools/digest-overlay.json \
+            tools/digest-worker/digests/*.json
+          python3 tools/generate-schema.py
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.archive.outputs.new != '0'
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build gate
+        if: steps.archive.outputs.new != '0'
+        run: dotnet build AlbionPacketExplorer.slnx -clp:ErrorsOnly
+
+      - name: Open PR
+        if: steps.archive.outputs.new != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW: ${{ steps.archive.outputs.new }}
+        run: |
+          BRANCH="digest-sync/$(date -u +%Y%m%d-%H%M)"
+          git config user.name "apx-digest-sync"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add tools/digest-worker/digests tools/digest-overlay.json \
+                  src/AlbionPacketExplorer/Assets/packet-schema.base.json
+          if git diff --staged --quiet; then
+            echo "Nothing changed after fold; skipping PR."
+            exit 0
+          fi
+          git commit -m "packet(app): fold $NEW shared digest(s) into schema"
+          git push -u origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "packet(app): fold $NEW shared digest(s) into schema" \
+            --body "Automated digest sync from the apx-digest worker. Review the schema diff, then merge. Digest archive: tools/digest-worker/digests/."
