@@ -26,6 +26,12 @@ public sealed class PacketSchemaService
     private Dictionary<string, PacketTypeSchema> _base = new();
     private Dictionary<string, PacketTypeSchema> _user = new();
 
+    /// <summary>From the embedded base schema's "$schemaMeta" block; empty when absent.</summary>
+    public string SchemaVersion { get; private set; } = string.Empty;
+
+    /// <summary>SAT source commit the base schema was generated from; empty when absent.</summary>
+    public string SchemaCommit { get; private set; } = string.Empty;
+
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -36,6 +42,28 @@ public sealed class PacketSchemaService
     {
         _base = await LoadEmbeddedBaseAsync();
         _user = await LoadUserAsync();
+        LoadMeta();
+    }
+
+    // The "$schemaMeta" entry does not fit PacketTypeSchema, so it is read in a second
+    // lightweight pass over the embedded resource.
+    private void LoadMeta()
+    {
+        try
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            var resName = asm.GetManifestResourceNames()
+                .FirstOrDefault(n => n.EndsWith("packet-schema.base.json"));
+            if (resName == null) return;
+
+            using var stream = asm.GetManifestResourceStream(resName)!;
+            using var doc = JsonDocument.Parse(stream);
+            if (!doc.RootElement.TryGetProperty("$schemaMeta", out var meta)) return;
+
+            if (meta.TryGetProperty("schemaVersion", out var v)) SchemaVersion = v.GetString() ?? "";
+            if (meta.TryGetProperty("sourceCommit", out var c)) SchemaCommit = c.GetString() ?? "";
+        }
+        catch { /* meta is optional */ }
     }
 
     private static async Task<Dictionary<string, PacketTypeSchema>> LoadEmbeddedBaseAsync()
