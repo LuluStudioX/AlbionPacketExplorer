@@ -67,15 +67,28 @@ public partial class CodeAggregatorViewModel : ObservableObject
     public ToastService? Toasts { get; set; }
     public PacketSchemaService? Schema { get; set; }
 
-    public void Ingest(PacketEntry packet)
+    public void Ingest(PacketEntry packet) => Ingest(packet, packet.Params);
+
+    /// <summary>
+    /// Ingest with the params already materialized. The file-load path hands over the ParamSet it
+    /// just parsed, so ingest never round-trips through <see cref="PackedParamStore.Decode"/> for
+    /// bytes it encoded a moment earlier.
+    /// </summary>
+    public void Ingest(PacketEntry packet, ParamSet ps)
     {
         var stats = GetOrCreateStats(packet.Kind, packet.Code);
         stats.Count++;
-        UpdateKeyStats(stats, packet);
+        UpdateKeyStats(stats, ps);
     }
 
     public void Flush()
     {
+        // TotalPackets (the presence-percent denominator) is only read when rows render, so it is
+        // refreshed once per flush instead of the old O(keys) pass on every single Ingest.
+        foreach (var s in _map.Values)
+            foreach (var ks in s.Keys.Values)
+                ks.TotalPackets = s.Count;
+
         ApplyFilter();
         UpdateCoverage();
         UpdateGap();
@@ -259,9 +272,9 @@ public partial class CodeAggregatorViewModel : ObservableObject
         return stats;
     }
 
-    private static void UpdateKeyStats(CodeStats stats, PacketEntry packet)
+    private static void UpdateKeyStats(CodeStats stats, ParamSet ps)
     {
-        foreach (var (paramKey, paramVal) in packet.Params)
+        foreach (var (paramKey, paramVal) in ps)
         {
             if (paramKey == "252" || paramKey == "253") continue;
             var ks = GetOrCreateKeyStats(stats, paramKey);
@@ -286,9 +299,6 @@ public partial class CodeAggregatorViewModel : ObservableObject
                 ks.NumericMax = ks.NumericMax is { } mx ? Math.Max(mx, d) : d;
             }
         }
-
-        foreach (var ks in stats.Keys.Values)
-            ks.TotalPackets = stats.Count;
     }
 
     private static double? ToDouble(object? v) => v switch
