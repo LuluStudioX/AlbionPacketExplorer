@@ -310,6 +310,6 @@ jobs:
           curl -fsS -X POST \
             -H "Authorization: Bearer $HUB_DISPATCH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/Lulu195/lulustudio-hub/dispatches \
+            https://api.github.com/repos/LuluStudioX/lulustudio-hub/dispatches \
             -d '{"event_type":"apx-release"}'
           echo "dispatched apx-release to the hub"
