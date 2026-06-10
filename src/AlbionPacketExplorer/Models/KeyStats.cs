@@ -69,6 +69,22 @@ public class KeyStats
     };
 
     /// <summary>
+    /// The single rule for what keys <see cref="ValueCounts"/>: scalars count by their raw boxed
+    /// value (the box already exists in the ParamSet; boxed primitives hash/compare by value, so
+    /// the load hot path formats nothing), arrays/dicts by their formatted string so identical
+    /// contents still dedupe, nulls by the "(null)" marker (dictionary keys cannot be null).
+    /// Shared by the aggregator's per-packet pass and the parallel per-batch partials so both
+    /// produce identical buckets.
+    /// </summary>
+    public static object CountKeyFor(ParamValue pv) => pv.Value switch
+    {
+        null => "(null)",
+        long or int or short or byte or sbyte or ushort or uint
+            or double or float or bool or string => pv.Value,
+        _ => Services.PacketDisplayFormatter.FormatParamValue(pv)
+    };
+
+    /// <summary>
     /// Best-effort guess at what the field represents, from its observed types and value spread.
     /// Hints only (the curated schema is authoritative); meant to speed annotation.
     /// </summary>
