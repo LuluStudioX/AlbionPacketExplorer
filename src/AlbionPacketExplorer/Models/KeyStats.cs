@@ -1,5 +1,65 @@
 namespace AlbionPacketExplorer.Models;
 
+/// <summary>
+/// A value-type key for <see cref="KeyStats.ValueCounts"/>. Replaces the old <c>object</c> key so the
+/// load hot path never hashes/compares a boxed primitive (16M+ lookups per big load): scalars carry
+/// their bits inline (numbers in <c>_num</c>, doubles as their bit pattern, bools as 0/1), only
+/// strings and array/dict reprs hold a reference. Display formatting happens once, at render.
+/// </summary>
+public readonly struct StatKey : IEquatable<StatKey>
+{
+    private enum Tag : byte { Null, Long, Double, Bool, Text }
+
+    private readonly Tag _tag;
+    private readonly long _num;       // Long value | Double bit pattern | Bool (0/1)
+    private readonly string? _text;   // Text only
+
+    private StatKey(Tag tag, long num, string? text)
+    {
+        _tag = tag;
+        _num = num;
+        _text = text;
+    }
+
+    public static readonly StatKey Null = new(Tag.Null, 0, null);
+    public static StatKey FromLong(long v) => new(Tag.Long, v, null);
+    public static StatKey FromDouble(double v) => new(Tag.Double, BitConverter.DoubleToInt64Bits(v), null);
+    public static StatKey FromBool(bool v) => new(Tag.Bool, v ? 1 : 0, null);
+    public static StatKey FromText(string v) => new(Tag.Text, 0, v);
+
+    /// <summary>The numeric value for min/max tracking, or null when the key is non-numeric.</summary>
+    public double? Numeric => _tag switch
+    {
+        Tag.Long => _num,
+        Tag.Double => BitConverter.Int64BitsToDouble(_num),
+        _ => null
+    };
+
+    public bool Equals(StatKey other) =>
+        _tag == other._tag && _num == other._num && string.Equals(_text, other._text, StringComparison.Ordinal);
+
+    public override bool Equals(object? obj) => obj is StatKey k && Equals(k);
+
+    public override int GetHashCode() =>
+        _tag == Tag.Text ? HashCode.Combine(_tag, _text) : HashCode.Combine(_tag, _num);
+
+    /// <summary>Render this key to display text (matches the old per-type formatting).</summary>
+    public string Display() => _tag switch
+    {
+        Tag.Null => "(null)",
+        Tag.Long => Services.PacketDisplayFormatter.FormatInt64(_num),
+        Tag.Double => FmtDouble(BitConverter.Int64BitsToDouble(_num)),
+        Tag.Bool => _num != 0 ? "True" : "False",
+        Tag.Text => _text ?? "(null)",
+        _ => "(null)"
+    };
+
+    private static string FmtDouble(double d) =>
+        d == Math.Floor(d) && Math.Abs(d) < 1e15
+            ? ((long) d).ToString(System.Globalization.CultureInfo.InvariantCulture)
+            : d.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+}
+
 public class KeyStats
 {
     public string Key { get; set; } = "";
@@ -17,7 +77,7 @@ public class KeyStats
     // (ids, ticks) cannot grow this without bound; once the cap is hit only already-seen values
     // keep counting.
     public const int DistinctCap = 500;
-    public Dictionary<object, int> ValueCounts { get; } = [];
+    public Dictionary<StatKey, int> ValueCounts { get; } = [];
     public bool DistinctCapped { get; set; }
 
     // Numeric range across observed numeric values (null when the field is never numeric).
@@ -30,6 +90,42 @@ public class KeyStats
 
     /// <summary>True when the field only ever held one value (a constant / likely default).</summary>
     public bool IsConstant => !DistinctCapped && ValueCounts.Count == 1;
+
+    /// <summary>
+    /// Folds another partition's stats for the SAME key into this one. Presence, types, value counts
+    /// and numeric range merge exactly; sample values fill up to 5 in arrival order; the distinct cap
+    /// is re-applied as counts combine (so the capped flag and which values are retained can differ
+    /// slightly from a single-threaded run, which only affects the display hints).
+    /// </summary>
+    public void MergeFrom(KeyStats other)
+    {
+        PresenceCount += other.PresenceCount;
+
+        foreach (var t in other.Types)
+            Types.Add(t);
+
+        foreach (var v in other.SampleValues)
+        {
+            if (SampleValues.Count >= 5) break;
+            SampleValues.Add(v);
+        }
+
+        foreach (var (k, c) in other.ValueCounts)
+        {
+            if (ValueCounts.TryGetValue(k, out var existing))
+                ValueCounts[k] = existing + c;
+            else if (ValueCounts.Count < DistinctCap)
+                ValueCounts[k] = c;
+            else
+                DistinctCapped = true;
+        }
+        if (other.DistinctCapped) DistinctCapped = true;
+
+        if (other.NumericMin is { } omn)
+            NumericMin = NumericMin is { } mn ? Math.Min(mn, omn) : omn;
+        if (other.NumericMax is { } omx)
+            NumericMax = NumericMax is { } mx ? Math.Max(mx, omx) : omx;
+    }
 
     public string TypesDisplay => string.Join(", ", Types);
 
@@ -53,36 +149,18 @@ public class KeyStats
             var top = ValueCounts
                 .OrderByDescending(kv => kv.Value)
                 .Take(5)
-                .Select(kv => kv.Value > 1 ? $"{Trim(FormatKey(kv.Key))} x{kv.Value}" : Trim(FormatKey(kv.Key)));
+                .Select(kv => kv.Value > 1 ? $"{Trim(kv.Key.Display())} x{kv.Value}" : Trim(kv.Key.Display()));
             return string.Join("   ", top);
         }
     }
 
-    // Renders a counted key: strings are already display text (raw string values, array reprs and
-    // the "(null)" marker); raw longs get the same ticks-aware formatting the params view uses;
-    // other boxed scalars print as before (ToString matched the old formatter's output for them).
-    private static string FormatKey(object key) => key switch
-    {
-        string s => s,
-        long l => Services.PacketDisplayFormatter.FormatInt64(l),
-        _ => key.ToString() ?? "(null)"
-    };
-
     /// <summary>
-    /// The single rule for what keys <see cref="ValueCounts"/>: scalars count by their raw boxed
-    /// value (the box already exists in the ParamSet; boxed primitives hash/compare by value, so
-    /// the load hot path formats nothing), arrays/dicts by their formatted string so identical
-    /// contents still dedupe, nulls by the "(null)" marker (dictionary keys cannot be null).
-    /// Shared by the aggregator's per-packet pass and the parallel per-batch partials so both
-    /// produce identical buckets.
+    /// The single rule for what keys <see cref="ValueCounts"/>: scalars carry their bits inline in a
+    /// <see cref="StatKey"/> (no boxed hashing on the load hot path), arrays/dicts key by their
+    /// formatted string so identical contents still dedupe, nulls by the "(null)" marker. Shared by
+    /// the aggregator's per-packet pass and the parallel partials so both produce identical buckets.
     /// </summary>
-    public static object CountKeyFor(ParamValue pv) => pv.Value switch
-    {
-        null => "(null)",
-        long or int or short or byte or sbyte or ushort or uint
-            or double or float or bool or string => pv.Value,
-        _ => Services.PacketDisplayFormatter.FormatParamValue(pv)
-    };
+    public static StatKey CountKeyFor(ParamValue pv) => pv.ToStatKey();
 
     /// <summary>
     /// Best-effort guess at what the field represents, from its observed types and value spread.

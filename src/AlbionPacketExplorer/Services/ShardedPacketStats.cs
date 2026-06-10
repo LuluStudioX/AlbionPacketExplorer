@@ -4,30 +4,34 @@ using AlbionPacketExplorer.Models;
 namespace AlbionPacketExplorer.Services;
 
 /// <summary>
-/// Parallel packet-statistics aggregation for the file-load path, exact by construction.
+/// Parallel packet-statistics aggregation for the file-load path.
 ///
-/// <para>Stats for different (kind, code) buckets are fully independent, so packets are routed by a
-/// hash of (kind, code) to one of N shard workers; each shard runs the SAME sequential
-/// <see cref="CodeStatsMap"/> ingest over its disjoint subset of codes, in file order (batches are
-/// fed in file order and each shard's channel is FIFO). The shard results are a disjoint union -
-/// no merging of counts ever happens, so the final state is bit-identical to single-threaded
-/// ingest of the whole file.</para>
+/// <para>The earlier design sharded by a hash of (kind, code) so shards stayed disjoint and could be
+/// unioned without merging. But real captures are heavily skewed - a handful of codes (movement,
+/// etc.) hold most packets - so those codes pinned one or two shards while the rest sat idle (~2 of
+/// 16 cores busy). This version partitions by ARRIVAL instead: each parse batch is handed round-robin
+/// to one of N worker maps, so load spreads evenly across all cores regardless of code skew. Because
+/// a single (kind, code) is now split across workers, the workers' maps overlap and are MERGED at the
+/// end (see <see cref="CodeStatsMap.Merge"/>). Counts, presence, types and numeric range merge
+/// exactly; the capped value set and the 5 sample values can differ slightly from a single-threaded
+/// run when a field is high-cardinality, which is acceptable for these display-only hints.</para>
 /// </summary>
 public sealed class ShardedPacketStats
 {
-    private readonly int _shardCount;
+    private readonly int _workerCount;
     private readonly Channel<List<(string Kind, int Code, ParamSet Params)>>[] _channels;
     private readonly Task<CodeStatsMap>[] _workers;
+    private int _next;
 
-    public ShardedPacketStats(int? shardCount = null)
+    public ShardedPacketStats(int? workerCount = null)
     {
-        // Stats ingest is lighter than parse; a handful of shards is enough to pull it off the
-        // critical path. More shards = more routing lists per batch for little gain.
-        _shardCount = shardCount ?? Math.Clamp(Environment.ProcessorCount / 2, 2, 6);
-        _channels = new Channel<List<(string, int, ParamSet)>>[_shardCount];
-        _workers = new Task<CodeStatsMap>[_shardCount];
+        // Use most of the box for stats; the parse pipeline runs concurrently, so leave a little
+        // headroom rather than oversubscribing every core with stats workers alone.
+        _workerCount = workerCount ?? Math.Clamp(Environment.ProcessorCount - 1, 4, 16);
+        _channels = new Channel<List<(string, int, ParamSet)>>[_workerCount];
+        _workers = new Task<CodeStatsMap>[_workerCount];
 
-        for (int i = 0; i < _shardCount; i++)
+        for (int i = 0; i < _workerCount; i++)
         {
             var channel = Channel.CreateBounded<List<(string, int, ParamSet)>>(new BoundedChannelOptions(8)
             {
@@ -46,29 +50,22 @@ public sealed class ShardedPacketStats
         }
     }
 
-    private int ShardOf(string kind, int code) =>
-        (int)((uint)HashCode.Combine(kind, code) % (uint)_shardCount);
-
     /// <summary>
-    /// Routes one load batch to the shards. Awaited per batch (bounded channels give backpressure),
-    /// and batches must be fed in file order - that is what keeps each shard's per-code stream in
-    /// file order and the result exact.
+    /// Routes one load batch to a worker round-robin. Awaited per batch (bounded channels give
+    /// backpressure). Whole batches go to one worker so the per-worker stream stays in file order,
+    /// which keeps the merged sample values close to a sequential run.
     /// </summary>
     public async ValueTask FeedAsync(IReadOnlyList<(PacketEntry Entry, ParamSet Params)> items)
     {
-        var buckets = new List<(string, int, ParamSet)>?[_shardCount];
+        var list = new List<(string, int, ParamSet)>(items.Count);
         foreach (var (entry, ps) in items)
-        {
-            int s = ShardOf(entry.Kind, entry.Code);
-            (buckets[s] ??= new List<(string, int, ParamSet)>(items.Count)).Add((entry.Kind, entry.Code, ps));
-        }
+            list.Add((entry.Kind, entry.Code, ps));
 
-        for (int i = 0; i < _shardCount; i++)
-            if (buckets[i] is { } b)
-                await _channels[i].Writer.WriteAsync(b);
+        int w = (int)((uint)_next++ % (uint)_workerCount);
+        await _channels[w].Writer.WriteAsync(list);
     }
 
-    /// <summary>Completes all shards and returns their disjoint maps for adoption.</summary>
+    /// <summary>Completes all workers and returns their maps (overlapping; the caller merges them).</summary>
     public async Task<IReadOnlyList<CodeStatsMap>> CompleteAsync()
     {
         foreach (var c in _channels)
@@ -77,8 +74,8 @@ public sealed class ShardedPacketStats
     }
 
     /// <summary>
-    /// Abandons the shards after a failed load: completes the channels and observes the worker
-    /// tasks so nothing is left running or unobserved. Safe to call after CompleteAsync too.
+    /// Abandons the workers after a failed load: completes the channels and observes the tasks so
+    /// nothing is left running or unobserved. Safe to call after CompleteAsync too.
     /// </summary>
     public async Task AbortAsync()
     {

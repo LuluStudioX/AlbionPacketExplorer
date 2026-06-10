@@ -22,13 +22,31 @@ public sealed class CodeStatsMap
     }
 
     /// <summary>
-    /// Adopts another map whose codes are DISJOINT from this one (the shard router guarantees a
-    /// (kind, code) only ever lands on one shard), so adoption is a plain union - no stat merging.
+    /// Merges another map into this one. The arrival-partitioned workers each see a slice of every
+    /// (kind, code), so their maps overlap; merging accumulates counts and key distributions. A
+    /// (kind, code) or key absent here is adopted wholesale (cheap, no copy); when both have it, the
+    /// per-key <see cref="KeyStats.MergeFrom"/> folds the other side in. Merge the workers in worker
+    /// order (0..N) so the kept sample values come from the earliest batches first.
     /// </summary>
-    public void AdoptDisjoint(CodeStatsMap other)
+    public void Merge(CodeStatsMap other)
     {
-        foreach (var (key, stats) in other.Map)
-            Map[key] = stats;
+        foreach (var (key, os) in other.Map)
+        {
+            if (!Map.TryGetValue(key, out var ts))
+            {
+                Map[key] = os;
+                continue;
+            }
+
+            ts.Count += os.Count;
+            foreach (var (paramKey, oks) in os.Keys)
+            {
+                if (ts.Keys.TryGetValue(paramKey, out var tks))
+                    tks.MergeFrom(oks);
+                else
+                    ts.Keys[paramKey] = oks;
+            }
+        }
     }
 
     private static void UpdateKeyStats(CodeStats stats, ParamSet ps)
@@ -47,8 +65,9 @@ public sealed class CodeStatsMap
 
             // Value distribution: count distinct values (capped) and track the numeric range so a
             // field's shape (constant / enum-like / id / range) is visible. The key rule lives in
-            // KeyStats.CountKeyFor; display formatting happens at render in TopValuesDisplay.
-            object repr = KeyStats.CountKeyFor(paramVal);
+            // KeyStats.CountKeyFor; display formatting happens at render in TopValuesDisplay. The
+            // StatKey carries the numeric value inline, so min/max needs no second unbox.
+            StatKey repr = KeyStats.CountKeyFor(paramVal);
             if (ks.ValueCounts.TryGetValue(repr, out var c))
                 ks.ValueCounts[repr] = c + 1;
             else if (ks.ValueCounts.Count < KeyStats.DistinctCap)
@@ -56,22 +75,11 @@ public sealed class CodeStatsMap
             else
                 ks.DistinctCapped = true;
 
-            if (ToDouble(paramVal.Value) is { } d)
+            if (repr.Numeric is { } d)
             {
                 ks.NumericMin = ks.NumericMin is { } mn ? Math.Min(mn, d) : d;
                 ks.NumericMax = ks.NumericMax is { } mx ? Math.Max(mx, d) : d;
             }
         }
     }
-
-    public static double? ToDouble(object? v) => v switch
-    {
-        byte b   => b,
-        short s  => s,
-        int i    => i,
-        long l   => l,
-        float f  => f,
-        double d => d,
-        _        => null
-    };
 }
