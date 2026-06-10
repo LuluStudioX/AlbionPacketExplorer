@@ -1,0 +1,162 @@
+/**
+ * apx-digest: receiver for AlbionPacketExplorer schema digests.
+ *
+ * POST /v1/digest   - validates a digest payload (shape + size), dedupes by content hash,
+ *                     stores it in the DIGESTS KV namespace with a 60-day TTL. No auth:
+ *                     the endpoint accepts nothing but digest-shaped JSON and stores no
+ *                     requester identity.
+ * GET  /v1/digests  - admin only (Authorization: Bearer <ADMIN_KEY>): returns every stored
+ *                     digest with its metadata, for the repo's scheduled sync workflow.
+ *
+ * Entries expire on their own (TTL), so no consumer ever needs to drain the namespace;
+ * archives dedupe by the content hash embedded in the key.
+ */
+
+const MAX_BODY_BYTES = 2 * 1024 * 1024; // a full "all codes" digest stays well under this
+const MAX_CODES = 3000;
+const MAX_KEYS_PER_CODE = 80;
+const MAX_TOP_PER_KEY = 8;
+const MAX_VALUE_LEN = 64;
+const TTL_SECONDS = 60 * 60 * 24 * 60; // 60 days: ample for any sync cadence
+const KINDS = new Set(["EVENT", "REQUEST", "RESPONSE"]);
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+
+    if (request.method === "GET" && url.pathname === "/v1/digests") {
+      return listDigests(request, env);
+    }
+
+    if (request.method !== "POST" || url.pathname !== "/v1/digest") {
+      return json({ ok: false, error: "not found" }, 404);
+    }
+
+    const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+    const { success } = await env.RATE_LIMITER.limit({ key: ip });
+    if (!success) {
+      return json({ ok: false, error: "rate limited" }, 429);
+    }
+
+    const length = Number(request.headers.get("Content-Length") ?? "0");
+    if (length > MAX_BODY_BYTES) {
+      return json({ ok: false, error: "too large" }, 413);
+    }
+
+    let body;
+    try {
+      body = await request.text();
+    } catch {
+      return json({ ok: false, error: "unreadable body" }, 400);
+    }
+    if (body.length > MAX_BODY_BYTES) {
+      return json({ ok: false, error: "too large" }, 413);
+    }
+
+    let digest;
+    try {
+      digest = JSON.parse(body);
+    } catch {
+      return json({ ok: false, error: "invalid json" }, 400);
+    }
+
+    const error = validate(digest);
+    if (error) {
+      return json({ ok: false, error }, 422);
+    }
+
+    const hash = await sha256Hex(body);
+    const key = `d:${digest.schemaCommit || "nocommit"}:${digest.mode}:${hash}`;
+
+    // Same content = same key, so re-submissions are idempotent (no KV write wasted on
+    // an existing entry; reads are 100x cheaper than writes on the free tier).
+    const existing = await env.DIGESTS.get(key, { type: "stream" });
+    if (existing === null) {
+      await env.DIGESTS.put(key, body, {
+        expirationTtl: TTL_SECONDS,
+        metadata: {
+          receivedAt: new Date().toISOString(),
+          app: String(digest.app).slice(0, 64),
+          codes: digest.codes.length,
+        },
+      });
+    }
+
+    return json({ ok: true, id: hash.slice(0, 12) });
+  },
+};
+
+async function listDigests(request, env) {
+  const auth = request.headers.get("Authorization") ?? "";
+  if (!env.ADMIN_KEY || auth !== `Bearer ${env.ADMIN_KEY}`) {
+    return json({ ok: false, error: "unauthorized" }, 401);
+  }
+
+  const out = [];
+  let cursor;
+  do {
+    const page = await env.DIGESTS.list({ cursor });
+    for (const k of page.keys) {
+      const body = await env.DIGESTS.get(k.name, { type: "json" });
+      if (body !== null) {
+        out.push({ key: k.name, metadata: k.metadata ?? {}, body });
+      }
+    }
+    cursor = page.list_complete ? undefined : page.cursor;
+  } while (cursor);
+
+  return json(out);
+}
+
+/** Returns an error string, or null when the payload is a well-formed digest. */
+function validate(d) {
+  if (typeof d !== "object" || d === null || Array.isArray(d)) return "not an object";
+  if (d.v !== 1) return "unsupported version";
+  if (typeof d.app !== "string" || d.app.length > 64) return "bad app";
+  if (typeof d.schemaCommit !== "string" || d.schemaCommit.length > 64) return "bad schemaCommit";
+  if (d.mode !== "unknown" && d.mode !== "all") return "bad mode";
+  if (!Array.isArray(d.codes) || d.codes.length === 0) return "no codes";
+  if (d.codes.length > MAX_CODES) return "too many codes";
+
+  for (const c of d.codes) {
+    if (typeof c !== "object" || c === null) return "bad code entry";
+    if (!KINDS.has(c.kind)) return "bad kind";
+    if (!Number.isInteger(c.code) || c.code < 0 || c.code > 65535) return "bad code";
+    if (!Number.isInteger(c.count) || c.count < 0) return "bad count";
+    if (typeof c.keys !== "object" || c.keys === null) return "bad keys";
+
+    const keys = Object.entries(c.keys);
+    if (keys.length > MAX_KEYS_PER_CODE) return "too many keys";
+
+    for (const [idx, k] of keys) {
+      const i = Number(idx);
+      if (!Number.isInteger(i) || i < 0 || i > 255) return "bad key index";
+      if (typeof k !== "object" || k === null) return "bad key entry";
+      if (!Array.isArray(k.types) || k.types.length > 8) return "bad types";
+      if (!k.types.every((t) => typeof t === "string" && t.length <= 32)) return "bad type name";
+      if (!Number.isInteger(k.present) || k.present < 0) return "bad present";
+      if (k.top !== undefined && k.top !== null) {
+        if (!Array.isArray(k.top) || k.top.length > MAX_TOP_PER_KEY) return "bad top";
+        for (const t of k.top) {
+          if (typeof t !== "object" || t === null) return "bad top entry";
+          if (typeof t.v !== "string" || t.v.length > MAX_VALUE_LEN) return "bad top value";
+          if (!Number.isInteger(t.n) || t.n < 0) return "bad top count";
+        }
+      }
+    }
+  }
+  return null;
+}
+
+async function sha256Hex(text) {
+  const data = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function json(obj, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
