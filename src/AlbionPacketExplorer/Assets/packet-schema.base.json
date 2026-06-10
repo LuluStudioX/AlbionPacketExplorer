@@ -18550,73 +18550,73 @@
         "resolveAs": ""
       },
       "11": {
-        "name": "",
-        "note": "(inferred) Single; 17 distinct; range [1.2e+03..3.16e+03]",
+        "name": "health",
+        "note": "Single; current health (cur==max at join; by value magnitude)",
         "resolveAs": ""
       },
       "12": {
-        "name": "",
-        "note": "(inferred) Single; 17 distinct; range [1.2e+03..3.16e+03]",
+        "name": "maxHealth",
+        "note": "Single; max health",
         "resolveAs": ""
       },
       "14": {
-        "name": "",
-        "note": "(inferred) Single; 19 distinct; range [12..79.1]",
+        "name": "healthRegen",
+        "note": "Single; health regen/sec",
         "resolveAs": ""
       },
       "15": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; high-card; range [639156302454866100..639164359955097336]; likely .NET ticks (UTC)",
+        "name": "healthUpdateTicks",
+        "note": ".NET ticks (UTC); health last-update",
         "resolveAs": ""
       },
       "16": {
-        "name": "",
-        "note": "(inferred) Single; 22 distinct; range [120..483]",
+        "name": "energy",
+        "note": "Single; current energy (by value magnitude)",
         "resolveAs": ""
       },
       "17": {
-        "name": "",
-        "note": "(inferred) Single; 17 distinct; range [120..483]",
+        "name": "maxEnergy",
+        "note": "Single; max energy",
         "resolveAs": ""
       },
       "19": {
-        "name": "",
-        "note": "(inferred) Single; 19 distinct; range [1.5..7]",
+        "name": "energyRegen",
+        "note": "Single; energy regen/sec",
         "resolveAs": ""
       },
       "20": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; high-card; range [639156302454866100..639164359955097336]; likely .NET ticks (UTC)",
+        "name": "energyUpdateTicks",
+        "note": ".NET ticks (UTC); energy last-update",
         "resolveAs": ""
       },
       "21": {
-        "name": "",
-        "note": "(inferred) Single; 82% present; 11 distinct; range [860..3.58e+03]",
+        "name": "mountHealth",
+        "note": "Single; mount health (block present only when mounted, 5/9)",
         "resolveAs": ""
       },
       "22": {
-        "name": "",
-        "note": "(inferred) Single; 82% present; 8 distinct; range [860..3.58e+03]",
+        "name": "maxMountHealth",
+        "note": "Single; max mount health",
         "resolveAs": ""
       },
       "24": {
-        "name": "",
-        "note": "(inferred) Single; 82% present; 7 distinct; range [8.6..35.8]",
+        "name": "mountHealthRegen",
+        "note": "Single; mount health regen/sec",
         "resolveAs": ""
       },
       "25": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; high-card; range [639156302454866100..639164359955097336]; likely .NET ticks (UTC)",
+        "name": "mountUpdateTicks",
+        "note": ".NET ticks (UTC); mount health last-update",
         "resolveAs": ""
       },
       "30": {
-        "name": "",
-        "note": "(inferred) Single; 1 distinct; range [0.116..0.116]",
+        "name": "focusRegen",
+        "note": "Single; focus regen/sec",
         "resolveAs": ""
       },
       "31": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; high-card; range [639156302374009000..639164359951609000]; likely .NET ticks (UTC)",
+        "name": "focusUpdateTicks",
+        "note": ".NET ticks (UTC); focus last-update",
         "resolveAs": ""
       },
       "35": {
@@ -18650,8 +18650,8 @@
         "resolveAs": ""
       },
       "43": {
-        "name": "",
-        "note": "(inferred) Int64[]; 11 distinct; Int64[] array",
+        "name": "reSpecPoints",
+        "note": "Int64[]; [1] = ReSpec points (FixPoint internal)",
         "resolveAs": ""
       },
       "44": {
@@ -18740,13 +18740,13 @@
         "resolveAs": ""
       },
       "66": {
-        "name": "",
-        "note": "(inferred) String; high-card; string value",
+        "name": "previousClusterIndex",
+        "note": "Cluster ref entered before this one (= key 8 of the preceding join)",
         "resolveAs": ""
       },
       "67": {
-        "name": "",
-        "note": "(inferred) String; 1 distinct; string value",
+        "name": "hideoutRef",
+        "note": "@HIDEOUT@<mainCluster>@<guid>; own hideout reference",
         "resolveAs": ""
       },
       "68": {
@@ -18805,13 +18805,13 @@
         "resolveAs": ""
       },
       "81": {
-        "name": "",
-        "note": "(inferred) String; 7 distinct; string value",
+        "name": "cityScopedRef",
+        "note": "guid@cityId; per-city entity reference (role unknown)",
         "resolveAs": ""
       },
       "82": {
-        "name": "",
-        "note": "(inferred) Byte[]; 56% present; 69 distinct; Byte[] array",
+        "name": "mapGuid",
+        "note": "Byte[16]; current cluster GUID (raw form of key 8 @ISLAND@ guid)",
         "resolveAs": ""
       },
       "83": {
@@ -18840,8 +18840,8 @@
         "resolveAs": ""
       },
       "89": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; 1 distinct; range [639223430870000000..639223430870000000]; likely .NET ticks (UTC)",
+        "name": "premiumExpiry",
+        "note": ".NET ticks (UTC); account premium subscription expiry",
         "resolveAs": ""
       },
       "90": {
@@ -18940,8 +18940,8 @@
         "resolveAs": ""
       },
       "117": {
-        "name": "",
-        "note": "(inferred) String; 20 distinct; string value",
+        "name": "mainClusterId",
+        "note": "City/main-cluster id (== @cityId suffix of key 81)",
         "resolveAs": ""
       },
       "118": {
