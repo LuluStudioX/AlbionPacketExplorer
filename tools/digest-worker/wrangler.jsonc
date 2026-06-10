@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "apx-digest",
+  "main": "src/index.js",
+  "compatibility_date": "2026-06-01",
+  "workers_dev": true,
+  "kv_namespaces": [
+    {
+      "binding": "DIGESTS",
+      "id": "bdff7deacc7144c68afbaa09faef3cb8"
+    }
+  ],
+  // Per-IP rate limit: 10 submissions per minute is generous for legitimate use and
+  // keeps abuse inside the free tier's 1000 KV writes/day.
+  "unsafe": {
+    "bindings": [
+      {
+        "name": "RATE_LIMITER",
+        "type": "ratelimit",
+        "namespace_id": "1001",
+        "simple": { "limit": 10, "period": 60 }
+      }
+    ]
+  }
+}
