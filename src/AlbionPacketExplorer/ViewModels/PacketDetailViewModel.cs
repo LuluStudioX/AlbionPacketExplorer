@@ -301,6 +301,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
     partial void OnPacketChanged(PacketEntry? value)
     {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+
         foreach (var r in _allRows) r.IsExpanded = false;
         _filterKey = "";
         _filterType = "";
@@ -321,8 +323,18 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(CorrelatedLabel));
         OnPropertyChanged(nameof(HasBanner));
         OnPropertyChanged(nameof(HasDiff));
+        long t1 = System.Diagnostics.Stopwatch.GetTimestamp();
         BuildDiff();
+        long t2 = System.Diagnostics.Stopwatch.GetTimestamp();
         RebuildRows();
+        long t3 = System.Diagnostics.Stopwatch.GetTimestamp();
+
+        if (Services.AppDiagnostics.VerboseEnabled && value is not null)
+        {
+            double f = System.Diagnostics.Stopwatch.Frequency / 1000.0;
+            Services.AppDiagnostics.Log($"detail: notify {(t1 - t0) / f:F0}ms, "
+                + $"diff {(t2 - t1) / f:F0}ms, rows {(t3 - t2) / f:F0}ms");
+        }
     }
 
     partial void OnRowsChanged(ObservableCollection<ParamRow> value)

@@ -235,6 +235,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenGlossary() => OpenSettingsSectionRequested?.Invoke("Glossary");
 
+    /// <summary>Raised by the hidden Ctrl+Shift+D shortcut to open the diagnostics window.</summary>
+    public event Action? DiagnosticsRequested;
+
+    [RelayCommand]
+    private void OpenDiagnostics() => DiagnosticsRequested?.Invoke();
+
     public SettingsViewModel Settings => new(this);
 
     private void SaveSettings() =>
@@ -707,6 +713,17 @@ public partial class MainViewModel : ObservableObject
         var progress = new Progress<double>(p => LoadProgress = p);
         var loaded = new List<PacketEntry>();
 
+        long fileBytes = 0;
+        try { fileBytes = new FileInfo(path).Length; } catch { }
+        AppDiagnostics.Log($"load start: {Path.GetFileName(path)} ({fileBytes / 1024.0 / 1024.0:F0} MB)");
+
+        // Timing: parse = the off-thread parse/ingest; total = until the async row build finishes
+        // (SetSource kicks BuildRows off, which completes AFTER the UI hand-off returns). The split
+        // tells us whether load time is parse-bound or row-build-bound. Surfaced in the diagnostics
+        // window (Ctrl+Shift+D), not the status bar.
+        var loadSw = System.Diagnostics.Stopwatch.StartNew();
+        TimeSpan parseElapsed = TimeSpan.Zero;
+
         try
         {
             // Parse + ingest off the UI thread. The reader's Progress<double> was created on the UI
@@ -715,20 +732,39 @@ public partial class MainViewModel : ObservableObject
             // code-sharded workers fed in file order (exact same per-packet logic, disjoint codes),
             // so the adopted result is identical to sequential ingest while parse, params encoding
             // and stats counting all run in parallel.
+            // Stage split: swReader = time the reader pipeline takes to hand us the next batch
+            // (worker parse-await + mmap append + PacketEntry build); swConsume = our serial body
+            // (shard feed + correlator + list add). Tells us which side caps the 16-core machine.
+            var swReader = new System.Diagnostics.Stopwatch();
+            var swConsume = new System.Diagnostics.Stopwatch();
+
             await Task.Run(async () =>
             {
                 var shards = new ShardedPacketStats();
                 try
                 {
-                    await foreach (var batch in reader.ReadBatchesAsync(path, progress, _paramStore))
+                    var e = reader.ReadBatchesAsync(path, progress, _paramStore).GetAsyncEnumerator();
+                    try
                     {
-                        await shards.FeedAsync(batch.Items);
-                        foreach (var (packet, _) in batch.Items)
+                        while (true)
                         {
-                            _correlator.Observe(packet);
-                            loaded.Add(packet);
+                            swReader.Start();
+                            bool has = await e.MoveNextAsync();
+                            swReader.Stop();
+                            if (!has) break;
+
+                            swConsume.Start();
+                            var batch = e.Current;
+                            await shards.FeedAsync(batch.Items);
+                            foreach (var (packet, _) in batch.Items)
+                            {
+                                _correlator.Observe(packet);
+                                loaded.Add(packet);
+                            }
+                            swConsume.Stop();
                         }
                     }
+                    finally { await e.DisposeAsync(); }
                     Aggregator.AdoptShards(await shards.CompleteAsync());
                 }
                 catch
@@ -738,10 +774,32 @@ public partial class MainViewModel : ObservableObject
                 }
             });
 
+            parseElapsed = loadSw.Elapsed;
+            var readerMs = swReader.Elapsed;
+            var consumeMs = swConsume.Elapsed;
+
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
             {
                 Aggregator.Flush();
                 _allPackets.AddRange(loaded);
+
+                // Stops on the first row build (UI thread) and reports the parse/build split to the
+                // diagnostics window (Ctrl+Shift+D) so the real load cost is visible without a profiler.
+                var pe = parseElapsed;
+                var rm = readerMs;
+                var cm = consumeMs;
+                var fb = fileBytes;
+                var pkts = loaded.Count;
+                var loadedPath = path;
+                PacketList.FirstBuildDone = () =>
+                {
+                    loadSw.Stop();
+                    PacketList.FirstBuildDone = null;
+                    var total = loadSw.Elapsed;
+                    AppDiagnostics.ReportLoad(new LoadReport(
+                        loadedPath, fb, pkts, total, pe, rm, cm, Build: total - pe));
+                };
+
                 PacketList.SetSource(loaded);
                 NotifySaveCommands();
                 var fileName = Path.GetFileName(path);
