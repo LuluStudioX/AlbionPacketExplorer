@@ -1,4 +1,4 @@
-using AlbionPacketExplorer.Models;
+﻿using AlbionPacketExplorer.Models;
 using AlbionPacketExplorer.Network;
 using AlbionPacketExplorer.Services;
 using Avalonia.Input.Platform;
@@ -39,7 +39,9 @@ public partial class CodeAggregatorViewModel : ObservableObject
 
     public CodeStats? SelectedCode => SelectedRow?.Stats;
 
-    private readonly Dictionary<(string Kind, int Code), CodeStats> _map = [];
+    // The single ingest implementation lives in CodeStatsMap (shared with the sharded load path).
+    private readonly CodeStatsMap _stats = new();
+    private Dictionary<(string Kind, int Code), CodeStats> Map => _stats.Map;
     private readonly CodeNotesStore _notes = new();
 
     public CodeAggregatorViewModel() => _notes.Load();
@@ -74,18 +76,25 @@ public partial class CodeAggregatorViewModel : ObservableObject
     /// just parsed, so ingest never round-trips through <see cref="PackedParamStore.Decode"/> for
     /// bytes it encoded a moment earlier.
     /// </summary>
-    public void Ingest(PacketEntry packet, ParamSet ps)
+    public void Ingest(PacketEntry packet, ParamSet ps) => _stats.Ingest(packet.Kind, packet.Code, ps);
+
+    /// <summary>
+    /// Adopts the disjoint per-shard maps produced by <see cref="ShardedPacketStats"/> at the end
+    /// of a file load. Each (kind, code) lives on exactly one shard and was ingested there by the
+    /// same <see cref="CodeStatsMap"/> code in file order, so the union is bit-identical to
+    /// per-packet <see cref="Ingest"/> of the whole file.
+    /// </summary>
+    public void AdoptShards(IReadOnlyList<CodeStatsMap> shards)
     {
-        var stats = GetOrCreateStats(packet.Kind, packet.Code);
-        stats.Count++;
-        UpdateKeyStats(stats, ps);
+        foreach (var shard in shards)
+            _stats.AdoptDisjoint(shard);
     }
 
     public void Flush()
     {
         // TotalPackets (the presence-percent denominator) is only read when rows render, so it is
         // refreshed once per flush instead of the old O(keys) pass on every single Ingest.
-        foreach (var s in _map.Values)
+        foreach (var s in Map.Values)
             foreach (var ks in s.Keys.Values)
                 ks.TotalPackets = s.Count;
 
@@ -101,7 +110,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
         var known = Schema?.GetKnownCodes();
         if (known == null || known.Count == 0) { GapText = ""; _unseen = []; OnPropertyChanged(nameof(HasUnseen)); CopyUnseenCommand.NotifyCanExecuteChanged(); return; }
 
-        var seen = _map.Keys.ToHashSet();
+        var seen = Map.Keys.ToHashSet();
         var seenKnown = known.Count(k => seen.Contains((k.Kind, k.Code)));
         _unseen = known.Where(k => !seen.Contains((k.Kind, k.Code)))
                        .OrderBy(k => k.Kind).ThenBy(k => k.Code).ToList();
@@ -127,12 +136,12 @@ public partial class CodeAggregatorViewModel : ObservableObject
     // many byte keys have a curated param name. Surfaces how much annotation work remains.
     private void UpdateCoverage()
     {
-        if (_map.Count == 0) { CoverageText = ""; return; }
+        if (Map.Count == 0) { CoverageText = ""; return; }
 
-        var codes = _map.Count;
-        var named = _map.Values.Count(s => !string.IsNullOrEmpty(PacketNameResolver.Resolve(s.Kind, s.Code)));
+        var codes = Map.Count;
+        var named = Map.Values.Count(s => !string.IsNullOrEmpty(PacketNameResolver.Resolve(s.Kind, s.Code)));
         int totalKeys = 0, annotatedKeys = 0;
-        foreach (var s in _map.Values)
+        foreach (var s in Map.Values)
             foreach (var k in s.Keys.Values)
             {
                 totalKeys++;
@@ -148,7 +157,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
 
     private void ApplyFilter()
     {
-        var filtered = _map.Values
+        var filtered = Map.Values
             .Where(s =>
                 FilterHelper.Matches(_filterKind, s.Kind) &&
                 FilterHelper.Matches(_filterCode, s.Code.ToString()) &&
@@ -167,7 +176,7 @@ public partial class CodeAggregatorViewModel : ObservableObject
 
     public void Reset()
     {
-        _map.Clear();
+        Map.Clear();
         CodeStats.Clear();
         SelectedRow = null;
         CoverageText = "";
@@ -261,75 +270,4 @@ public partial class CodeAggregatorViewModel : ObservableObject
         NoteDraft = value?.Stats is { } st ? _notes.Get(st.Kind, st.Code) : "";
     }
 
-    private CodeStats GetOrCreateStats(string kind, int code)
-    {
-        var key = (kind, code);
-        if (!_map.TryGetValue(key, out var stats))
-        {
-            stats = new CodeStats { Kind = kind, Code = code };
-            _map[key] = stats;
-        }
-        return stats;
-    }
-
-    private static void UpdateKeyStats(CodeStats stats, ParamSet ps)
-    {
-        foreach (var (paramKey, paramVal) in ps)
-        {
-            if (paramKey == "252" || paramKey == "253") continue;
-            var ks = GetOrCreateKeyStats(stats, paramKey);
-            ks.PresenceCount++;
-            ks.Types.Add(paramVal.Type);
-            if (ks.SampleValues.Count < 5)
-                ks.SampleValues.Add(paramVal.Value);
-
-            // Value distribution: count distinct values (capped) and track the numeric range so a
-            // field's shape (constant / enum-like / id / range) is visible. Scalars are counted by
-            // their raw boxed value (the box already exists in the ParamSet, and boxed primitives
-            // hash/compare by value), so the load hot path formats nothing; arrays/dicts fall back
-            // to the formatted string so identical contents still land in one bucket. Display
-            // formatting happens once at render in KeyStats.TopValuesDisplay.
-            object repr = paramVal.Value switch
-            {
-                // Dictionary keys cannot be null; the literal matches the old formatted marker.
-                null => "(null)",
-                long or int or short or byte or sbyte or ushort or uint
-                    or double or float or bool or string => paramVal.Value,
-                _ => PacketDisplayFormatter.FormatParamValue(paramVal)
-            };
-            if (ks.ValueCounts.TryGetValue(repr, out var c))
-                ks.ValueCounts[repr] = c + 1;
-            else if (ks.ValueCounts.Count < KeyStats.DistinctCap)
-                ks.ValueCounts[repr] = 1;
-            else
-                ks.DistinctCapped = true;
-
-            if (ToDouble(paramVal.Value) is { } d)
-            {
-                ks.NumericMin = ks.NumericMin is { } mn ? Math.Min(mn, d) : d;
-                ks.NumericMax = ks.NumericMax is { } mx ? Math.Max(mx, d) : d;
-            }
-        }
-    }
-
-    private static double? ToDouble(object? v) => v switch
-    {
-        byte b   => b,
-        short s  => s,
-        int i    => i,
-        long l   => l,
-        float f  => f,
-        double d => d,
-        _        => null
-    };
-
-    private static KeyStats GetOrCreateKeyStats(CodeStats stats, string paramKey)
-    {
-        if (!stats.Keys.TryGetValue(paramKey, out var ks))
-        {
-            ks = new KeyStats { Key = paramKey };
-            stats.Keys[paramKey] = ks;
-        }
-        return ks;
-    }
 }

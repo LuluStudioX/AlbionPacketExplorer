@@ -711,15 +711,30 @@ public partial class MainViewModel : ObservableObject
         {
             // Parse + ingest off the UI thread. The reader's Progress<double> was created on the UI
             // thread, so LoadProgress updates still marshal automatically. Aggregator map, correlator
-            // and the local list are not bound, so mutating them here is safe. The reader hands over
-            // each packet's freshly parsed ParamSet so ingest never decodes the store it just wrote.
+            // and the local list are not bound, so mutating them here is safe. Stats ingest runs on
+            // code-sharded workers fed in file order (exact same per-packet logic, disjoint codes),
+            // so the adopted result is identical to sequential ingest while parse, params encoding
+            // and stats counting all run in parallel.
             await Task.Run(async () =>
             {
-                await foreach (var (packet, ps) in reader.ReadWithParamsAsync(path, progress, _paramStore))
+                var shards = new ShardedPacketStats();
+                try
                 {
-                    Aggregator.Ingest(packet, ps);
-                    _correlator.Observe(packet);
-                    loaded.Add(packet);
+                    await foreach (var batch in reader.ReadBatchesAsync(path, progress, _paramStore))
+                    {
+                        await shards.FeedAsync(batch.Items);
+                        foreach (var (packet, _) in batch.Items)
+                        {
+                            _correlator.Observe(packet);
+                            loaded.Add(packet);
+                        }
+                    }
+                    Aggregator.AdoptShards(await shards.CompleteAsync());
+                }
+                catch
+                {
+                    await shards.AbortAsync();
+                    throw;
                 }
             });
 
