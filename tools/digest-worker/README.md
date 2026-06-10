@@ -21,6 +21,17 @@ packet schema.
   whitelisted game identifiers). The worker stores no IP or requester identity; metadata
   is receivedAt + app version + code count.
 
+## Automation (machine-independent)
+
+`.github/workflows/digest-sync.yml` runs daily at 09:00 UTC (and on manual dispatch):
+fetches digests via `GET /v1/digests` (Bearer `ADMIN_KEY`), archives new ones under
+`digests/`, rebuilds `tools/digest-overlay.json`, regenerates the schema, build-gates,
+and opens a PR. Needs no local machine. KV entries expire after 60 days on their own.
+
+The admin key exists only as a Worker secret + the repo secret `APX_DIGEST_ADMIN_KEY`.
+To rotate: generate a random string, then
+`npx wrangler secret put ADMIN_KEY` and `gh secret set APX_DIGEST_ADMIN_KEY --body <key>`.
+
 ## Operations
 
 ```powershell
