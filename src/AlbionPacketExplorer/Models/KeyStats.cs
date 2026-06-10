@@ -10,10 +10,14 @@ public class KeyStats
     public List<object?> SampleValues { get; } = [];
 
     // ── Value distribution (populated by the aggregator) ──────────────────────────────
-    // Stringified value -> times seen. Capped so a high-cardinality field (ids, ticks) cannot
-    // grow this without bound; once the cap is hit only already-seen values keep counting.
+    // Value -> times seen. Scalar values (numbers, bools, strings) are keyed by their raw boxed
+    // value so the load path never formats them; arrays/dicts are keyed by their formatted string
+    // so identical contents still dedupe (raw references never would). Formatting of the retained
+    // entries happens only at render time in TopValuesDisplay. Capped so a high-cardinality field
+    // (ids, ticks) cannot grow this without bound; once the cap is hit only already-seen values
+    // keep counting.
     public const int DistinctCap = 500;
-    public Dictionary<string, int> ValueCounts { get; } = [];
+    public Dictionary<object, int> ValueCounts { get; } = [];
     public bool DistinctCapped { get; set; }
 
     // Numeric range across observed numeric values (null when the field is never numeric).
@@ -49,10 +53,20 @@ public class KeyStats
             var top = ValueCounts
                 .OrderByDescending(kv => kv.Value)
                 .Take(5)
-                .Select(kv => kv.Value > 1 ? $"{Trim(kv.Key)} x{kv.Value}" : Trim(kv.Key));
+                .Select(kv => kv.Value > 1 ? $"{Trim(FormatKey(kv.Key))} x{kv.Value}" : Trim(FormatKey(kv.Key)));
             return string.Join("   ", top);
         }
     }
+
+    // Renders a counted key: strings are already display text (raw string values, array reprs and
+    // the "(null)" marker); raw longs get the same ticks-aware formatting the params view uses;
+    // other boxed scalars print as before (ToString matched the old formatter's output for them).
+    private static string FormatKey(object key) => key switch
+    {
+        string s => s,
+        long l => Services.PacketDisplayFormatter.FormatInt64(l),
+        _ => key.ToString() ?? "(null)"
+    };
 
     /// <summary>
     /// Best-effort guess at what the field represents, from its observed types and value spread.
