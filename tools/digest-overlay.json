@@ -1,0 +1,419 @@
+{
+ "$meta": {
+  "source": "AlbionPacketExplorer capture inference",
+  "captures": [
+   "4ac7ba3e-unknown-a4c7851fcc5c.json"
+  ],
+  "note": "Lowest-precedence fill. Every param is (inferred) from wire shape."
+ },
+ "EVENT:44": {
+  "count": 1542,
+  "params": {
+   "0": {
+    "name": "objectId",
+    "note": "(inferred) Int64; high-card; range [2365..1100101]; high-cardinality id at key 0",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "vector",
+    "note": "(inferred) Single[]; high-card; Single[]",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Int32; high-card; range [6..4000]",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) Int64; high-card; range [1904..1096581]",
+    "resolveAs": ""
+   },
+   "4": {
+    "name": "",
+    "note": "(inferred) Boolean; 28% present; 1 distinct",
+    "resolveAs": ""
+   },
+   "5": {
+    "name": "timestamp",
+    "note": "(inferred) Int64; high-card; range [6.39156096e+17..6.39164736e+17]; likely .NET ticks (UTC)",
+    "resolveAs": ""
+   },
+   "6": {
+    "name": "",
+    "note": "(inferred) Byte[]; high-card; Byte[] array",
+    "resolveAs": ""
+   },
+   "9": {
+    "name": "",
+    "note": "(inferred) Int16[]/Int32[]; 9% present; 29 distinct; Int16[] array",
+    "resolveAs": ""
+   },
+   "11": {
+    "name": "",
+    "note": "(inferred) Boolean; 0% present; 1 distinct",
+    "resolveAs": ""
+   },
+   "12": {
+    "name": "",
+    "note": "(inferred) Boolean; 22% present; 1 distinct",
+    "resolveAs": ""
+   },
+   "13": {
+    "name": "",
+    "note": "(inferred) Byte[]; 20% present; 46 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "14": {
+    "name": "",
+    "note": "(inferred) Byte[]; 52% present; high-card; Byte[] array",
+    "resolveAs": ""
+   },
+   "15": {
+    "name": "",
+    "note": "(inferred) Int32; 38% present; 60 distinct; range [1721..102222]",
+    "resolveAs": ""
+   },
+   "17": {
+    "name": "flags",
+    "note": "(inferred) Byte; 4 distinct; range [0..255]; small enum/flag byte",
+    "resolveAs": ""
+   },
+   "18": {
+    "name": "flags",
+    "note": "(inferred) Byte; 4 distinct; range [0..3]; small enum/flag byte",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:62": {
+  "count": 2182,
+  "params": {
+   "0": {
+    "name": "objectId",
+    "note": "(inferred) Int64; high-card; range [128..3043944]; high-cardinality id at key 0",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Int32; high-card; range [260087..81595810]",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Int64; high-card; range [128..3043944]",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) Int64; high-card; range [31428..8700000000]",
+    "resolveAs": ""
+   },
+   "4": {
+    "name": "",
+    "note": "(inferred) Int64; 0% present; 4 distinct; range [53865..212625]",
+    "resolveAs": ""
+   },
+   "5": {
+    "name": "",
+    "note": "(inferred) Int64; 42% present; high-card; range [900..12870900]",
+    "resolveAs": ""
+   },
+   "7": {
+    "name": "",
+    "note": "(inferred) Boolean; 13% present; 1 distinct",
+    "resolveAs": ""
+   },
+   "8": {
+    "name": "",
+    "note": "(inferred) Int64; 9 distinct; range [10000..37800]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:337": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [10897..10897]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [4209516..4209516]",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [1..1]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:361": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) String; 1 distinct; string value",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) String; 1 distinct; string value",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:597": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [26..26]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "REQUEST:157": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [101..101]",
+    "resolveAs": ""
+   },
+   "4": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [0..0]",
+    "resolveAs": ""
+   },
+   "5": {
+    "name": "",
+    "note": "(inferred) String; 1 distinct; string value",
+    "resolveAs": ""
+   },
+   "6": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [28..28]",
+    "resolveAs": ""
+   },
+   "255": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [201..201]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "REQUEST:427": {
+  "count": 3,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) String; 2 distinct; string value",
+    "resolveAs": ""
+   },
+   "255": {
+    "name": "",
+    "note": "(inferred) Int32; 3 distinct; range [947..949]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "REQUEST:438": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "255": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [200..200]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "RESPONSE:157": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) String[]; 1 distinct; String[] array",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Int16[]; 1 distinct; Int16[] array",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) Int16[]; 1 distinct; Int16[] array",
+    "resolveAs": ""
+   },
+   "4": {
+    "name": "",
+    "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+    "resolveAs": ""
+   },
+   "5": {
+    "name": "",
+    "note": "(inferred) String[]; 1 distinct; String[] array",
+    "resolveAs": ""
+   },
+   "255": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [201..201]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "RESPONSE:422": {
+  "count": 6,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) String; 3 distinct; string value",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) String; 3 distinct; string value",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) Int32; 67% present; 2 distinct; range [1..14]",
+    "resolveAs": ""
+   },
+   "4": {
+    "name": "",
+    "note": "(inferred) Int32; 67% present; 2 distinct; range [12..13]",
+    "resolveAs": ""
+   },
+   "6": {
+    "name": "",
+    "note": "(inferred) String[]; 3 distinct; String[] array",
+    "resolveAs": ""
+   },
+   "7": {
+    "name": "",
+    "note": "(inferred) Byte[]; 4 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "8": {
+    "name": "",
+    "note": "(inferred) Byte[]; 4 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "9": {
+    "name": "",
+    "note": "(inferred) String[]; 3 distinct; String[] array",
+    "resolveAs": ""
+   },
+   "10": {
+    "name": "",
+    "note": "(inferred) String[]; 3 distinct; String[] array",
+    "resolveAs": ""
+   },
+   "11": {
+    "name": "",
+    "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "12": {
+    "name": "",
+    "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "13": {
+    "name": "",
+    "note": "(inferred) Byte[]; 4 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "14": {
+    "name": "",
+    "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "15": {
+    "name": "",
+    "note": "(inferred) String[]; 50% present; 2 distinct; String[] array",
+    "resolveAs": ""
+   },
+   "16": {
+    "name": "",
+    "note": "(inferred) Byte[]; 50% present; 3 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "17": {
+    "name": "",
+    "note": "(inferred) Byte[]; 50% present; 3 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "255": {
+    "name": "",
+    "note": "(inferred) Int32; 5 distinct; range [463..958]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "RESPONSE:427": {
+  "count": 3,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int16; 1 distinct; range [0..0]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "255": {
+    "name": "",
+    "note": "(inferred) Int32; 3 distinct; range [947..949]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "RESPONSE:438": {
+  "count": 1,
+  "params": {
+   "255": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [200..200]",
+    "resolveAs": ""
+   }
+  }
+ }
+}
