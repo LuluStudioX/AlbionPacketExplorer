@@ -334,6 +334,12 @@ public partial class PacketListViewModel : ObservableObject
 
     public event Action<PacketRow>? ScrollToRowRequested;
 
+    // Fires once on the UI thread the first time rows are assigned after a SetSource, so the load
+    // path can measure the full perceived load (parse + the async row build that SetSource kicks off
+    // and which finishes after LoadFileAsync's UI hand-off returns).
+    public Action? FirstBuildDone;
+    private bool _reportFirstBuild;
+
     /// <summary>Raised when the user asks to diff two selected packets (left, right in pick order).</summary>
     public event Action<PacketEntry, PacketEntry>? DiffRequested;
 
@@ -531,6 +537,7 @@ public partial class PacketListViewModel : ObservableObject
             }
         }
 
+        _reportFirstBuild = true;
         ApplyFilter();
     }
 
@@ -726,6 +733,12 @@ public partial class PacketListViewModel : ObservableObject
         OnPropertyChanged(nameof(CountText));
         OnPropertyChanged(nameof(CanSortColumns));
         NotifyStatusCounts();
+
+        if (_reportFirstBuild)
+        {
+            _reportFirstBuild = false;
+            FirstBuildDone?.Invoke();
+        }
     }
 
     /// <summary>

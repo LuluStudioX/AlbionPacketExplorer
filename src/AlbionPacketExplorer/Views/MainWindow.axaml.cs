@@ -161,6 +161,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.PropertyChanged += OnViewModelPropertyChanged;
             vm.ShortcutsChanged += ApplyShortcuts;
             vm.OpenSettingsSectionRequested += OpenSettings;
+            vm.DiagnosticsRequested += OnDiagnosticsRequested;
             vm.UpdateAvailableRequested += OnUpdateAvailableRequested;
             vm.CapturePermissionHelpRequested += OnCapturePermissionHelpRequested;
             ApplyEffectiveSidebar();
@@ -390,6 +391,10 @@ public partial class MainWindow : ApxWindow, IFilePicker
     {
         ApplyLayout(LayoutState.Default);
         LayoutStore.Save(LayoutState.Default);
+        // Drop the cached table height too: OnContentDetachChanged restores _savedContentTopHeight
+        // onto row 0, so a stale (large) value would otherwise clobber the reset and push the detail
+        // panel out of view.
+        _savedContentTopHeight = LayoutState.Default.TopPanelHeight;
         // ApplyLayout rebuilds the row definitions, so re-collapse any currently-detached panels.
         OnSidebarDetachChanged(this, EventArgs.Empty);
         OnContentDetachChanged(this, EventArgs.Empty);
@@ -405,6 +410,12 @@ public partial class MainWindow : ApxWindow, IFilePicker
         AddBinding(vm.SidebarToggleGesture, "F5", vm.ToggleSidebarCommand);
         AddBinding(vm.AutoSelectNewestGesture, "Ctrl+L", vm.ToggleAutoSelectNewestCommand);
         AddBinding(vm.ToggleRowExpandGesture, "Space", vm.ToggleRowExpandCommand);
+        // Fixed (non-configurable) diagnostics shortcut.
+        KeyBindings.Add(new KeyBinding
+        {
+            Gesture = KeyGesture.Parse("Ctrl+Shift+D"),
+            Command = vm.OpenDiagnosticsCommand,
+        });
     }
 
     private void AddBinding(string? gestureText, string fallback, System.Windows.Input.ICommand command)
@@ -521,6 +532,23 @@ public partial class MainWindow : ApxWindow, IFilePicker
         _toolsWindow = new ToolsWindow(tvm);
         _toolsWindow.Closed += (_, _) => _toolsWindow = null;
         _toolsWindow.Show(this);
+    }
+
+    private DiagnosticsWindow? _diagnosticsWindow;
+
+    // Diagnostics is a single-instance dev/support window opened by Ctrl+Shift+D. Always available
+    // (Release too) so the shipped build can be profiled in the field.
+    private void OnDiagnosticsRequested()
+    {
+        if (_diagnosticsWindow != null)
+        {
+            _diagnosticsWindow.Activate();
+            return;
+        }
+
+        _diagnosticsWindow = new DiagnosticsWindow(new DiagnosticsViewModel());
+        _diagnosticsWindow.Closed += (_, _) => _diagnosticsWindow = null;
+        _diagnosticsWindow.Show(this);
     }
 
     private SettingsWindow? _settingsWindow;
