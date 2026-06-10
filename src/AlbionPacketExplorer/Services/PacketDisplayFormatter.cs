@@ -59,7 +59,11 @@ public static class PacketDisplayFormatter
         return value.ToString() ?? "(null)";
     }
 
-    private static string FormatInt64(long l)
+    /// <summary>
+    /// Formats an Int64 the way the params view shows it (ticks-looking values get the UTC date
+    /// suffix). Public so KeyStats can format raw counted values at render time.
+    /// </summary>
+    public static string FormatInt64(long l)
     {
         // Albion timestamps are .NET ticks; values above threshold are dates
         if (l > AlbionTicksThreshold)
