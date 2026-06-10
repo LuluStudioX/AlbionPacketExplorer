@@ -26,7 +26,8 @@ from pathlib import Path
 
 APX = Path(__file__).resolve().parents[1]
 OUT = APX / "src/AlbionPacketExplorer/Assets/packet-schema.base.json"
-OVERLAY = APX / "tools/inferred-overlay.json"
+OVERLAY = APX / "tools/inferred-overlay.json"          # built locally from captures
+DIGEST_OVERLAY = APX / "tools/digest-overlay.json"     # built (also in CI) from shared digests
 
 # Bump when the schema's shape or curation method changes (not on routine resyncs).
 SCHEMA_VERSION = "1"
@@ -487,9 +488,11 @@ def best_params_by_name(old, kind):
 
 def main():
     parser = argparse.ArgumentParser()
+    # Default source = this repo itself: src/AlbionPacketExplorer/Network/ holds the enum
+    # copies. An external reference repo is only ever passed explicitly (one-time updates).
     parser.add_argument(
         "--source-path",
-        default=os.environ.get("APX_SOURCE_REPO", str(APX.parent / "reference-source")),
+        default=os.environ.get("APX_SOURCE_REPO", str(APX)),
     )
     args = parser.parse_args()
 
@@ -541,11 +544,14 @@ def main():
     for key, entry in WIRE_OVERRIDE.items():
         out[key] = entry
 
-    # Lowest precedence: fill still-empty key slots with capture-inferred shape descriptors so every
+    # Lowest precedence: fill still-empty key slots with inferred shape descriptors so every
     # observed field of every captured packet is documented. Never clobbers an authoritative name.
+    # Capture overlay first (richest local data), then the digest overlay from user submissions.
     inferred_added = 0
-    if OVERLAY.exists():
-        overlay = json.loads(OVERLAY.read_text(encoding="utf-8-sig"))
+    for ov_path in (OVERLAY, DIGEST_OVERLAY):
+        if not ov_path.exists():
+            continue
+        overlay = json.loads(ov_path.read_text(encoding="utf-8-sig"))
         for key, entry in overlay.items():
             if key.startswith("$"):
                 continue
