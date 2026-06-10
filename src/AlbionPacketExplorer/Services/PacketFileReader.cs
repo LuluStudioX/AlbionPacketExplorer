@@ -20,15 +20,30 @@ public class PacketFileReader
             yield return entry;
     }
 
+    /// <summary>Per-packet stream; a flattening wrapper over <see cref="ReadBatchesAsync"/>.</summary>
+    public async IAsyncEnumerable<(PacketEntry Entry, ParamSet Params)> ReadWithParamsAsync(string filePath, IProgress<double>? progress = null, PackedParamStore? store = null)
+    {
+        await foreach (var batch in ReadBatchesAsync(filePath, progress, store))
+            foreach (var pair in batch.Items)
+                yield return pair;
+    }
+
+    /// <summary>
+    /// One consumed parse batch: the packets in file order, each with its freshly parsed ParamSet
+    /// so downstream stats ingest never decodes the store it just wrote.
+    /// </summary>
+    public sealed record LoadedBatch(IReadOnlyList<(PacketEntry Entry, ParamSet Params)> Items);
+
     // store is optional and last: callers that retain packets (the main load path) pass their own
     // arena so decoded params stay reachable; one-shot consumers that stream-and-discard (e.g. the
     // merge/verify tool) omit it and get a private per-call store.
     /// <summary>
-    /// Streams each packet together with its freshly parsed <see cref="ParamSet"/>. The load path
-    /// consumes the set directly (aggregator ingest) instead of round-tripping through
-    /// <see cref="PackedParamStore.Decode"/> for params it just encoded.
+    /// Streams the file as ordered batches. NDJSON files run the parallel pipeline (parse, params
+    /// encoding and stats accumulation all happen on workers); array files fall back to sequential
+    /// batching. Batch boundaries are an implementation detail - concatenating batch Items always
+    /// yields the file's packets in file order.
     /// </summary>
-    public async IAsyncEnumerable<(PacketEntry Entry, ParamSet Params)> ReadWithParamsAsync(string filePath, IProgress<double>? progress = null, PackedParamStore? store = null)
+    public async IAsyncEnumerable<LoadedBatch> ReadBatchesAsync(string filePath, IProgress<double>? progress = null, PackedParamStore? store = null)
     {
         store ??= new PackedParamStore();
 
@@ -42,13 +57,13 @@ public class PacketFileReader
 
         if (isArray)
         {
-            await foreach (var pair in ReadArrayAsync(stream, store, progress))
-                yield return pair;
+            await foreach (var batch in ReadArrayAsync(stream, store, progress))
+                yield return batch;
         }
         else
         {
-            await foreach (var pair in ReadNdjsonAsync(stream, store, totalBytes, progress))
-                yield return pair;
+            await foreach (var batch in ReadNdjsonAsync(stream, store, totalBytes, progress))
+                yield return batch;
         }
     }
 
@@ -64,25 +79,28 @@ public class PacketFileReader
         return false;
     }
 
-    // A parsed line before store packing. Workers produce these in parallel; the consumer appends
-    // each ParamSet to the store and builds the PacketEntry, keeping the store single-writer.
+    // A parsed line before store packing. Workers produce these in parallel; the consumer rebases
+    // the worker-encoded param refs and builds the PacketEntries, keeping the store single-writer.
     private readonly record struct ParsedLine(
         DateTime Ts, string Kind, int Code, ParamSet Params, int? ReturnCode, string? DebugMessage);
 
-    // One worker result: the batch's parsed lines plus the stream position at the batch's end
-    // (drives the progress bar from the consumer, so progress tracks ingest, not raw IO).
-    private sealed record ParseBatchResult(List<ParsedLine> Lines, long Position);
+    // One worker result: the batch's parsed lines, their params pre-encoded into one blob with
+    // BLOB-RELATIVE refs (consumer rebases after one AppendEncodedBatch), and the stream position
+    // at the batch's end (drives the progress bar from the consumer, so progress tracks ingest,
+    // not raw IO).
+    private sealed record ParseBatchResult(
+        List<ParsedLine> Lines, List<ParamRef> RelRefs, byte[] Blob, int BlobLength, long Position);
 
     // NDJSON: a three-stage parallel pipeline.
     //   1. Producer reads raw byte chunks and slices each at its last newline into a pooled copy.
-    //   2. Workers (plain Task.Run per batch) split lines and JSON-parse them concurrently - the
-    //      expensive stage, and every line is independent.
+    //   2. Workers (plain Task.Run per batch) split lines, JSON-parse them and binary-encode the
+    //      params blob concurrently - the expensive per-packet work, and every line is independent.
     //   3. This iterator awaits the parse TASKS strictly in enqueue order, so output order matches
-    //      file order with no reordering machinery, and store.Append plus the caller's ingest stay
-    //      single-threaded. The bounded channel doubles as backpressure: at most `capacity` batches
-    //      (~1 MB each) are in flight.
+    //      file order with no reordering machinery; what remains serial is one blob append plus
+    //      entry construction per batch. The bounded channel doubles as backpressure: at most
+    //      `capacity` batches (~1 MB each) are in flight.
     // No per-line strings, no UTF-16 round trip: each line's UTF-8 bytes feed Utf8JsonReader as-is.
-    private static async IAsyncEnumerable<(PacketEntry, ParamSet)> ReadNdjsonAsync(Stream stream, PackedParamStore store, long totalBytes, IProgress<double>? progress)
+    private static async IAsyncEnumerable<LoadedBatch> ReadNdjsonAsync(Stream stream, PackedParamStore store, long totalBytes, IProgress<double>? progress)
     {
         int capacity = Math.Clamp(Environment.ProcessorCount - 1, 2, 8);
         var channel = Channel.CreateBounded<Task<ParseBatchResult>>(new BoundedChannelOptions(capacity)
@@ -99,7 +117,7 @@ public class PacketFileReader
         {
             try
             {
-                await ProduceBatchesAsync(stream, channel.Writer, cts.Token);
+                await ProduceBatchesAsync(stream, channel.Writer, store, cts.Token);
                 channel.Writer.Complete();
             }
             catch (Exception ex)
@@ -116,14 +134,23 @@ public class PacketFileReader
             await foreach (var batchTask in channel.Reader.ReadAllAsync())
             {
                 var batch = await batchTask;
-                foreach (var p in batch.Lines)
+
+                // One cursor bump + one write for the whole worker-encoded blob (bytes identical to
+                // per-packet appends), then rebase the blob-relative refs against the base offset.
+                long baseOffset = store.AppendEncodedBatch(batch.Blob, batch.BlobLength);
+                ArrayPool<byte>.Shared.Return(batch.Blob);
+
+                var items = new List<(PacketEntry Entry, ParamSet Params)>(batch.Lines.Count);
+                for (int i = 0; i < batch.Lines.Count; i++)
                 {
-                    // Pack the parsed set into the store, which binary-encodes it into the arena.
-                    // The source file is still JSON; only the arena is binary.
-                    var paramRef = store.Append(p.Params);
-                    var entry = new PacketEntry(p.Ts, p.Kind, p.Code, store, paramRef, p.ReturnCode, p.DebugMessage);
-                    yield return (entry, p.Params);
+                    var p = batch.Lines[i];
+                    var rel = batch.RelRefs[i];
+                    var paramRef = rel.IsEmpty ? ParamRef.Empty
+                        : new ParamRef(baseOffset + rel.Offset, rel.Length, rel.Count);
+                    items.Add((new PacketEntry(p.Ts, p.Kind, p.Code, store, paramRef, p.ReturnCode, p.DebugMessage), p.Params));
                 }
+
+                yield return new LoadedBatch(items);
 
                 if (progress != null && totalBytes > 0)
                 {
@@ -149,7 +176,7 @@ public class PacketFileReader
     // (the read buffer is reused immediately) and handed to a worker task; the partial tail line
     // moves to the buffer front. A cancelled read or write just ends the producer - the consumer
     // already stopped listening.
-    private static async Task ProduceBatchesAsync(Stream stream, ChannelWriter<Task<ParseBatchResult>> writer, CancellationToken ct)
+    private static async Task ProduceBatchesAsync(Stream stream, ChannelWriter<Task<ParseBatchResult>> writer, PackedParamStore store, CancellationToken ct)
     {
         byte[] buffer = ArrayPool<byte>.Shared.Rent(1 << 20);
         try
@@ -173,7 +200,7 @@ public class PacketFileReader
                 {
                     // Final line without a trailing newline.
                     if (dataLen > 0)
-                        await DispatchAsync(writer, buffer, 0, dataLen, stream.Position, ct);
+                        await DispatchAsync(writer, buffer, 0, dataLen, stream.Position, store, ct);
                     break;
                 }
                 dataLen += read;
@@ -200,7 +227,7 @@ public class PacketFileReader
                 }
 
                 int tail = dataLen - (lastNl + 1);
-                await DispatchAsync(writer, buffer, start, lastNl + 1 - start, stream.Position - tail, ct);
+                await DispatchAsync(writer, buffer, start, lastNl + 1 - start, stream.Position - tail, store, ct);
 
                 Buffer.BlockCopy(buffer, lastNl + 1, buffer, 0, tail);
                 dataLen = tail;
@@ -213,19 +240,24 @@ public class PacketFileReader
     }
 
     private static async ValueTask DispatchAsync(ChannelWriter<Task<ParseBatchResult>> writer,
-        byte[] source, int offset, int length, long position, CancellationToken ct)
+        byte[] source, int offset, int length, long position, PackedParamStore store, CancellationToken ct)
     {
         byte[] copy = ArrayPool<byte>.Shared.Rent(length);
         Buffer.BlockCopy(source, offset, copy, 0, length);
-        await writer.WriteAsync(Task.Run(() => ParseBatch(copy, length, position), CancellationToken.None), ct);
+        await writer.WriteAsync(Task.Run(() => ParseBatch(copy, length, position, store), CancellationToken.None), ct);
     }
 
-    // Stage 2 (worker): split the batch into lines and parse each. Always returns its pooled buffer.
-    private static ParseBatchResult ParseBatch(byte[] buf, int length, long position)
+    // Stage 2 (worker): split the batch into lines, parse each, binary-encode the params into the
+    // batch blob and accumulate the stats partial. Always returns its pooled input buffer; the blob
+    // is detached and returned by the consumer after AppendEncodedBatch.
+    private static ParseBatchResult ParseBatch(byte[] buf, int length, long position, PackedParamStore store)
     {
         try
         {
             var lines = new List<ParsedLine>(1024);
+            var relRefs = new List<ParamRef>(1024);
+            var encoder = new PackedParamStore.BatchEncoder(store);
+
             int lineStart = 0;
             while (lineStart < length)
             {
@@ -236,12 +268,22 @@ public class PacketFileReader
                 if (len > 0)
                 {
                     // Malformed lines are skipped, matching the old per-line try/catch.
-                    try { if (ParseLine(buf, lineStart, len) is { } p) lines.Add(p); } catch { }
+                    try
+                    {
+                        if (ParseLine(buf, lineStart, len) is { } p)
+                        {
+                            lines.Add(p);
+                            relRefs.Add(encoder.Add(p.Params));
+                        }
+                    }
+                    catch { }
                 }
                 if (nl < 0) break;
                 lineStart = nl + 1;
             }
-            return new ParseBatchResult(lines, position);
+
+            byte[] blob = encoder.Detach(out int blobLength);
+            return new ParseBatchResult(lines, relRefs, blob, blobLength, position);
         }
         finally
         {
@@ -262,9 +304,15 @@ public class PacketFileReader
         return i < 0 ? -1 : start + i;
     }
 
-    private static async IAsyncEnumerable<(PacketEntry, ParamSet)> ReadArrayAsync(Stream stream, PackedParamStore store, IProgress<double>? progress)
+    // Array-format files (saved sessions) parse sequentially via JsonElement; they are chunked into
+    // LoadedBatches purely so both formats flow through the same batch surface downstream.
+    private const int ArrayBatchSize = 4096;
+
+    private static async IAsyncEnumerable<LoadedBatch> ReadArrayAsync(Stream stream, PackedParamStore store, IProgress<double>? progress)
     {
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        var items = new List<(PacketEntry Entry, ParamSet Params)>(ArrayBatchSize);
 
         // Stream the array element-by-element so a giant array file is never fully materialized.
         await foreach (var el in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(stream, options))
@@ -272,8 +320,18 @@ public class PacketFileReader
             PacketEntry? entry = null;
             ParamSet ps = ParamSet.Empty;
             try { entry = ParseElement(el, store, out ps); } catch { }
-            if (entry != null) yield return (entry, ps);
+            if (entry == null) continue;
+
+            items.Add((entry, ps));
+            if (items.Count >= ArrayBatchSize)
+            {
+                yield return new LoadedBatch(items);
+                items = new List<(PacketEntry, ParamSet)>(ArrayBatchSize);
+            }
         }
+
+        if (items.Count > 0)
+            yield return new LoadedBatch(items);
 
         progress?.Report(1.0);
     }
