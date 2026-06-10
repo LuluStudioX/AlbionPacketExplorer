@@ -283,9 +283,20 @@ public partial class CodeAggregatorViewModel : ObservableObject
             if (ks.SampleValues.Count < 5)
                 ks.SampleValues.Add(paramVal.Value);
 
-            // Value distribution: count distinct stringified values (capped) and track the
-            // numeric range so a field's shape (constant / enum-like / id / range) is visible.
-            var repr = PacketDisplayFormatter.FormatParamValue(paramVal);
+            // Value distribution: count distinct values (capped) and track the numeric range so a
+            // field's shape (constant / enum-like / id / range) is visible. Scalars are counted by
+            // their raw boxed value (the box already exists in the ParamSet, and boxed primitives
+            // hash/compare by value), so the load hot path formats nothing; arrays/dicts fall back
+            // to the formatted string so identical contents still land in one bucket. Display
+            // formatting happens once at render in KeyStats.TopValuesDisplay.
+            object repr = paramVal.Value switch
+            {
+                // Dictionary keys cannot be null; the literal matches the old formatted marker.
+                null => "(null)",
+                long or int or short or byte or sbyte or ushort or uint
+                    or double or float or bool or string => paramVal.Value,
+                _ => PacketDisplayFormatter.FormatParamValue(paramVal)
+            };
             if (ks.ValueCounts.TryGetValue(repr, out var c))
                 ks.ValueCounts[repr] = c + 1;
             else if (ks.ValueCounts.Count < KeyStats.DistinctCap)
