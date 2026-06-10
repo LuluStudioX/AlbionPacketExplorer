@@ -79,10 +79,16 @@ public sealed class PackedParamStore : IDisposable
     // Per-store TYPE-ID table: distinct ParamValue.Type strings -> small int id. Each distinct type
     // name (~15: Int64, Int16, Byte, Single, Double, Boolean, String, Byte[], Int32[], ...) is written
     // once as a varint id; decode maps the id back to the interned string. This is the big compaction
-    // win over repeating the type text per param. Mutated only under the write lock (single-writer);
-    // read under the read lock during Decode. Resets with the arena on Clear/new store.
-    private readonly List<string> _typeNames = new();
-    private readonly Dictionary<string, int> _typeIds = new(StringComparer.Ordinal);
+    // win over repeating the type text per param.
+    //
+    // CONCURRENT: parse workers encode batches in parallel (BatchEncoder), so lookups must be
+    // lock-free - a ConcurrentDictionary for name -> id and a volatile copy-on-write array for
+    // id -> name. Registering a NEW name (rare: ~15 per dataset lifetime) takes _typeRegLock and
+    // publishes the grown array BEFORE the id becomes discoverable, so any id a worker can write
+    // into a blob is always resolvable by a concurrent Decode. Resets with the arena on Clear.
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, int> _typeIds = new(StringComparer.Ordinal);
+    private volatile string[] _typeNames = [];
+    private readonly object _typeRegLock = new();
 
     public PackedParamStore()
     {
@@ -157,6 +163,83 @@ public sealed class PackedParamStore : IDisposable
         }
     }
 
+    /// <summary>
+    /// Appends a worker-encoded params blob (built by a <see cref="BatchEncoder"/>) in ONE cursor
+    /// bump and ONE write, and returns the arena base offset the encoder's blob-relative refs get
+    /// rebased against. The byte layout is identical to per-packet <see cref="Append"/> calls in the
+    /// same order, so Decode is oblivious to which path stored the bytes.
+    /// </summary>
+    public long AppendEncodedBatch(byte[] blob, int length)
+    {
+        _lock.EnterWriteLock();
+        try
+        {
+            if (_disposed) throw new ObjectDisposedException(nameof(PackedParamStore));
+
+            if (_cursor + length > _capacity)
+                Grow(_cursor + length);
+
+            long offset = _cursor;
+            if (length > 0)
+                _accessor.WriteArray(offset, blob, 0, length);
+            _cursor += length;
+            return offset;
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
+    }
+
+    /// <summary>
+    /// A per-batch params encoder for parse workers: encodes ParamSets back-to-back into one pooled
+    /// blob OFF the store's write lock (the type registry is concurrent), returning BLOB-RELATIVE
+    /// refs. The consumer appends the whole blob via <see cref="AppendEncodedBatch"/> and rebases
+    /// the refs by the returned base offset. Encoding is the exact code path <see cref="Append"/>
+    /// uses, so the bytes are identical.
+    /// </summary>
+    public sealed class BatchEncoder
+    {
+        private readonly PackedParamStore _store;
+        private byte[] _buffer;
+        private int _length;
+
+        public BatchEncoder(PackedParamStore store)
+        {
+            _store = store;
+            _buffer = ArrayPool<byte>.Shared.Rent(64 * 1024);
+            _length = 0;
+        }
+
+        /// <summary>Encodes one packet's params; returns a blob-relative ref (empty set: empty ref).</summary>
+        public ParamRef Add(ParamSet ps)
+        {
+            int count = ps.Count;
+            if (count == 0)
+                return ParamRef.Empty;
+
+            int start = _length;
+            var w = new BinaryWriterScratch(_buffer, _length);
+            _store.EncodeBinary(ps, ref w);
+            _buffer = w.Buffer; // the writer may have grown (swapped) the pooled array
+            _length = w.Length;
+            return new ParamRef(start, _length - start, count);
+        }
+
+        /// <summary>
+        /// Hands the blob to the caller (who must return it to <see cref="ArrayPool{T}.Shared"/>
+        /// after writing it to the store) and neutralizes this encoder.
+        /// </summary>
+        public byte[] Detach(out int length)
+        {
+            length = _length;
+            byte[] blob = _buffer;
+            _buffer = [];
+            _length = 0;
+            return blob;
+        }
+    }
+
     // Doubles capacity until it fits the required total, then recreates the map over the SAME open
     // FileStream at the new size. Runs under the write lock so no Decode observes a disposed accessor.
     private void Grow(long required)
@@ -217,8 +300,11 @@ public sealed class PackedParamStore : IDisposable
             if (_disposed) return;
             DisposeMap();
 
-            _typeNames.Clear();
-            _typeIds.Clear();
+            lock (_typeRegLock)
+            {
+                _typeIds.Clear();
+                _typeNames = [];
+            }
             _capacity = InitialCapacity;
             _cursor = 0;
             // Reuse the same path: the previous file is already deleted by DisposeMap's stream close,
@@ -260,21 +346,35 @@ public sealed class PackedParamStore : IDisposable
     // ----- binary codec (instance methods so they share the per-store type-id table) -----
 
     // Maps a type string to its small id, registering a new id (interned string) on first sight.
-    // Called only under the write lock during Append.
+    // Lock-free on the hot path; registration is copy-on-write under _typeRegLock (see field doc).
     private int TypeId(string type)
     {
         if (_typeIds.TryGetValue(type, out int id))
             return id;
-        id = _typeNames.Count;
-        // Intern so the table holds one shared instance per distinct type name.
-        string interned = string.Intern(type);
-        _typeNames.Add(interned);
-        _typeIds[interned] = id;
-        return id;
+
+        lock (_typeRegLock)
+        {
+            if (_typeIds.TryGetValue(type, out id))
+                return id;
+
+            // Intern so the table holds one shared instance per distinct type name.
+            string interned = string.Intern(type);
+            var snapshot = _typeNames;
+            var grown = new string[snapshot.Length + 1];
+            Array.Copy(snapshot, grown, snapshot.Length);
+            grown[snapshot.Length] = interned;
+            _typeNames = grown; // publish the name BEFORE the id becomes discoverable
+            _typeIds[interned] = snapshot.Length;
+            return snapshot.Length;
+        }
     }
 
     // Resolves a type id back to its interned string; ids are always valid (written via TypeId).
-    private string TypeName(int id) => (uint)id < (uint)_typeNames.Count ? _typeNames[id] : "";
+    private string TypeName(int id)
+    {
+        var arr = _typeNames;
+        return (uint)id < (uint)arr.Length ? arr[id] : "";
+    }
 
     private void EncodeBinary(ParamSet ps, ref BinaryWriterScratch w)
     {
@@ -478,6 +578,14 @@ public sealed class PackedParamStore : IDisposable
         {
             _buffer = ArrayPool<byte>.Shared.Rent(256);
             _length = 0;
+        }
+
+        // Adopts an existing pooled buffer at the given write position (BatchEncoder); on grow the
+        // old array goes back to the pool and the caller re-reads Buffer/Length after the write.
+        public BinaryWriterScratch(byte[] adopt, int length)
+        {
+            _buffer = adopt;
+            _length = length;
         }
 
         public readonly byte[] Buffer => _buffer;
