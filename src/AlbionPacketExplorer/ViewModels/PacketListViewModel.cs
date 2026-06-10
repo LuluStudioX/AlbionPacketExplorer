@@ -10,8 +10,13 @@ using System.Threading.Tasks;
 
 namespace AlbionPacketExplorer.ViewModels;
 
-public record PacketRow(PacketEntry Packet)
+// A CLASS with reference equality, deliberately not a record: the DataGrid's selection plumbing
+// runs Equals against the row list, and record value-equality there meant every click compared
+// millions of rows field-by-field through the whole PacketEntry (~1s per click on a 4M set).
+public sealed class PacketRow(PacketEntry packet)
 {
+    public PacketEntry Packet { get; } = packet;
+
     public DateTime Timestamp => Packet.Timestamp;
     public string Kind => Packet.Kind;
     public int Code => Packet.Code;
