@@ -84,26 +84,29 @@ public class PacketFileReader
     private readonly record struct ParsedLine(
         DateTime Ts, string Kind, int Code, ParamSet Params, int? ReturnCode, string? DebugMessage);
 
-    // One worker result: the batch's parsed lines, their params pre-encoded into one blob with
-    // BLOB-RELATIVE refs (consumer rebases after one AppendEncodedBatch), and the stream position
-    // at the batch's end (drives the progress bar from the consumer, so progress tracks ingest,
-    // not raw IO).
-    private sealed record ParseBatchResult(
-        List<ParsedLine> Lines, List<ParamRef> RelRefs, byte[] Blob, int BlobLength, long Position);
+    // One finished worker result: the batch's packets fully built (params already written into the
+    // arena and refs rebased to absolute, all done ON the worker), plus the stream position at the
+    // batch's end (drives the progress bar; progress tracks ingest, not raw IO).
+    private sealed record ParsedBatch(LoadedBatch Batch, long Position);
 
-    // NDJSON: a three-stage parallel pipeline.
+    // NDJSON: a parallel pipeline where the workers do EVERYTHING per-packet and the consumer only
+    // collects finished batches in order.
     //   1. Producer reads raw byte chunks and slices each at its last newline into a pooled copy.
-    //   2. Workers (plain Task.Run per batch) split lines, JSON-parse them and binary-encode the
-    //      params blob concurrently - the expensive per-packet work, and every line is independent.
-    //   3. This iterator awaits the parse TASKS strictly in enqueue order, so output order matches
-    //      file order with no reordering machinery; what remains serial is one blob append plus
-    //      entry construction per batch. The bounded channel doubles as backpressure: at most
-    //      `capacity` batches (~1 MB each) are in flight.
+    //   2. Workers (plain Task.Run per batch) split lines, JSON-parse them, binary-encode the params,
+    //      write that blob into their own reserved (disjoint) region of the arena, and build the
+    //      PacketEntry list with absolute refs - the whole per-packet cost, fully parallel. This is
+    //      lock-free because the arena was pre-Reserved to the file size, so no writer ever grows it.
+    //   3. This iterator awaits the parse TASKS strictly in enqueue order (output order = file order)
+    //      and just yields each finished batch - no serial append/build funnel to starve the workers.
     // No per-line strings, no UTF-16 round trip: each line's UTF-8 bytes feed Utf8JsonReader as-is.
     private static async IAsyncEnumerable<LoadedBatch> ReadNdjsonAsync(Stream stream, PackedParamStore store, long totalBytes, IProgress<double>? progress)
     {
+        // Pre-size the arena to the source size so every worker's concurrent write lands in a
+        // pre-reserved region and the view accessor never swaps mid-load (binary params < JSON text).
+        store.Reserve(totalBytes);
+
         int capacity = Math.Clamp(Environment.ProcessorCount - 1, 2, 8);
-        var channel = Channel.CreateBounded<Task<ParseBatchResult>>(new BoundedChannelOptions(capacity)
+        var channel = Channel.CreateBounded<Task<ParsedBatch>>(new BoundedChannelOptions(capacity)
         {
             SingleReader = true,
             SingleWriter = true,
@@ -131,33 +134,27 @@ public class PacketFileReader
             var sw = Stopwatch.StartNew();
             var lastReport = TimeSpan.Zero;
 
+            // Verbose-only split of the consumer thread: time spent waiting on the parse workers
+            // (parallel, worker-bound) vs the serial section we run inline (mmap append + building
+            // the PacketEntry list). A high serial share means one core is the floor; a high wait
+            // share means the parse workers are.
+            bool trace = AppDiagnostics.VerboseEnabled;
+            long waitTicks = 0;
+
             await foreach (var batchTask in channel.Reader.ReadAllAsync())
             {
-                var batch = await batchTask;
+                long w0 = trace ? Stopwatch.GetTimestamp() : 0;
+                var parsed = await batchTask;
+                if (trace) waitTicks += Stopwatch.GetTimestamp() - w0;
 
-                // One cursor bump + one write for the whole worker-encoded blob (bytes identical to
-                // per-packet appends), then rebase the blob-relative refs against the base offset.
-                long baseOffset = store.AppendEncodedBatch(batch.Blob, batch.BlobLength);
-                ArrayPool<byte>.Shared.Return(batch.Blob);
-
-                var items = new List<(PacketEntry Entry, ParamSet Params)>(batch.Lines.Count);
-                for (int i = 0; i < batch.Lines.Count; i++)
-                {
-                    var p = batch.Lines[i];
-                    var rel = batch.RelRefs[i];
-                    var paramRef = rel.IsEmpty ? ParamRef.Empty
-                        : new ParamRef(baseOffset + rel.Offset, rel.Length, rel.Count);
-                    items.Add((new PacketEntry(p.Ts, p.Kind, p.Code, store, paramRef, p.ReturnCode, p.DebugMessage), p.Params));
-                }
-
-                yield return new LoadedBatch(items);
+                yield return parsed.Batch;
 
                 if (progress != null && totalBytes > 0)
                 {
                     var now = sw.Elapsed;
                     if (now - lastReport >= ProgressInterval)
                     {
-                        progress.Report((double)batch.Position / totalBytes);
+                        progress.Report((double)parsed.Position / totalBytes);
                         lastReport = now;
                     }
                 }
@@ -165,6 +162,12 @@ public class PacketFileReader
 
             await producer;
             progress?.Report(1.0);
+
+            // With append+build moved onto the workers, the consumer's only cost is waiting on the
+            // workers; a high wait here now means the parse itself is the floor (not a serial funnel).
+            if (trace)
+                AppDiagnostics.Log($"reader: worker-wait {waitTicks / (double)Stopwatch.Frequency:F1}s "
+                    + "(append + entry build now run on the parse workers)");
         }
         finally
         {
@@ -176,9 +179,9 @@ public class PacketFileReader
     // (the read buffer is reused immediately) and handed to a worker task; the partial tail line
     // moves to the buffer front. A cancelled read or write just ends the producer - the consumer
     // already stopped listening.
-    private static async Task ProduceBatchesAsync(Stream stream, ChannelWriter<Task<ParseBatchResult>> writer, PackedParamStore store, CancellationToken ct)
+    private static async Task ProduceBatchesAsync(Stream stream, ChannelWriter<Task<ParsedBatch>> writer, PackedParamStore store, CancellationToken ct)
     {
-        byte[] buffer = ArrayPool<byte>.Shared.Rent(1 << 20);
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(1 << 22);
         try
         {
             int dataLen = 0;
@@ -239,7 +242,7 @@ public class PacketFileReader
         }
     }
 
-    private static async ValueTask DispatchAsync(ChannelWriter<Task<ParseBatchResult>> writer,
+    private static async ValueTask DispatchAsync(ChannelWriter<Task<ParsedBatch>> writer,
         byte[] source, int offset, int length, long position, PackedParamStore store, CancellationToken ct)
     {
         byte[] copy = ArrayPool<byte>.Shared.Rent(length);
@@ -247,10 +250,11 @@ public class PacketFileReader
         await writer.WriteAsync(Task.Run(() => ParseBatch(copy, length, position, store), CancellationToken.None), ct);
     }
 
-    // Stage 2 (worker): split the batch into lines, parse each, binary-encode the params into the
-    // batch blob and accumulate the stats partial. Always returns its pooled input buffer; the blob
-    // is detached and returned by the consumer after AppendEncodedBatch.
-    private static ParseBatchResult ParseBatch(byte[] buf, int length, long position, PackedParamStore store)
+    // Stage 2 (worker): split the batch into lines, parse each, binary-encode the params into one
+    // blob, write that blob into the worker's own reserved region of the arena, and build the
+    // PacketEntry list with absolute refs - the entire per-packet cost, all on this worker thread so
+    // it runs across every core. Always returns its pooled input buffer.
+    private static ParsedBatch ParseBatch(byte[] buf, int length, long position, PackedParamStore store)
     {
         try
         {
@@ -282,8 +286,24 @@ public class PacketFileReader
                 lineStart = nl + 1;
             }
 
+            // Write the whole batch blob into a reserved arena region (lock-free; the arena was
+            // pre-Reserved to the file size) and rebase the blob-relative refs to absolute.
             byte[] blob = encoder.Detach(out int blobLength);
-            return new ParseBatchResult(lines, relRefs, blob, blobLength, position);
+            long baseOffset = store.ReserveAndWriteConcurrent(blob, blobLength);
+            ArrayPool<byte>.Shared.Return(blob);
+
+            int n = lines.Count;
+            var items = new (PacketEntry Entry, ParamSet Params)[n];
+            for (int i = 0; i < n; i++)
+            {
+                var p = lines[i];
+                var rel = relRefs[i];
+                var paramRef = rel.IsEmpty ? ParamRef.Empty
+                    : new ParamRef(baseOffset + rel.Offset, rel.Length, rel.Count);
+                items[i] = (new PacketEntry(p.Ts, p.Kind, p.Code, store, paramRef, p.ReturnCode, p.DebugMessage), p.Params);
+            }
+
+            return new ParsedBatch(new LoadedBatch(items), position);
         }
         finally
         {

@@ -119,6 +119,44 @@ public sealed class PackedParamStore : IDisposable
         return (mmf, accessor);
     }
 
+    // Raw span copies through the view's base pointer. MemoryMappedViewAccessor.WriteArray/ReadArray
+    // marshal element-by-element and were ~6s of a 4M-packet load; a direct memcpy is ~10x faster.
+    // Callers already hold the appropriate lock, and _accessor only swaps under the write lock (Grow),
+    // so the pointer acquired here stays valid for the copy.
+    private unsafe void WriteBytes(long offset, byte[] src, int srcOffset, int length)
+    {
+        if (length <= 0) return;
+        var handle = _accessor.SafeMemoryMappedViewHandle;
+        byte* basePtr = null;
+        handle.AcquirePointer(ref basePtr);
+        try
+        {
+            var dest = new Span<byte>(basePtr + _accessor.PointerOffset + offset, length);
+            new ReadOnlySpan<byte>(src, srcOffset, length).CopyTo(dest);
+        }
+        finally
+        {
+            handle.ReleasePointer();
+        }
+    }
+
+    private unsafe void ReadBytes(long offset, byte[] dest, int destOffset, int length)
+    {
+        if (length <= 0) return;
+        var handle = _accessor.SafeMemoryMappedViewHandle;
+        byte* basePtr = null;
+        handle.AcquirePointer(ref basePtr);
+        try
+        {
+            var src = new ReadOnlySpan<byte>(basePtr + _accessor.PointerOffset + offset, length);
+            src.CopyTo(new Span<byte>(dest, destOffset, length));
+        }
+        finally
+        {
+            handle.ReleasePointer();
+        }
+    }
+
     /// <summary>
     /// Binary-encodes a packet's params into the spill file and returns a <see cref="ParamRef"/>
     /// locating the bytes. The param count is stored in the ref so callers can read the count without
@@ -148,7 +186,7 @@ public sealed class PackedParamStore : IDisposable
                     Grow(_cursor + len);
 
                 long offset = _cursor;
-                _accessor.WriteArray(offset, writer.Buffer, 0, len);
+                WriteBytes(offset, writer.Buffer, 0, len);
                 _cursor += len;
                 return new ParamRef(offset, len, count);
             }
@@ -180,8 +218,7 @@ public sealed class PackedParamStore : IDisposable
                 Grow(_cursor + length);
 
             long offset = _cursor;
-            if (length > 0)
-                _accessor.WriteArray(offset, blob, 0, length);
+            WriteBytes(offset, blob, 0, length);
             _cursor += length;
             return offset;
         }
@@ -192,9 +229,52 @@ public sealed class PackedParamStore : IDisposable
     }
 
     /// <summary>
+    /// Grows the arena so it can hold at least <paramref name="capacity"/> bytes without any further
+    /// growth. Call once before a parallel load (pass the source file size; the binary param encoding
+    /// is always smaller than its JSON, so the blobs are guaranteed to fit). With no mid-load grow,
+    /// <see cref="ReserveAndWriteConcurrent"/> needs no lock and the view accessor never swaps under
+    /// the concurrent writers.
+    /// </summary>
+    public void Reserve(long capacity)
+    {
+        if (capacity <= 0) return;
+        _lock.EnterWriteLock();
+        try
+        {
+            if (_disposed) throw new ObjectDisposedException(nameof(PackedParamStore));
+            if (capacity > _capacity) Grow(capacity);
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
+    }
+
+    /// <summary>
+    /// Lock-free batch append for the parallel load path: bumps the cursor atomically and writes the
+    /// blob straight into its reserved (disjoint) region of the arena, so every parse worker writes
+    /// its own params concurrently with no serialization. REQUIRES a prior <see cref="Reserve"/> sized
+    /// to the whole dataset - the regions are pre-reserved, so this never grows (a grow would swap the
+    /// view out from under the other writers). The byte layout is identical to <see cref="Append"/>.
+    /// </summary>
+    public long ReserveAndWriteConcurrent(byte[] blob, int length)
+    {
+        if (length <= 0)
+            return System.Threading.Interlocked.Read(ref _cursor);
+
+        long offset = System.Threading.Interlocked.Add(ref _cursor, length) - length;
+        if (offset + length > _capacity)
+            throw new InvalidOperationException(
+                "PackedParamStore overflow: call Reserve(fileBytes) before a concurrent load.");
+
+        WriteBytes(offset, blob, 0, length);
+        return offset;
+    }
+
+    /// <summary>
     /// A per-batch params encoder for parse workers: encodes ParamSets back-to-back into one pooled
     /// blob OFF the store's write lock (the type registry is concurrent), returning BLOB-RELATIVE
-    /// refs. The consumer appends the whole blob via <see cref="AppendEncodedBatch"/> and rebases
+    /// refs. The worker writes the whole blob via <see cref="ReserveAndWriteConcurrent"/> and rebases
     /// the refs by the returned base offset. Encoding is the exact code path <see cref="Append"/>
     /// uses, so the bytes are identical.
     /// </summary>
@@ -271,7 +351,7 @@ public sealed class PackedParamStore : IDisposable
             try
             {
                 if (_disposed) return ParamSet.Empty;
-                _accessor.ReadArray(r.Offset, buffer, 0, r.Length);
+                ReadBytes(r.Offset, buffer, 0, r.Length);
                 // Decode while holding the read lock: the type table is shared, and a concurrent
                 // single-writer Append may extend it; reading under the lock keeps it consistent.
                 return DecodeBinary(buffer.AsSpan(0, r.Length), r.Count);
