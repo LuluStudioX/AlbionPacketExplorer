@@ -50,6 +50,33 @@ jobs:
               out.write(f"new={new}\n")
           EOF
 
+      # Storage hygiene: KV entries whose digest is already archived ON MAIN (i.e. a previous
+      # run's PR was merged) are no longer needed - dedupe for them lives in the repo archive.
+      # Deleting them keeps the namespace far from its storage/write ceilings. Entries from
+      # THIS run are left alone until their PR merges; the 60-day TTL is the backstop.
+      - name: Clear archived entries from KV
+        env:
+          ADMIN_KEY: ${{ secrets.APX_DIGEST_ADMIN_KEY }}
+        run: |
+          git ls-files tools/digest-worker/digests > /tmp/tracked.txt
+          python3 - <<'EOF'
+          import json, pathlib, subprocess
+          docs = json.load(open('/tmp/digests.json'))
+          tracked = set(pathlib.Path(p).name for p in open('/tmp/tracked.txt').read().split())
+          doomed = []
+          for d in docs:
+              parts = d['key'].split(':')
+              if len(parts) == 4 and f"{parts[1]}-{parts[2]}-{parts[3][:12]}.json" in tracked:
+                  doomed.append(d['key'])
+          pathlib.Path('/tmp/doomed.txt').write_text('\n'.join(doomed))
+          print(f"clearing {len(doomed)} archived entr(ies) from KV")
+          EOF
+          while IFS= read -r key; do
+            [ -z "$key" ] && continue
+            curl -sf -X DELETE -H "Authorization: Bearer $ADMIN_KEY" \
+              "https://apx-digest.workpressfail2ban.workers.dev/v1/digest/$key" > /dev/null
+          done < /tmp/doomed.txt
+
       - name: Rebuild digest overlay + schema
         if: steps.archive.outputs.new != '0'
         run: |
