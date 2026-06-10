@@ -9,6 +9,7 @@ using AlbionPacketExplorer.Services;
 using AlbionPacketExplorer.ViewModels;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 
 namespace AlbionPacketExplorer.Views;
 
@@ -158,6 +159,7 @@ public partial class MainWindow : ApxWindow, IFilePicker
             vm.PacketDetail.LabelValueRequested += OnLabelValueRequested;
             vm.PacketDetail.ViewFullValueRequested += OnViewFullValueRequested;
             vm.PacketList.DiffRequested += OnDiffRequested;
+            vm.Aggregator.ShareDigestRequested += OnShareDigestRequested;
             vm.PropertyChanged += OnViewModelPropertyChanged;
             vm.ShortcutsChanged += ApplyShortcuts;
             vm.OpenSettingsSectionRequested += OpenSettings;
@@ -444,6 +446,22 @@ public partial class MainWindow : ApxWindow, IFilePicker
     {
         var win = new ExpandedValueWindow(row, gameData);
         win.Show(this);
+    }
+
+    private void OnShareDigestRequested(System.Collections.Generic.List<Models.CodeStats> stats)
+    {
+        if (DataContext is not MainViewModel vm) return;
+
+        var appVersion = Assembly.GetExecutingAssembly()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion ?? "unknown";
+
+        var dialogVm = new ShareDigestViewModel(stats, vm.Aggregator.Schema, appVersion)
+        {
+            Clipboard = TopLevel.GetTopLevel(this)?.Clipboard,
+            RequestSavePath = suggested => vm.FilePicker.PickSaveJsonFileAsync(suggested),
+        };
+        new ShareDigestWindow(dialogVm).Show(this);
     }
 
     private async void OnUpdateAvailableRequested(string version, string? notes)
