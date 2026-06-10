@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-"""Build tools/inferred-overlay.json from a decoded capture (Save-as-JSON array or NDJSON).
+"""Build tools/inferred-overlay.json from decoded captures and/or schema digests.
 
-For every (kind, code) seen in the capture, emit a per-byte-key descriptor inferred from the
-observed wire shape: dominant type, presence %, cardinality, numeric range, and a conservative
-name guess for unambiguous shapes (timestamp / objectId / position / vector / flags). Every entry
-is marked "(inferred)" in its note. generate-schema.py merges this overlay at LOWEST precedence:
+Inputs (mixed freely on the command line):
+  - decoded capture: Save-as-JSON array or NDJSON of {ts, kind, code, params}
+  - schema digest:   {"v":1, "codes":[...]} produced by the app's Share Field Data dialog
+                     (pulled from KV via tools/digest-worker/pull-digests.ps1)
+
+For every (kind, code) seen, emit a per-byte-key descriptor inferred from the observed wire
+shape: dominant type, presence %, cardinality, numeric range, and a conservative name guess
+for unambiguous shapes (timestamp / objectId / position / vector / flags). Every entry is
+marked "(inferred)" in its note. generate-schema.py merges this overlay at LOWEST precedence:
 it only fills key slots that the enum/decoder/hand-curated passes left empty, so authoritative
-field names always win. Re-run on a fresh capture to extend coverage:
+field names always win. Re-run on the full file set to extend coverage:
 
-    python tools/build-inference-overlay.py <capture.json> [more.json ...]
+    python tools/build-inference-overlay.py <capture.json> <digest.json> [more ...]
 """
-import json, sys, collections
+import argparse, json, sys, collections
 from pathlib import Path
 
 APX = Path(__file__).resolve().parents[1]
@@ -32,6 +37,55 @@ def load(path):
                 yield json.loads(line)
             except json.JSONDecodeError:
                 pass
+
+
+def read_digest(path):
+    """Returns the parsed digest dict when the file is a schema digest, else None."""
+    try:
+        doc = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if isinstance(doc, dict) and doc.get("v") == 1 and isinstance(doc.get("codes"), list):
+        return doc
+    return None
+
+
+def key_stats(e, pk):
+    return e["keys"].setdefault(pk, {"pres": 0, "t": collections.Counter(),
+                                     "v": collections.Counter(), "nmin": None, "nmax": None,
+                                     "dmin": 0})
+
+
+def fold_digest(agg, digest):
+    """Folds a digest's pre-aggregated stats into the same accumulators the capture path
+    fills. Digests carry no per-type counts, so each seen type is weighted by presence;
+    the distinct count survives as a floor (dmin) since only the top values travel."""
+    for c in digest.get("codes", []):
+        kind, code = c.get("kind"), c.get("code")
+        if kind is None or code is None:
+            continue
+        e = agg.setdefault((kind, code), {"count": 0, "keys": {}})
+        e["count"] += c.get("count", 0)
+        echo = ECHO.get(kind)
+        for pk, k in (c.get("keys") or {}).items():
+            if pk == echo or not isinstance(k, dict):
+                continue
+            ks = key_stats(e, pk)
+            pres = k.get("present", 0)
+            ks["pres"] += pres
+            for t in (k.get("types") or []):
+                ks["t"][t] += max(pres, 1)
+            for tv in (k.get("top") or []):
+                if isinstance(tv, dict) and "v" in tv:
+                    ks["v"][str(tv["v"])] += tv.get("n", 1)
+            dmin = k.get("distinct", 0)
+            if k.get("capped"):
+                dmin = max(dmin, 500)
+            ks["dmin"] = max(ks["dmin"], dmin)
+            if isinstance(k.get("min"), (int, float)):
+                ks["nmin"] = k["min"] if ks["nmin"] is None else min(ks["nmin"], k["min"])
+            if isinstance(k.get("max"), (int, float)):
+                ks["nmax"] = k["max"] if ks["nmax"] is None else max(ks["nmax"], k["max"])
 
 
 def arity(sample):
@@ -65,12 +119,23 @@ def guess(key, dom, pres_pct, distinct, nmin, nmax, top):
 
 
 def main():
-    caps = sys.argv[1:]
-    if not caps:
-        sys.exit("usage: build-inference-overlay.py <capture.json> [more.json ...]")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("files", nargs="+", help="captures and/or digests, mixed freely")
+    ap.add_argument("--out", default=str(OUT),
+                    help="overlay to write (default tools/inferred-overlay.json; the CI digest "
+                         "sync writes tools/digest-overlay.json from the digest archive alone)")
+    args = ap.parse_args()
+    caps = args.files
+    out_path = Path(args.out)
 
     agg = {}
+    digests = 0
     for cap in caps:
+        digest = read_digest(cap)
+        if digest is not None:
+            fold_digest(agg, digest)
+            digests += 1
+            continue
         for pkt in load(cap):
             if not isinstance(pkt, dict):
                 continue
@@ -83,8 +148,7 @@ def main():
             for pk, pv in (pkt.get("params") or {}).items():
                 if pk == echo:
                     continue
-                ks = e["keys"].setdefault(pk, {"pres": 0, "t": collections.Counter(),
-                                               "v": collections.Counter(), "nmin": None, "nmax": None})
+                ks = key_stats(e, pk)
                 ks["pres"] += 1
                 t = pv.get("type") if isinstance(pv, dict) else None
                 v = pv.get("value") if isinstance(pv, dict) else pv
@@ -105,7 +169,7 @@ def main():
         for pk, ks in sorted(e["keys"].items(), key=lambda x: int(x[0])):
             dom = ks["t"].most_common(1)[0][0] or "?"
             types = "/".join(t for t, _ in ks["t"].most_common())
-            distinct = len(ks["v"])
+            distinct = max(len(ks["v"]), ks.get("dmin", 0))
             pct = round(ks["pres"] * 100 / cnt)
             name, hint = guess(pk, dom, pct, distinct, ks["nmin"], ks["nmax"], ks["v"].most_common(3))
             bits = [types if "/" in types else dom]
@@ -122,8 +186,9 @@ def main():
             params[pk] = {"name": name, "note": note, "resolveAs": ""}
         overlay[f"{kind}:{code}"] = {"count": cnt, "params": params}
 
-    OUT.write_text(json.dumps(overlay, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"captures: {len(caps)}  codes: {len(agg)}  -> {OUT.relative_to(APX)}")
+    out_path.write_text(json.dumps(overlay, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    rel = out_path.relative_to(APX) if out_path.is_relative_to(APX) else out_path
+    print(f"inputs: {len(caps)} ({digests} digest)  codes: {len(agg)}  -> {rel}")
 
 
 if __name__ == "__main__":
