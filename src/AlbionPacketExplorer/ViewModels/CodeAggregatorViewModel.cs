@@ -100,6 +100,8 @@ public partial class CodeAggregatorViewModel : ObservableObject
         ApplyFilter();
         UpdateCoverage();
         UpdateGap();
+        OnPropertyChanged(nameof(HasStats));
+        ShareDigestCommand.NotifyCanExecuteChanged();
     }
 
     // Capture-coverage gap: of every named code the schema knows, how many this session actually
@@ -130,6 +132,14 @@ public partial class CodeAggregatorViewModel : ObservableObject
         Toasts?.Show(Loc.T("summary.gap.title"),
             Loc.Format("summary.gap.copied", _unseen.Count.ToString()), ToastSeverity.Success);
     }
+
+    /// <summary>Raised with a snapshot of all aggregated stats; the view opens the share window.</summary>
+    public event Action<List<CodeStats>>? ShareDigestRequested;
+
+    public bool HasStats => Map.Count > 0;
+
+    [RelayCommand(CanExecute = nameof(HasStats))]
+    private void ShareDigest() => ShareDigestRequested?.Invoke(Map.Values.ToList());
 
     // Schema-annotation coverage over every code seen: how many codes resolve to a name and how
     // many byte keys have a curated param name. Surfaces how much annotation work remains.
@@ -183,6 +193,8 @@ public partial class CodeAggregatorViewModel : ObservableObject
         _unseen = [];
         OnPropertyChanged(nameof(HasUnseen));
         CopyUnseenCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(HasStats));
+        ShareDigestCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand(CanExecute = nameof(CanExport))]

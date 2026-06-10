@@ -8,22 +8,22 @@
 
     <DockPanel>
 
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="4,2">
-            <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,3"
+        <WrapPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,2">
+            <ToggleButton IsChecked="{Binding SortUnknownFirst, Mode=TwoWay}" Padding="8,3" Margin="0,2,10,2"
                           ToolTip.Tip="{loc:T summary.unknownFirst.tip}">
                 <TextBlock Text="{loc:T summary.unknownFirst}" FontSize="11" VerticalAlignment="Center" />
             </ToggleButton>
-            <TextBlock Text="{Binding CoverageText}" FontSize="11" VerticalAlignment="Center"
+            <TextBlock Text="{Binding CoverageText}" FontSize="11" VerticalAlignment="Center" Margin="0,2,10,2"
                        Foreground="{DynamicResource Apx.TextMuted}" />
-            <Border Width="1" Background="{DynamicResource Apx.Border}" Margin="4,2"
+            <Border Width="1" Background="{DynamicResource Apx.Border}" Margin="0,2,10,2"
                     IsVisible="{Binding GapText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            <TextBlock Text="{Binding GapText}" FontSize="11" VerticalAlignment="Center"
+            <TextBlock Text="{Binding GapText}" FontSize="11" VerticalAlignment="Center" Margin="0,2,10,2"
                        Foreground="{DynamicResource Apx.TextMuted}" />
-            <Button Classes="ghost" Padding="8,3" Command="{Binding CopyUnseenCommand}"
+            <Button Classes="ghost" Padding="8,3" Margin="0,2,0,2" Command="{Binding CopyUnseenCommand}"
                     IsVisible="{Binding HasUnseen}"
                     ToolTip.Tip="{loc:T summary.gap.copyUnseen.tip}"
                     Content="{loc:T summary.gap.copyUnseen}" FontSize="11" />
-        </StackPanel>
+        </WrapPanel>
 
         <Grid RowDefinitions="2*,Auto,*">
 
@@ -153,9 +153,16 @@
 
         <!-- Field-value distribution for the selected code (#1): how each byte key's value varies. -->
         <DockPanel Grid.Row="2">
-            <TextBlock DockPanel.Dock="Top" Margin="6,4,6,2" FontWeight="SemiBold"
-                       Text="{loc:T summary.fields.title}"
-                       Foreground="{DynamicResource Apx.TextMuted}" />
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="6,4,6,2">
+                <TextBlock FontWeight="SemiBold" VerticalAlignment="Center"
+                           Text="{loc:T summary.fields.title}"
+                           Foreground="{DynamicResource Apx.TextMuted}" />
+                <Border Background="{DynamicResource Apx.Highlight}" CornerRadius="8" Padding="4,1"
+                        VerticalAlignment="Center"
+                        ToolTip.Tip="{loc:T summary.fields.help}">
+                    <TextBlock Text="?" FontSize="11" Foreground="{DynamicResource Apx.Text}" />
+                </Border>
+            </StackPanel>
             <!-- Per-code note (#9): persisted findings about the selected code. -->
             <Grid DockPanel.Dock="Top" Margin="6,0,6,4" ColumnDefinitions="*,Auto"
                   IsVisible="{Binding HasSelectedKeyStats}">

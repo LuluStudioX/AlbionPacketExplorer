@@ -22,7 +22,15 @@
                  (last child) fills the remaining width and wraps when narrow. -->
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
                         HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"
-                        MaxWidth="320">
+                        MaxWidth="420">
+                <Button Classes="accent" Padding="10,8"
+                        Command="{Binding Aggregator.ShareDigestCommand}"
+                        ToolTip.Tip="{loc:T toolbar.shareDigest.tip}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Upload}" Stroke="#FFFFFF" />
+                        <TextBlock Text="{loc:T toolbar.shareDigest}" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                    </StackPanel>
+                </Button>
                 <StackPanel Orientation="Horizontal" Spacing="6"
                             IsVisible="{Binding UpdateVersion, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                     <TextBlock VerticalAlignment="Center" FontSize="12"
