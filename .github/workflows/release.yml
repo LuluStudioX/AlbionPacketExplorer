@@ -5,8 +5,26 @@ on:
     tags:
       - 'v*'
 
+# Build jobs upload their assets STRAIGHT to the GitHub release (created as a draft up front,
+# published by the final job). No actions/upload-artifact anywhere: release assets do not count
+# against the Actions artifact storage quota, which a transit-artifact design kept exhausting.
+permissions:
+  contents: write
+
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+              --draft --generate-notes --title "$GITHUB_REF_NAME"
+
   build-windows:
+    needs: create-release
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
@@ -62,12 +80,22 @@ jobs:
           --channel win-x64
           --icon src/AlbionPacketExplorer/Assets/app-icon.ico
 
-      - uses: actions/upload-artifact@v7
-        with:
-          name: win-x64
-          path: releases/win-x64/*
+      # Curated set: installer + portable (downloads) and the Velopack-1 feed
+      # (releases.<rid>.json + *.nupkg). The legacy RELEASES-* index and the vpk-internal
+      # assets.<rid>.json are intentionally excluded; no client or the feed needs them.
+      - name: Upload release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(releases/win-x64/*Setup.exe releases/win-x64/*Portable.zip \
+                 releases/win-x64/*-full.nupkg releases/win-x64/*-delta.nupkg \
+                 releases/win-x64/releases.*.json)
+          gh release upload "$GITHUB_REF_NAME" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
 
   build-linux:
+    needs: create-release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -120,12 +148,19 @@ jobs:
           --channel linux-x64
           --icon src/AlbionPacketExplorer/Assets/app-icon.png
 
-      - uses: actions/upload-artifact@v7
-        with:
-          name: linux-x64
-          path: releases/linux-x64/*
+      - name: Upload release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(releases/linux-x64/*.AppImage releases/linux-x64/*Portable.zip \
+                 releases/linux-x64/*-full.nupkg releases/linux-x64/*-delta.nupkg \
+                 releases/linux-x64/releases.*.json)
+          gh release upload "$GITHUB_REF_NAME" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
 
   build-macos-x64:
+    needs: create-release
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
@@ -177,12 +212,19 @@ jobs:
           --outputDir releases/osx-x64
           --channel osx-x64
 
-      - uses: actions/upload-artifact@v7
-        with:
-          name: osx-x64
-          path: releases/osx-x64/*
+      - name: Upload release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(releases/osx-x64/*Setup.pkg releases/osx-x64/*Portable.zip \
+                 releases/osx-x64/*-full.nupkg releases/osx-x64/*-delta.nupkg \
+                 releases/osx-x64/releases.*.json)
+          gh release upload "$GITHUB_REF_NAME" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
 
   build-macos-arm64:
+    needs: create-release
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
@@ -234,38 +276,26 @@ jobs:
           --outputDir releases/osx-arm64
           --channel osx-arm64
 
-      - uses: actions/upload-artifact@v7
-        with:
-          name: osx-arm64
-          path: releases/osx-arm64/*
+      - name: Upload release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(releases/osx-arm64/*Setup.pkg releases/osx-arm64/*Portable.zip \
+                 releases/osx-arm64/*-full.nupkg releases/osx-arm64/*-delta.nupkg \
+                 releases/osx-arm64/releases.*.json)
+          gh release upload "$GITHUB_REF_NAME" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
 
   release:
     needs: [build-windows, build-linux, build-macos-x64, build-macos-arm64]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
-      - uses: actions/download-artifact@v8
-        with:
-          path: artifacts
-          merge-multiple: true
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
-        with:
-          # Curated set: installers + portable (downloads) and the Velopack-1 feed
-          # (releases.<rid>.json + *-full.nupkg). The legacy RELEASES-* index and the vpk-internal
-          # assets.<rid>.json are intentionally excluded; no client or the feed needs them.
-          files: |
-            artifacts/*Setup.exe
-            artifacts/*Setup.pkg
-            artifacts/*.AppImage
-            artifacts/*Portable.zip
-            artifacts/*-full.nupkg
-            artifacts/*-delta.nupkg
-            artifacts/releases.*.json
-          generate_release_notes: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false
 
       # Nudge the update-feed hub to mirror this release immediately instead of waiting for its
       # poll. No-ops until HUB_DISPATCH_TOKEN (a PAT with access to the hub repo) is configured.
