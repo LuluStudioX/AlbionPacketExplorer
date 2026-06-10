@@ -79,15 +79,14 @@ public partial class CodeAggregatorViewModel : ObservableObject
     public void Ingest(PacketEntry packet, ParamSet ps) => _stats.Ingest(packet.Kind, packet.Code, ps);
 
     /// <summary>
-    /// Adopts the disjoint per-shard maps produced by <see cref="ShardedPacketStats"/> at the end
-    /// of a file load. Each (kind, code) lives on exactly one shard and was ingested there by the
-    /// same <see cref="CodeStatsMap"/> code in file order, so the union is bit-identical to
-    /// per-packet <see cref="Ingest"/> of the whole file.
+    /// Merges the arrival-partitioned worker maps produced by <see cref="ShardedPacketStats"/> at the
+    /// end of a file load. Each worker saw a slice of every (kind, code), so the maps overlap and are
+    /// folded together with <see cref="CodeStatsMap.Merge"/> in worker order.
     /// </summary>
     public void AdoptShards(IReadOnlyList<CodeStatsMap> shards)
     {
         foreach (var shard in shards)
-            _stats.AdoptDisjoint(shard);
+            _stats.Merge(shard);
     }
 
     public void Flush()

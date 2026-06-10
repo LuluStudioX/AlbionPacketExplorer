@@ -102,4 +102,21 @@ public readonly record struct ParamValue
         TagRef => _ref,
         _ => null,
     };
+
+    /// <summary>
+    /// Builds the value-distribution key straight from the tagged union, with NO boxing - the stats
+    /// load hot path calls this ~16M times per big file, and going through <see cref="Value"/> would
+    /// box every numeric into a transient gen0 object just to read it back. Numerics/bools carry
+    /// their bits inline; only strings and array/dict reprs allocate (the repr is needed to dedupe
+    /// equal contents, and those types are the minority).
+    /// </summary>
+    public StatKey ToStatKey() => _tag switch
+    {
+        TagInt64 => StatKey.FromLong(_num),
+        TagDouble => StatKey.FromDouble(BitConverter.Int64BitsToDouble(_num)),
+        TagBool => StatKey.FromBool(_num != 0),
+        TagRef => _ref is string s ? StatKey.FromText(s)
+                                   : StatKey.FromText(Services.PacketDisplayFormatter.FormatParamValue(this)),
+        _ => StatKey.Null,
+    };
 }
