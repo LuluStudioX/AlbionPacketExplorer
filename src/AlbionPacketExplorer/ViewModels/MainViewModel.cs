@@ -711,12 +711,13 @@ public partial class MainViewModel : ObservableObject
         {
             // Parse + ingest off the UI thread. The reader's Progress<double> was created on the UI
             // thread, so LoadProgress updates still marshal automatically. Aggregator map, correlator
-            // and the local list are not bound, so mutating them here is safe.
+            // and the local list are not bound, so mutating them here is safe. The reader hands over
+            // each packet's freshly parsed ParamSet so ingest never decodes the store it just wrote.
             await Task.Run(async () =>
             {
-                await foreach (var packet in reader.ReadAsync(path, progress, _paramStore))
+                await foreach (var (packet, ps) in reader.ReadWithParamsAsync(path, progress, _paramStore))
                 {
-                    Aggregator.Ingest(packet);
+                    Aggregator.Ingest(packet, ps);
                     _correlator.Observe(packet);
                     loaded.Add(packet);
                 }
