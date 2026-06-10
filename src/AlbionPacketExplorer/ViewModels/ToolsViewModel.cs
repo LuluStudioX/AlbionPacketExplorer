@@ -53,6 +53,9 @@ public partial class ToolsViewModel : ObservableObject
     [ObservableProperty] private double _progress;
     [ObservableProperty] private bool _isBusy;
 
+    /// <summary>Collapse exact-duplicate packets while merging. On by default.</summary>
+    [ObservableProperty] private bool _dedupe = true;
+
     /// <summary>True once a merge has completed without throwing (gates Verify).</summary>
     [ObservableProperty] private bool _merged;
 
@@ -191,7 +194,7 @@ public partial class ToolsViewModel : ObservableObject
 
         try
         {
-            var r = await Task.Run(() => _merge.MergeAsync(inputs, OutputPath, progress));
+            var r = await Task.Run(() => _merge.MergeAsync(inputs, OutputPath, Dedupe, progress));
 
             int errored = 0;
             foreach (var f in r.Files)
@@ -207,8 +210,9 @@ public partial class ToolsViewModel : ObservableObject
                 }
             }
 
+            var dupeNote = r.DuplicatesRemoved > 0 ? $", {r.DuplicatesRemoved:N0} duplicate(s) removed" : "";
             MergeSummary = $"{r.TotalEmitted:N0} packets -> {Path.GetFileName(r.OutputPath)} " +
-                           $"({ToolsInputItem.FormatBytes(r.OutputBytes)})";
+                           $"({ToolsInputItem.FormatBytes(r.OutputBytes)}){dupeNote}";
             AppendLog(errored == 0
                 ? $"Merge done. {MergeSummary}"
                 : $"Merge done with {errored} unreadable file(s). {MergeSummary}");
@@ -216,7 +220,8 @@ public partial class ToolsViewModel : ObservableObject
 
             // Verify always runs right after a merge, cross-checking against the very inputs that
             // produced the file, so the delete prompt only appears once nothing-was-lost is proven.
-            await RunVerifyAsync(inputs);
+            // The dupe count lets the source cross-check stay exact even with dedupe on.
+            await RunVerifyAsync(inputs, r.DuplicatesRemoved);
         }
         catch (Exception ex)
         {
@@ -249,7 +254,8 @@ public partial class ToolsViewModel : ObservableObject
     }
 
     // Shared verify body. Caller owns IsBusy/Progress so it can run standalone or chained after merge.
-    private async Task RunVerifyAsync(IReadOnlyList<string>? sources)
+    // duplicatesRemoved is non-zero only when chained after a dedupe merge; standalone verify passes 0.
+    private async Task RunVerifyAsync(IReadOnlyList<string>? sources, long duplicatesRemoved = 0)
     {
         Verified = false;
         AppendLog($"Verifying {Path.GetFileName(OutputPath)} ...");
@@ -257,7 +263,8 @@ public partial class ToolsViewModel : ObservableObject
 
         try
         {
-            var r = await Task.Run(() => _merge.VerifyAsync(OutputPath, sources, progress));
+            var r = await Task.Run(() => _merge.VerifyAsync(OutputPath, sources, progress,
+                duplicatesRemoved: duplicatesRemoved));
             if (r.Ok)
             {
                 VerifySummary = r.SourcesChecked
