@@ -10,7 +10,8 @@ public sealed record MergeFileResult(string Path, string Name, long Emitted, str
 
 /// <summary>Aggregate result of a merge run.</summary>
 public sealed record MergeResult(
-    IReadOnlyList<MergeFileResult> Files, long TotalEmitted, string OutputPath, long OutputBytes);
+    IReadOnlyList<MergeFileResult> Files, long TotalEmitted, string OutputPath, long OutputBytes,
+    long DuplicatesRemoved);
 
 /// <summary>
 /// Result of verifying a merged file. <see cref="MergedLineCount"/> and <see cref="ReadBackCount"/>
@@ -37,13 +38,25 @@ public sealed class PacketMergeService
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
+    /// <param name="dedupe">
+    /// When true, exact-duplicate packets are collapsed to a single line. Two packets are duplicates
+    /// iff their canonical serialized form (the very bytes written here) is identical, so re-merging
+    /// outputs that share an original capture cannot double its packets. The first occurrence in
+    /// input order is kept; later identical lines are dropped and counted.
+    /// </param>
     public async Task<MergeResult> MergeAsync(
-        IReadOnlyList<string> inputs, string outputPath,
+        IReadOnlyList<string> inputs, string outputPath, bool dedupe = true,
         IProgress<double>? progress = null, CancellationToken ct = default)
     {
         var reader = new PacketFileReader();
         var results = new List<MergeFileResult>(inputs.Count);
         long totalEmitted = 0;
+        long duplicatesRemoved = 0;
+
+        // 128-bit content hashes of every line already written (dedupe only). A hash set of 16-byte
+        // keys costs ~16 B/packet versus retaining the full ~hundreds-of-bytes line, and the 128-bit
+        // width makes a false-positive collision (which would wrongly drop a packet) negligible.
+        var seen = dedupe ? new HashSet<UInt128>() : null;
 
         long totalBytes = 0;
         foreach (var p in inputs)
@@ -53,7 +66,6 @@ public sealed class PacketMergeService
 
         await using (var outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write,
                          FileShare.None, bufferSize: 1 << 16, useAsync: true))
-        await using (var writer = new StreamWriter(outStream, new UTF8Encoding(false)) { NewLine = "\n" })
         {
             foreach (var input in inputs)
             {
@@ -70,11 +82,41 @@ public sealed class PacketMergeService
                     var fileProgress = new Progress<double>(p =>
                         progress?.Report(Math.Min(1.0, (start + p * fileBytes) / (double)totalBytes)));
 
-                    await foreach (var packet in reader.ReadAsync(input, fileProgress))
+                    // Read the file as ordered batches (the reader parses in parallel). For each batch
+                    // the CPU-heavy work - shaping every packet to its canonical UTF-8 JSON line and
+                    // hashing it - runs across all cores; the serial tail only does the dedupe set
+                    // check and one buffered write per batch, preserving input order exactly.
+                    await foreach (var batch in reader.ReadBatchesAsync(input, fileProgress))
                     {
                         ct.ThrowIfCancellationRequested();
-                        await writer.WriteLineAsync(JsonSerializer.Serialize(PacketWire.ToJsonShape(packet), CompactJson));
-                        emitted++;
+                        int n = batch.Items.Count;
+                        if (n == 0) continue;
+
+                        var lines = new byte[n][];
+                        var hashes = seen is not null ? new UInt128[n] : null;
+                        Parallel.For(0, n, i =>
+                        {
+                            var (entry, ps) = batch.Items[i];
+                            byte[] line = JsonSerializer.SerializeToUtf8Bytes(
+                                PacketWire.ToJsonShape(entry, ps), CompactJson);
+                            lines[i] = line;
+                            if (hashes is not null) hashes[i] = Hash(line);
+                        });
+
+                        using var chunk = new MemoryStream(n * 64);
+                        for (int i = 0; i < n; i++)
+                        {
+                            if (seen is not null && !seen.Add(hashes![i]))
+                            {
+                                duplicatesRemoved++;
+                                continue;
+                            }
+                            chunk.Write(lines[i], 0, lines[i].Length);
+                            chunk.WriteByte((byte)'\n');
+                            emitted++;
+                        }
+                        if (chunk.Length > 0)
+                            await outStream.WriteAsync(chunk.GetBuffer().AsMemory(0, (int)chunk.Length), ct);
                     }
                 }
                 catch (OperationCanceledException) { throw; }
@@ -86,22 +128,39 @@ public sealed class PacketMergeService
                 results.Add(new MergeFileResult(input, Path.GetFileName(input), emitted, error));
             }
 
-            await writer.FlushAsync(ct);
+            await outStream.FlushAsync(ct);
         }
 
         long outBytes = 0;
         try { outBytes = new FileInfo(outputPath).Length; } catch { /* report 0 */ }
-        return new MergeResult(results, totalEmitted, outputPath, outBytes);
+        return new MergeResult(results, totalEmitted, outputPath, outBytes, duplicatesRemoved);
+    }
+
+    // Content hash for dedupe: MD5 is not used for security here, only as a fast, dependency-free
+    // 128-bit digest. TryHashData writes into a stack buffer so per-packet hashing never allocates.
+    private static UInt128 Hash(ReadOnlySpan<byte> data)
+    {
+        Span<byte> digest = stackalloc byte[16];
+        System.Security.Cryptography.MD5.HashData(data, digest);
+        ulong lo = BitConverter.ToUInt64(digest[..8]);
+        ulong hi = BitConverter.ToUInt64(digest[8..]);
+        return new UInt128(hi, lo);
     }
 
     /// <param name="sources">
     /// The inputs that produced <paramref name="outputPath"/>. When non-empty they are re-parsed
-    /// from scratch and their total must equal the merged count - this is what proves nothing was
-    /// dropped. Pass null/empty to verify a standalone file (internal consistency only).
+    /// from scratch and their total, minus <paramref name="duplicatesRemoved"/>, must equal the
+    /// merged count - this is what proves nothing was dropped. Pass null/empty to verify a standalone
+    /// file (internal consistency only).
+    /// </param>
+    /// <param name="duplicatesRemoved">
+    /// How many exact-duplicate packets the merge collapsed. The re-counted source total is expected
+    /// to exceed the merged count by exactly this much (dedupe removes, never adds), so the cross
+    /// check stays a real "nothing lost" guarantee even with dedupe on.
     /// </param>
     public async Task<VerifyResult> VerifyAsync(
         string outputPath, IReadOnlyList<string>? sources,
-        IProgress<double>? progress = null, CancellationToken ct = default)
+        IProgress<double>? progress = null, CancellationToken ct = default, long duplicatesRemoved = 0)
     {
         var issues = new List<string>();
         var reader = new PacketFileReader();
@@ -161,8 +220,11 @@ public sealed class PacketMergeService
                 doneBytes += fileBytes;
             }
 
-            if (sourceTotal != readBack)
-                issues.Add($"Sources hold {sourceTotal:N0} packets but merged has {readBack:N0}.");
+            if (sourceTotal - duplicatesRemoved != readBack)
+                issues.Add(duplicatesRemoved > 0
+                    ? $"Sources hold {sourceTotal:N0} packets, merged has {readBack:N0} after removing "
+                      + $"{duplicatesRemoved:N0} duplicate(s) - expected {sourceTotal - duplicatesRemoved:N0}."
+                    : $"Sources hold {sourceTotal:N0} packets but merged has {readBack:N0}.");
         }
 
         if (lineCount != readBack)
