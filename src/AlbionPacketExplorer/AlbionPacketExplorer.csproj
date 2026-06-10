@@ -7,6 +7,10 @@
     <Nullable>enable</Nullable>
     <RootNamespace>AlbionPacketExplorer</RootNamespace>
     <AssemblyName>AlbionPacketExplorer</AssemblyName>
+    <!-- Raw pointer copies into the memory-mapped param arena (PackedParamStore) - the accessor's
+         WriteArray/ReadArray marshal element-by-element and dominate big loads; a span copy through
+         the view's base pointer is ~10x faster. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AvaloniaVersion>12.0.4</AvaloniaVersion>
     <NoWarn>$(NoWarn);AVLN3001</NoWarn>
     <Win32Resource Condition="'$(OS)'=='Windows_NT'">app.res</Win32Resource>
