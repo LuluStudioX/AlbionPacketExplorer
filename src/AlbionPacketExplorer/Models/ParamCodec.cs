@@ -31,8 +31,11 @@ public static class ParamCodec
 
         while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
         {
-            // Reuse a shared "0".."255" instance instead of allocating a fresh key string per packet.
-            string name = ParamKeys.Intern(reader.GetString()!);
+            // Resolve the shared "0".."255" key straight from the UTF-8 token bytes - no string
+            // allocation per key. Escaped or out-of-range names fall back to GetString+Intern.
+            string name = !reader.HasValueSequence && TryGetByteKey(reader.ValueSpan, out var shared)
+                ? shared
+                : ParamKeys.Intern(reader.GetString()!);
             reader.Read(); // advance to the param value (expected an object)
 
             string type = "";
@@ -42,20 +45,20 @@ public static class ParamCodec
             {
                 while (reader.Read() && reader.TokenType == JsonTokenType.PropertyName)
                 {
-                    string inner = reader.GetString()!;
-                    reader.Read();
-                    switch (inner)
+                    if (reader.ValueTextEquals("type"u8))
                     {
-                        case "type":
-                            // Intern: a handful of distinct type names dedupe to single instances.
-                            type = reader.TokenType == JsonTokenType.String ? string.Intern(reader.GetString() ?? "") : "";
-                            break;
-                        case "value":
-                            value = ExtractValue(ref reader);
-                            break;
-                        default:
-                            reader.Skip();
-                            break;
+                        reader.Read();
+                        type = reader.TokenType == JsonTokenType.String ? InternType(ref reader) : "";
+                    }
+                    else if (reader.ValueTextEquals("value"u8))
+                    {
+                        reader.Read();
+                        value = ExtractValue(ref reader);
+                    }
+                    else
+                    {
+                        // Skip on a PropertyName consumes the name and its whole value.
+                        reader.Skip();
                     }
                 }
             }
@@ -69,6 +72,39 @@ public static class ParamCodec
         }
 
         return new ParamSet(parameters.ToArray());
+    }
+
+    // Parses a 1-3 digit property name (0..255) directly from its UTF-8 bytes and returns the shared
+    // ParamKeys instance. Mirrors ParamKeys.Intern's canonicalization (leading zeros collapse).
+    private static bool TryGetByteKey(ReadOnlySpan<byte> span, out string key)
+    {
+        key = "";
+        if (span.Length is 0 or > 3) return false;
+        int v = 0;
+        foreach (byte b in span)
+        {
+            if (b < (byte)'0' || b > (byte)'9') return false;
+            v = v * 10 + (b - '0');
+        }
+        if (v > 255) return false;
+        key = ParamKeys.Get(v);
+        return true;
+    }
+
+    // The distinct type names on the wire (~15). Matching the UTF-8 token against these returns the
+    // shared instance without allocating the string first; anything new falls back to GetString+Intern.
+    private static readonly string[] CommonTypes =
+    [
+        "Int64", "Int32", "Int16", "Byte", "Boolean", "Single", "Double", "String", "Null",
+        "Byte[]", "Int16[]", "Int32[]", "Int64[]", "Single[]", "Double[]", "Boolean[]", "String[]"
+    ];
+
+    private static string InternType(ref Utf8JsonReader reader)
+    {
+        foreach (var t in CommonTypes)
+            if (reader.ValueTextEquals(t))
+                return t;
+        return string.Intern(reader.GetString() ?? "");
     }
 
     // Mirrors the old Dictionary indexer's last-write-wins: a repeated key overwrites in place
