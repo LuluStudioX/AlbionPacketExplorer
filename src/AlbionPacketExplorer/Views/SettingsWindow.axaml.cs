@@ -57,6 +57,10 @@ public partial class SettingsWindow : ApxWindow
         if (sender is Button btn) ShowSection(btn);
     }
 
+    // A webhook field that's left blank when focus leaves is dropped, so empty rows don't pile up.
+    private void OnWebhookFieldLostFocus(object? sender, RoutedEventArgs e)
+        => (DataContext as SettingsViewModel)?.ProtocolScan.PruneEmptyWebhooks();
+
     private void ShowSection(Button btn)
     {
         var tag = btn.Tag as string;
