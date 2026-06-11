@@ -75,7 +75,7 @@ public static class WebhookNotifier
         foreach (var c in items)
         {
             if (budget-- <= 0) { sb.Append("...and more\n"); return; }
-            sb.Append(format(c)).Append('\n');
+            sb.Append("• ").Append(format(c)).Append('\n');
         }
     }
 
