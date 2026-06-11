@@ -74,11 +74,12 @@ public partial class MainViewModel : ObservableObject
     private PackedParamStore _paramStore = new();
     private readonly List<PacketEntry> _capturedPackets = [];
     private readonly List<PacketEntry> _allPackets = [];
-    private readonly List<byte[]> _rawPackets = [];   // raw payloads (live capture / loaded .b64) for Save as RAW
-    private readonly Lock _rawLock = new();
+    // Raw payloads (live capture / loaded .b64) for Save as RAW, spilled to a temp file instead of
+    // held as byte[]s - an unbounded in-memory list grew to GBs over a long capture session.
+    private readonly RawSpillStore _rawSpill = new();
     private readonly PacketCorrelator _correlator = new();
 
-    private bool HasRaw { get { lock (_rawLock) return _rawPackets.Count > 0; } }
+    private bool HasRaw => _rawSpill.HasAny;
 
     public bool ResolveItemNames
     {
@@ -581,7 +582,7 @@ public partial class MainViewModel : ObservableObject
 
     private void OnRawPacket(byte[] payload)
     {
-        lock (_rawLock) _rawPackets.Add(payload);
+        _rawSpill.Append(payload);
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenFile))]
@@ -634,15 +635,13 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanSaveRaw))]
     private async Task SaveRawAsync()
     {
-        byte[][] raws;
-        lock (_rawLock) raws = _rawPackets.ToArray();
         var path = await _filePicker.PickSaveFileAsync($"packets_{DateTime.Now:yyyyMMdd_HHmmss}.b64", "b64", "Raw packets");
         if (path == null) return;
         try
         {
-            await using var w = new StreamWriter(path, append: false, System.Text.Encoding.ASCII);
-            foreach (var p in raws) await w.WriteLineAsync(Convert.ToBase64String(p));
-            StatusText = Loc.Format("status.saved", raws.Length.ToString("N0"), Path.GetFileName(path));
+            int count = _rawSpill.Count;
+            await Task.Run(() => _rawSpill.SaveTo(path));
+            StatusText = Loc.Format("status.saved", count.ToString("N0"), Path.GetFileName(path));
         }
         catch (Exception ex) { StatusText = Loc.Format("status.saveFailed", ex.Message); }
     }
@@ -670,7 +669,6 @@ public partial class MainViewModel : ObservableObject
         ResetData();
 
         var loaded = new List<PacketEntry>();
-        var raws = new List<byte[]>();
         try
         {
             // Decode + ingest off the UI thread: aggregator map, correlator and the local lists are
@@ -684,7 +682,7 @@ public partial class MainViewModel : ObservableObject
                     if (string.IsNullOrWhiteSpace(line)) continue;
                     byte[] payload;
                     try { payload = Convert.FromBase64String(line.Trim()); } catch { continue; }
-                    raws.Add(payload);
+                    _rawSpill.Append(payload);
                     try { parser.ReceivePacket(payload); } catch { /* skip undecodable */ }
                 }
 
@@ -694,7 +692,6 @@ public partial class MainViewModel : ObservableObject
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
             {
                 Aggregator.Flush();
-                lock (_rawLock) _rawPackets.AddRange(raws);
                 _allPackets.AddRange(loaded);
                 PacketList.SetSource(loaded);
                 NotifySaveCommands();
@@ -877,7 +874,7 @@ public partial class MainViewModel : ObservableObject
     {
         _capturedPackets.Clear();
         _allPackets.Clear();
-        lock (_rawLock) _rawPackets.Clear();
+        _rawSpill.Clear();
         _correlator.Reset();
         Aggregator.Reset();
         PacketList.SetSource([]);
