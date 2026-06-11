@@ -28,6 +28,14 @@ fetches digests via `GET /v1/digests` (Bearer `ADMIN_KEY`), archives new ones un
 `digests/`, rebuilds `tools/digest-overlay.json`, regenerates the schema, build-gates,
 and opens a PR. Needs no local machine. KV entries expire after 60 days on their own.
 
+`.github/workflows/protocol-sync.yml` runs daily for the separate **protocol** stream
+(new/shifted/removed enum codes from a patched client, submitted via the app's
+"Submit to project" button to `POST /v1/protocol`). It fetches `GET /v1/protocols`, archives
+submissions under `protocols/`, and folds them with `tools/fold-protocol-changes.py`:
+tail-append code additions are appended to `EventCodes.cs` / `OperationCodes.cs` automatically,
+while shifts and removals are flagged in `tools/protocol-proposals.md` for manual review (a PR is
+opened for approval either way). Same `ADMIN_KEY` and `APX_PR_TOKEN` as digest-sync.
+
 The admin key exists only as a Worker secret + the repo secret `APX_DIGEST_ADMIN_KEY`.
 To rotate: generate a random string, then
 `npx wrangler secret put ADMIN_KEY` and `gh secret set APX_DIGEST_ADMIN_KEY --body <key>`.
