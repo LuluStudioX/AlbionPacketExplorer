@@ -46,7 +46,7 @@ public static class WebhookNotifier
         var sb = new StringBuilder();
         sb.Append("**Albion protocol change detected**\n");
         sb.Append($"Client `{r.ClientVersion ?? "unknown"}` - ");
-        sb.Append($"new: {r.AddedCount}, shifted: {r.ShiftedCount}, removed: {r.RemovedCount}\n");
+        sb.Append($"new: {r.AddedCount}, moved: {r.ShiftedCount}, removed: {r.RemovedCount}\n");
 
         int shown = 0;
         foreach (var c in r.Changes)
@@ -54,9 +54,10 @@ public static class WebhookNotifier
             if (shown++ >= MaxListed) { sb.Append($"...and {r.Changes.Count - MaxListed} more\n"); break; }
             sb.Append(c.Type switch
             {
-                ProtocolChangeType.Added   => $"+ `{c.Enum}.{c.Name}` = {c.ClientCode}\n",
-                ProtocolChangeType.Removed => $"- `{c.Enum}.{c.Name}` (was {c.AppCode})\n",
-                _                          => $"~ `{c.Enum}.{c.Name}` {c.AppCode} -> {c.ClientCode}\n",
+                ProtocolChangeType.Added   => $"+ new `{c.Enum}.{c.Name}` = {c.ClientCode}\n",
+                ProtocolChangeType.Removed => $"- removed `{c.Enum}.{c.Name}` (was {c.AppCode})\n",
+                // Migration: the event kept its identity but its wire code moved.
+                _                          => $"~ moved `{c.Enum}.{c.Name}`: code {c.AppCode} -> {c.ClientCode}\n",
             });
         }
         return sb.ToString();
