@@ -545,6 +545,7 @@ public partial class MainViewModel : ObservableObject
         IsCapturing = false;
         IsPaused = false;
         Aggregator.Flush();
+        PacketList.RebuildIfTruncated();
         NotifySaveCommands();
         var count = _capturedPackets.Count.ToString("N0");
         StatusText = Loc.Format("status.captureStopped", count);
@@ -565,6 +566,7 @@ public partial class MainViewModel : ObservableObject
         if (IsPaused)
         {
             Aggregator.Flush();
+            PacketList.RebuildIfTruncated();
             NotifySaveCommands();
             StatusText = Loc.Format("status.capturePaused", _capturedPackets.Count.ToString("N0"));
             _toasts.Show(Loc.T("toast.capturePaused.title"), Loc.T("toast.capturePaused.body"), ToastSeverity.Info);
@@ -850,11 +852,11 @@ public partial class MainViewModel : ObservableObject
             _allPackets.Add(packet);
             Aggregator.Ingest(packet);
             _correlator.Observe(packet);
-            // Keep per-packet so PacketList's cached Kind counts stay correct.
-            PacketList.AddLivePacket(packet);
         }
 
-        // One flush per batch instead of the old every-100-packets cadence.
+        // One UI batch-append and one flush per timer tick; per-packet appends starve the UI
+        // thread once the grid is large (see PacketListViewModel.AddLivePacketBatch).
+        PacketList.AddLivePacketBatch(batch);
         Aggregator.Flush();
     }
 
