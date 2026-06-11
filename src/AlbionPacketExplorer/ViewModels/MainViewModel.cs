@@ -260,8 +260,9 @@ public partial class MainViewModel : ObservableObject
             SkippedUpdateVersion: _skippedUpdateVersion,
             ProtocolScanEnabled: ProtocolScan?.Enabled ?? false,
             ProtocolScanOnStartup: ProtocolScan?.ScanOnStartup ?? false,
-            ProtocolWebhookUrl: string.IsNullOrWhiteSpace(ProtocolScan?.WebhookUrl) ? null : ProtocolScan!.WebhookUrl,
-            AlbionClientPath: string.IsNullOrWhiteSpace(ProtocolScan?.ClientPathOverride) ? null : ProtocolScan!.ClientPathOverride));
+            ProtocolWebhookUrl: null,
+            AlbionClientPath: string.IsNullOrWhiteSpace(ProtocolScan?.ClientPathOverride) ? null : ProtocolScan!.ClientPathOverride,
+            ProtocolWebhooks: ProtocolScan?.WebhookUrls is { Count: > 0 } w ? w.ToArray() : null));
 
     public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
