@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "721c500",
-    "generatedAt": "2026-06-10"
+    "sourceCommit": "0324984",
+    "generatedAt": "2026-06-11"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -25,7 +25,18 @@
   },
   "EVENT:3": {
     "name": "Move",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 7 distinct; range [540..547]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; high-card; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:4": {
     "name": "Teleport",
