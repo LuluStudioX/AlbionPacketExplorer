@@ -2,9 +2,25 @@
  "$meta": {
   "source": "AlbionPacketExplorer capture inference",
   "captures": [
-   "4ac7ba3e-unknown-a4c7851fcc5c.json"
+   "4ac7ba3e-unknown-a4c7851fcc5c.json",
+   "721c500-unknown-eb2d4a40c254.json"
   ],
   "note": "Lowest-precedence fill. Every param is (inferred) from wire shape."
+ },
+ "EVENT:3": {
+  "count": 3282,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 7 distinct; range [540..547]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Byte[]; high-card; Byte[] array",
+    "resolveAs": ""
+   }
+  }
  },
  "EVENT:44": {
   "count": 1542,
