@@ -11,6 +11,7 @@ public partial class SettingsWindow : ApxWindow
     private StackPanel? _sectionDisplay;
     private StackPanel? _sectionCapture;
     private StackPanel? _sectionShortcuts;
+    private StackPanel? _sectionProtocol;
     private StackPanel? _sectionPaths;
     private StackPanel? _sectionSchema;
     private StackPanel? _sectionTheme;
@@ -29,6 +30,7 @@ public partial class SettingsWindow : ApxWindow
             _sectionDisplay   = this.FindControl<StackPanel>("SectionDisplay");
             _sectionCapture   = this.FindControl<StackPanel>("SectionCapture");
             _sectionShortcuts = this.FindControl<StackPanel>("SectionShortcuts");
+            _sectionProtocol  = this.FindControl<StackPanel>("SectionProtocol");
             _sectionPaths     = this.FindControl<StackPanel>("SectionPaths");
             _sectionSchema  = this.FindControl<StackPanel>("SectionSchema");
             _sectionTheme   = this.FindControl<StackPanel>("SectionTheme");
@@ -61,6 +63,7 @@ public partial class SettingsWindow : ApxWindow
         if (_sectionDisplay   != null) _sectionDisplay.IsVisible   = tag == "Display";
         if (_sectionCapture   != null) _sectionCapture.IsVisible   = tag == "Capture";
         if (_sectionShortcuts != null) _sectionShortcuts.IsVisible = tag == "Shortcuts";
+        if (_sectionProtocol  != null) _sectionProtocol.IsVisible  = tag == "Protocol";
         if (_sectionPaths     != null) _sectionPaths.IsVisible     = tag == "Paths";
         if (_sectionSchema  != null) _sectionSchema.IsVisible  = tag == "Schema";
         if (_sectionTheme   != null) _sectionTheme.IsVisible   = tag == "Theme";
