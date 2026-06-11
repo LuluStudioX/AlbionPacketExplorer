@@ -32,6 +32,29 @@ The admin key exists only as a Worker secret + the repo secret `APX_DIGEST_ADMIN
 To rotate: generate a random string, then
 `npx wrangler secret put ADMIN_KEY` and `gh secret set APX_DIGEST_ADMIN_KEY --body <key>`.
 
+### PR token (`APX_PR_TOKEN`)
+
+The `LuluStudioX` org disallows the default `GITHUB_TOKEN` (GitHub Actions) from creating pull
+requests, so the "Open PR" step uses a user fine-grained PAT instead. Without it the fold still
+runs and the branch is pushed, but `gh pr create` fails and that digest is stranded on a
+`digest-sync/*` branch (its KV entry is already cleared, so the branch holds the only copy).
+
+Create / rotate the token:
+
+1. GitHub -> your account -> Settings -> Developer settings -> Personal access tokens ->
+   Fine-grained tokens -> Generate new token.
+2. Resource owner: `LuluStudioX`. Repository access: Only select repositories -> `AlbionPacketExplorer`.
+3. Repository permissions: Pull requests -> Read and write. (Metadata read is implied; the branch
+   push uses the default token, so Contents write is not needed for this token.)
+4. Expiration: pick a date and note it - the PR step fails once the token lapses.
+5. Copy the token, then store it as the repo secret:
+   `gh secret set APX_PR_TOKEN --body <token>` (or repo Settings -> Secrets and variables -> Actions).
+6. Verify: Actions -> digest-sync -> Run workflow, and confirm a PR opens.
+
+If a scheduled run failed at the PR step before the token existed, the fold is on its pushed
+branch; open the PR by hand so the digest is not lost:
+`gh pr create --head digest-sync/<stamp> --base main --title "packet(app): fold digests into schema"`.
+
 ## Operations
 
 ```powershell

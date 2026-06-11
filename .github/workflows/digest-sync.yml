@@ -96,7 +96,11 @@ jobs:
       - name: Open PR
         if: steps.archive.outputs.new != '0'
         env:
-          GH_TOKEN: ${{ github.token }}
+          # `gh pr create` needs a user PAT: the org forbids the default GITHUB_TOKEN (Actions)
+          # from creating PRs. APX_PR_TOKEN is a fine-grained PAT (Pull requests: read/write).
+          # Falls back to the default token if the secret is unset - the PR step then fails as
+          # before until APX_PR_TOKEN is added. See the digest-worker README for token setup.
+          GH_TOKEN: ${{ secrets.APX_PR_TOKEN || github.token }}
           NEW: ${{ steps.archive.outputs.new }}
         run: |
           BRANCH="digest-sync/$(date -u +%Y%m%d-%H%M)"
