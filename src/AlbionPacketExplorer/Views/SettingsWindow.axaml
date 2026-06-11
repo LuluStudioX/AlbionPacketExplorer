@@ -74,6 +74,17 @@
                         <TextBlock Text="{loc:T settings.nav.schema}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                <Button Name="NavProtocol"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,10"
+                        Click="OnNavClicked"
+                        Tag="Protocol">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Path Classes="icon sm" Data="{StaticResource Icon.Globe}" />
+                        <TextBlock Text="{loc:T settings.nav.protocol}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
                 <Button Name="NavTheme"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -238,6 +249,119 @@
                                          VerticalAlignment="Center" Margin="20,0,0,0" />
                         </Grid>
                     </Border>
+                </StackPanel>
+
+                <!-- Protocol Scanner section -->
+                <StackPanel Name="SectionProtocol" Spacing="12" IsVisible="False">
+                    <TextBlock Text="{loc:T settings.protocol.title}" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="{loc:T settings.protocol.hint}"
+                               Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="{loc:T settings.protocol.enable}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.protocol.enable.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsChecked="{Binding ProtocolScan.Enabled}"
+                                          VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Everything below is gated on the feature being enabled. -->
+                    <StackPanel Spacing="12" IsVisible="{Binding ProtocolScan.Enabled}">
+
+                        <Border Classes="card" Padding="16">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Spacing="3">
+                                    <TextBlock Text="{loc:T settings.protocol.startup}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:T settings.protocol.startup.desc}"
+                                               Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1"
+                                              IsChecked="{Binding ProtocolScan.ScanOnStartup}"
+                                              VerticalAlignment="Center" Margin="20,0,0,0" />
+                            </Grid>
+                        </Border>
+
+                        <Border Classes="card" Padding="16">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{loc:T settings.protocol.path}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.protocol.path.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding ProtocolScan.ClientPathOverride}"
+                                             Watermark="{loc:T settings.protocol.path.auto}" />
+                                    <Button Grid.Column="1" Classes="ghost"
+                                            Content="{loc:T settings.protocol.browse}"
+                                            Command="{Binding ProtocolScan.BrowseClientCommand}" />
+                                    <Button Grid.Column="2" Classes="ghost"
+                                            Content="{loc:T settings.protocol.clear}"
+                                            Command="{Binding ProtocolScan.ClearClientPathCommand}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="card" Padding="16">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{loc:T settings.protocol.webhook}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.protocol.webhook.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding ProtocolScan.WebhookUrl}"
+                                             Watermark="https://discord.com/api/webhooks/..." />
+                                    <Button Grid.Column="1" Classes="ghost"
+                                            Content="{loc:T settings.protocol.test}"
+                                            IsEnabled="{Binding ProtocolScan.HasWebhook}"
+                                            Command="{Binding ProtocolScan.TestWebhookCommand}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="card" Padding="16">
+                            <StackPanel Spacing="10">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="3">
+                                        <TextBlock Text="{loc:T settings.protocol.scan}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding ProtocolScan.StatusText}"
+                                                   Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Classes="accent"
+                                            Content="{loc:T settings.protocol.scanNow}"
+                                            IsEnabled="{Binding !ProtocolScan.IsScanning}"
+                                            Command="{Binding ProtocolScan.ScanCommand}"
+                                            VerticalAlignment="Center" Margin="20,0,0,0" />
+                                </Grid>
+
+                                <StackPanel Spacing="6" IsVisible="{Binding ProtocolScan.HasResult}">
+                                    <TextBlock Text="{Binding ProtocolScan.Summary}" FontWeight="SemiBold" />
+                                    <ItemsControl ItemsSource="{Binding ProtocolScan.Changes}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:ProtocolChangeRow">
+                                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Margin="0,2">
+                                                    <TextBlock Grid.Column="0" Text="{Binding Symbol}"
+                                                               FontFamily="Cascadia Code,Consolas,monospace"
+                                                               Foreground="{DynamicResource Apx.Accent}" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Title}"
+                                                               FontFamily="Cascadia Code,Consolas,monospace"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Grid.Column="2" Text="{Binding Detail}"
+                                                               Foreground="Gray" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="{loc:T settings.protocol.privacy}"
+                                   Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- Shortcuts section -->

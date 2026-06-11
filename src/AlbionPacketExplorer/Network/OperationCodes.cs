@@ -542,4 +542,6 @@ public enum OperationCodes
     RequestLoreSnippetStates,
     RetrieveCarriableObjectStart,
     RetrieveCarriableObjectCancel,
+    ForfeitCustomMatch,
+    GetPartyMemberCluster,
 }

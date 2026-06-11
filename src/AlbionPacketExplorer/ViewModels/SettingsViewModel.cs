@@ -19,6 +19,9 @@ public partial class SettingsViewModel : ObservableObject
 
     public bool GameDataLoaded => _main.GameDataLoaded;
 
+    /// <summary>Protocol Scanner panel state (lives on MainViewModel so it survives dialog reopen).</summary>
+    public ProtocolScanViewModel ProtocolScan => _main.ProtocolScan;
+
     // Update controls live on MainViewModel; surfaced here for the About section.
     public System.Windows.Input.ICommand CheckForUpdateCommand => _main.CheckForUpdateCommand;
     public System.Windows.Input.ICommand ApplyUpdateCommand => _main.ApplyUpdateCommand;

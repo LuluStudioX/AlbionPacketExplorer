@@ -684,4 +684,5 @@ public enum EventCodes
     RetrieveCarriableObjectFinished = 680,
     LosingCarriableObjectStart = 681,
     LosingCarriableObjectFinished = 682,
+    NotifyPlatformAccountConfirmed = 683,
 }
