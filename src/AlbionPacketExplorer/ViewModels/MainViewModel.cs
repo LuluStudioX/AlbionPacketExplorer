@@ -483,7 +483,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             AvailableDevices.Clear();
-            AvailableDevices.Add(new NetworkDeviceInfo("", "Automatic (all adapters)", -1));
+            AvailableDevices.Add(new NetworkDeviceInfo("", "Automatic (1 adapter)", -1));
             foreach (var d in NetworkDeviceScanner.GetDevices())
                 AvailableDevices.Add(d);
 
