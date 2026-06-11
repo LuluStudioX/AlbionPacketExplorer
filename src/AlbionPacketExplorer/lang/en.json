@@ -383,7 +383,7 @@
   "settings.display.forceExpand.note": "Arrays and dicts are shown one entry per line with item index resolution.",
   "settings.display.autoStart": "Auto-start capture on launch",
   "settings.display.autoStart.desc": "Start network capture automatically when the app opens.",
-  "settings.display.autoStart.note": "Uses the last selected device (or all adapters if set to Automatic).",
+  "settings.display.autoStart.note": "Uses the last selected device (or, if set to Automatic, starts on all adapters and locks onto the one carrying game traffic).",
   "settings.display.autoSave": "Auto-save capture log on exit",
   "settings.display.autoSave.desc": "Save all captured packets to a JSON file when closing the app.",
   "settings.display.autoSave.note": "Saved to the app data logs folder with a timestamped filename.",
