@@ -19,9 +19,15 @@ public static class WebhookNotifier
 
     public static Task<SendResult> SendTestAsync(string url, CancellationToken ct = default)
     {
+        var line = $"**{UserName}** test - if you can read this, change notifications are wired up correctly.";
         var payload = IsDiscord(url)
-            ? DiscordBody($"**{UserName}** test - if you can read this, change notifications are wired up correctly.")
-            : JsonSerializer.Serialize(new { source = "AlbionPacketExplorer", @event = "test" });
+            ? DiscordBody($"{line}\n\nExamples:\n{BuildMarkdown(SampleResult())}")
+            : JsonSerializer.Serialize(new
+            {
+                source = "AlbionPacketExplorer",
+                @event = "test",
+                example = BuildMarkdown(SampleResult()),
+            });
         return PostAsync(url, payload, ct);
     }
 
@@ -48,21 +54,40 @@ public static class WebhookNotifier
         sb.Append($"Client `{r.ClientVersion ?? "unknown"}` - ");
         sb.Append($"new: {r.AddedCount}, moved: {r.ShiftedCount}, removed: {r.RemovedCount}\n");
 
-        int shown = 0;
-        foreach (var c in r.Changes)
-        {
-            if (shown++ >= MaxListed) { sb.Append($"...and {r.Changes.Count - MaxListed} more\n"); break; }
-            sb.Append(c.Type switch
-            {
-                // Bright/colored emoji (not +/-) so the markers stay visible on dark Discord themes.
-                ProtocolChangeType.Added   => $"🆕 `{c.Enum}.{c.Name}` = {c.ClientCode}\n",
-                ProtocolChangeType.Removed => $"❌ removed `{c.Enum}.{c.Name}` (was {c.AppCode})\n",
-                // Migration: the event kept its identity but its wire code moved.
-                _                          => $"\U0001F500 moved `{c.Enum}.{c.Name}`: code {c.AppCode} -> {c.ClientCode}\n",
-            });
-        }
+        // Grouped by type with a header each (only when non-empty). Emoji on dark themes stay visible.
+        var budget = MaxListed;
+        AppendGroup(sb, "New \U0001F195", r.Changes, ProtocolChangeType.Added,
+            c => $"`{c.Enum}.{c.Name}` = {c.ClientCode}", ref budget);
+        AppendGroup(sb, "Moved \U0001F500", r.Changes, ProtocolChangeType.Shifted,
+            c => $"`{c.Enum}.{c.Name}`: code {c.AppCode} -> {c.ClientCode}", ref budget);
+        AppendGroup(sb, "Removed ❌", r.Changes, ProtocolChangeType.Removed,
+            c => $"`{c.Enum}.{c.Name}` (was {c.AppCode})", ref budget);
         return sb.ToString();
     }
+
+    // One section per change type, listed only when it has entries, sharing a global line budget.
+    private static void AppendGroup(StringBuilder sb, string title, IReadOnlyList<ProtocolChange> changes,
+        ProtocolChangeType type, Func<ProtocolChange, string> format, ref int budget)
+    {
+        var items = changes.Where(c => c.Type == type).ToList();
+        if (items.Count == 0) return;
+        sb.Append($"\n**{title}**\n");
+        foreach (var c in items)
+        {
+            if (budget-- <= 0) { sb.Append("...and more\n"); return; }
+            sb.Append(format(c)).Append('\n');
+        }
+    }
+
+    // A representative change set so the test message can show what a real alert looks like.
+    private static ProtocolScanResult SampleResult() => new(
+        true, null, "1.31.021.334290", null, "example", false,
+        [
+            new("EventCodes", ProtocolChangeType.Added, "NotifyPlatformAccountConfirmed", null, 683),
+            new("EventCodes", ProtocolChangeType.Shifted, "NewSimpleItem", 32, 33),
+            new("EventCodes", ProtocolChangeType.Shifted, "NewBuilding", 45, 46),
+            new("EventCodes", ProtocolChangeType.Removed, "SomePrototypeEvent", 410, null),
+        ]);
 
     private static string BuildJson(ProtocolScanResult r) =>
         JsonSerializer.Serialize(new
