@@ -1,0 +1,91 @@
+# Folds anonymous protocol-change submissions (new/shifted/removed enum codes detected in a
+# patched game client) from the apx-digest Worker into the C# enums, then opens a PR.
+# Tail-append additions are applied automatically; shifts/removals are flagged for manual review.
+# Runs without any local machine. No artifacts are ever uploaded (repo policy).
+name: protocol-sync
+
+on:
+  schedule:
+    # Daily: protocol changes only happen on a game patch, far rarer than field digests.
+    - cron: "30 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Fetch protocol submissions from worker
+        env:
+          ADMIN_KEY: ${{ secrets.APX_DIGEST_ADMIN_KEY }}
+        run: |
+          curl -sf -H "Authorization: Bearer $ADMIN_KEY" \
+            https://apx-digest.workpressfail2ban.workers.dev/v1/protocols > /tmp/protocols.json
+
+      - name: Fold into enums
+        id: fold
+        run: python3 tools/fold-protocol-changes.py
+
+      # Storage hygiene: drop KV entries whose submission is already archived ON MAIN (their PR
+      # merged). Entries from THIS run stay until their PR merges; the 60-day TTL is the backstop.
+      - name: Clear archived entries from KV
+        env:
+          ADMIN_KEY: ${{ secrets.APX_DIGEST_ADMIN_KEY }}
+        run: |
+          git ls-files tools/digest-worker/protocols > /tmp/tracked.txt
+          python3 - <<'EOF'
+          import json, pathlib
+          docs = json.load(open('/tmp/protocols.json'))
+          tracked = set(pathlib.Path(p).name for p in open('/tmp/tracked.txt').read().split())
+          doomed = []
+          for d in docs:
+              parts = d['key'].split(':')  # p:<clientVersion>:<sha256>
+              if len(parts) == 3 and f"{parts[1]}-{parts[2][:12]}.json" in tracked:
+                  doomed.append(d['key'])
+          pathlib.Path('/tmp/doomed.txt').write_text('\n'.join(doomed))
+          print(f"clearing {len(doomed)} archived entr(ies) from KV")
+          EOF
+          while IFS= read -r key; do
+            [ -z "$key" ] && continue
+            curl -sf -X DELETE -H "Authorization: Bearer $ADMIN_KEY" \
+              "https://apx-digest.workpressfail2ban.workers.dev/v1/protocol/$key" > /dev/null
+          done < /tmp/doomed.txt
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.fold.outputs.new != '0'
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build gate
+        if: steps.fold.outputs.new != '0'
+        run: dotnet build AlbionPacketExplorer.slnx -clp:ErrorsOnly
+
+      - name: Open PR
+        if: steps.fold.outputs.new != '0'
+        env:
+          # Same user PAT as digest-sync: org policy blocks the default token from creating PRs.
+          GH_TOKEN: ${{ secrets.APX_PR_TOKEN || github.token }}
+          NEW: ${{ steps.fold.outputs.new }}
+          APPLIED: ${{ steps.fold.outputs.applied }}
+        run: |
+          BRANCH="protocol-sync/$(date -u +%Y%m%d-%H%M)"
+          git config user.name "apx-digest-sync"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add src/AlbionPacketExplorer/Network/EventCodes.cs \
+                  src/AlbionPacketExplorer/Network/OperationCodes.cs \
+                  tools/digest-worker/protocols tools/protocol-proposals.md
+          if git diff --staged --quiet; then
+            echo "Nothing changed after fold; skipping PR."
+            exit 0
+          fi
+          git commit -m "packet(network): fold $APPLIED protocol code add(s) from client submissions"
+          git push -u origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "packet(network): fold protocol changes from client submissions" \
+            --body "Automated from the apx-digest worker (/v1/protocols). Applied tail-append code additions are in the enum diff; see tools/protocol-proposals.md for shifts/removals that need manual review before merge."
