@@ -546,31 +546,71 @@ public partial class PacketListViewModel : ObservableObject
         ApplyFilter();
     }
 
-    public void AddLivePacket(PacketEntry packet)
+    // Appending into the DataGrid-bound view costs per-row collection-view and dispatcher work that
+    // grows with the row count; past this cap the live list stops appending. Everything is still
+    // recorded in _allPackets and the cached counts (CountText keeps reporting the true total), and
+    // the next full filter pass - pause, stop, or any filter change - rebuilds the view in full.
+    private const int LiveRowAppendCap = 100_000;
+    private bool _liveViewTruncated;
+
+    /// <summary>
+    /// Ingests one live batch with a single round of change notifications. The old per-packet path
+    /// raised CollectionChanged + CountText/HasData for every packet; at high capture rates the
+    /// dispatcher queue grew faster than the UI thread could drain it and the app went permanently
+    /// Not Responding once the grid held ~1M rows.
+    /// </summary>
+    public void AddLivePacketBatch(IReadOnlyList<PacketEntry> batch)
     {
+        if (batch.Count == 0) return;
+
         lock (_sync)
-            _allPackets.Add(packet);
-        _countAll++;
-        switch (packet.Kind)
+            _allPackets.AddRange(batch);
+
+        PacketRow? lastAdded = null;
+        foreach (var packet in batch)
         {
-            case "EVENT": _countEvent++; break;
-            case "REQUEST": _countRequest++; break;
-            case "RESPONSE": _countResponse++; break;
-        }
-        if (_filter.Matches(packet))
-        {
+            _countAll++;
+            switch (packet.Kind)
+            {
+                case "EVENT": _countEvent++; break;
+                case "REQUEST": _countRequest++; break;
+                case "RESPONSE": _countResponse++; break;
+            }
+
+            if (!_filter.Matches(packet)) continue;
+            if (Packets.Count >= LiveRowAppendCap)
+            {
+                _liveViewTruncated = true;
+                continue;
+            }
             var row = new PacketRow(packet);
             Packets.Add(row);
+            lastAdded = row;
+        }
+
+        if (lastAdded != null)
+        {
             // Incremental append may cross SortRowThreshold during live capture.
             OnPropertyChanged(nameof(CanSortColumns));
             if (AutoSelectNewest)
             {
-                SelectedRow = row;
-                ScrollToRowRequested?.Invoke(row);
+                SelectedRow = lastAdded;
+                ScrollToRowRequested?.Invoke(lastAdded);
             }
         }
         OnPropertyChanged(nameof(CountText));
-        OnPropertyChanged(nameof(HasData));
+        NotifyStatusCounts(); // includes HasData; keeps the Status sidebar live during capture
+    }
+
+    /// <summary>
+    /// Rebuilds the view off-thread if the live append cap truncated it, so pausing or stopping a
+    /// huge capture surfaces every row. No-op otherwise.
+    /// </summary>
+    public void RebuildIfTruncated()
+    {
+        if (!_liveViewTruncated) return;
+        _liveViewTruncated = false;
+        ApplyFilter();
     }
 
     public void FilterTo(string kind, int code)
