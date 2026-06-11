@@ -21,7 +21,7 @@ public static class AppPaths
     [
         "settings.json", "layout.json", "filter-presets.json", "filter-last.json",
         "row-hidden.json", "row-hide-presets.json", "items.json", "packet-schema.user.json",
-        "enum-labels.json", "code-notes.json", "protocol-scan.json"
+        "enum-labels.json", "code-notes.json", "protocol-scan.json", "protocol-overrides.json"
     ];
 
     private static readonly string[] DataSubDirs = ["icons", "logs", "lang"];
@@ -59,6 +59,7 @@ public static class AppPaths
     public static string EnumLabels       => Path.Combine(BaseDir, "enum-labels.json");
     public static string CodeNotes        => Path.Combine(BaseDir, "code-notes.json");
     public static string ProtocolState    => Path.Combine(BaseDir, "protocol-scan.json");
+    public static string ProtocolOverrides => Path.Combine(BaseDir, "protocol-overrides.json");
     public static string LangDir          => Path.Combine(BaseDir, "lang");
     public static string LogsDir          => Path.Combine(BaseDir, "logs");
 
