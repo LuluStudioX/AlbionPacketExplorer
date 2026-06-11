@@ -54,10 +54,10 @@ public static class WebhookNotifier
             if (shown++ >= MaxListed) { sb.Append($"...and {r.Changes.Count - MaxListed} more\n"); break; }
             sb.Append(c.Type switch
             {
-                ProtocolChangeType.Added   => $"+ new `{c.Enum}.{c.Name}` = {c.ClientCode}\n",
-                ProtocolChangeType.Removed => $"- removed `{c.Enum}.{c.Name}` (was {c.AppCode})\n",
+                ProtocolChangeType.Added   => $"➕ new `{c.Enum}.{c.Name}` = {c.ClientCode}\n",
+                ProtocolChangeType.Removed => $"➖ removed `{c.Enum}.{c.Name}` (was {c.AppCode})\n",
                 // Migration: the event kept its identity but its wire code moved.
-                _                          => $"~ moved `{c.Enum}.{c.Name}`: code {c.AppCode} -> {c.ClientCode}\n",
+                _                          => $"\U0001F500 moved `{c.Enum}.{c.Name}`: code {c.AppCode} -> {c.ClientCode}\n",
             });
         }
         return sb.ToString();
