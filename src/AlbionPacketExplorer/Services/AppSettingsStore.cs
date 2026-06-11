@@ -36,7 +36,11 @@ public record AppSettings(
     string ToggleRowExpandGesture = "Space",
     bool HasSeenWelcome = false,
     string AccentTheme = "Indigo",
-    string? SkippedUpdateVersion = null)
+    string? SkippedUpdateVersion = null,
+    bool ProtocolScanEnabled = false,
+    bool ProtocolScanOnStartup = false,
+    string? ProtocolWebhookUrl = null,
+    string? AlbionClientPath = null)
 {
     public static readonly AppSettings Default = new();
 }
