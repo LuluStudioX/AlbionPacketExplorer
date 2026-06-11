@@ -39,10 +39,16 @@ public record AppSettings(
     string? SkippedUpdateVersion = null,
     bool ProtocolScanEnabled = false,
     bool ProtocolScanOnStartup = false,
-    string? ProtocolWebhookUrl = null,
-    string? AlbionClientPath = null)
+    string? ProtocolWebhookUrl = null, // deprecated: migrated into ProtocolWebhooks on load
+    string? AlbionClientPath = null,
+    string[]? ProtocolWebhooks = null)
 {
     public static readonly AppSettings Default = new();
+
+    /// <summary>The configured webhooks, folding the legacy single-URL field in for back-compat.</summary>
+    public IReadOnlyList<string> EffectiveWebhooks =>
+        (ProtocolWebhooks ?? (string.IsNullOrWhiteSpace(ProtocolWebhookUrl) ? [] : [ProtocolWebhookUrl]))
+        .Where(u => !string.IsNullOrWhiteSpace(u)).ToArray();
 }
 
 public static class AppSettingsStore
