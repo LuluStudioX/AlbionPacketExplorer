@@ -38,6 +38,18 @@ public sealed class PacketSchemaService
         WriteIndented = true
     };
 
+    // Set by the Protocol Scanner when a game patch shifts ordinals: maps a live wire code to the
+    // code whose schema it should borrow, so a shifted event keeps showing its real key meanings
+    // (params follow the event, not the raw number). Empty in the normal case.
+    private static volatile IReadOnlyDictionary<(string Kind, int Code), int> _codeAliases =
+        new Dictionary<(string, int), int>();
+
+    public static void SetCodeAliases(IReadOnlyDictionary<(string Kind, int Code), int> aliases)
+        => _codeAliases = aliases;
+
+    private static int Redirect(string kindUpper, int code) =>
+        _codeAliases.TryGetValue((kindUpper, code), out var aliased) ? aliased : code;
+
     public async Task LoadAsync()
     {
         _base = await LoadEmbeddedBaseAsync();
@@ -96,7 +108,8 @@ public sealed class PacketSchemaService
 
     public PacketTypeSchema? GetSchema(string kind, int code)
     {
-        var key = $"{kind.ToUpperInvariant()}:{code}";
+        var ku = kind.ToUpperInvariant();
+        var key = $"{ku}:{Redirect(ku, code)}";
         _user.TryGetValue(key, out var userType);
         _base.TryGetValue(key, out var baseType);
         if (userType == null && baseType == null) return null;
@@ -166,7 +179,8 @@ public sealed class PacketSchemaService
 
     public ParamSource GetParamSource(string kind, int code, string key)
     {
-        var typeKey = $"{kind.ToUpperInvariant()}:{code}";
+        var k = kind.ToUpperInvariant();
+        var typeKey = $"{k}:{Redirect(k, code)}";
         if (_user.TryGetValue(typeKey, out var u) && u.Params.ContainsKey(key)) return ParamSource.User;
         if (_base.TryGetValue(typeKey, out var b) && b.Params.ContainsKey(key)) return ParamSource.Base;
         return ParamSource.None;
