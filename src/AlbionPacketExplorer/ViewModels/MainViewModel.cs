@@ -19,6 +19,7 @@ public partial class MainViewModel : ObservableObject
     private readonly RowHideStore _rowHideStore = new();
     private readonly EnumLabelStore _enumLabels = new();
     private readonly UpdateService _updater = new();
+    private readonly ProtocolScanService _protocolScanService = new();
 
     [ObservableProperty] private CodeAggregatorViewModel _aggregator = new();
     [ObservableProperty] private PacketListViewModel _packetList = new();
@@ -243,6 +244,9 @@ public partial class MainViewModel : ObservableObject
 
     public SettingsViewModel Settings => new(this);
 
+    /// <summary>Protocol Scanner panel (opt-in client enum diff + webhook notify). Created in the ctor.</summary>
+    public ProtocolScanViewModel ProtocolScan { get; private set; } = null!;
+
     private void SaveSettings() =>
         AppSettingsStore.Save(new AppSettings(ResolveItemNames, IconMode, SidebarVisible, MinimizeToTray,
             ThemeService.Instance.IsDark, ForceExpandRows,
@@ -253,7 +257,11 @@ public partial class MainViewModel : ObservableObject
             ToggleRowExpandGesture: ToggleRowExpandGesture,
             HasSeenWelcome: !ShowWelcome,
             AccentTheme: ThemeService.Instance.ActiveAccent.DisplayName,
-            SkippedUpdateVersion: _skippedUpdateVersion));
+            SkippedUpdateVersion: _skippedUpdateVersion,
+            ProtocolScanEnabled: ProtocolScan?.Enabled ?? false,
+            ProtocolScanOnStartup: ProtocolScan?.ScanOnStartup ?? false,
+            ProtocolWebhookUrl: string.IsNullOrWhiteSpace(ProtocolScan?.WebhookUrl) ? null : ProtocolScan!.WebhookUrl,
+            AlbionClientPath: string.IsNullOrWhiteSpace(ProtocolScan?.ClientPathOverride) ? null : ProtocolScan!.ClientPathOverride));
 
     public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
@@ -267,6 +275,8 @@ public partial class MainViewModel : ObservableObject
         PacketList.LoadPersistedState();
 
         var saved = AppSettingsStore.Load();
+        // Built before any toggle assignment below so SaveSettings() can always read it.
+        ProtocolScan = new ProtocolScanViewModel(_protocolScanService, _filePicker, _toasts, SaveSettings, saved);
         _packetDetail.ResolveItemNames = saved.ResolveItemNames;
         PacketList.SetResolveItemNames(saved.ResolveItemNames);
         _packetDetail.IconMode = saved.IconMode;
@@ -289,6 +299,10 @@ public partial class MainViewModel : ObservableObject
         _ = CheckForUpdateAsync();
         StartPeriodicUpdateChecks();
         RefreshDevices();
+
+        // Opt-in: silently check the live client for protocol changes on launch.
+        if (ProtocolScan.Enabled && ProtocolScan.ScanOnStartup)
+            _ = ProtocolScan.RunScanAsync(notify: true);
 
         Aggregator.PropertyChanged += (_, args) =>
         {
