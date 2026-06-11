@@ -294,7 +294,7 @@
                                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                                     <TextBox Grid.Column="0"
                                              Text="{Binding ProtocolScan.ClientPathOverride}"
-                                             Watermark="{loc:T settings.protocol.path.auto}" />
+                                             PlaceholderText="{loc:T settings.protocol.path.auto}" />
                                     <Button Grid.Column="1" Classes="ghost"
                                             Content="{loc:T settings.protocol.browse}"
                                             Command="{Binding ProtocolScan.BrowseClientCommand}" />
@@ -317,7 +317,7 @@
                                                 <TextBox Grid.Column="0"
                                                          Text="{Binding Url}"
                                                          LostFocus="OnWebhookFieldLostFocus"
-                                                         Watermark="https://discord.com/api/webhooks/..." />
+                                                         PlaceholderText="https://discord.com/api/webhooks/..." />
                                                 <Button Grid.Column="1" Classes="ghost"
                                                         Content="{loc:T settings.protocol.test}"
                                                         IsEnabled="{Binding HasUrl}"
