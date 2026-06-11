@@ -54,8 +54,9 @@ public static class WebhookNotifier
             if (shown++ >= MaxListed) { sb.Append($"...and {r.Changes.Count - MaxListed} more\n"); break; }
             sb.Append(c.Type switch
             {
-                ProtocolChangeType.Added   => $"➕ new `{c.Enum}.{c.Name}` = {c.ClientCode}\n",
-                ProtocolChangeType.Removed => $"➖ removed `{c.Enum}.{c.Name}` (was {c.AppCode})\n",
+                // Colored dots, not +/-, so the markers stay visible on dark Discord themes.
+                ProtocolChangeType.Added   => $"\U0001F7E2 new `{c.Enum}.{c.Name}` = {c.ClientCode}\n",
+                ProtocolChangeType.Removed => $"\U0001F534 removed `{c.Enum}.{c.Name}` (was {c.AppCode})\n",
                 // Migration: the event kept its identity but its wire code moved.
                 _                          => $"\U0001F500 moved `{c.Enum}.{c.Name}`: code {c.AppCode} -> {c.ClientCode}\n",
             });
