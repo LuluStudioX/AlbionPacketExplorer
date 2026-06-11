@@ -44,8 +44,9 @@ Create / rotate the token:
 1. GitHub -> your account -> Settings -> Developer settings -> Personal access tokens ->
    Fine-grained tokens -> Generate new token.
 2. Resource owner: `LuluStudioX`. Repository access: Only select repositories -> `AlbionPacketExplorer`.
-3. Repository permissions: Pull requests -> Read and write. (Metadata read is implied; the branch
-   push uses the default token, so Contents write is not needed for this token.)
+3. Repository permissions: Pull requests -> Read and write, AND Contents -> Read-only (`gh pr create`
+   reads the default branch, which needs Contents read). Metadata read is implied. Contents *write*
+   is not needed - the branch push uses the default token.
 4. Expiration: pick a date and note it - the PR step fails once the token lapses.
 5. Copy the token, then store it as the repo secret:
    `gh secret set APX_PR_TOKEN --body <token>` (or repo Settings -> Secrets and variables -> Actions).
