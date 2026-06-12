@@ -10,6 +10,15 @@ curated, human-organised history.
 
 ## [Unreleased]
 
+### Added
+- **Tools window - Copy log button**: copies the full merge/verify log to the clipboard.
+
+### Changed
+- **Tools window - log text wrapping**: log panel now wraps long lines instead of clipping them.
+- **Tools window - output path UX**: directory and filename are now shown on separate rows; the
+  filename field edits the stem only with a fixed `.json` badge, preventing accidental extension
+  deletion. Default output name is `merged_packets_YYYYMMDD_HHmmss` instead of `packets-merged`.
+
 ## [0.17.0] - 2026-06-12
 
 Param value resolution: the Packet Detail **Resolved** column can now turn raw numbers and
