@@ -148,8 +148,18 @@
 
             <!-- RESULTS / LOG -->
             <DockPanel Grid.Column="2" Margin="10,0,0,0">
-                <TextBlock DockPanel.Dock="Top" Text="Results" FontWeight="SemiBold"
-                           Foreground="{DynamicResource Apx.Text}" Margin="0,0,0,8" />
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                    <TextBlock Grid.Column="0" Text="Results" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Apx.Text}" VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Classes="ghost" Name="CopyLogButton"
+                            Click="OnCopyLogClicked" Padding="8,5"
+                            ToolTip.Tip="Copy log to clipboard">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <Path Classes="icon sm" Data="{StaticResource Icon.Copy}" />
+                            <TextBlock Text="Copy log" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
 
                 <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,8">
                     <TextBlock Text="{Binding MergeSummary}" FontSize="12"
@@ -165,7 +175,7 @@
                     <ScrollViewer>
                         <TextBlock Text="{Binding Log}" FontFamily="Cascadia Code,Consolas,monospace"
                                    FontSize="12" Foreground="{DynamicResource Apx.TextMuted}"
-                                   TextWrapping="NoWrap" />
+                                   TextWrapping="Wrap" />
                     </ScrollViewer>
                 </Border>
             </DockPanel>
