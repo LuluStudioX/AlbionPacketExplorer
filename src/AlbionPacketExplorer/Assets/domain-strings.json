@@ -1,0 +1,12 @@
+{
+  "accessrights": {
+    "builder": "Builder",
+    "coowner": "Co-Owners",
+    "friend": "Associates",
+    "noaccess": "No access",
+    "owner": "Owner",
+    "supplier": "Suppliers",
+    "user": "User",
+    "visitor": "Visitor"
+  }
+}

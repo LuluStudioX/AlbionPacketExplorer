@@ -104,6 +104,43 @@ public class LocStringStoreTests
     }
 }
 
+public class DomainStringStoreTests
+{
+    private static DomainStringStore Loaded()
+    {
+        var s = new DomainStringStore();
+        s.Load();
+        return s;
+    }
+
+    [Fact]
+    public void Has_accessrights_set()
+    {
+        var s = Loaded();
+        Assert.Contains("str:accessrights", s.ResolveAsOptions());
+        Assert.True(s.IsStringResolve("str:accessrights"));
+        Assert.False(s.IsStringResolve("enum:AttackType"));
+        Assert.False(s.IsStringResolve(""));
+    }
+
+    [Theory]
+    [InlineData("owner", "Owner")]
+    [InlineData("noaccess", "No access")]
+    [InlineData("builder", "Builder")]
+    public void Resolves_access_roles(string value, string expected)
+    {
+        Assert.True(Loaded().TryResolve("str:accessrights", value, out var m));
+        Assert.Equal(expected, m);
+    }
+
+    [Theory]
+    [InlineData("str:accessrights", "not_a_role")]
+    [InlineData("str:accessrights", "")]
+    [InlineData("str:unknownset", "owner")]
+    public void Unknown_does_not_resolve(string resolveAs, string value)
+        => Assert.False(Loaded().TryResolve(resolveAs, value, out _));
+}
+
 /// <summary>Proves the curated box->enum mappings actually shipped in the embedded base schema.</summary>
 public class SchemaResolveAsTests
 {
@@ -128,6 +165,7 @@ public class SchemaResolveAsTests
     [InlineData("EVENT:104", "7", "enum:GuildRole")]               // curated
     [InlineData("EVENT:210", "1", "enum:AccessRightsContainers")]  // curated (accessrights)
     [InlineData("EVENT:140", "29", "enum:ClusterQualities")]       // curated
+    [InlineData("EVENT:210", "5", "str:accessrights")]             // string value-set
     public void Schema_has_curated_resolveAs(string typeKey, string paramKey, string expected)
         => Assert.Equal(expected, ResolveAsOf(typeKey, paramKey));
 

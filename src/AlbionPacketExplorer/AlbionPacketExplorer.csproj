@@ -52,6 +52,7 @@
     <EmbeddedResource Include="Assets\packet-schema.base.json" />
     <EmbeddedResource Include="Assets\resolve-enums.json" />
     <EmbeddedResource Include="Assets\loc-strings.json" />
+    <EmbeddedResource Include="Assets\domain-strings.json" />
     <EmbeddedResource Include="lang\*.json" />
   </ItemGroup>
 
