@@ -37,6 +37,7 @@ jobs:
           outdir = pathlib.Path('tools/digest-worker/digests')
           outdir.mkdir(parents=True, exist_ok=True)
           new = 0
+          new_files = []
           for d in docs:
               parts = d['key'].split(':')  # d:<schemaCommit>:<mode>:<sha256>
               if len(parts) != 4:
@@ -45,9 +46,11 @@ jobs:
               if not f.exists():
                   f.write_text(json.dumps(d['body'], separators=(',', ':')) + '\n', encoding='utf-8')
                   new += 1
+                  new_files.append(f.name)
           print(f"stored {len(docs)} total, {new} new")
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               out.write(f"new={new}\n")
+              out.write(f"new_files={'%0A'.join(new_files)}\n")
           EOF
 
       # Storage hygiene: KV entries whose digest is already archived ON MAIN (i.e. a previous
@@ -59,6 +62,13 @@ jobs:
           ADMIN_KEY: ${{ secrets.APX_DIGEST_ADMIN_KEY }}
         run: |
           git ls-files tools/digest-worker/digests > /tmp/tracked.txt
+          # Union in any newly-written digests not yet committed (from this run's Archive step)
+          NEW_FILES="${{ steps.archive.outputs.new_files }}"
+          if [ -n "$NEW_FILES" ]; then
+            echo "$NEW_FILES" | tr '%0A' '\n' | while IFS= read -r name; do
+              [ -n "$name" ] && echo "tools/digest-worker/digests/$name" >> /tmp/tracked.txt
+            done
+          fi
           python3 - <<'EOF'
           import json, pathlib, subprocess
           docs = json.load(open('/tmp/digests.json'))
@@ -116,6 +126,27 @@ jobs:
           fi
           git commit -m "packet(app): fold $NEW shared digest(s) into schema"
           git push -u origin "$BRANCH"
+          # Collect digest basenames staged in this branch
+          STAGED_DIGESTS=$(git diff --name-only origin/main...HEAD -- tools/digest-worker/digests/ | xargs -I{} basename {})
+          # Check if any open digest-sync PR already covers the same files
+          SKIP_PR=false
+          for PR_NUM in $(gh pr list --base main --state open --json number,headRefName --jq '.[] | select(.headRefName | startswith("digest-sync/")) | .number'); do
+            PR_FILES=$(gh pr view "$PR_NUM" --json files --jq '[.files[].path | select(startswith("tools/digest-worker/digests/")) | split("/")[-1]] | join("\n")')
+            # If every staged digest basename appears in this PR's files, it's a duplicate
+            ALL_FOUND=true
+            while IFS= read -r f; do
+              if ! echo "$PR_FILES" | grep -qF "$f"; then
+                ALL_FOUND=false
+                break
+              fi
+            done <<< "$STAGED_DIGESTS"
+            if $ALL_FOUND; then
+              echo "Open PR #$PR_NUM already covers these digests; skipping duplicate PR."
+              SKIP_PR=true
+              break
+            fi
+          done
+          if $SKIP_PR; then exit 0; fi
           gh pr create --base main --head "$BRANCH" \
             --title "packet(app): fold $NEW shared digest(s) into schema" \
             --body "Automated digest sync from the apx-digest worker. Review the schema diff, then merge. Digest archive: tools/digest-worker/digests/."
