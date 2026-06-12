@@ -119,21 +119,27 @@
                     </DataGrid.Styles>
                     <DataGrid.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="{loc:T detail.menu.copyValue}"    Command="{Binding CopyValueCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.copyValue}" Command="{Binding CopyValueCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.copyRow}"   Command="{Binding CopyRowCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.copyAll}"   Command="{Binding CopyAllRowsCommand}" />
+                            <Separator />
                             <MenuItem Header="{loc:T detail.menu.viewFull}" Command="{Binding ViewFullValueCommand}" />
-                            <MenuItem Header="{loc:T detail.menu.copyRow}"      Command="{Binding CopyRowCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.previewResolve}" Command="{Binding PreviewResolveCommand}"
+                                      ToolTip.Tip="{loc:T detail.menu.previewResolve.tip}" />
                             <Separator />
-                            <MenuItem Header="{loc:T detail.menu.copyAll}" Command="{Binding CopyAllRowsCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.editParam}" Command="{Binding EditParamCommand}"
+                                      ToolTip.Tip="{loc:T detail.menu.editParam.tip}" />
+                            <MenuItem Header="{loc:T detail.menu.labelValue}" Command="{Binding LabelValueCommand}"
+                                      ToolTip.Tip="{loc:T detail.menu.labelValue.tip}" />
+                            <MenuItem Header="{loc:T detail.menu.followValue}" Command="{Binding FollowValueCommand}"
+                                      ToolTip.Tip="{loc:T detail.menu.followValue.tip}" />
                             <Separator />
-                            <MenuItem Header="{loc:T detail.menu.previewResolve}" Command="{Binding PreviewResolveCommand}" />
-                            <Separator />
-                            <MenuItem Header="{loc:T detail.menu.editParam}" Command="{Binding EditParamCommand}" />
-                            <MenuItem Header="{loc:T detail.menu.labelValue}" Command="{Binding LabelValueCommand}" />
-                            <MenuItem Header="{loc:T detail.menu.followValue}" Command="{Binding FollowValueCommand}" />
-                            <Separator />
-                            <MenuItem Header="{loc:T detail.menu.hideRow}"         Command="{Binding HideRowCommand}" />
-                            <MenuItem Header="{loc:T detail.menu.unhideRow}"       Command="{Binding UnhideRowCommand}" />
-                            <MenuItem Header="{loc:T detail.menu.showAll}"    Command="{Binding UnhideAllRowsCommand}" />
+                            <MenuItem Header="{loc:T detail.menu.visibility}">
+                                <MenuItem Header="{loc:T detail.menu.hideRow}"   Command="{Binding HideRowCommand}" />
+                                <MenuItem Header="{loc:T detail.menu.unhideRow}" Command="{Binding UnhideRowCommand}" />
+                                <Separator />
+                                <MenuItem Header="{loc:T detail.menu.showAll}"   Command="{Binding UnhideAllRowsCommand}" />
+                            </MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                     <DataGrid.Columns>
