@@ -10,6 +10,14 @@ curated, human-organised history.
 
 ## [Unreleased]
 
+## [0.17.2] - 2026-06-12
+
+### Changed
+- **Packet detail context menu**: restructured into a submenu hierarchy; copy actions grouped under
+  a **Copy** submenu. Tooltips added to clarify what each action copies. Label tweaks for clarity.
+
+## [0.17.1] - 2026-06-12
+
 ### Added
 - **Tools window - Copy log button**: copies the full merge/verify log to the clipboard.
 
@@ -53,6 +61,8 @@ domain strings into readable names, far beyond the previous item-index lookup.
 - Earlier releases (capture pipeline, live capture, schema system, export, packet list, code
   aggregator). See the Releases page for per-tag notes.
 
-[Unreleased]: https://github.com/LuluStudioX/AlbionPacketExplorer/compare/v0.17.0...HEAD
+[Unreleased]: https://github.com/LuluStudioX/AlbionPacketExplorer/compare/v0.17.2...HEAD
+[0.17.2]: https://github.com/LuluStudioX/AlbionPacketExplorer/compare/v0.17.1...v0.17.2
+[0.17.1]: https://github.com/LuluStudioX/AlbionPacketExplorer/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/LuluStudioX/AlbionPacketExplorer/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/LuluStudioX/AlbionPacketExplorer/releases/tag/v0.16.0
