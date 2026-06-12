@@ -336,8 +336,8 @@
       },
       "3": {
         "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [1..4]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 3 distinct; range [1..4]; small enum/flag byte; resolveAs AttackType (curated high)",
+        "resolveAs": "enum:AttackType"
       },
       "4": {
         "name": "",
@@ -351,8 +351,8 @@
       },
       "6": {
         "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte; resolveAs AttackType (curated high)",
+        "resolveAs": "enum:AttackType"
       }
     }
   },
@@ -2275,8 +2275,8 @@
       },
       "5": {
         "name": "",
-        "note": "(inferred) Byte; 8 distinct; range [1..8]",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 8 distinct; range [1..8]; resolveAs ActionOnBuildingErrorCode (curated high)",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       }
     }
   },
@@ -2290,8 +2290,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [1..7]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 3 distinct; range [1..7]; small enum/flag byte; resolveAs ActionOnBuildingErrorCode (curated high)",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       }
     }
   },
@@ -3641,8 +3641,8 @@
       },
       "7": {
         "name": "",
-        "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 7 distinct; range [0..6]; resolveAs GuildRole (curated high)",
+        "resolveAs": "enum:GuildRole"
       },
       "8": {
         "name": "",
@@ -3651,8 +3651,8 @@
       },
       "9": {
         "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte; resolveAs GuildJoinSettings (curated medium)",
+        "resolveAs": "enum:GuildJoinSettings"
       }
     }
   },
@@ -4320,8 +4320,8 @@
       },
       "30": {
         "name": "flags",
-        "note": "(inferred) Byte; 4 distinct; range [0..3]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 4 distinct; range [0..3]; small enum/flag byte; resolveAs ClusterValueFilterMobDangerTypes (curated medium)",
+        "resolveAs": "enum:ClusterValueFilterMobDangerTypes"
       },
       "31": {
         "name": "",
@@ -4335,8 +4335,8 @@
       },
       "33": {
         "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte; resolveAs ClusterValueFilterMobDangerTypes (curated medium)",
+        "resolveAs": "enum:ClusterValueFilterMobDangerTypes"
       }
     }
   },
@@ -4565,8 +4565,8 @@
       },
       "29": {
         "name": "",
-        "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 7 distinct; range [0..6]; resolveAs ClusterQualities (curated high)",
+        "resolveAs": "enum:ClusterQualities"
       },
       "30": {
         "name": "",
@@ -4580,8 +4580,8 @@
       },
       "32": {
         "name": "",
-        "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 7 distinct; range [0..6]; resolveAs ClusterQualities (curated high)",
+        "resolveAs": "enum:ClusterQualities"
       },
       "33": {
         "name": "",
@@ -4655,8 +4655,8 @@
       },
       "48": {
         "name": "",
-        "note": "(inferred) Int32; 5 distinct; range [0..5]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 5 distinct; range [0..5]; resolveAs ClusterValueFilterClusterTypes (curated medium)",
+        "resolveAs": "enum:ClusterValueFilterClusterTypes"
       },
       "49": {
         "name": "",
@@ -5245,8 +5245,8 @@
       },
       "8": {
         "name": "",
-        "note": "(inferred) Int32; 27% present; 3 distinct; range [1..5]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 27% present; 3 distinct; range [1..5]; resolveAs GuildRole (curated medium)",
+        "resolveAs": "enum:GuildRole"
       },
       "9": {
         "name": "",
@@ -6102,8 +6102,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte; resolveAs MiniMapPingTypes (curated high)",
+        "resolveAs": "enum:MiniMapPingTypes"
       },
       "2": {
         "name": "",
@@ -6122,8 +6122,8 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 6 distinct; range [1..6]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 6 distinct; range [1..6]; resolveAs MarketPlaceView (curated high)",
+        "resolveAs": "enum:MarketPlaceView"
       }
     }
   },
@@ -6575,8 +6575,8 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 4 distinct; range [0..3]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 4 distinct; range [0..3]; resolveAs AccessRightsContainers (curated high)",
+        "resolveAs": "enum:AccessRightsContainers"
       },
       "2": {
         "name": "",
@@ -7219,8 +7219,8 @@
       },
       "3": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [0..5]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [0..5]; small enum/flag byte; resolveAs PartyStartHuntAnswer (curated medium)",
+        "resolveAs": "enum:PartyStartHuntAnswer"
       }
     }
   },
@@ -11223,8 +11223,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte; resolveAs MiniMapPingTypes (curated medium)",
+        "resolveAs": "enum:MiniMapPingTypes"
       }
     }
   },
@@ -11298,8 +11298,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [2..4]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [2..4]; small enum/flag byte; resolveAs Faction (curated high)",
+        "resolveAs": "enum:Faction"
       }
     }
   },
@@ -11566,8 +11566,8 @@
       },
       "2": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [1..3]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [1..3]; small enum/flag byte; resolveAs LocalActionCancelReason (curated medium)",
+        "resolveAs": "enum:LocalActionCancelReason"
       },
       "3": {
         "name": "",
@@ -11704,8 +11704,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte; resolveAs StaticDungeonValueInfo (curated medium)",
+        "resolveAs": "enum:StaticDungeonValueInfo"
       }
     }
   },
@@ -11914,8 +11914,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [3..3]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 1 distinct; range [3..3]; small enum/flag byte; resolveAs PortalExitType (curated medium)",
+        "resolveAs": "enum:PortalExitType"
       }
     }
   },
@@ -12142,8 +12142,8 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [1..1]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 1 distinct; range [1..1]; resolveAs MistsStaticEntranceRegisterErrorCode (curated medium)",
+        "resolveAs": "enum:MistsStaticEntranceRegisterErrorCode"
       },
       "2": {
         "name": "timestamp",
@@ -12162,8 +12162,8 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [2..2]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 1 distinct; range [2..2]; resolveAs CagedObjectState (curated high)",
+        "resolveAs": "enum:CagedObjectState"
       },
       "2": {
         "name": "position",
@@ -12177,8 +12177,8 @@
       },
       "5": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [1..1]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 1 distinct; range [1..1]; resolveAs CagedObjectState (curated medium)",
+        "resolveAs": "enum:CagedObjectState"
       }
     }
   },
@@ -12192,8 +12192,8 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [2..2]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 1 distinct; range [2..2]; resolveAs CagedObjectState (curated high)",
+        "resolveAs": "enum:CagedObjectState"
       }
     }
   },
@@ -12787,8 +12787,8 @@
       },
       "10": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [0..2]; small enum/flag byte; resolveAs FortificationTileCategories (curated high)",
+        "resolveAs": "enum:FortificationTileCategories"
       },
       "11": {
         "name": "",
@@ -13454,8 +13454,8 @@
       },
       "4": {
         "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [2..4]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 3 distinct; range [2..4]; small enum/flag byte; resolveAs FactionFortressFightState (curated medium)",
+        "resolveAs": "enum:FactionFortressFightState"
       },
       "5": {
         "name": "flags",
@@ -13464,13 +13464,13 @@
       },
       "7": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [0..4]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [0..4]; small enum/flag byte; resolveAs FactionFortressFightState (curated medium)",
+        "resolveAs": "enum:FactionFortressFightState"
       },
       "8": {
         "name": "",
-        "note": "(inferred) Int32; 2 distinct; range [0..1]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 2 distinct; range [0..1]; resolveAs FactionFortressState (curated medium)",
+        "resolveAs": "enum:FactionFortressState"
       },
       "9": {
         "name": "",
@@ -13571,8 +13571,8 @@
       },
       "4": {
         "name": "flags",
-        "note": "(inferred) Byte; 4 distinct; range [1..4]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 4 distinct; range [1..4]; small enum/flag byte; resolveAs Faction (curated high)",
+        "resolveAs": "enum:Faction"
       }
     }
   },
@@ -13676,13 +13676,13 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte; resolveAs FactionFortressFightState (curated medium)",
+        "resolveAs": "enum:FactionFortressFightState"
       },
       "2": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [4..4]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 1 distinct; range [4..4]; small enum/flag byte; resolveAs FactionFortressFightState (curated medium)",
+        "resolveAs": "enum:FactionFortressFightState"
       }
     }
   },
@@ -14099,8 +14099,8 @@
       },
       "2": {
         "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte; resolveAs AttackType (curated high)",
+        "resolveAs": "enum:AttackType"
       }
     }
   },
@@ -14373,8 +14373,8 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int64; 1 distinct; range [2..2]",
-        "resolveAs": ""
+        "note": "(inferred) Int64; 1 distinct; range [2..2]; resolveAs ItemMoveType (curated high)",
+        "resolveAs": "enum:ItemMoveType"
       },
       "3": {
         "name": "",
@@ -14580,13 +14580,13 @@
       },
       "12": {
         "name": "",
-        "note": "(inferred) Int16; 1 distinct; range [0..0]",
-        "resolveAs": ""
+        "note": "(inferred) Int16; 1 distinct; range [0..0]; resolveAs ActionOnBuildingErrorCode (curated high)",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       },
       "14": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte; resolveAs ActionOnBuildingErrorCode (curated medium)",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       }
     }
   },
@@ -15901,8 +15901,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte; resolveAs MiniMapPingTypes (curated high)",
+        "resolveAs": "enum:MiniMapPingTypes"
       }
     }
   },
@@ -16019,8 +16019,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte; resolveAs GuildJoinSettings (curated medium)",
+        "resolveAs": "enum:GuildJoinSettings"
       },
       "255": {
         "name": "",
@@ -16360,8 +16360,8 @@
       },
       "2": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [5..5]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 1 distinct; range [5..5]; small enum/flag byte; resolveAs PartyStartHuntAnswer (curated medium)",
+        "resolveAs": "enum:PartyStartHuntAnswer"
       },
       "255": {
         "name": "",
@@ -17149,8 +17149,8 @@
     "params": {
       "0": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte; resolveAs TemporaryFlaggingStatus (curated medium)",
+        "resolveAs": "enum:TemporaryFlaggingStatus"
       },
       "255": {
         "name": "",
@@ -17329,8 +17329,8 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [1..1]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 1 distinct; range [1..1]; resolveAs UserGroup (curated medium)",
+        "resolveAs": "enum:UserGroup"
       },
       "1": {
         "name": "timestamp",
@@ -17403,8 +17403,8 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int32; 4 distinct; range [1..16]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 4 distinct; range [1..16]; resolveAs GuildApplicationStatCategories (curated medium)",
+        "resolveAs": "enum:GuildApplicationStatCategories"
       },
       "3": {
         "name": "",
@@ -20803,8 +20803,8 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte; resolveAs GuildJoinSettings (curated medium)",
+        "resolveAs": "enum:GuildJoinSettings"
       },
       "2": {
         "name": "flags",
@@ -20833,8 +20833,8 @@
       },
       "7": {
         "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte; resolveAs GuildJoinSettings (curated medium)",
+        "resolveAs": "enum:GuildJoinSettings"
       },
       "8": {
         "name": "",
@@ -20848,8 +20848,8 @@
       },
       "10": {
         "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [2..6]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 3 distinct; range [2..6]; small enum/flag byte; resolveAs GuildRole (curated medium)",
+        "resolveAs": "enum:GuildRole"
       },
       "11": {
         "name": "",
@@ -20908,8 +20908,8 @@
       },
       "25": {
         "name": "",
-        "note": "(inferred) Int32; 75% present; 1 distinct; range [1..1]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 75% present; 1 distinct; range [1..1]; resolveAs GuildJoinSettings (curated medium)",
+        "resolveAs": "enum:GuildJoinSettings"
       },
       "255": {
         "name": "",
@@ -21267,13 +21267,13 @@
       },
       "60": {
         "name": "",
-        "note": "(inferred) Int32; 36% present; 3 distinct; range [2..4]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 36% present; 3 distinct; range [2..4]; resolveAs ClusterValueFilterClusterTypes (curated medium)",
+        "resolveAs": "enum:ClusterValueFilterClusterTypes"
       },
       "61": {
         "name": "flags",
-        "note": "(inferred) Byte; 4 distinct; range [0..4]; small enum/flag byte",
-        "resolveAs": ""
+        "note": "(inferred) Byte; 4 distinct; range [0..4]; small enum/flag byte; resolveAs ClusterTypes (curated medium)",
+        "resolveAs": "enum:ClusterTypes"
       },
       "62": {
         "name": "flags",
@@ -23177,8 +23177,8 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int16; 1 distinct; range [0..0]",
-        "resolveAs": ""
+        "note": "(inferred) Int16; 1 distinct; range [0..0]; resolveAs LoadoutResultCode (curated medium)",
+        "resolveAs": "enum:LoadoutResultCode"
       },
       "1": {
         "name": "",
@@ -23220,8 +23220,8 @@
       },
       "4": {
         "name": "",
-        "note": "(inferred) Int32; 67% present; 1 distinct; range [4..4]",
-        "resolveAs": ""
+        "note": "(inferred) Int32; 67% present; 1 distinct; range [4..4]; resolveAs Faction (curated high)",
+        "resolveAs": "enum:Faction"
       },
       "5": {
         "name": "",
