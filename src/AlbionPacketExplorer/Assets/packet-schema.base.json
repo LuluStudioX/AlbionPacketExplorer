@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "e36ad83",
-    "generatedAt": "2026-06-11"
+    "sourceCommit": "2225235",
+    "generatedAt": "2026-06-12"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -27,8 +27,8 @@
     "name": "Move",
     "params": {
       "0": {
-        "name": "",
-        "note": "(inferred) Int64; 7 distinct; range [540..547]",
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [264..1926817]; high-cardinality id at key 0",
         "resolveAs": ""
       },
       "1": {
@@ -747,7 +747,38 @@
   },
   "EVENT:25": {
     "name": "AttackBuilding",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 3 distinct; range [427680..429595]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 20 distinct; range [39366452..39591465]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [2166..2173]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 3 distinct; range [2950..2953]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 20 distinct; range [39366702..39591715]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Boolean; 10% present; 1 distinct",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:26": {
     "name": "InventoryPutItem",
@@ -7202,7 +7233,43 @@
   },
   "EVENT:239": {
     "name": "PartyPlayerUpdated",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [57906..57906]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [3..3]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [12..12]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:240": {
     "name": "PartyInvitationAnswer",
@@ -9236,7 +9303,83 @@
   },
   "EVENT:360": {
     "name": "FishingMiniGame",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [133115..133115]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [6..6]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639167328000000000..639167328000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [1.5..1.5]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [2..2]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [3..3]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [0.3..0.3]",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [1.1..1.1]",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [3..3]",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [-2..-2]",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [1.5..1.5]",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [6..6]",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [3..3]",
+        "resolveAs": ""
+      },
+      "13": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [10..10]",
+        "resolveAs": ""
+      },
+      "15": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [7..7]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:361": {
     "name": "AlbionJournalAchievementCompleted",
@@ -13491,6 +13634,11 @@
         "name": "timestamp",
         "note": "(inferred) Int64; 8% present; 1 distinct; range [639158524007525661..639158524007525661]; likely .NET ticks (UTC)",
         "resolveAs": ""
+      },
+      "13": {
+        "name": "",
+        "note": "(inferred) Int64; 3% present; 1 distinct; range [450000..450000]",
+        "resolveAs": ""
       }
     }
   },
@@ -13753,6 +13901,16 @@
       "4": {
         "name": "timestamp",
         "note": "(inferred) Int64; 0% present; 1 distinct; range [639158641446207783..639158641446207783]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 0% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 0% present; 1 distinct; range [639167328000000000..639167328000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -14428,7 +14586,23 @@
   },
   "REQUEST:44": {
     "name": "ReportClientError",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:45": {
     "name": "OpenLaborerOrBuilding",
@@ -16073,7 +16247,13 @@
   },
   "REQUEST:195": {
     "name": "PlayEmote",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [13..13]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:196": {
     "name": "StopEmote",
@@ -18512,7 +18692,23 @@
   },
   "REQUEST:534": {
     "name": "TravelFactionWarfarePortal",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [1224..1224]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [20..22]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 50% present; 1 distinct; range [263780000..263780000]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:535": {
     "name": "RequestRedZoneEventStandings",
@@ -20914,6 +21110,16 @@
       "255": {
         "name": "",
         "note": "(inferred) Int32; 4 distinct; range [311..1811]",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "",
+        "note": "(inferred) Int64; 10% present; 1 distinct; range [500000000000..500000000000]",
+        "resolveAs": ""
+      },
+      "15": {
+        "name": "",
+        "note": "(inferred) Int64; 10% present; 1 distinct; range [100000000000..100000000000]",
         "resolveAs": ""
       }
     }
