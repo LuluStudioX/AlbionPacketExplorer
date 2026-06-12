@@ -399,10 +399,10 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             var (resolved, uniqueName) = (string.Empty, string.Empty);
             List<ResolvedItem>? resolvedItems = null;
             // Enum resolution is data-independent (a static client enum table), so it runs without
-            // game data and is not gated by the item-name toggle.
+            // game data and is not gated by the item-name toggle. Read the raw integral value, not
+            // the formatted string (Int64 params format with a "(... UTC)" timestamp suffix).
             if (_resolveEnums.IsEnumResolve(resolveAs)
-                && long.TryParse(formatted, System.Globalization.NumberStyles.Integer,
-                                 System.Globalization.CultureInfo.InvariantCulture, out var enumValue)
+                && TryGetIntegral(pv, out var enumValue)
                 && _resolveEnums.TryResolve(resolveAs, enumValue, out var member))
             {
                 resolved = member;
@@ -765,6 +765,24 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             or "Int16[]" or "Int32[]" or "Int64[]" => true,
         _ => false
     };
+
+    // Raw integral value of a scalar param (Byte/Int16/Int32/Int64), for enum resolution. False for
+    // non-integral, array, or reference payloads.
+    private static bool TryGetIntegral(ParamValue pv, out long value)
+    {
+        value = 0;
+        switch (pv.Value)
+        {
+            case long l:   value = l; return true;
+            case int i:    value = i; return true;
+            case short s:  value = s; return true;
+            case byte b:   value = b; return true;
+            case sbyte sb: value = sb; return true;
+            case ushort us: value = us; return true;
+            case uint ui:  value = ui; return true;
+            default: return false;
+        }
+    }
 
     private static int? ToInt(object? v) => v switch
     {
