@@ -21,18 +21,22 @@ public partial class EditParamViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<string> _suggestions = [];
     [ObservableProperty] private bool _showSuggestions;
 
-    public static readonly string[] ResolveAsOptions = ["", "itemIndex"];
+    /// <summary>Built per instance: the two built-ins plus one <c>enum:&lt;Name&gt;</c> entry per
+    /// enum the <see cref="ResolveEnumStore"/> knows.</summary>
+    public IReadOnlyList<string> ResolveAsOptions { get; }
 
     public string Title { get; }
     public bool SourceIsBase { get; }
     public bool SourceIsUser { get; }
 
-    public EditParamViewModel(PacketSchemaService schema, string kind, int code,
+    public EditParamViewModel(PacketSchemaService schema, ResolveEnumStore resolveEnums,
+                               string kind, int code,
                                string key, string currentName, string currentNote,
                                string currentResolveAs, Action onSaved,
                                ParamSource source = ParamSource.None)
     {
         _schema = schema;
+        ResolveAsOptions = new[] { "", "itemIndex" }.Concat(resolveEnums.ResolveAsOptions()).ToList();
         _kind = kind;
         _code = code;
         _key = key;

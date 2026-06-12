@@ -150,6 +150,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     private readonly PacketSchemaService _schema;
     private readonly RowHideStore _hideStore;
     private readonly EnumLabelStore _enumLabels;
+    private readonly ResolveEnumStore _resolveEnums;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
@@ -287,15 +288,18 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     public ToastService? Toasts { get; set; }
 
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema,
-                                 RowHideStore hideStore, EnumLabelStore enumLabels)
+                                 RowHideStore hideStore, EnumLabelStore enumLabels,
+                                 ResolveEnumStore resolveEnums)
     {
         _gameData = gameData;
         _icons = icons;
         _schema = schema;
         _hideStore = hideStore;
         _enumLabels = enumLabels;
+        _resolveEnums = resolveEnums;
         _hideStore.Load();
         _enumLabels.Load();
+        _resolveEnums.Load();
         RefreshHidePresets();
     }
 
@@ -394,7 +398,16 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
             var (resolved, uniqueName) = (string.Empty, string.Empty);
             List<ResolvedItem>? resolvedItems = null;
-            if (ResolveItemNames && _gameData.IsLoaded)
+            // Enum resolution is data-independent (a static client enum table), so it runs without
+            // game data and is not gated by the item-name toggle.
+            if (_resolveEnums.IsEnumResolve(resolveAs)
+                && long.TryParse(formatted, System.Globalization.NumberStyles.Integer,
+                                 System.Globalization.CultureInfo.InvariantCulture, out var enumValue)
+                && _resolveEnums.TryResolve(resolveAs, enumValue, out var member))
+            {
+                resolved = member;
+            }
+            else if (ResolveItemNames && _gameData.IsLoaded)
             {
                 if (resolveAs == "itemIndex" && IsIndexResolvable(pv.Type))
                 {
@@ -631,7 +644,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         var existing = _schema.GetParam(Packet.Kind, Packet.Code, SelectedRow.Key);
         var src = _schema.GetParamSource(Packet.Kind, Packet.Code, SelectedRow.Key);
         var vm = new EditParamViewModel(
-            _schema,
+            _schema, _resolveEnums,
             Packet.Kind, Packet.Code, SelectedRow.Key,
             existing?.Name ?? string.Empty,
             existing?.Note ?? string.Empty,

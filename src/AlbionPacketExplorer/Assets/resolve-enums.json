@@ -1,0 +1,109 @@
+{
+  "ActionComponentType": {
+    "0": "Invalid",
+    "1": "CraftItem",
+    "2": "RepairItem",
+    "3": "SalvageItem",
+    "4": "StudyItem",
+    "5": "MeldItem",
+    "6": "RerollItemQuality",
+    "7": "UpgradeItemEnchantment",
+    "8": "AwakenLegendaryItem"
+  },
+  "ActionOnBuildingErrorCode": {
+    "0": "OK",
+    "1": "Invalid",
+    "2": "InvalidRights",
+    "3": "BuildingOutOfRange",
+    "4": "NotAllowedWhileMoving",
+    "5": "PlayerNotRegisterd",
+    "6": "PriceChanged",
+    "7": "NotEnoughSilver",
+    "8": "NotEnoughGold",
+    "9": "NotEnoughResources",
+    "10": "DurabilityLow",
+    "11": "NutritionLow",
+    "12": "NotAllowedWhenMounted",
+    "13": "NotAllowedInGvg",
+    "14": "AlreadyDoingThisAction",
+    "15": "ItemOvercharged"
+  },
+  "EquipmentSlot": {
+    "0": "MainHand",
+    "1": "OffHand",
+    "2": "Head",
+    "3": "Armor",
+    "4": "Shoes",
+    "5": "Bag",
+    "6": "Cape",
+    "7": "Mount",
+    "8": "Potion",
+    "9": "Food",
+    "10": "NumEntries",
+    "-1": "Invalid"
+  },
+  "GuildRole": {
+    "0": "NONE",
+    "1": "RECRUIT",
+    "2": "MEMBER",
+    "3": "GUARDSMAN",
+    "4": "OFFICER",
+    "5": "WARMASTER",
+    "6": "MASTER_OF_COIN",
+    "7": "THE_RIGHT_HAND",
+    "8": "GUILDMASTER"
+  },
+  "Faction": {
+    "0": "None",
+    "1": "Keeper",
+    "2": "Morgana",
+    "3": "Undead",
+    "4": "Heretic",
+    "5": "Avalon"
+  },
+  "FlaggingStatus": {
+    "0": "Blue",
+    "1": "Highland",
+    "2": "Forest",
+    "3": "Steppe",
+    "4": "Mountain",
+    "5": "Swamp",
+    "6": "Caerleon",
+    "255": "Red"
+  },
+  "Rarity": {
+    "0": "None",
+    "1": "Standard",
+    "2": "Uncommon",
+    "3": "Rare",
+    "4": "Legendary"
+  },
+  "ChestState": {
+    "0": "BossLocked",
+    "1": "LockedByTimer",
+    "2": "LockedByProtectingMobs",
+    "3": "LockedByWatcherMobs",
+    "4": "LockedByQuest",
+    "5": "LockedByMissingCarriables",
+    "6": "Unlocked",
+    "7": "Open",
+    "8": "Empty"
+  },
+  "CastleGateState": {
+    "0": "Closed",
+    "1": "Open",
+    "2": "GateDamagedClosed",
+    "3": "GateDamagedOpen",
+    "4": "Destroyed",
+    "5": "Inactive"
+  },
+  "RcGeneric": {
+    "0": "OK",
+    "-1": "UnhandledOperation",
+    "-500": "InternalServerError",
+    "-501": "InvalidState",
+    "-502": "CharacterIsDead",
+    "-503": "InvalidTimeStamp",
+    "-504": "IncorrectClientVersion"
+  }
+}
