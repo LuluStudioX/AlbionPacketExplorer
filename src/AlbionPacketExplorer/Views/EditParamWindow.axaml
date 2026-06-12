@@ -88,7 +88,7 @@
         <StackPanel Spacing="4">
             <TextBlock Text="{loc:T editParam.resolveAs}" FontSize="12" Foreground="Gray" />
             <ComboBox SelectedItem="{Binding ResolveAs}" HorizontalAlignment="Stretch"
-                      ItemsSource="{x:Static vm:EditParamViewModel.ResolveAsOptions}" />
+                      ItemsSource="{Binding ResolveAsOptions}" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,6,0,0">

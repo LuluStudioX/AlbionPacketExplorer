@@ -18,6 +18,8 @@ public partial class MainViewModel : ObservableObject
     private readonly PacketSchemaService _schema = new();
     private readonly RowHideStore _rowHideStore = new();
     private readonly EnumLabelStore _enumLabels = new();
+    private readonly ResolveEnumStore _resolveEnums = new();
+    private readonly LocStringStore _locStrings = new();
     private readonly UpdateService _updater = new();
     private readonly ProtocolScanService _protocolScanService = new();
 
@@ -269,7 +271,7 @@ public partial class MainViewModel : ObservableObject
     {
         _filePicker = filePicker;
         _toasts = toasts;
-        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore, _enumLabels);
+        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore, _enumLabels, _resolveEnums, _locStrings);
         _packetDetail.CorrelatedPacketRequested += PacketList.SelectPacket;
         _packetDetail.FollowValueRequested += PacketList.FollowValue;
         Aggregator.Schema = _schema;

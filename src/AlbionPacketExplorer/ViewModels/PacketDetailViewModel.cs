@@ -150,6 +150,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     private readonly PacketSchemaService _schema;
     private readonly RowHideStore _hideStore;
     private readonly EnumLabelStore _enumLabels;
+    private readonly ResolveEnumStore _resolveEnums;
+    private readonly LocStringStore _locStrings;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
@@ -287,15 +289,20 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     public ToastService? Toasts { get; set; }
 
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema,
-                                 RowHideStore hideStore, EnumLabelStore enumLabels)
+                                 RowHideStore hideStore, EnumLabelStore enumLabels,
+                                 ResolveEnumStore resolveEnums, LocStringStore locStrings)
     {
         _gameData = gameData;
         _icons = icons;
         _schema = schema;
         _hideStore = hideStore;
         _enumLabels = enumLabels;
+        _resolveEnums = resolveEnums;
+        _locStrings = locStrings;
         _hideStore.Load();
         _enumLabels.Load();
+        _resolveEnums.Load();
+        _locStrings.Load();
         RefreshHidePresets();
     }
 
@@ -394,7 +401,22 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
             var (resolved, uniqueName) = (string.Empty, string.Empty);
             List<ResolvedItem>? resolvedItems = null;
-            if (ResolveItemNames && _gameData.IsLoaded)
+            // Enum resolution is data-independent (a static client enum table), so it runs without
+            // game data and is not gated by the item-name toggle. Read the raw integral value, not
+            // the formatted string (Int64 params format with a "(... UTC)" timestamp suffix).
+            if (_resolveEnums.IsEnumResolve(resolveAs)
+                && TryGetIntegral(pv, out var enumValue)
+                && _resolveEnums.TryResolve(resolveAs, enumValue, out var member))
+            {
+                resolved = member;
+            }
+            // Localization keys (@KEY string params) resolve to English text without game data or
+            // the item-name toggle - the value itself unambiguously marks a loc key.
+            else if (pv.Value is string locKey && _locStrings.TryResolve(locKey, out var locText))
+            {
+                (resolved, uniqueName) = (locText, locKey);
+            }
+            else if (ResolveItemNames && _gameData.IsLoaded)
             {
                 if (resolveAs == "itemIndex" && IsIndexResolvable(pv.Type))
                 {
@@ -631,7 +653,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         var existing = _schema.GetParam(Packet.Kind, Packet.Code, SelectedRow.Key);
         var src = _schema.GetParamSource(Packet.Kind, Packet.Code, SelectedRow.Key);
         var vm = new EditParamViewModel(
-            _schema,
+            _schema, _resolveEnums,
             Packet.Kind, Packet.Code, SelectedRow.Key,
             existing?.Name ?? string.Empty,
             existing?.Note ?? string.Empty,
@@ -753,6 +775,24 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         _ => false
     };
 
+    // Raw integral value of a scalar param (Byte/Int16/Int32/Int64), for enum resolution. False for
+    // non-integral, array, or reference payloads.
+    private static bool TryGetIntegral(ParamValue pv, out long value)
+    {
+        value = 0;
+        switch (pv.Value)
+        {
+            case long l:   value = l; return true;
+            case int i:    value = i; return true;
+            case short s:  value = s; return true;
+            case byte b:   value = b; return true;
+            case sbyte sb: value = sb; return true;
+            case ushort us: value = us; return true;
+            case uint ui:  value = ui; return true;
+            default: return false;
+        }
+    }
+
     private static int? ToInt(object? v) => v switch
     {
         long   l when l is >= 0 and <= int.MaxValue  => (int)l,
@@ -769,6 +809,9 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         // String params: value is already a UniqueName (e.g. "T8_LABOURER_HUNTER")
         if (pv.Type == "String" && pv.Value is string s && !string.IsNullOrEmpty(s))
         {
+            // A leading '@' marks an Albion localization key -> show its English text.
+            if (_locStrings.TryResolve(s, out var locText))
+                return (locText, s);
             if (_gameData.TryResolveByUniqueName(s, out var display))
                 return ($"{s} — {display}", s);
         }
