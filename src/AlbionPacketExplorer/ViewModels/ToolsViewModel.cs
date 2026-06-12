@@ -49,8 +49,14 @@ public partial class ToolsViewModel : ObservableObject
     /// <summary>True while at least one input is queued (drives the empty-state placeholder).</summary>
     public bool HasInputs => Inputs.Count > 0;
 
-    [ObservableProperty] private string _outputPath = "";
+    [ObservableProperty] private string _outputDir = "";
+    [ObservableProperty] private string _outputStem = "";
     [ObservableProperty] private double _progress;
+
+    /// <summary>Full output path derived from dir + stem + .json extension.</summary>
+    public string OutputPath => string.IsNullOrWhiteSpace(OutputDir) || string.IsNullOrWhiteSpace(OutputStem)
+        ? ""
+        : Path.Combine(OutputDir, OutputStem + ".json");
     [ObservableProperty] private bool _isBusy;
 
     /// <summary>Collapse exact-duplicate packets while merging. On by default.</summary>
@@ -111,11 +117,14 @@ public partial class ToolsViewModel : ObservableObject
         }
 
         // Default the output next to the first input the first time something is queued.
-        if (string.IsNullOrWhiteSpace(OutputPath) && Inputs.Count > 0)
+        if (string.IsNullOrWhiteSpace(OutputDir) && Inputs.Count > 0)
         {
             var dir = Path.GetDirectoryName(Inputs[0].Path);
             if (!string.IsNullOrEmpty(dir))
-                OutputPath = Path.Combine(dir, "packets-merged.json");
+            {
+                OutputDir = dir;
+                OutputStem = "merged_packets_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            }
         }
     }
 
@@ -133,7 +142,7 @@ public partial class ToolsViewModel : ObservableObject
         var folder = await RequestPickFolder();
         if (string.IsNullOrWhiteSpace(folder)) return;
 
-        var outName = string.IsNullOrWhiteSpace(OutputPath) ? null : Path.GetFileName(OutputPath);
+        var outName = string.IsNullOrWhiteSpace(OutputStem) ? null : OutputStem + ".json";
         var jsons = Directory.EnumerateFiles(folder, "*.json", SearchOption.TopDirectoryOnly)
             .Where(p => !string.Equals(Path.GetFileName(p), outName, StringComparison.OrdinalIgnoreCase))
             .OrderBy(p => p, StringComparer.OrdinalIgnoreCase);
@@ -153,9 +162,15 @@ public partial class ToolsViewModel : ObservableObject
     private async Task BrowseOutputAsync()
     {
         if (RequestPickOutput is null) return;
-        var suggested = string.IsNullOrWhiteSpace(OutputPath) ? "packets-merged.json" : Path.GetFileName(OutputPath);
+        var suggested = string.IsNullOrWhiteSpace(OutputStem)
+            ? "merged_packets_" + DateTime.Now.ToString("yyyyMMdd_HHmmss")
+            : OutputStem;
         var picked = await RequestPickOutput(suggested);
-        if (!string.IsNullOrWhiteSpace(picked)) OutputPath = picked;
+        if (!string.IsNullOrWhiteSpace(picked))
+        {
+            OutputDir = Path.GetDirectoryName(picked) ?? OutputDir;
+            OutputStem = Path.GetFileNameWithoutExtension(picked);
+        }
     }
 
     /// <summary>Point at an existing merged file to verify or load on its own (no merge needed).</summary>
@@ -166,7 +181,8 @@ public partial class ToolsViewModel : ObservableObject
         var picked = await RequestPickExisting();
         if (string.IsNullOrWhiteSpace(picked)) return;
         // Standalone target: no known sources, so Verify checks internal consistency only.
-        OutputPath = picked;
+        OutputDir = Path.GetDirectoryName(picked) ?? OutputDir;
+        OutputStem = Path.GetFileNameWithoutExtension(picked);
         Log = "";
         MergeSummary = "";
         VerifySummary = "";
@@ -369,8 +385,16 @@ public partial class ToolsViewModel : ObservableObject
 
     partial void OnIsBusyChanged(bool value) => NotifyAll();
     partial void OnVerifiedChanged(bool value) { /* step indicator only */ }
-    partial void OnOutputPathChanged(string value)
+    partial void OnOutputDirChanged(string value)
     {
+        OnPropertyChanged(nameof(OutputPath));
+        Verified = false;
+        NotifyAll();
+    }
+
+    partial void OnOutputStemChanged(string value)
+    {
+        OnPropertyChanged(nameof(OutputPath));
         Verified = false;
         NotifyAll();
     }

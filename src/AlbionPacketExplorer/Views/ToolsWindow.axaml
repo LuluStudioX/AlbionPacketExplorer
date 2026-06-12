@@ -87,14 +87,18 @@
                 </Grid>
 
                 <!-- Output row -->
-                <Grid DockPanel.Dock="Bottom" RowDefinitions="Auto,Auto,Auto" Margin="0,8,0,0">
+                <Grid DockPanel.Dock="Bottom" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,8,0,0">
                     <TextBlock Grid.Row="0" Text="Output" FontWeight="SemiBold"
                                Foreground="{DynamicResource Apx.Text}" Margin="0,0,0,4" />
-                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto">
-                        <TextBox Grid.Column="0" Text="{Binding OutputPath}" PlaceholderText="packets-merged.json"
-                                 VerticalAlignment="Center" Margin="0,0,6,0" />
+
+                    <!-- Directory: read-only path display + Browse / Open -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,4">
+                        <TextBlock Grid.Column="0" Text="{Binding OutputDir}"
+                                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource Apx.TextMuted}" FontSize="12"
+                                   ToolTip.Tip="{Binding OutputDir}" />
                         <Button Grid.Column="1" Classes="ghost" Command="{Binding BrowseOutputCommand}" Padding="10,7"
-                                Margin="0,0,6,0" ToolTip.Tip="Choose where the merged file is written">
+                                Margin="6,0,6,0" ToolTip.Tip="Choose where the merged file is written">
                             <TextBlock Text="Browse" />
                         </Button>
                         <Button Grid.Column="2" Classes="ghost" Command="{Binding OpenExistingCommand}" Padding="10,7"
@@ -102,7 +106,21 @@
                             <TextBlock Text="Open..." />
                         </Button>
                     </Grid>
-                    <CheckBox Grid.Row="2" IsChecked="{Binding Dedupe}" Margin="0,6,0,0"
+
+                    <!-- Filename: editable stem + fixed .json badge -->
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,0,0,0">
+                        <TextBox Grid.Column="0" Text="{Binding OutputStem}"
+                                 PlaceholderText="merged_packets_YYYYMMDD_HHmmss"
+                                 VerticalAlignment="Center" Margin="0,0,4,0" />
+                        <Border Grid.Column="1" Background="{DynamicResource Apx.Highlight}"
+                                BorderBrush="{DynamicResource Apx.Border}" BorderThickness="1"
+                                CornerRadius="4" Padding="8,0" VerticalAlignment="Stretch">
+                            <TextBlock Text=".json" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource Apx.TextMuted}" FontSize="12" />
+                        </Border>
+                    </Grid>
+
+                    <CheckBox Grid.Row="3" IsChecked="{Binding Dedupe}" Margin="0,6,0,0"
                               Content="Remove duplicate packets" Foreground="{DynamicResource Apx.Text}"
                               ToolTip.Tip="Collapse byte-identical packets, so re-merging files that share a capture cannot double its packets" />
                 </Grid>
