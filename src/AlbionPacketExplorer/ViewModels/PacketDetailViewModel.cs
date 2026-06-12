@@ -151,6 +151,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     private readonly RowHideStore _hideStore;
     private readonly EnumLabelStore _enumLabels;
     private readonly ResolveEnumStore _resolveEnums;
+    private readonly LocStringStore _locStrings;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
@@ -289,7 +290,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema,
                                  RowHideStore hideStore, EnumLabelStore enumLabels,
-                                 ResolveEnumStore resolveEnums)
+                                 ResolveEnumStore resolveEnums, LocStringStore locStrings)
     {
         _gameData = gameData;
         _icons = icons;
@@ -297,9 +298,11 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         _hideStore = hideStore;
         _enumLabels = enumLabels;
         _resolveEnums = resolveEnums;
+        _locStrings = locStrings;
         _hideStore.Load();
         _enumLabels.Load();
         _resolveEnums.Load();
+        _locStrings.Load();
         RefreshHidePresets();
     }
 
@@ -406,6 +409,12 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                 && _resolveEnums.TryResolve(resolveAs, enumValue, out var member))
             {
                 resolved = member;
+            }
+            // Localization keys (@KEY string params) resolve to English text without game data or
+            // the item-name toggle - the value itself unambiguously marks a loc key.
+            else if (pv.Value is string locKey && _locStrings.TryResolve(locKey, out var locText))
+            {
+                (resolved, uniqueName) = (locText, locKey);
             }
             else if (ResolveItemNames && _gameData.IsLoaded)
             {
@@ -800,6 +809,9 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         // String params: value is already a UniqueName (e.g. "T8_LABOURER_HUNTER")
         if (pv.Type == "String" && pv.Value is string s && !string.IsNullOrEmpty(s))
         {
+            // A leading '@' marks an Albion localization key -> show its English text.
+            if (_locStrings.TryResolve(s, out var locText))
+                return (locText, s);
             if (_gameData.TryResolveByUniqueName(s, out var display))
                 return ($"{s} — {display}", s);
         }
