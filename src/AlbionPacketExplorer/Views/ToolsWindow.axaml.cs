@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using AlbionPacketExplorer.Controls;
@@ -74,4 +75,11 @@ public partial class ToolsWindow : ApxWindow
     }
 
     private void OnCloseClicked(object? sender, RoutedEventArgs e) => Close();
+
+    private async void OnCopyLogClicked(object? sender, RoutedEventArgs e)
+    {
+        var log = (DataContext as ToolsViewModel)?.Log;
+        if (!string.IsNullOrEmpty(log))
+            await Clipboard!.SetTextAsync(log);
+    }
 }
