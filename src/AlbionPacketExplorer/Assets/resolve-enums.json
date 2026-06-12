@@ -1,4 +1,98 @@
 {
+  "AccessRightsContainers": {
+    "0": "Inspect",
+    "1": "PutItem",
+    "2": "RemoveItem",
+    "3": "Pickup",
+    "4": "Giveup",
+    "5": "ChangeSettings"
+  },
+  "AccessRightsCraftBuilding": {
+    "0": "InstallResources",
+    "1": "Repair",
+    "10": "Destroy",
+    "11": "CancelRenovation",
+    "12": "GetMailOnDestructiveRenovation",
+    "13": "GetProtectedLoot",
+    "2": "Craft",
+    "3": "Study",
+    "4": "Upgrade",
+    "5": "ChangeUsageFees",
+    "6": "PickupMoney",
+    "7": "Customize",
+    "8": "Giveup",
+    "9": "Downgrade"
+  },
+  "AccessRightsFarmBuilding": {
+    "0": "InstallResources",
+    "1": "Repair",
+    "10": "GetProtectedLoot",
+    "2": "UseFarmable",
+    "3": "Upgrade",
+    "4": "Customize",
+    "5": "Giveup",
+    "6": "Downgrade",
+    "7": "Destroy",
+    "8": "CancelRenovation",
+    "9": "GetMailOnDestructiveRenovation"
+  },
+  "AccessRightsFurnitureBattleVault": {
+    "0": "Pickup",
+    "1": "Giveup"
+  },
+  "AccessRightsFurnitureBuffProvider": {
+    "0": "Use",
+    "1": "Pickup",
+    "2": "Giveup"
+  },
+  "AccessRightsFurnitureDecoration": {
+    "0": "Pickup",
+    "1": "Giveup"
+  },
+  "AccessRightsFurnitureRepairKit": {
+    "0": "Use",
+    "1": "Pickup",
+    "2": "Giveup"
+  },
+  "AccessRightsLaborerObject": {
+    "0": "Use",
+    "1": "Fire"
+  },
+  "AccessRightsMeldBuilding": {
+    "0": "InstallResources",
+    "1": "Repair",
+    "10": "Customize",
+    "11": "Giveup",
+    "12": "Downgrade",
+    "13": "Destroy",
+    "14": "CancelRenovation",
+    "15": "GetMailOnDestructiveRenovation",
+    "16": "GetProtectedLoot",
+    "2": "MeldItem",
+    "3": "SalvageItem",
+    "4": "CraftItem",
+    "5": "UpgradeItemEnchantment",
+    "6": "AwakenLegendaryItem",
+    "7": "Upgrade",
+    "8": "ChangeUsageFees",
+    "9": "PickupMoney"
+  },
+  "AccessRightsPlayerBuilding": {
+    "0": "InstallResources",
+    "1": "Repair",
+    "10": "Destroy",
+    "11": "CancelRenovation",
+    "12": "GetMailOnDestructiveRenovation",
+    "13": "GetProtectedLoot",
+    "2": "PlaceFurniture",
+    "3": "ClaimUnownedFurniture",
+    "4": "ForceClaimFurniture",
+    "5": "Upgrade",
+    "6": "Customize",
+    "7": "Giveup",
+    "8": "MakeHome",
+    "9": "Downgrade"
+  },
   "ActionComponentType": {
     "0": "Invalid",
     "1": "CraftItem",
@@ -13,6 +107,12 @@
   "ActionOnBuildingErrorCode": {
     "0": "OK",
     "1": "Invalid",
+    "10": "DurabilityLow",
+    "11": "NutritionLow",
+    "12": "NotAllowedWhenMounted",
+    "13": "NotAllowedInGvg",
+    "14": "AlreadyDoingThisAction",
+    "15": "ItemOvercharged",
     "2": "InvalidRights",
     "3": "BuildingOutOfRange",
     "4": "NotAllowedWhileMoving",
@@ -20,17 +120,352 @@
     "6": "PriceChanged",
     "7": "NotEnoughSilver",
     "8": "NotEnoughGold",
-    "9": "NotEnoughResources",
+    "9": "NotEnoughResources"
+  },
+  "Activity": {
+    "-1": "Invalid",
+    "0": "OpenWorldFarm",
+    "1": "Dungeon",
+    "2": "FactionWarfare",
+    "3": "Hellgate",
+    "4": "Expedition",
+    "5": "HCE",
+    "6": "Roleplay",
+    "7": "NumActivities"
+  },
+  "AmountFilter": {
+    "0": "Any",
+    "1": "Deposit",
+    "2": "Withdraw"
+  },
+  "ApplyItemTraitErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "2": "OutOfRange",
+    "3": "PriceChanged",
+    "4": "ItemIsNotAwakened",
+    "5": "InvalidRights",
+    "6": "PlayerNotRegistered",
+    "7": "PlayerIsMounted",
+    "8": "NoPendingModification"
+  },
+  "ArenaRewardCategory": {
+    "0": "DailyLimitedReward",
+    "1": "WinReward",
+    "2": "LoseReward",
+    "3": "SeasonRankUpReward"
+  },
+  "AttackType": {
+    "0": "None",
+    "1": "Melee",
+    "2": "Ranged",
+    "4": "Magic"
+  },
+  "AwakenItemErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
     "10": "DurabilityLow",
     "11": "NutritionLow",
-    "12": "NotAllowedWhenMounted",
-    "13": "NotAllowedInGvg",
-    "14": "AlreadyDoingThisAction",
-    "15": "ItemOvercharged"
+    "12": "PlayerIsMounted",
+    "13": "NotEnoughGold",
+    "14": "NotEnoughSilver",
+    "15": "PriceChanged",
+    "16": "AlreadyAwakened",
+    "17": "ItemIsOvercharged",
+    "18": "NeedEmptySlotInInventory",
+    "19": "FeatureDisabled",
+    "2": "OutOfRange",
+    "3": "ItemTypeCannotBeAwakened",
+    "4": "ItemDamaged",
+    "5": "ItemTierTooLow",
+    "6": "ItemEnchantmentTooLow",
+    "7": "NotEnoughResources",
+    "8": "InvalidRights",
+    "9": "PlayerNotRegistered"
+  },
+  "Biome": {
+    "-1": "Invalid",
+    "0": "Steppe",
+    "1": "Swamp",
+    "2": "Highland",
+    "3": "Mountain",
+    "4": "Forest",
+    "5": "Hell",
+    "6": "Crystal",
+    "7": "Roads",
+    "8": "Mists",
+    "9": "Dragon"
+  },
+  "CagedObjectState": {
+    "0": "Protected",
+    "1": "Closed",
+    "2": "Open"
+  },
+  "CarriableKeyType": {
+    "0": "HellDungeonChestKey",
+    "1": "DragonAreaIslandKey",
+    "2": "Invalid"
+  },
+  "CarriableObjectType": {
+    "0": "TerritoryPowerCrystal",
+    "1": "HideoutPowerCore",
+    "10": "DragonAreaIslandKey",
+    "2": "TerritoryEnergyCore",
+    "3": "HurtWisp",
+    "4": "SiegeBanner",
+    "5": "RaidBanner",
+    "6": "SmugglersCrate",
+    "7": "HellDungeonKey",
+    "8": "HellDungeonSoul",
+    "9": "FactionBattleStandard"
+  },
+  "CastleGateSize": {
+    "0": "Small",
+    "1": "Large"
+  },
+  "CastleGateState": {
+    "0": "Closed",
+    "1": "Open",
+    "2": "GateDamagedClosed",
+    "3": "GateDamagedOpen",
+    "4": "Destroyed",
+    "5": "Inactive"
+  },
+  "ChatChannelType": {
+    "0": "Global",
+    "1": "Trade",
+    "10": "French",
+    "11": "Polish",
+    "12": "Portuguese",
+    "13": "Russian",
+    "14": "Spanish",
+    "15": "Chinese",
+    "16": "Korean",
+    "17": "Japanese",
+    "18": "Italian",
+    "19": "TraditionalChinese",
+    "2": "Recruit",
+    "20": "Indonesian",
+    "21": "Turkish",
+    "22": "Arabic",
+    "23": "LanguageProxy",
+    "24": "Guild",
+    "25": "Alliance",
+    "26": "Party",
+    "27": "Area",
+    "28": "Private",
+    "29": "Faction",
+    "3": "LookingForGroup",
+    "30": "FactionArea",
+    "31": "Surrounding",
+    "32": "SurroundingEmote",
+    "33": "System",
+    "34": "Duell",
+    "35": "TakeDamage",
+    "36": "GiveDamage",
+    "37": "KillPlayer",
+    "38": "HealPlayer",
+    "39": "SpellEffect",
+    "4": "HardCoreExpedition",
+    "40": "Loot",
+    "41": "Silver",
+    "42": "Reputation",
+    "43": "Fame",
+    "44": "NumEntries",
+    "45": "Invalid",
+    "5": "Help",
+    "6": "Staff",
+    "7": "Announcement",
+    "8": "English",
+    "9": "German"
+  },
+  "ClaimState": {
+    "0": "Initial",
+    "1": "Unclaimable",
+    "2": "Guarded",
+    "3": "Claimable"
+  },
+  "ClusterQualities": {
+    "0": "None",
+    "1": "Q1",
+    "2": "Q2",
+    "3": "Q3",
+    "4": "Q4",
+    "5": "Q5",
+    "6": "Q6"
+  },
+  "ClusterTypes": {
+    "-1": "Invalid",
+    "0": "World",
+    "1": "Dungeon",
+    "10": "Harbor",
+    "11": "HomeBase",
+    "12": "Test",
+    "13": "Debug",
+    "14": "PassageOverground",
+    "15": "PassageUnderground",
+    "16": "CharacterSelectArea",
+    "17": "RandomDungeon",
+    "18": "CorruptedDungeon",
+    "19": "Hideout",
+    "2": "Expedition",
+    "20": "AvalonianRoads",
+    "21": "Mists",
+    "22": "MistsDungeon",
+    "23": "ResourceMists",
+    "24": "HellDungeon",
+    "25": "DragonArea",
+    "3": "Arena",
+    "4": "Island",
+    "5": "Hellgate",
+    "6": "City",
+    "7": "StartArea",
+    "8": "StartTown",
+    "9": "TutorialCluster"
+  },
+  "ClusterValueFilterClusterTypes": {
+    "0": "All",
+    "1": "Safe",
+    "2": "Yellow",
+    "3": "Orange",
+    "4": "Red",
+    "5": "Black"
+  },
+  "ClusterValueFilterMobDangerTypes": {
+    "0": "All",
+    "1": "Normal",
+    "2": "Veteran",
+    "3": "Elite"
+  },
+  "ConstraintSpace": {
+    "0": "Local",
+    "1": "World"
+  },
+  "ConstraintTransformationUpdateType": {
+    "0": "None",
+    "1": "Initial",
+    "2": "Continuous"
+  },
+  "ConstraintType": {
+    "0": "AttributeMask",
+    "1": "Parent"
+  },
+  "ContentOption": {
+    "0": "Hide",
+    "1": "ShowCompleted",
+    "2": "ShowAll"
+  },
+  "Continents": {
+    "0": "None",
+    "1": "Royal",
+    "2": "Outlands",
+    "3": "Avalon",
+    "4": "Mists",
+    "5": "DragonLands"
+  },
+  "CraftItemErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "10": "NotEnoughPlayerFactionStanding",
+    "11": "NotEnoughStanding",
+    "12": "VanityNotUnlocked",
+    "13": "InvalidMoneyType",
+    "14": "InventoryFull",
+    "15": "InventoryWeightLimitExceeded",
+    "16": "InvalidRights",
+    "17": "InvalidItem",
+    "18": "InvalidAmount",
+    "19": "PlayerNotRegistered",
+    "2": "OutOfRange",
+    "20": "DurabilityLow",
+    "21": "NutritionLow",
+    "22": "NotEnoughCraftCapacity",
+    "23": "PriceChanged",
+    "3": "ItemNotCraftable",
+    "4": "RecipeNotUseableHere",
+    "5": "ItemNotUnlocked",
+    "6": "NotEnoughSilver",
+    "7": "NotEnoughGold",
+    "8": "NotEnoughResources",
+    "9": "NotEnoughCurrency"
+  },
+  "CustomSpawnPositionUsage": {
+    "0": "None",
+    "1": "DynamicTemplate"
+  },
+  "DataWindow": {
+    "10": "Current",
+    "35": "Stable"
+  },
+  "DebugStateMachineType": {
+    "0": "Movement",
+    "1": "Action"
+  },
+  "DeviceTypeFilter": {
+    "0": "Any",
+    "1": "Desktop",
+    "2": "Handheld",
+    "4": "Console"
+  },
+  "DisenchantItemErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "2": "OutOfRange",
+    "3": "PriceChanged",
+    "4": "ItemIsNotAwakened",
+    "5": "InvalidRights",
+    "6": "PlayerNotRegistered",
+    "7": "PlayerIsMounted",
+    "8": "FeatureDisabled"
+  },
+  "DuellingMsgEvents": {
+    "0": "PlayerReceivedChallenge",
+    "1": "PlayerSentChallenge",
+    "10": "ChallengeAccepted",
+    "11": "ChallengeDenied",
+    "12": "ChallengeRequestCanceled",
+    "13": "NoActiveDuel",
+    "14": "WaitForDuelIssueingInterval",
+    "15": "NotEnoughSilver",
+    "16": "PlayerIsBusy",
+    "17": "NotAllowed",
+    "2": "PlayerHasDuelPending",
+    "3": "YouHaveDuelPending",
+    "4": "PlayerIsAlreadyInDuel",
+    "5": "YouAreAlreadyInDuel",
+    "6": "PlayerIsDead",
+    "7": "YouAreDead",
+    "8": "PlayerNotFound",
+    "9": "PlayerOutOfRange"
+  },
+  "DungeonLevelUsage": {
+    "0": "First",
+    "1": "Last",
+    "2": "Others",
+    "3": "FirstAndOthers",
+    "4": "LastAndOthers"
+  },
+  "DynamicTemplateFeatureLayer": {
+    "0": "NotInitialized",
+    "1": "Default",
+    "2": "FactionWarfare"
+  },
+  "DynamicTemplateState": {
+    "0": "None",
+    "1": "Active",
+    "2": "Inactive"
+  },
+  "EncounterTypes": {
+    "-1": "None",
+    "0": "Light",
+    "1": "Standard",
+    "2": "Hard"
   },
   "EquipmentSlot": {
+    "-1": "Invalid",
     "0": "MainHand",
     "1": "OffHand",
+    "10": "NumEntries",
     "2": "Head",
     "3": "Armor",
     "4": "Shoes",
@@ -38,9 +473,197 @@
     "6": "Cape",
     "7": "Mount",
     "8": "Potion",
-    "9": "Food",
-    "10": "NumEntries",
-    "-1": "Invalid"
+    "9": "Food"
+  },
+  "EventFilter": {
+    "0": "Any",
+    "1": "GuildJoiners",
+    "2": "GuildLeavers",
+    "3": "RankChanges"
+  },
+  "ExitDirection": {
+    "0": "NE",
+    "1": "NW",
+    "2": "SE",
+    "3": "SW",
+    "4": "DungeonSolo",
+    "5": "DungeonGroup",
+    "6": "DungeonRaid"
+  },
+  "Faction": {
+    "0": "None",
+    "1": "Keeper",
+    "2": "Morgana",
+    "3": "Undead",
+    "4": "Heretic",
+    "5": "Avalon"
+  },
+  "FactionFortressFightState": {
+    "0": "NotStarted",
+    "1": "PreSiegeAnnouncement",
+    "2": "PreSiege",
+    "3": "ActiveSiege",
+    "4": "ActiveSiegeLastStand",
+    "5": "Finished"
+  },
+  "FactionFortressState": {
+    "0": "Inactive",
+    "1": "PreSiege",
+    "2": "ActiveSiege",
+    "3": "RedZoneEventPhase2Active"
+  },
+  "FlaggingStatus": {
+    "0": "Blue",
+    "1": "Highland",
+    "2": "Forest",
+    "255": "Red",
+    "3": "Steppe",
+    "4": "Mountain",
+    "5": "Swamp",
+    "6": "Caerleon"
+  },
+  "FortificationGroundVariant": {
+    "0": "Building",
+    "1": "WallCornerLeft",
+    "2": "WallCornerRight",
+    "3": "WallDoubleCornerLeft",
+    "4": "WallDoubleCornerRight",
+    "5": "WallInnerCornerLeft",
+    "6": "WallInnerCornerRight",
+    "7": "WallStraight",
+    "8": "GateDecorative",
+    "9": "GateMain"
+  },
+  "FortificationTileCategories": {
+    "0": "NONE",
+    "1": "DEFAULT",
+    "2": "DESTROYED",
+    "4": "ACTIVE",
+    "8": "GATECOLLISION"
+  },
+  "FortificationTileTiers": {
+    "-1": "NONE",
+    "0": "FALLBACK",
+    "3": "T3",
+    "4": "T4",
+    "5": "T5",
+    "6": "T6",
+    "7": "T7",
+    "8": "T8"
+  },
+  "FounderState": {
+    "0": "None",
+    "1": "Bronze",
+    "2": "Silver",
+    "3": "Gold",
+    "4": "Crystal"
+  },
+  "Frequency": {
+    "0": "None",
+    "1": "Today",
+    "2": "ThisWeek",
+    "3": "ThisMonth",
+    "4": "Minutes",
+    "5": "Hours",
+    "6": "Days",
+    "7": "Weeks",
+    "8": "AllTime"
+  },
+  "GameState": {
+    "0": "Invalid",
+    "1": "Login",
+    "2": "Loading",
+    "3": "Game",
+    "4": "TryingToReconnect"
+  },
+  "GamepadInteraction": {
+    "0": "Press",
+    "1": "Hold",
+    "2": "Repeat"
+  },
+  "GamepadModifiers": {
+    "0": "None",
+    "1": "Modifier1",
+    "2": "Modifier2"
+  },
+  "GenerateItemTraitsErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "10": "NotEnoughSilver",
+    "11": "SilverCostsChanged",
+    "12": "FeatureDisabled",
+    "13": "OtherTraitHasPendingTraits",
+    "2": "OutOfRange",
+    "3": "PriceChanged",
+    "4": "ItemIsNotAwakened",
+    "5": "InvalidRights",
+    "6": "PlayerNotRegistered",
+    "7": "PlayerIsMounted",
+    "8": "NotEnoughAttunement",
+    "9": "AttunementCostsChanged"
+  },
+  "GuildApplicationStatCategories": {
+    "0": "None",
+    "1": "TotalFame",
+    "128": "CrystalLeagueWins",
+    "16": "CraftingFame",
+    "2": "KillFame",
+    "32": "HellgateInfamy",
+    "4": "PveFame",
+    "64": "ArenaWins",
+    "8": "GatheringFame"
+  },
+  "GuildHome": {
+    "0": "Default",
+    "1": "Caerleon",
+    "10": "Brecilien",
+    "2": "Martlock",
+    "3": "Thetford",
+    "4": "FortSterling",
+    "5": "Lymhurst",
+    "6": "Bridgewatch",
+    "7": "ArthursRest",
+    "8": "MerlynsRest",
+    "9": "MorganasRest"
+  },
+  "GuildJoinSettings": {
+    "0": "Invite",
+    "1": "Application",
+    "2": "OpenJoin"
+  },
+  "GuildLanguage": {
+    "0": "None",
+    "1": "ar",
+    "10": "fr",
+    "11": "de",
+    "12": "el",
+    "13": "hi",
+    "14": "hu",
+    "15": "id",
+    "16": "it",
+    "17": "ja",
+    "18": "kk",
+    "19": "ko",
+    "2": "be",
+    "20": "ms",
+    "21": "fa",
+    "22": "pl",
+    "23": "pt",
+    "24": "ro",
+    "25": "ru",
+    "26": "es",
+    "27": "sv",
+    "28": "th",
+    "29": "tr",
+    "3": "my",
+    "30": "uk",
+    "31": "vi",
+    "4": "zh",
+    "5": "zh_tw",
+    "6": "cs",
+    "7": "nl",
+    "8": "en",
+    "9": "fil"
   },
   "GuildRole": {
     "0": "NONE",
@@ -53,57 +676,858 @@
     "7": "THE_RIGHT_HAND",
     "8": "GUILDMASTER"
   },
-  "Faction": {
-    "0": "None",
-    "1": "Keeper",
-    "2": "Morgana",
-    "3": "Undead",
-    "4": "Heretic",
-    "5": "Avalon"
+  "HellDungeonDownwardExitState": {
+    "0": "Open",
+    "1": "Closed",
+    "2": "Broken"
   },
-  "FlaggingStatus": {
-    "0": "Blue",
-    "1": "Highland",
-    "2": "Forest",
-    "3": "Steppe",
-    "4": "Mountain",
-    "5": "Swamp",
-    "6": "Caerleon",
-    "255": "Red"
+  "HellDungeonRoomShrineState": {
+    "0": "Protected",
+    "1": "Depleted"
+  },
+  "HellDungeonSoulExitState": {
+    "0": "Open",
+    "1": "Closed"
+  },
+  "HellDungeonSoulShrineState": {
+    "0": "Protected",
+    "1": "WaitingForSoul",
+    "2": "AllSoulSlotsOccupied",
+    "3": "Depleted"
+  },
+  "HellDungeonStaticEntranceState": {
+    "0": "Open",
+    "1": "Closed"
+  },
+  "HighlightRarityLevel": {
+    "0": "Standard",
+    "1": "Uncommon",
+    "2": "Rare",
+    "3": "Legendary"
+  },
+  "HuntGroupType": {
+    "0": "SOLO",
+    "1": "GROUP",
+    "2": "RAID"
+  },
+  "HuntTrackState": {
+    "0": "Active",
+    "1": "NotUseable",
+    "2": "AlreadyUsed"
+  },
+  "InputMode": {
+    "0": "None",
+    "1": "MouseAndKeyboard",
+    "2": "Gamepad"
+  },
+  "InputTypeFilter": {
+    "0": "Any",
+    "1": "Mouse",
+    "4": "Gamepad"
+  },
+  "Instant": {
+    "0": "None",
+    "1": "In",
+    "2": "Out",
+    "3": "Both"
+  },
+  "ItemMoveType": {
+    "0": "Any",
+    "1": "Deposit",
+    "2": "Withdraw"
+  },
+  "Layer": {
+    "-1": "Default",
+    "0": "UpperBody",
+    "1": "LeftArm"
+  },
+  "LayerControlType": {
+    "0": "None",
+    "1": "Encounter",
+    "2": "Story",
+    "3": "Environment"
+  },
+  "LinkModeEnum": {
+    "0": "None",
+    "1": "Store",
+    "2": "Wardrobe",
+    "3": "FriendsInvite",
+    "4": "Url",
+    "5": "KillEmotes"
+  },
+  "LoadoutBoughtAuctionFetchingResult": {
+    "0": "Ok",
+    "1": "InternalServerError",
+    "2": "PartiallyMovedItems",
+    "3": "InventoryFull"
+  },
+  "LoadoutResultCode": {
+    "0": "Ok",
+    "1": "InternalServerError",
+    "2": "UpdateConflict",
+    "3": "NoEmptySlots",
+    "4": "AccessDenied"
+  },
+  "LocalActionCancelReason": {
+    "0": "Default",
+    "1": "CancelChannelingRecast",
+    "2": "StopAnyActionHotKey",
+    "3": "Mounting"
+  },
+  "LocalQuestState": {
+    "0": "NotInitialized",
+    "1": "Started",
+    "2": "Stopped",
+    "3": "Finished"
+  },
+  "LocalQuestType": {
+    "0": "PerPlayer",
+    "1": "Open"
+  },
+  "LogType": {
+    "0": "silver",
+    "1": "gold",
+    "2": "siphoned_energy",
+    "3": "just_event"
+  },
+  "MarketPlaceView": {
+    "0": "Buy",
+    "1": "Sell",
+    "10": "None",
+    "2": "CreateBuyOrder",
+    "3": "MyOrders",
+    "4": "MyOrdersBuyOnly",
+    "5": "MyOrdersSellOnly",
+    "6": "MySellOrders",
+    "7": "Complete",
+    "8": "BuyOrders",
+    "9": "Loadouts"
+  },
+  "MeldItemErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "10": "NotEnoughCraftCapacity",
+    "2": "OutOfRange",
+    "3": "ItemNotMeldable",
+    "4": "NotEnoughResources",
+    "5": "InventoryFull",
+    "6": "InvalidRights",
+    "7": "PlayerNotRegistered",
+    "8": "DurabilityLow",
+    "9": "NutritionLow"
+  },
+  "MetaDirectionFlag": {
+    "0": "None",
+    "1": "Forward",
+    "2": "Right",
+    "4": "Back",
+    "8": "Left"
+  },
+  "Metric": {
+    "0": "Uses",
+    "1": "Kills",
+    "10": "BuildingDamage",
+    "11": "PvPFameGained",
+    "12": "PvEFameGained",
+    "13": "VortexCore",
+    "14": "TreasureSmuggler",
+    "15": "PvEEncounters",
+    "16": "PvPEncounters",
+    "17": "HealingReceived",
+    "18": "Duration",
+    "19": "MinItemPower",
+    "2": "Deaths",
+    "20": "AvgItemPower",
+    "21": "MaxItemPower",
+    "3": "DamageReceived",
+    "4": "DamageDealt",
+    "5": "HealingDone",
+    "6": "OutpostCaptured",
+    "7": "DynamicCamp",
+    "8": "MobsKilled",
+    "9": "SuccessWin"
+  },
+  "MiniMapPingTypes": {
+    "0": "Default",
+    "1": "Attack",
+    "2": "Defend"
+  },
+  "MinimapZoomTypes": {
+    "0": "Desktop",
+    "1": "Mobile",
+    "2": "Console"
+  },
+  "MistDungeonRoomFlags": {
+    "0": "NONE",
+    "1": "ROSE",
+    "16": "BOSS",
+    "2": "SCALE",
+    "4": "SWORD",
+    "8": "MOBS"
+  },
+  "MistDungeonRoomStates": {
+    "0": "Default",
+    "1": "Cleared"
+  },
+  "MistsModeType": {
+    "0": "Mists",
+    "1": "MistsDungeon",
+    "2": "ResourceMists"
+  },
+  "MistsStaticEntranceRegisterErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "2": "OutOfRange",
+    "3": "InvalidBuilding"
+  },
+  "MobTypeCategory": {
+    "0": "Critter",
+    "1": "Trash",
+    "10": "Environment",
+    "11": "Other",
+    "2": "Harmless",
+    "3": "Standard",
+    "4": "Champion",
+    "5": "MiniBoss",
+    "6": "Boss",
+    "7": "Chest",
+    "8": "Vanity",
+    "9": "Summon"
+  },
+  "OnDamageEventBehaviours": {
+    "0": "BasedOnOrigin",
+    "1": "Never",
+    "2": "Always"
+  },
+  "OperatingSystemFamilyFilter": {
+    "0": "Any",
+    "1": "Windows",
+    "128": "PlayStation",
+    "16": "IOS",
+    "2": "Linux",
+    "32": "SteamOS",
+    "4": "MacOS",
+    "64": "XBox",
+    "8": "Android"
+  },
+  "Operation": {
+    "0": "equals",
+    "1": "notEquals",
+    "2": "greater",
+    "3": "less",
+    "4": "greaterOrEqual",
+    "5": "lessOrEqual"
+  },
+  "OutlineType": {
+    "0": "Marker",
+    "1": "Fence",
+    "2": "Wall"
+  },
+  "PartyStartHuntAnswer": {
+    "0": "Accepted",
+    "1": "Declined",
+    "2": "DeclinedTimeout",
+    "3": "AutoDeclinedOffline",
+    "4": "AutoDeclinedLeaderChanged",
+    "5": "AutoDeclinedInCombat",
+    "6": "AutoDeclinedDeadOrKnockedDown"
+  },
+  "PileState": {
+    "0": "Protected",
+    "1": "Lootable",
+    "2": "Empty"
+  },
+  "PlatePosition": {
+    "0": "North",
+    "1": "South",
+    "2": "East",
+    "3": "West",
+    "4": "NorthEast",
+    "5": "NorthWest",
+    "6": "SouthEast",
+    "7": "SouthWest"
+  },
+  "PlayerAttribute": {
+    "0": "HitpointsMax",
+    "1": "HitpointsMaxBonus",
+    "10": "CraftingFocusRegeneration",
+    "11": "CraftingFocusRegenerationBonus",
+    "12": "MoveSpeed",
+    "13": "MoveSpeedBonus",
+    "14": "MaxLoad",
+    "15": "MaxLoadBonus",
+    "16": "AttackDamage",
+    "17": "PhysicalAttackDamageBonus",
+    "18": "MagicAttackDamageBonus",
+    "19": "AttackRangeBonus",
+    "2": "HitpointsRegeneration",
+    "20": "AttackSpeedBonus",
+    "21": "PhysicalSpellDamageBonus",
+    "22": "MagicSpellDamageBonus",
+    "23": "MagicCastTimeReductionRaw",
+    "24": "MagicCastTimeReductionAdjusted",
+    "25": "MagicCoolDownReductionRaw",
+    "26": "MagicCoolDownReductionAdjusted",
+    "27": "MagicCastingResilience",
+    "28": "HealBonus",
+    "29": "HealModifier",
+    "3": "HitpointsRegenerationBonus",
+    "30": "EnergyCostReduction",
+    "31": "PhysicalArmor",
+    "32": "MagicResistance",
+    "33": "CrowdControlResistance",
+    "34": "BalanceModifier",
+    "35": "HealingSicknessModifier",
+    "36": "FocusFireProtectionPenetration",
+    "37": "CraftTime",
+    "38": "InstallTime",
+    "39": "GatheringSpeed",
+    "4": "EnergyMax",
+    "40": "GatheringYield",
+    "41": "FishingYield",
+    "42": "FishingSpeed",
+    "43": "BonusDamageVsPlayers",
+    "44": "BonusDefenseVsPlayers",
+    "45": "BonusCCRVsPlayers",
+    "46": "BonusCCDurationVsPlayers",
+    "47": "BonusDamageVsMobs",
+    "48": "BonusDefenseVsMobs",
+    "49": "BonusCCRVsMobs",
+    "5": "EnergyMaxBonus",
+    "50": "BonusCCDurationVsMobs",
+    "51": "CraftingQuality",
+    "52": "CraftingFocusCostReduction",
+    "53": "AbilityPower",
+    "54": "CCAbilityPower",
+    "55": "ItemPower",
+    "56": "ThreatBonus",
+    "57": "DestinyBoardProgressionBonus",
+    "58": "MobFameModifier",
+    "59": "ResourceFameModifier",
+    "6": "EnergyRegeneration",
+    "60": "FishingFameModifier",
+    "61": "MobSilverModifier",
+    "62": "MobLootModifier",
+    "63": "SilverToBonusPvEFame",
+    "64": "DamageVsMountsModifier",
+    "65": "CCDurationVsMountsModifier",
+    "66": "MightGain",
+    "67": "FactionPointsBonus",
+    "68": "TrackingTimeReductionRaw",
+    "69": "TrackingTimeReductionAdjusted",
+    "7": "EnergyRegenerationBonus",
+    "70": "TrackingFameModifier",
+    "71": "TrackingTargetChanceModifier",
+    "72": "NumAttributes",
+    "8": "CraftingFocusMax",
+    "9": "CraftingFocusMaxBonus"
+  },
+  "PlayerCharacterDuelOutcome": {
+    "0": "Victory",
+    "1": "Defeat",
+    "2": "Draw"
+  },
+  "PopupTemplateType": {
+    "0": "Default",
+    "1": "LootChest",
+    "2": "GenericAdvertisement"
+  },
+  "PopupType": {
+    "0": "None",
+    "1": "Premium",
+    "10": "AdventurersChallenge",
+    "11": "ActivityHub",
+    "12": "FeaturedFeature",
+    "13": "FactionWarFareUnlock",
+    "14": "MobileStoreRating",
+    "15": "GenericTutorial",
+    "16": "GuildFinder",
+    "17": "LootChests",
+    "18": "EuropeFounderPacks",
+    "19": "JournalIntroduction",
+    "2": "Gold",
+    "20": "GenericAdvertisement",
+    "21": "PlatformAccount",
+    "3": "Bundles",
+    "4": "Vanity",
+    "5": "VictoryEmotes",
+    "6": "GuestAccount",
+    "7": "SeasonWinner",
+    "8": "CrossPlatform",
+    "9": "ConquerorsChallenge"
+  },
+  "PortalExitType": {
+    "0": "Caerleon",
+    "1": "Bridgewatch",
+    "2": "Lymhurst",
+    "3": "Martlock",
+    "4": "Thetford",
+    "5": "FortSterling"
+  },
+  "PrefabPlatform": {
+    "4": "PC",
+    "5": "Mobile",
+    "6": "Console"
+  },
+  "PremiumStatus": {
+    "0": "Premium",
+    "1": "NonPremium",
+    "2": "All"
+  },
+  "Preset": {
+    "0": "Closed",
+    "1": "Private",
+    "2": "Public",
+    "3": "Custom",
+    "4": "Num",
+    "5": "Invalid"
+  },
+  "ProximityTooltipOptionEntry": {
+    "0": "SoloDungeon",
+    "1": "GroupDungeon",
+    "10": "MistsImmediateReturnExit",
+    "11": "MistsOpenWorldExit",
+    "12": "MistCityRoadsEntrance",
+    "13": "MistCityEntrance",
+    "14": "Hideout",
+    "15": "PowerCrystal",
+    "16": "EnergyVortex",
+    "17": "Treasure",
+    "18": "Smugglers",
+    "19": "CityBuildings",
+    "2": "LargeGroupDungeon",
+    "20": "FactionBattleStandardDelivery",
+    "3": "StaticDungeon",
+    "4": "Hellgates",
+    "5": "CorruptedDungeons",
+    "6": "Exit",
+    "7": "RoadsOfAvalon",
+    "8": "MistsEntrance",
+    "9": "MistsStaticEntrance"
+  },
+  "ProximityTooltipType": {
+    "0": "None",
+    "1": "StaticDungeonEntrance",
+    "10": "CorruptedDungeons",
+    "11": "Castle",
+    "12": "CastleGate",
+    "13": "MistsEntrance",
+    "14": "LocalQuest",
+    "15": "MistsStaticEntrance",
+    "16": "MistsImmediateReturnExit",
+    "17": "MistCityEntrance",
+    "18": "MistCityRoadsEntrance",
+    "19": "MistsOpenWorldExit",
+    "2": "RoadsOfAvalonPortal",
+    "20": "MistsBorderExit",
+    "21": "MistsDungeonExit",
+    "22": "Wisp",
+    "23": "TreasureDestination",
+    "24": "Harvestable",
+    "25": "City",
+    "26": "DungeonTransitionExit",
+    "27": "LootChest",
+    "28": "Spell",
+    "29": "Tracking",
+    "3": "TreasureHarvestable",
+    "30": "Territory",
+    "31": "Banner",
+    "32": "OutlandsTeleportationPortal",
+    "33": "OutlandsTeleportationReturnPortal",
+    "34": "Simple",
+    "35": "SmugglersDeliverySpot",
+    "36": "WorldObject",
+    "37": "VanityItemTooltip",
+    "38": "HellDungeonExit",
+    "39": "Infamy",
+    "4": "Treasure",
+    "40": "HellDungeonShrine",
+    "41": "HellDungeonSoul",
+    "42": "HellDungeonKeyChest",
+    "43": "AdjustedItemPower",
+    "44": "GamepadActions",
+    "45": "Timed",
+    "46": "PiledObject",
+    "5": "PowerCrystal",
+    "6": "Hideout",
+    "7": "Exit",
+    "8": "Dungeon",
+    "9": "Hellgates"
+  },
+  "PunishmentType": {
+    "0": "Warn",
+    "1": "Mute",
+    "2": "Shadowmute"
+  },
+  "RankingCharacterFilter": {
+    "0": "None",
+    "1": "Friends",
+    "2": "GuildMembers"
+  },
+  "RankingEntityTypes": {
+    "0": "Character",
+    "1": "Guild",
+    "2": "Alliance",
+    "3": "Faction"
   },
   "Rarity": {
-    "0": "None",
-    "1": "Standard",
-    "2": "Uncommon",
-    "3": "Rare",
+    "0": "Common",
+    "1": "Uncommon",
+    "2": "Rare",
+    "3": "Epic",
     "4": "Legendary"
   },
-  "ChestState": {
-    "0": "BossLocked",
-    "1": "LockedByTimer",
-    "2": "LockedByProtectingMobs",
-    "3": "LockedByWatcherMobs",
-    "4": "LockedByQuest",
-    "5": "LockedByMissingCarriables",
-    "6": "Unlocked",
-    "7": "Open",
-    "8": "Empty"
-  },
-  "CastleGateState": {
-    "0": "Closed",
-    "1": "Open",
-    "2": "GateDamagedClosed",
-    "3": "GateDamagedOpen",
-    "4": "Destroyed",
-    "5": "Inactive"
-  },
   "RcGeneric": {
-    "0": "OK",
     "-1": "UnhandledOperation",
     "-500": "InternalServerError",
     "-501": "InvalidState",
     "-502": "CharacterIsDead",
     "-503": "InvalidTimeStamp",
-    "-504": "IncorrectClientVersion"
+    "-504": "IncorrectClientVersion",
+    "0": "OK"
+  },
+  "RcOpChangeCluster": {
+    "1640": "NotNearAnExit",
+    "1641": "ExitNotConnected",
+    "1642": "ExitInfoNotFound",
+    "1643": "NotInGuildOfThisTerritory",
+    "1644": "NotInGuildOfTargetTerritory",
+    "1645": "ThisTerritoryWithoutOwner",
+    "1646": "TargetTerritoryWithoutOwner",
+    "1647": "TooEarlyWaitForExitCooldown",
+    "1648": "CannotUseExitWhileInCombat",
+    "1649": "CannotUseExitWhileInClusterQueue",
+    "1650": "TerritoryDoesNotExist",
+    "1651": "ClusterChangeAlreadyInProgress",
+    "1652": "ReputationTooLow",
+    "1653": "KnockedDownOrDead",
+    "1654": "NoOutlawsAllowed",
+    "1655": "NoFactionPlayersAllowed",
+    "1656": "NoOpposingFactionPlayersAllowed",
+    "1657": "ClusterIsFull",
+    "1658": "ClusterIsFullWithQueue",
+    "1659": "UnderCannotUseExitSpell",
+    "1660": "NoChargesLeft",
+    "1661": "OnCooldownAfterSmartQueueJoin",
+    "1662": "AlternativeClusterUnavailable",
+    "1663": "SkipTooEarlyPersonalCooldown",
+    "1664": "TooEarlyQueueNotActiveLongEnough",
+    "1665": "AvalonRoadsNoFactionEnterAllowed",
+    "1666": "MistCityRequirementsNotMet",
+    "1667": "DisabledByFeatureSwitch",
+    "1668": "CouldNotEnterExitOtherActionStillActive",
+    "1669": "AlreadyEnteringExit",
+    "1670": "ClusterIsAlreadyShuttingDown",
+    "1671": "UsageBlockedByObjectBlockerBuff",
+    "1672": "SilverCostsChanged",
+    "1673": "NoEnoughSilver",
+    "1674": "NoOutlandsClusterFound",
+    "1675": "NoExitFoundInOutlandCluster",
+    "1676": "ExitLocked"
+  },
+  "RcOpFriendInvite": {
+    "10640": "PlayerNotFound",
+    "10641": "CantInviteYourself",
+    "10642": "TargetPlayerIsAlreadyInvited",
+    "10643": "TargetPlayerIsInTutorial",
+    "10644": "FriendLimitReached",
+    "10645": "FriendLimitReachedForOtherPlayer",
+    "10646": "FriendRequestLimitReached",
+    "10647": "FriendRequestLimitReachedForOtherPlayer",
+    "10648": "PlayerIsAlreadyFriend",
+    "10649": "PlayerWasAddedAsFriend"
+  },
+  "RcOpGetSiegeBannerInfo": {
+    "10240": "ItemNotFound",
+    "10241": "NoGuild",
+    "10242": "InvalidItem",
+    "10243": "NoMonolithFound",
+    "10244": "OwnGuild",
+    "10245": "NoOwner"
+  },
+  "ReattuneItemErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "2": "OutOfRange",
+    "3": "ItemIsNotAwakened",
+    "4": "InvalidRights",
+    "5": "PlayerNotRegistered",
+    "6": "NotEnoughSilver",
+    "7": "AlreadyAttuned",
+    "8": "FeatureDisabled"
+  },
+  "RelationShipStatus": {
+    "0": "Friendly",
+    "1": "Neutral",
+    "2": "Hostile"
+  },
+  "RerollItemTraitErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "2": "OutOfRange",
+    "3": "PriceChanged",
+    "4": "ItemIsNotAwakened",
+    "5": "InvalidRights",
+    "6": "PlayerNotRegistered",
+    "7": "PlayerIsMounted"
+  },
+  "RerollItemTraitValueErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "10": "AttunementCostsChanged",
+    "11": "NotEnoughSilver",
+    "12": "SilverCostsChanged",
+    "13": "MaxRollValueReached",
+    "14": "FeatureDisabled",
+    "2": "OutOfRange",
+    "3": "PriceChanged",
+    "4": "ItemIsNotAwakened",
+    "5": "InvalidRights",
+    "6": "PlayerNotRegistered",
+    "7": "PlayerIsMounted",
+    "8": "NotEnoughAttunement",
+    "9": "PendingTraits"
+  },
+  "ResourceNodeTypes": {
+    "-1": "Invalid",
+    "10": "low",
+    "20": "medium",
+    "30": "high"
+  },
+  "ResourceType": {
+    "0": "Invalid",
+    "1": "Rock",
+    "2": "Fiber",
+    "3": "Ore",
+    "4": "Wood",
+    "5": "Hide"
+  },
+  "ResurrectionShrineState": {
+    "0": "Active",
+    "1": "Depleted"
+  },
+  "ScalingOptions": {
+    "0": "None",
+    "1": "IgnoreSocketScale",
+    "2": "UseCustomScaling"
+  },
+  "SceneMigrationStepResult": {
+    "0": "Success",
+    "1": "Failure"
+  },
+  "ServerLocation": {
+    "-1": "Invalid",
+    "0": "USA",
+    "1": "Asia",
+    "2": "Europe"
+  },
+  "ServerSelectionHint": {
+    "0": "Online",
+    "1": "Offline",
+    "2": "OfflineRecommended",
+    "3": "Unavaliable",
+    "4": "ExistingPlayerNewServer",
+    "5": "GuestAndSteamAndEpic",
+    "6": "BeforeBeta",
+    "7": "ClosedBeta",
+    "8": "OpenBeta"
+  },
+  "ServiceTicketResourceType": {
+    "0": "Collections",
+    "1": "UserStoreIdCreation",
+    "2": "Purchase"
+  },
+  "SiegeEvent": {
+    "0": "AttackAnnouncement",
+    "1": "DefenderStartWar",
+    "10": "AttackerRaidSuccess",
+    "11": "DefenderRaided",
+    "12": "TerritoryCaptured",
+    "13": "DefenderFinalWarBannerDestroyed",
+    "14": "DefenderFinalRaidBannerDestroyed",
+    "2": "DefenderStartRaid",
+    "3": "DefenderWarBannerDestroyed",
+    "4": "DefenderRaidBannerDestroyed",
+    "5": "TerritoryLost",
+    "6": "AttackerStartWar",
+    "7": "AttackerStartRaid",
+    "8": "AttackerWarBannerDestroyed",
+    "9": "AttackerRaidBannerDestroyed"
+  },
+  "SlotSize": {
+    "0": "Small",
+    "1": "Medium"
+  },
+  "SortMode": {
+    "0": "None",
+    "1": "Item",
+    "2": "Time",
+    "3": "Price",
+    "4": "Distance",
+    "5": "MarketAverage",
+    "6": "Durability"
+  },
+  "StandingType": {
+    "0": "MistCity",
+    "1": "Smugglers",
+    "2": "Hell",
+    "3": "Invalid"
+  },
+  "StateLifeTime": {
+    "0": "Application",
+    "1": "PlayerSession",
+    "2": "Permanent"
+  },
+  "StaticDungeonEventRarity": {
+    "0": "HIDDEN",
+    "1": "STANDARD",
+    "2": "RARE"
+  },
+  "StaticDungeonValueInfo": {
+    "0": "HIDDEN",
+    "1": "VERY_LOW",
+    "2": "LOW",
+    "3": "MEDIUM",
+    "4": "HIGH"
+  },
+  "StoragePaths": {
+    "0": "None",
+    "1": "Editor",
+    "15": "All",
+    "2": "Staging",
+    "4": "Nightly",
+    "8": "Live"
+  },
+  "StoreType": {
+    "0": "Web",
+    "1": "Steam",
+    "2": "GooglePlay",
+    "3": "AppStore",
+    "4": "Xbox"
+  },
+  "SubBiome": {
+    "-1": "Invalid",
+    "0": "Green",
+    "1": "Red",
+    "2": "Dead"
+  },
+  "SubState": {
+    "0": "Invalid",
+    "1": "Idle",
+    "10": "Fail",
+    "11": "GroundFail",
+    "12": "ToolFail",
+    "13": "CaughtNothing",
+    "14": "CatchMissed",
+    "15": "CatchTooEarly",
+    "2": "Waiting",
+    "3": "Casting",
+    "4": "Cast",
+    "5": "Bitten",
+    "6": "MiniGame",
+    "7": "Pull",
+    "8": "GiveLine",
+    "9": "Success"
+  },
+  "TargetFilter": {
+    "0": "Account",
+    "1": "Character"
+  },
+  "TeleporterConnectionState": {
+    "0": "Active",
+    "1": "Inactive"
+  },
+  "TeleporterState": {
+    "0": "Active",
+    "1": "Inactive",
+    "2": "Broken"
+  },
+  "TemplateType": {
+    "-1": "None",
+    "0": "Basic",
+    "1": "Highlight",
+    "2": "Start",
+    "3": "Exit",
+    "4": "Backdrop",
+    "5": "Master"
+  },
+  "TemplateUsageType": {
+    "0": "Default",
+    "1": "Enforce",
+    "2": "Exclude"
+  },
+  "TemporaryFlaggingStatus": {
+    "0": "Flagged",
+    "1": "LeavingFlagging",
+    "2": "None"
+  },
+  "TimeFrame": {
+    "0": "AllTime",
+    "1": "ThisWeek",
+    "2": "LastWeek"
+  },
+  "TimeType": {
+    "0": "Minutes",
+    "1": "Hours",
+    "2": "Days",
+    "3": "Weeks",
+    "4": "Months",
+    "5": "Forever"
+  },
+  "TokenType": {
+    "0": "Invalid",
+    "1": "Season",
+    "2": "Category"
+  },
+  "TransformPositionType": {
+    "0": "AreaPosition",
+    "1": "CasterPosition",
+    "2": "TargetPosition"
+  },
+  "UpgradeItemEnchantmentErrorCode": {
+    "0": "Invalid",
+    "1": "Ok",
+    "10": "DurabilityLow",
+    "11": "NutritionLow",
+    "12": "NotEnoughCraftCapacity",
+    "13": "PlayerIsMounted",
+    "14": "PriceChanged",
+    "15": "NotEnoughGold",
+    "16": "NotEnoughSilver",
+    "2": "OutOfRange",
+    "3": "ItemNotUpgradeable",
+    "4": "ItemNotUpgradeableAnymore",
+    "5": "ItemTierToHigh",
+    "6": "ItemDamaged",
+    "7": "NotEnoughResources",
+    "8": "InvalidRights",
+    "9": "PlayerNotRegistered"
+  },
+  "UserGroup": {
+    "0": "Everyone",
+    "1": "Guild",
+    "2": "Owner"
+  },
+  "VanityType": {
+    "0": "Unlock",
+    "1": "Consumable",
+    "2": "BodyType"
+  },
+  "VanityUnlockType": {
+    "0": "Emote",
+    "1": "Mount",
+    "2": "Skin",
+    "3": "Customization",
+    "4": "Avatar",
+    "5": "AvatarRing"
+  },
+  "VanityVisibilityKillEmotes": {
+    "0": "Always",
+    "1": "Never"
+  },
+  "VanityVisibilityRelationShipStatus": {
+    "0": "Myself",
+    "1": "PlayMate",
+    "2": "Opponent"
   }
 }
