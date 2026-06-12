@@ -6625,9 +6625,9 @@
         "resolveAs": ""
       },
       "5": {
-        "name": "",
-        "note": "(inferred) String[]; high-card; String[] array",
-        "resolveAs": ""
+        "name": "accessRoles",
+        "note": "(inferred) String[]; high-card; String[] array; str:accessrights (owner/coowner/builder/.../noaccess)",
+        "resolveAs": "str:accessrights"
       },
       "6": {
         "name": "",

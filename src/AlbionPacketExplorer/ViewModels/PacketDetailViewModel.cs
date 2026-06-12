@@ -152,6 +152,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     private readonly EnumLabelStore _enumLabels;
     private readonly ResolveEnumStore _resolveEnums;
     private readonly LocStringStore _locStrings;
+    private readonly DomainStringStore _domainStrings;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
@@ -290,7 +291,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema,
                                  RowHideStore hideStore, EnumLabelStore enumLabels,
-                                 ResolveEnumStore resolveEnums, LocStringStore locStrings)
+                                 ResolveEnumStore resolveEnums, LocStringStore locStrings,
+                                 DomainStringStore domainStrings)
     {
         _gameData = gameData;
         _icons = icons;
@@ -299,10 +301,12 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         _enumLabels = enumLabels;
         _resolveEnums = resolveEnums;
         _locStrings = locStrings;
+        _domainStrings = domainStrings;
         _hideStore.Load();
         _enumLabels.Load();
         _resolveEnums.Load();
         _locStrings.Load();
+        _domainStrings.Load();
         RefreshHidePresets();
     }
 
@@ -415,6 +419,12 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             else if (pv.Value is string locKey && _locStrings.TryResolve(locKey, out var locText))
             {
                 (resolved, uniqueName) = (locText, locKey);
+            }
+            // Domain string value-sets (e.g. resolveAs "str:accessrights"): a raw role string -> meaning.
+            else if (_domainStrings.IsStringResolve(resolveAs)
+                     && pv.Value is string ds && _domainStrings.TryResolve(resolveAs, ds, out var meaning))
+            {
+                (resolved, uniqueName) = (meaning, ds);
             }
             else if (ResolveItemNames && _gameData.IsLoaded)
             {
@@ -598,8 +608,15 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                 var item = items[i].Trim();
                 string resolved = "";
                 if (canResolve && _gameData.IsLoaded && long.TryParse(item, out var idx) && idx >= 0)
+                {
                     if (_gameData.TryResolve((int)idx, out var u, out var d))
                         resolved = $"  → {u} — {d}";
+                }
+                // String[] elements: resolve domain-string value-sets and @LOC keys per element.
+                else if (_domainStrings.TryResolve(row.ResolveAs, item, out var meaning))
+                    resolved = $"  → {meaning}";
+                else if (_locStrings.TryResolve(item, out var locText))
+                    resolved = $"  → {locText}";
                 lines.AppendLine($"[{i}] {item}{resolved}");
             }
             return lines.ToString().TrimEnd();
@@ -653,7 +670,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         var existing = _schema.GetParam(Packet.Kind, Packet.Code, SelectedRow.Key);
         var src = _schema.GetParamSource(Packet.Kind, Packet.Code, SelectedRow.Key);
         var vm = new EditParamViewModel(
-            _schema, _resolveEnums,
+            _schema, _resolveEnums, _domainStrings,
             Packet.Kind, Packet.Code, SelectedRow.Key,
             existing?.Name ?? string.Empty,
             existing?.Note ?? string.Empty,

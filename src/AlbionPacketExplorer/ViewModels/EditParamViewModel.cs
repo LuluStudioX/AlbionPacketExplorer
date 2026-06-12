@@ -30,13 +30,17 @@ public partial class EditParamViewModel : ObservableObject
     public bool SourceIsUser { get; }
 
     public EditParamViewModel(PacketSchemaService schema, ResolveEnumStore resolveEnums,
+                               DomainStringStore domainStrings,
                                string kind, int code,
                                string key, string currentName, string currentNote,
                                string currentResolveAs, Action onSaved,
                                ParamSource source = ParamSource.None)
     {
         _schema = schema;
-        ResolveAsOptions = new[] { "", "itemIndex" }.Concat(resolveEnums.ResolveAsOptions()).ToList();
+        ResolveAsOptions = new[] { "", "itemIndex" }
+            .Concat(resolveEnums.ResolveAsOptions())
+            .Concat(domainStrings.ResolveAsOptions())
+            .ToList();
         _kind = kind;
         _code = code;
         _key = key;
