@@ -14550,8 +14550,8 @@
       },
       "2": {
         "name": "actionType",
-        "note": "Enum value",
-        "resolveAs": ""
+        "note": "ActionComponentType (CraftItem, RepairItem, ...)",
+        "resolveAs": "enum:ActionComponentType"
       },
       "4": {
         "name": "costs",

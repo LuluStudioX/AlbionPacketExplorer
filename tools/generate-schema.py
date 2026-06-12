@@ -275,7 +275,7 @@ REQUEST_OVERRIDE = {
     "ActionOnBuildingStart": {
         "0": p("ticks", ".NET ticks"),
         "1": p("buildingObjectId"),
-        "2": p("actionType", "Enum value"),
+        "2": p("actionType", "ActionComponentType (CraftItem, RepairItem, ...)", "enum:ActionComponentType"),
         "4": p("costs", "Silver cost"),
         "5": p("itemIndices", "Int[] of item indices being used", "itemIndex"),
     },
