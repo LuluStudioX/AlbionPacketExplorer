@@ -106,6 +106,41 @@ python tools/generate-schema.py --source-path /path/to/reference-source
 
 ---
 
+## Resolving param values
+
+Most packet params are bare numbers or short strings whose meaning is not obvious. The Packet
+Detail view can resolve them to something readable in the **Resolved** column. A param resolves
+according to its `resolveAs` tag (set per param in the schema, or by hand - see below). Four kinds
+of resolution exist:
+
+| `resolveAs` | applies to | turns | into |
+|-------------|-----------|-------|------|
+| `itemIndex` | integer params/arrays | `4823` | `T4_BAG - Adept's Bag` (needs item data loaded) |
+| `enum:<Name>` | integer params | `2` | `RepairItem` (a client enum member name) |
+| `str:<set>` | string params/arrays | `owner` | `Owner` (a game-domain value-set) |
+| _(none)_ + leading `@` | string params | `@PARTYFINDER_JOINREQUEST_DECLINED` | the English text (automatic, no tag) |
+
+- **Enum resolution** ships ~160 verified client enums (`ActionComponentType`, `AttackType`,
+  `GuildRole`, `ClusterQualities`, `Faction`, ...). `enum:AttackType` on a param shows
+  `Melee`/`Ranged`/`Magic` instead of `1`/`2`/`4`. Works with no item data loaded.
+- **Domain-string resolution** ships value-sets harvested from the community `ao-bin-dumps` data.
+  The first set, `accessrights`, turns access-role strings (`owner`, `coowner`, `builder`,
+  `noaccess`, ...) into readable labels - e.g. on `AccessStatus` (EVENT 210).
+- **Localization** (`@...` strings) resolves automatically; no tag needed. The leading `@` marks
+  a localization key, looked up in the embedded `ao-bin-dumps` text.
+
+### Assigning a `resolveAs` yourself
+
+When you spot a param whose number is clearly one of these value-sets, tag it: right-click the
+param row -> **Edit Param Name...** -> pick from the **Resolve as** dropdown (lists `itemIndex`,
+every `enum:<Name>`, and every `str:<set>`). Save, and the Resolved column updates live. Your
+choice is stored in your user schema and survives schema regenerations.
+
+The shipped enum/string sets are regenerated from the client + `ao-bin-dumps` by
+`tools/build-resolve-enums.py` and `tools/build-domain-strings.py`.
+
+---
+
 ## Disclaimer
 
 Provided "as is", without warranty; the authors are not liable for misuse. Use only on traffic you
