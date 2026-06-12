@@ -6,4 +6,7 @@
   <Folder Name="/src/">
     <Project Path="src/AlbionPacketExplorer/AlbionPacketExplorer.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AlbionPacketExplorer.Tests/AlbionPacketExplorer.Tests.csproj" />
+  </Folder>
 </Solution>
