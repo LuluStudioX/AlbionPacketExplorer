@@ -2,6 +2,7 @@
  "$meta": {
   "source": "AlbionPacketExplorer capture inference",
   "captures": [
+   "2225235-unknown-3e5721ec16ae.json",
    "4ac7ba3e-unknown-a4c7851fcc5c.json",
    "721c500-unknown-3a0151532260.json",
    "721c500-unknown-eb2d4a40c254.json"
@@ -223,6 +224,46 @@
    }
   }
  },
+ "EVENT:272": {
+  "count": 33,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 18 distinct; range [543166..551410]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Boolean; 42% present; 1 distinct",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Boolean; 39% present; 1 distinct",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:273": {
+  "count": 13,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 13 distinct; range [547932..551410]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:274": {
+  "count": 13,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 13 distinct; range [547932..551410]",
+    "resolveAs": ""
+   }
+  }
+ },
  "EVENT:337": {
   "count": 1,
   "params": {
@@ -338,12 +379,167 @@
    }
   }
  },
+ "EVENT:385": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [894..894]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "vector",
+    "note": "(inferred) Single[]; 1 distinct; Single[]",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Single; 1 distinct; range [135..135]",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) String; 1 distinct; string value",
+    "resolveAs": ""
+   },
+   "4": {
+    "name": "",
+    "note": "(inferred) String; 1 distinct; string value",
+    "resolveAs": ""
+   },
+   "5": {
+    "name": "",
+    "note": "(inferred) Single; 1 distinct; range [8..8]",
+    "resolveAs": ""
+   },
+   "6": {
+    "name": "",
+    "note": "(inferred) Single; 1 distinct; range [-12..-12]",
+    "resolveAs": ""
+   },
+   "9": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [1..1]",
+    "resolveAs": ""
+   },
+   "10": {
+    "name": "",
+    "note": "(inferred) String; 1 distinct; string value",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:399": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [5..5]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "vector",
+    "note": "(inferred) Single[]; 1 distinct; Single[]",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Single; 1 distinct; range [301..301]",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) String; 1 distinct; string value",
+    "resolveAs": ""
+   },
+   "6": {
+    "name": "flags",
+    "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:400": {
+  "count": 34,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [5..5]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "flags",
+    "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [-1..-1]",
+    "resolveAs": ""
+   }
+  }
+ },
  "EVENT:597": {
   "count": 1,
   "params": {
    "0": {
     "name": "",
     "note": "(inferred) Int32; 1 distinct; range [26..26]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:633": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [6..6]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "vector",
+    "note": "(inferred) Single[]; 1 distinct; Single[]",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) Single; 1 distinct; range [90..90]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:634": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [7..7]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "vector",
+    "note": "(inferred) Single[]; 1 distinct; Single[]",
+    "resolveAs": ""
+   },
+   "4": {
+    "name": "flags",
+    "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+    "resolveAs": ""
+   },
+   "5": {
+    "name": "timestamp",
+    "note": "(inferred) Int64; 1 distinct; range [639169920000000000..639169920000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
