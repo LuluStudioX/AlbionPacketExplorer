@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <!-- Assembly / product metadata (stamped into every assembly; Version stays MinVer-driven).
-       License is intentionally omitted here while it is being finalised (GPL-3.0 pending). -->
+       PackageLicenseExpression is omitted; this is an app, not a NuGet package. -->
   <PropertyGroup>
     <Product>AlbionPacketExplorer</Product>
     <Authors>LuluStudioX</Authors>
