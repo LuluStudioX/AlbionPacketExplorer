@@ -28,7 +28,7 @@ Grab the latest build from the [Releases](https://github.com/LuluStudioX/AlbionP
 
 Install via the Setup/AppImage to get **auto-update** (Velopack). The other assets
 (`*-full.nupkg`, `RELEASES-*`, `*.json`) are the per-platform update feed and are not meant to
-be downloaded directly. Builds are currently unsigned, so the OS may warn on first launch.
+be downloaded directly. Builds are not code-signed; the OS may show a security warning on first launch.
 
 ---
 
