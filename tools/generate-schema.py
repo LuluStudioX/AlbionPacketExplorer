@@ -260,6 +260,13 @@ EVENT_OVERRIDE = {
         "3": p("startTicks", "Int64[]; per-entry start (.NET ticks UTC)"),
         "4": p("endTicks", "Int64[]; per-entry end (.NET ticks UTC)"),
     },
+    "FullAchievementInfo": {
+        "1": p("achievementsIndexLevel100", "Int16[]; indices of maxed (level 100) specs"),
+        "2": p("achievementsIndex", "Int16[]; all spec/achievement indices"),
+        "3": p("achievementLevels", "Byte[]; level per spec, parallel to achievementsIndex"),
+        "4": p("isAutoLearn", "Bool[]; auto-learn flag per spec"),
+        "5": p("isTracked", "Bool[]; tracked flag per spec"),
+    },
     # enum renamed MightAndFavorReceived -> MightAndFavorReceivedEvent; remap + correct from source.
     "MightAndFavorReceivedEvent": {
         "0": p("might", "Might"),

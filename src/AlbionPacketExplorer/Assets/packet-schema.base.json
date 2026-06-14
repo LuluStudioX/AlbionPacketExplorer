@@ -5452,34 +5452,34 @@
   "EVENT:151": {
     "name": "FullAchievementInfo",
     "params": {
-      "0": {
-        "name": "objectId",
-        "note": "(inferred) Int64; high-card; range [63..3043797]; high-cardinality id at key 0",
-        "resolveAs": ""
-      },
       "1": {
-        "name": "",
-        "note": "(inferred) Int16[]; 2 distinct; Int16[] array",
+        "name": "achievementsIndexLevel100",
+        "note": "Int16[]; indices of maxed (level 100) specs",
         "resolveAs": ""
       },
       "2": {
-        "name": "",
-        "note": "(inferred) Int16[]; 2 distinct; Int16[] array",
+        "name": "achievementsIndex",
+        "note": "Int16[]; all spec/achievement indices",
         "resolveAs": ""
       },
       "3": {
-        "name": "",
-        "note": "(inferred) Byte[]; 18 distinct; Byte[] array",
+        "name": "achievementLevels",
+        "note": "Byte[]; level per spec, parallel to achievementsIndex",
         "resolveAs": ""
       },
       "4": {
-        "name": "",
-        "note": "(inferred) Boolean[]; 2 distinct; Boolean[] array",
+        "name": "isAutoLearn",
+        "note": "Bool[]; auto-learn flag per spec",
         "resolveAs": ""
       },
       "5": {
-        "name": "",
-        "note": "(inferred) Boolean[]; 2 distinct; Boolean[] array",
+        "name": "isTracked",
+        "note": "Bool[]; tracked flag per spec",
+        "resolveAs": ""
+      },
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [63..3043797]; high-cardinality id at key 0",
         "resolveAs": ""
       }
     }
