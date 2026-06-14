@@ -72,16 +72,16 @@ public static class IconCacheLocator
             Path.Combine("source", "repos"),
         ];
 
-        // The profile FOLDER name can differ from the account name (e.g. login "Lulu" but
-        // C:\Users\bimas), so derive it from the real profile path rather than UserName.
-        var profileParent = Path.GetDirectoryName(profile);            // e.g. C:\Users
-        var profileLeaf   = Path.GetFileName(profile);                  // e.g. bimas
+        // The profile FOLDER name can differ from the account name, so derive it from the real
+        // profile path rather than UserName.
+        var profileParent = Path.GetDirectoryName(profile);
+        var profileLeaf   = Path.GetFileName(profile);
         var usersRel      = profileParent != null && profileLeaf.Length > 0
-            ? Path.Combine(Path.GetFileName(profileParent), profileLeaf) // Users\bimas
+            ? Path.Combine(Path.GetFileName(profileParent), profileLeaf)
             : null;
 
         // Probe the profile itself, plus the same Users\<leaf> on every fixed drive (repos often
-        // live off C:, e.g. D:\Users\bimas\Documents\github), and drive-root dev folders.
+        // live on a non-system drive), and drive-root dev folders.
         foreach (var sub in devSubpaths)
             yield return Path.Combine(profile, sub);
 

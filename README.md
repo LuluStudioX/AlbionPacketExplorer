@@ -149,7 +149,8 @@ with Sandbox Interactive / Albion Online. See [DISCLAIMER.md](DISCLAIMER.md).
 
 ## License
 
-Not yet finalized. The earlier GPL-3.0 decode components have been removed and replaced by the
-in-house `libs/PhotonWire` implementation, so the project no longer carries a copyleft obligation
-(see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)). Remaining dependencies are permissive
-(MIT / BSD). A final `LICENSE` will be added by the project owner.
+MIT. See [LICENSE](LICENSE).
+
+The Photon decode layer (`libs/PhotonWire`) is an in-house implementation written from the wire
+format; no GPL code. All remaining dependencies are permissive (MIT / BSD). See
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

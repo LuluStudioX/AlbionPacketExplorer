@@ -6,8 +6,7 @@ name: digest-sync
 
 on:
   schedule:
-    # Every 2 hours during the beta (few dev users, low volume; a no-op run costs ~30s of
-    # the 2000 free private-repo minutes/month). Relax to daily once volume grows.
+    # Every 2 hours. A no-op run costs ~30s; relax to daily once volume grows.
     - cron: "0 */2 * * *"
   workflow_dispatch:
 
@@ -106,11 +105,9 @@ jobs:
       - name: Open PR
         if: steps.archive.outputs.new != '0'
         env:
-          # `gh pr create` needs a user PAT: the org forbids the default GITHUB_TOKEN (Actions)
-          # from creating PRs. APX_PR_TOKEN is a fine-grained PAT with Pull requests: read/write
-          # AND Contents: read (gh reads the repo default branch).
-          # Falls back to the default token if the secret is unset - the PR step then fails as
-          # before until APX_PR_TOKEN is added. See the digest-worker README for token setup.
+          # APX_PR_TOKEN is a fine-grained PAT with Pull requests: read/write and Contents: read.
+          # Falls back to the default GITHUB_TOKEN if unset (works on public repos).
+          # See tools/digest-worker/README.md for token setup.
           GH_TOKEN: ${{ secrets.APX_PR_TOKEN || github.token }}
           NEW: ${{ steps.archive.outputs.new }}
         run: |
