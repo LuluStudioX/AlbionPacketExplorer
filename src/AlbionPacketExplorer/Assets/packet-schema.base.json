@@ -1,7 +1,7 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "713f6e8",
+    "sourceCommit": "bda845b",
     "generatedAt": "2026-06-29"
   },
   "EVENT:1": {
@@ -334,6 +334,16 @@
   "EVENT:13": {
     "name": "Attack",
     "params": {
+      "3": {
+        "name": "flags",
+        "note": "(inferred) Byte; 3 distinct; range [1..4]; small enum/flag byte",
+        "resolveAs": "enum:AttackType"
+      },
+      "6": {
+        "name": "flags",
+        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
+        "resolveAs": "enum:AttackType"
+      },
       "0": {
         "name": "objectId",
         "note": "(inferred) Int64; high-card; range [952..2709642]; high-cardinality id at key 0",
@@ -349,11 +359,6 @@
         "note": "(inferred) Int64; high-card; range [952..2709642]",
         "resolveAs": ""
       },
-      "3": {
-        "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [1..4]; small enum/flag byte",
-        "resolveAs": "enum:AttackType"
-      },
       "4": {
         "name": "",
         "note": "(inferred) Int32; high-card; range [515645..80570551]",
@@ -363,11 +368,6 @@
         "name": "",
         "note": "(inferred) Int32; high-card; range [515778..80570551]",
         "resolveAs": ""
-      },
-      "6": {
-        "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": "enum:AttackType"
       }
     }
   },
@@ -2335,30 +2335,10 @@
   "EVENT:64": {
     "name": "ActionOnBuildingStart",
     "params": {
-      "0": {
-        "name": "objectId",
-        "note": "(inferred) Int64; high-card; range [828..3043678]; high-cardinality id at key 0",
-        "resolveAs": ""
-      },
-      "1": {
-        "name": "",
-        "note": "(inferred) Int64; high-card; range [6..381073]",
-        "resolveAs": ""
-      },
       "2": {
         "name": "timestamp",
         "note": "(inferred) Int64; high-card; range [639156465617221627..639170663924043778]; likely .NET ticks (UTC)",
         "resolveAs": "enum:ActionComponentType"
-      },
-      "3": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; high-card; range [639156465619888627..639170663926043778]; likely .NET ticks (UTC)",
-        "resolveAs": ""
-      },
-      "4": {
-        "name": "",
-        "note": "(inferred) Int32; 48 distinct; range [17..524]",
-        "resolveAs": ""
       },
       "5": {
         "name": "",
@@ -2374,21 +2354,41 @@
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:ActionOnBuildingErrorCode"
+      },
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [828..3043678]; high-cardinality id at key 0",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; high-card; range [6..381073]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; high-card; range [639156465619888627..639170663926043778]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 48 distinct; range [17..524]",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:65": {
     "name": "ActionOnBuildingCancel",
     "params": {
-      "0": {
-        "name": "objectId",
-        "note": "(inferred) Int64; 59 distinct; range [3031..2713238]; high-cardinality id at key 0",
-        "resolveAs": ""
-      },
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
         "resolveAs": "enum:ActionOnBuildingErrorCode"
+      },
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; 59 distinct; range [3031..2713238]; high-cardinality id at key 0",
+        "resolveAs": ""
       }
     }
   },
@@ -3706,6 +3706,16 @@
   "EVENT:104": {
     "name": "GuildPlayerUpdated",
     "params": {
+      "7": {
+        "name": "",
+        "note": "(inferred) Byte; 7 distinct; range [0..6]",
+        "resolveAs": "enum:GuildRole"
+      },
+      "9": {
+        "name": "flags",
+        "note": "(inferred) Byte; 4 distinct; range [0..3]; small enum/flag byte",
+        "resolveAs": "enum:GuildJoinSettings"
+      },
       "0": {
         "name": "",
         "note": "(inferred) Byte[]; high-card; Byte[] array",
@@ -3741,20 +3751,10 @@
         "note": "(inferred) Int32; 96% present; 29 distinct; range [2..63]",
         "resolveAs": ""
       },
-      "7": {
-        "name": "",
-        "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": "enum:GuildRole"
-      },
       "8": {
         "name": "",
         "note": "(inferred) Int32; 34% present; 1 distinct; range [1..1]",
         "resolveAs": ""
-      },
-      "9": {
-        "name": "flags",
-        "note": "(inferred) Byte; 4 distinct; range [0..3]; small enum/flag byte",
-        "resolveAs": "enum:GuildJoinSettings"
       }
     }
   },
@@ -4520,6 +4520,21 @@
   "EVENT:140": {
     "name": "ClusterInfoUpdate",
     "params": {
+      "29": {
+        "name": "",
+        "note": "(inferred) Byte; 7 distinct; range [0..6]",
+        "resolveAs": "enum:ClusterQualities"
+      },
+      "32": {
+        "name": "",
+        "note": "(inferred) Byte; 7 distinct; range [0..6]",
+        "resolveAs": "enum:ClusterQualities"
+      },
+      "48": {
+        "name": "",
+        "note": "(inferred) Int32; 5 distinct; range [0..5]",
+        "resolveAs": "enum:ClusterValueFilterClusterTypes"
+      },
       "0": {
         "name": "",
         "note": "(inferred) String; high-card; string value",
@@ -4665,11 +4680,6 @@
         "note": "(inferred) Boolean[]; 50% present; 25 distinct; Boolean[] array",
         "resolveAs": ""
       },
-      "29": {
-        "name": "",
-        "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": "enum:ClusterQualities"
-      },
       "30": {
         "name": "",
         "note": "(inferred) Int32; 4 distinct; range [0..3]",
@@ -4679,11 +4689,6 @@
         "name": "",
         "note": "(inferred) Int64; 49% present; high-card; range [1724296..581948600]",
         "resolveAs": ""
-      },
-      "32": {
-        "name": "",
-        "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": "enum:ClusterQualities"
       },
       "33": {
         "name": "",
@@ -4754,11 +4759,6 @@
         "name": "",
         "note": "(inferred) Dictionary`2; 95% present; high-card",
         "resolveAs": ""
-      },
-      "48": {
-        "name": "",
-        "note": "(inferred) Int32; 5 distinct; range [0..5]",
-        "resolveAs": "enum:ClusterValueFilterClusterTypes"
       },
       "49": {
         "name": "",
@@ -5305,6 +5305,11 @@
   "EVENT:148": {
     "name": "GuildStats",
     "params": {
+      "8": {
+        "name": "",
+        "note": "(inferred) Int32; 26% present; 3 distinct; range [1..5]",
+        "resolveAs": "enum:GuildRole"
+      },
       "0": {
         "name": "",
         "note": "(inferred) Int64; 15 distinct; range [404..2712964]",
@@ -5344,11 +5349,6 @@
         "name": "",
         "note": "(inferred) Int32; 37% present; 3 distinct; range [1..5]",
         "resolveAs": ""
-      },
-      "8": {
-        "name": "",
-        "note": "(inferred) Int32; 26% present; 3 distinct; range [1..5]",
-        "resolveAs": "enum:GuildRole"
       },
       "9": {
         "name": "",
@@ -5452,7 +5452,7 @@
       },
       "37": {
         "name": "",
-        "note": "(inferred) Int32; 50% present; 1 distinct; range [1..1]",
+        "note": "(inferred) Int32; 9% present; 1 distinct; range [1..1]",
         "resolveAs": ""
       }
     }
@@ -5830,7 +5830,7 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int64; 25% present; 1 distinct; range [411300512..411300512]",
+        "note": "(inferred) Int64; 18% present; 1 distinct; range [411300512..411300512]",
         "resolveAs": ""
       }
     }
@@ -6228,15 +6228,15 @@
   "EVENT:182": {
     "name": "MiniMapPing",
     "params": {
-      "0": {
-        "name": "position",
-        "note": "(inferred) Single[]; 69 distinct; Single[2] world coords {x, y}?",
-        "resolveAs": ""
-      },
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
         "resolveAs": "enum:MiniMapPingTypes"
+      },
+      "0": {
+        "name": "position",
+        "note": "(inferred) Single[]; 69 distinct; Single[2] world coords {x, y}?",
+        "resolveAs": ""
       },
       "2": {
         "name": "",
@@ -6248,15 +6248,15 @@
   "EVENT:183": {
     "name": "MarketPlaceNotification",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Int32; 99% present; 2 distinct; range [1..2]",
-        "resolveAs": ""
-      },
       "1": {
         "name": "",
         "note": "(inferred) Int32; 6 distinct; range [1..6]",
         "resolveAs": "enum:MarketPlaceView"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 99% present; 2 distinct; range [1..2]",
+        "resolveAs": ""
       }
     }
   },
@@ -6701,15 +6701,20 @@
   "EVENT:210": {
     "name": "AccessStatus",
     "params": {
-      "0": {
-        "name": "objectId",
-        "note": "(inferred) Int64; high-card; range [6..801157]; high-cardinality id at key 0",
-        "resolveAs": ""
-      },
       "1": {
         "name": "",
         "note": "(inferred) Int32; 4 distinct; range [0..3]",
         "resolveAs": "enum:AccessRightsContainers"
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) String[]; high-card; String[] array",
+        "resolveAs": "str:accessrights"
+      },
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [6..801157]; high-cardinality id at key 0",
+        "resolveAs": ""
       },
       "2": {
         "name": "",
@@ -6725,11 +6730,6 @@
         "name": "",
         "note": "(inferred) String[]; high-card; String[] array",
         "resolveAs": ""
-      },
-      "5": {
-        "name": "",
-        "note": "(inferred) String[]; high-card; String[] array",
-        "resolveAs": "str:accessrights"
       },
       "6": {
         "name": "",
@@ -7381,6 +7381,11 @@
   "EVENT:240": {
     "name": "PartyInvitationAnswer",
     "params": {
+      "3": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [0..5]; small enum/flag byte",
+        "resolveAs": "enum:PartyStartHuntAnswer"
+      },
       "0": {
         "name": "",
         "note": "(inferred) String; 2 distinct; string value",
@@ -7390,11 +7395,6 @@
         "name": "",
         "note": "(inferred) Boolean; 67% present; 1 distinct",
         "resolveAs": ""
-      },
-      "3": {
-        "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [0..5]; small enum/flag byte",
-        "resolveAs": "enum:PartyStartHuntAnswer"
       }
     }
   },
@@ -7578,7 +7578,33 @@
   },
   "EVENT:250": {
     "name": "SpellCooldownUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32[]; 3 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32[]; 3 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:251": {
     "name": "NewHellgateExitPortal",
@@ -7773,12 +7799,17 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int64; 40% present; 1 distinct; range [10000000..10000000]",
+        "note": "(inferred) Int64; 38% present; 1 distinct; range [10000000..10000000]",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Boolean; 5% present; 1 distinct",
+        "note": "(inferred) Boolean/Byte; 9% present; 2 distinct; range [0..0]",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "flags",
+        "note": "(inferred) Byte; 4% present; 1 distinct; range [1..1]; small enum/flag byte",
         "resolveAs": ""
       }
     }
@@ -8156,7 +8187,48 @@
   },
   "EVENT:285": {
     "name": "LocalTreasuresUpdate",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Byte[]/Int16[]; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 3 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Int64[]; 3 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int64[]; 3 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:286": {
     "name": "LootChestSpawnpointsUpdate",
@@ -8378,7 +8450,23 @@
   },
   "EVENT:298": {
     "name": "FriendOnlineStatus",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Boolean; 63% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 32 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; 32 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:299": {
     "name": "FriendRequestCanceled",
@@ -8792,6 +8880,81 @@
         "name": "",
         "note": "(inferred) Int64; 7 distinct; range [65232557..300000000]",
         "resolveAs": ""
+      },
+      "3": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 0% present; 13 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Single; 0% present; 13 distinct; range [5.92..333]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 0% present; 8 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "flags",
+        "note": "(inferred) Byte; 0% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "flags",
+        "note": "(inferred) Byte; 0% present; 1 distinct; range [3..3]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Int32; 0% present; 1 distinct; range [153..153]",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) Byte[]; 0% present; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Byte[]; 0% present; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Int32; 0% present; 1 distinct; range [7..7]",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "",
+        "note": "(inferred) Int32; 0% present; 1 distinct; range [2..2]",
+        "resolveAs": ""
+      },
+      "13": {
+        "name": "",
+        "note": "(inferred) Int32; 0% present; 1 distinct; range [4..4]",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "",
+        "note": "(inferred) Int32; 0% present; 2 distinct; range [5..28]",
+        "resolveAs": ""
+      },
+      "15": {
+        "name": "",
+        "note": "(inferred) Int32; 0% present; 1 distinct; range [15775037..15775037]",
+        "resolveAs": ""
+      },
+      "16": {
+        "name": "",
+        "note": "(inferred) Single; 0% present; 2 distinct; range [-0.25..-0.05]",
+        "resolveAs": ""
+      },
+      "17": {
+        "name": "",
+        "note": "(inferred) Single; 0% present; 2 distinct; range [0.8..1]",
+        "resolveAs": ""
       }
     }
   },
@@ -8827,11 +8990,53 @@
   },
   "EVENT:314": {
     "name": "MountCooldownUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 14 distinct; range [97..14932]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639167328000000000..639167328000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [100000000..100000000]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:315": {
     "name": "NewExpeditionAgent",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [32..32]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [4..4]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:316": {
     "name": "NewExpeditionCheckPoint",
@@ -9036,6 +9241,56 @@
         "name": "level",
         "note": "Int32",
         "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Single; 0% present; 1 distinct; range [90..90]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 1% present; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) String; 1% present; 4 distinct; string value",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Int32; 1% present; 4 distinct; range [116..370]",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Boolean; 1% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Boolean; 0% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "16": {
+        "name": "",
+        "note": "(inferred) Int64; 1% present; 1 distinct; range [-1..-1]",
+        "resolveAs": ""
+      },
+      "17": {
+        "name": "",
+        "note": "(inferred) Int32; 1% present; 2 distinct; range [1..3]",
+        "resolveAs": ""
+      },
+      "19": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
       }
     }
   },
@@ -9108,7 +9363,38 @@
   },
   "EVENT:331": {
     "name": "PaymentTransactions",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Boolean[]; 1 distinct; Boolean[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [66..66]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:332": {
     "name": "PerformanceStatsUpdate",
@@ -9189,6 +9475,21 @@
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [1..1]",
         "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 33% present; 1 distinct; range [5817..5817]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 33% present; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "flags",
+        "note": "(inferred) Byte; 33% present; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
       }
     }
   },
@@ -9218,7 +9519,23 @@
   },
   "EVENT:340": {
     "name": "DeliverCarriableObjectFinished",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [14221..14221]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:341": {
     "name": "TerritoryClaimStart",
@@ -9279,11 +9596,48 @@
   },
   "EVENT:346": {
     "name": "ReceiveCarriableObjectStart",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [5817..5817]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:347": {
     "name": "ReceiveCarriableObjectFinished",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [5817..5817]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:348": {
     "name": "UpdateAccountState",
@@ -9700,12 +10054,17 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Boolean; 20% present; 1 distinct",
+        "note": "(inferred) Boolean/Single[]; 90% present; 17 distinct",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) Boolean; 4% present; 1 distinct",
+        "note": "(inferred) Boolean/Int16; 88% present; 2 distinct; range [0..0]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 88% present; 3 distinct; string value",
         "resolveAs": ""
       }
     }
@@ -9880,7 +10239,23 @@
   },
   "EVENT:370": {
     "name": "OverChargeStatus",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 14 distinct; range [97..14932]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:371": {
     "name": "PartyFinderFullUpdate",
@@ -10103,7 +10478,7 @@
       },
       "7": {
         "name": "",
-        "note": "(inferred) Int32; 11% present; 1 distinct; range [1..1]",
+        "note": "(inferred) Int32; 12% present; 1 distinct; range [1..1]",
         "resolveAs": ""
       }
     }
@@ -10920,7 +11295,13 @@
   },
   "EVENT:408": {
     "name": "BattlEyeServerMessage",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; high-card; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:409": {
     "name": "UnlockVanityUnlock",
@@ -11133,6 +11514,41 @@
         "name": "",
         "note": "(inferred) Int16[]; 55 distinct; Int16[] array",
         "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 4% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String[]; 4% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String[]; 4% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 4% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) String[]; 4% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Byte[]; 4% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]; 4% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
       }
     }
   },
@@ -11152,6 +11568,36 @@
       "2": {
         "name": "",
         "note": "(inferred) Int32; 4 distinct; range [0..7]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String[]; 18% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String[]; 18% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 18% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) String[]; 18% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Byte[]; 18% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]; 18% present; 1 distinct; Byte[] array",
         "resolveAs": ""
       }
     }
@@ -11372,16 +11818,208 @@
         "name": "position",
         "note": "(inferred) Single[]; 1 distinct; Single[2] world coords {x, y}?",
         "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 20% present; 1 distinct; range [2..2]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 20% present; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 20% present; 5 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Single; 6% present; 1 distinct; range [270..270]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Byte[]; 20% present; 4 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) String; 20% present; 4 distinct; string value",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]; 16% present; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) String; 20% present; 3 distinct; string value",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) String; 20% present; 5 distinct; string value",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 20% present; 5 distinct; range [638943552000000000..639154368000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "13": {
+        "name": "flags",
+        "note": "(inferred) Byte; 20% present; 3 distinct; range [0..2]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "flags",
+        "note": "(inferred) Byte; 20% present; 4 distinct; range [1..5]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "15": {
+        "name": "flags",
+        "note": "(inferred) Byte; 20% present; 1 distinct; range [2..2]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "17": {
+        "name": "flags",
+        "note": "(inferred) Byte; 20% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "18": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 20% present; 3 distinct; range [639182016000000000..639182016000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "20": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 18% present; 4 distinct; range [638967744000000000..639167328000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "21": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 20% present; 1 distinct; range [9223372036854776000..9223372036854776000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "22": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 20% present; 4 distinct; range [639182880000000000..639182880000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "23": {
+        "name": "",
+        "note": "(inferred) Boolean; 16% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "24": {
+        "name": "",
+        "note": "(inferred) Int64; 18% present; 5 distinct; range [30087417..861088222]",
+        "resolveAs": ""
+      },
+      "25": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 20% present; 6 distinct; range [639172512000000000..639182880000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "26": {
+        "name": "",
+        "note": "(inferred) Boolean; 8% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "27": {
+        "name": "",
+        "note": "(inferred) Boolean; 2% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "28": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 16% present; 2 distinct; range [639121536000000000..639131040000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:421": {
     "name": "NewHideoutManagement",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [19..31]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 2 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Int64; 3 distinct; range [443181259..861088222]",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 3 distinct; range [639182880000000000..639182880000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) Boolean; 25% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639121536000000000..639121536000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 75% present; 1 distinct; range [639081792000000000..639081792000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:422": {
     "name": "NewHideoutExit",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [29..34]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:423": {
     "name": "InitHideoutAttackStart",
@@ -11523,7 +12161,23 @@
   },
   "EVENT:444": {
     "name": "NewRandomResourceBlocker",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [5714..5818]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 2 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:445": {
     "name": "NewHomeObject",
@@ -11727,7 +12381,18 @@
   },
   "EVENT:466": {
     "name": "EstimatedMarketValueUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int16[]; 2 distinct; Int16[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64[]; 2 distinct; Int64[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:467": {
     "name": "StuckCancel",
@@ -11882,7 +12547,23 @@
   },
   "EVENT:476": {
     "name": "RedZonePlayerNotification",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "flags",
+        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:477": {
     "name": "RedZoneEventCheatCleanup",
@@ -11895,6 +12576,11 @@
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String[]; 1% present; 1 distinct; String[] array",
         "resolveAs": ""
       }
     }
@@ -11952,15 +12638,15 @@
   "EVENT:479": {
     "name": "RedZoneWorldMapEvent",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Int16[]; 6 distinct; Int16[] array",
-        "resolveAs": ""
-      },
       "1": {
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:MiniMapPingTypes"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Int16[]; 6 distinct; Int16[] array",
+        "resolveAs": ""
       }
     }
   },
@@ -11997,15 +12683,15 @@
   "EVENT:482": {
     "name": "FactionEnlistmentChanged",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) String[]; 1 distinct; String[] array",
-        "resolveAs": ""
-      },
       "1": {
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:Faction"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
       }
     }
   },
@@ -12160,6 +12846,11 @@
         "name": "",
         "note": "(inferred) Int64; 18 distinct; range [210500..1005089]",
         "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Boolean; 1% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
@@ -12259,6 +12950,11 @@
         "name": "",
         "note": "(inferred) Boolean; 20% present; 1 distinct",
         "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int64; 1% present; 1 distinct; range [5817..5817]",
+        "resolveAs": ""
       }
     }
   },
@@ -12269,6 +12965,11 @@
   "EVENT:494": {
     "name": "DoSimpleActionFinished",
     "params": {
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 97% present; 17 distinct; range [1730..15160896]",
+        "resolveAs": "enum:LocalActionCancelReason"
+      },
       "0": {
         "name": "",
         "note": "(inferred) Int16; 6 distinct; range [-1..9]",
@@ -12278,11 +12979,6 @@
         "name": "",
         "note": "(inferred) Int64; 99% present; 20 distinct; range [9084..79594704]",
         "resolveAs": ""
-      },
-      "2": {
-        "name": "",
-        "note": "(inferred) Int64; 97% present; 17 distinct; range [1730..15160896]",
-        "resolveAs": "enum:LocalActionCancelReason"
       },
       "3": {
         "name": "",
@@ -12368,6 +13064,36 @@
         "name": "unknown8",
         "note": "",
         "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int16/Int64; 2 distinct; range [0..47377800]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32/Int64; 2 distinct; range [-1..24968106]",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int64; 50% present; 1 distinct; range [10299021051..10299021051]",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "flags",
+        "note": "(inferred) Byte; 50% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Dictionary`2; 50% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Dictionary`2; 50% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
@@ -12413,12 +13139,48 @@
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
         "resolveAs": ""
+      },
+      "3": {
+        "name": "flags",
+        "note": "(inferred) Byte; 25% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 25% present; 1 distinct; range [-1..-1]",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:499": {
     "name": "StaticDungeonEntrancesDungeonEventStatusUpdates",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:500": {
     "name": "StaticDungeonDungeonValueUpdate",
@@ -12451,7 +13213,18 @@
   },
   "EVENT:503": {
     "name": "FeatureSwitchInfo",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Boolean[]; 1 distinct; Boolean[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:504": {
     "name": "PartyJoinRequestAborted",
@@ -12950,15 +13723,15 @@
   "EVENT:531": {
     "name": "MistsEntranceDataChanged",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [1254..1284]",
-        "resolveAs": ""
-      },
       "1": {
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [2..2]",
         "resolveAs": "enum:MistsStaticEntranceRegisterErrorCode"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [1254..1284]",
+        "resolveAs": ""
       }
     }
   },
@@ -13678,6 +14451,11 @@
   "EVENT:585": {
     "name": "NewFortificationBuilding",
     "params": {
+      "10": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:FortificationTileCategories"
+      },
       "0": {
         "name": "",
         "note": "(inferred) Int64; 1 distinct; range [1668..1668]",
@@ -13693,16 +14471,92 @@
         "note": "(inferred) Int64; 1 distinct; range [639168156004882569..639168156004882569]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
-      "10": {
+      "3": {
         "name": "",
-        "note": "(curated) resolver-only slot",
-        "resolveAs": "enum:FortificationTileCategories"
+        "note": "(inferred) String; 48% present; 13 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 48% present; 24 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Single; 30% present; 3 distinct; range [90..270]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Boolean; 48% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int64; 48% present; 1 distinct; range [1000000..1000000]",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 48% present; 1 distinct; range [639182880000000000..639182880000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:586": {
     "name": "NewCastleGateBuilding",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 4 distinct; range [2275..2322]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 4 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [636..636]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 4 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Single; 50% present; 2 distinct; range [90..270]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [1000000..1000000]",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639182880000000000..639182880000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:587": {
     "name": "BuildingDurabilityUpdate",
@@ -13772,7 +14626,23 @@
   },
   "EVENT:598": {
     "name": "JournalAchievementProgressUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [0..0]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:599": {
     "name": "JournalClaimableRewardUpdate",
@@ -13966,7 +14836,18 @@
   },
   "EVENT:612": {
     "name": "NewSmugglerCrateDeliveryStation",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [3878..3878]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:613": {
     "name": "KillRewardedNoFame",
@@ -14091,7 +14972,93 @@
   },
   "EVENT:619": {
     "name": "NewKillTrophyFurnitureBuilding",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [91..91]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [1071..1071]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [90..90]",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [72900000..72900000]",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639134496000000000..639134496000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "25": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "29": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "30": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "31": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [4..4]",
+        "resolveAs": ""
+      },
+      "32": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [12..12]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:620": {
     "name": "HellDungeonsPlayerJoinedInfo",
@@ -14240,7 +15207,13 @@
   },
   "EVENT:639": {
     "name": "FullJournalQuestInfo",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 14 distinct; range [97..14932]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:640": {
     "name": "JournalQuestProgressInfo",
@@ -14405,21 +15378,6 @@
   "EVENT:650": {
     "name": "NewFactionFortressObject",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [1000000..5000000]",
-        "resolveAs": ""
-      },
-      "1": {
-        "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
-        "resolveAs": ""
-      },
-      "2": {
-        "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [1..1]",
-        "resolveAs": ""
-      },
       "4": {
         "name": "",
         "note": "(curated) resolver-only slot",
@@ -14434,6 +15392,21 @@
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:FactionFortressState"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [1000000..5000000]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1..1]",
+        "resolveAs": ""
       }
     }
   },
@@ -14588,6 +15561,11 @@
   "EVENT:660": {
     "name": "NewFactionWarfarePortal",
     "params": {
+      "4": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:Faction"
+      },
       "0": {
         "name": "",
         "note": "(inferred) String; 1 distinct; string value",
@@ -14602,11 +15580,6 @@
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [4..4]; small enum/flag byte",
         "resolveAs": ""
-      },
-      "4": {
-        "name": "",
-        "note": "(curated) resolver-only slot",
-        "resolveAs": "enum:Faction"
       }
     }
   },
@@ -14617,11 +15590,6 @@
   "EVENT:662": {
     "name": "FactionFortressFightStartedInRemoteClusterEvent",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) String; 1 distinct; string value",
-        "resolveAs": ""
-      },
       "1": {
         "name": "",
         "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
@@ -14631,6 +15599,11 @@
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [3..3]; small enum/flag byte",
         "resolveAs": "enum:FactionFortressFightState"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
       },
       "3": {
         "name": "flags",
@@ -15035,6 +16008,11 @@
   "REQUEST:23": {
     "name": "AttackStart",
     "params": {
+      "2": {
+        "name": "flags",
+        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
+        "resolveAs": "enum:AttackType"
+      },
       "0": {
         "name": "timestamp",
         "note": "(inferred) Int64; high-card; range [639156490378111627..639164265944436373]; likely .NET ticks (UTC)",
@@ -15044,11 +16022,6 @@
         "name": "",
         "note": "(inferred) Int64; high-card; range [1871..1004493]",
         "resolveAs": ""
-      },
-      "2": {
-        "name": "flags",
-        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": "enum:AttackType"
       }
     }
   },
@@ -15568,15 +16541,15 @@
   "REQUEST:56": {
     "name": "ActionOnBuildingCancel",
     "params": {
-      "0": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; 5 distinct; range [639159922446076948..639159966004316948]; likely .NET ticks (UTC)",
-        "resolveAs": ""
-      },
       "1": {
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:ActionOnBuildingErrorCode"
+      },
+      "0": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 5 distinct; range [639159922446076948..639159966004316948]; likely .NET ticks (UTC)",
+        "resolveAs": ""
       }
     }
   },
@@ -16606,12 +17579,12 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) String; 2 distinct; string value",
+        "note": "(inferred) String; 3 distinct; string value",
         "resolveAs": ""
       },
       "255": {
         "name": "",
-        "note": "(inferred) Int32; 3 distinct; range [167..658]",
+        "note": "(inferred) Int32; 6 distinct; range [167..672]",
         "resolveAs": ""
       }
     }
@@ -16874,15 +17847,15 @@
   "REQUEST:168": {
     "name": "SendMiniMapPing",
     "params": {
-      "0": {
-        "name": "position",
-        "note": "(inferred) Single[]; 23 distinct; Single[2] world coords {x, y}?",
-        "resolveAs": ""
-      },
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
         "resolveAs": "enum:MiniMapPingTypes"
+      },
+      "0": {
+        "name": "position",
+        "note": "(inferred) Single[]; 23 distinct; Single[2] world coords {x, y}?",
+        "resolveAs": ""
       }
     }
   },
@@ -16943,7 +17916,33 @@
   },
   "REQUEST:177": {
     "name": "SendNewMail",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [673..673]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:178": {
     "name": "DeleteMail",
@@ -17013,20 +18012,10 @@
   "REQUEST:185": {
     "name": "RequestGuildRecruitmentInfo",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Byte[]; 4 distinct; Byte[] array",
-        "resolveAs": ""
-      },
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
         "resolveAs": "enum:GuildJoinSettings"
-      },
-      "255": {
-        "name": "",
-        "note": "(inferred) Int32; 4 distinct; range [311..1811]",
-        "resolveAs": ""
       },
       "7": {
         "name": "",
@@ -17042,6 +18031,16 @@
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:GuildJoinSettings"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 4 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 4 distinct; range [311..1811]",
+        "resolveAs": ""
       }
     }
   },
@@ -17104,16 +18103,6 @@
   "REQUEST:197": {
     "name": "GetClusterMapInfo",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) String; 50 distinct; string value",
-        "resolveAs": ""
-      },
-      "255": {
-        "name": "",
-        "note": "(inferred) Int32; high-card; range [2..1583]",
-        "resolveAs": ""
-      },
       "60": {
         "name": "",
         "note": "(curated) resolver-only slot",
@@ -17123,6 +18112,16 @@
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:ClusterTypes"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 50 distinct; string value",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; high-card; range [2..1583]",
+        "resolveAs": ""
       }
     }
   },
@@ -17385,15 +18384,15 @@
   "REQUEST:227": {
     "name": "PartyAnswerInvitation",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Boolean; 1 distinct",
-        "resolveAs": ""
-      },
       "2": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [5..5]; small enum/flag byte",
         "resolveAs": "enum:PartyStartHuntAnswer"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
       },
       "255": {
         "name": "",
@@ -18067,7 +19066,18 @@
   },
   "REQUEST:309": {
     "name": "QueryGuildPlayerStats",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 3 distinct; range [0..2]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [0..5]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:310": {
     "name": "QueryAllianceGuildStats",
@@ -18529,6 +19539,11 @@
   "REQUEST:386": {
     "name": "GetGuildChallengePoints",
     "params": {
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 4 distinct; range [1..16]",
+        "resolveAs": "enum:GuildApplicationStatCategories"
+      },
       "0": {
         "name": "",
         "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
@@ -18538,11 +19553,6 @@
         "name": "",
         "note": "(inferred) Int32; 78% present; 7 distinct; range [16..260]",
         "resolveAs": ""
-      },
-      "2": {
-        "name": "",
-        "note": "(inferred) Int32; 4 distinct; range [1..16]",
-        "resolveAs": "enum:GuildApplicationStatCategories"
       },
       "3": {
         "name": "",
@@ -18704,7 +19714,23 @@
   },
   "REQUEST:418": {
     "name": "ClientAntiAutoClickerInfo",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:419": {
     "name": "ClientBotPatternDetectionInfo",
@@ -18801,15 +19827,15 @@
   "REQUEST:430": {
     "name": "GetFactionWarfareWeeklyReport",
     "params": {
-      "255": {
-        "name": "",
-        "note": "(inferred) Int32; 2 distinct; range [37..48]",
-        "resolveAs": ""
-      },
       "4": {
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:Faction"
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [37..48]",
+        "resolveAs": ""
       }
     }
   },
@@ -19106,7 +20132,7 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Boolean; 25% present; 1 distinct",
+        "note": "(inferred) Boolean; 24% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -20316,7 +21342,7 @@
       },
       "124": {
         "name": "",
-        "note": "(inferred) Boolean; 1% present; 1 distinct",
+        "note": "(inferred) Boolean; 3% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -21442,7 +22468,103 @@
   },
   "RESPONSE:138": {
     "name": "GetMyTerritories",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32[]; 2 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "13": {
+        "name": "",
+        "note": "(inferred) Int32[]; 1 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "",
+        "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "15": {
+        "name": "",
+        "note": "(inferred) Int32[]; 1 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "16": {
+        "name": "",
+        "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "17": {
+        "name": "",
+        "note": "(inferred) Boolean[]; 1 distinct; Boolean[] array",
+        "resolveAs": ""
+      },
+      "18": {
+        "name": "",
+        "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:139": {
     "name": "MorganaCommand",
@@ -21495,37 +22617,37 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) String; 2 distinct; string value",
+        "note": "(inferred) String; 3 distinct; string value",
         "resolveAs": ""
       },
       "1": {
         "name": "",
-        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "note": "(inferred) String[]; 5 distinct; String[] array",
         "resolveAs": ""
       },
       "2": {
         "name": "",
-        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "note": "(inferred) String[]; 89% present; 4 distinct; String[] array",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int16[]/Int32[]; 3 distinct; Int16[] array",
+        "note": "(inferred) Int16[]/Int32[]; 89% present; 4 distinct; Int16[] array",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "note": "(inferred) String[]; 89% present; 4 distinct; String[] array",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) String[]; 2 distinct; String[] array",
+        "note": "(inferred) String[]; 89% present; 2 distinct; String[] array",
         "resolveAs": ""
       },
       "255": {
         "name": "",
-        "note": "(inferred) Int32; 3 distinct; range [167..658]",
+        "note": "(inferred) Int32; 6 distinct; range [167..672]",
         "resolveAs": ""
       }
     }
@@ -22026,7 +23148,13 @@
   },
   "RESPONSE:177": {
     "name": "SendNewMail",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [673..673]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:178": {
     "name": "DeleteMail",
@@ -22071,15 +23199,30 @@
   "RESPONSE:185": {
     "name": "RequestGuildRecruitmentInfo",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Byte[]; 7 distinct; Byte[] array",
-        "resolveAs": ""
-      },
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
         "resolveAs": "enum:GuildJoinSettings"
+      },
+      "7": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
+        "resolveAs": "enum:GuildJoinSettings"
+      },
+      "10": {
+        "name": "flags",
+        "note": "(inferred) Byte; 4 distinct; range [2..6]; small enum/flag byte",
+        "resolveAs": "enum:GuildRole"
+      },
+      "25": {
+        "name": "",
+        "note": "(inferred) Int32; 80% present; 2 distinct; range [1..2]",
+        "resolveAs": "enum:GuildJoinSettings"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 7 distinct; Byte[] array",
+        "resolveAs": ""
       },
       "2": {
         "name": "flags",
@@ -22106,11 +23249,6 @@
         "note": "(inferred) String; 4 distinct; string value",
         "resolveAs": ""
       },
-      "7": {
-        "name": "flags",
-        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
-        "resolveAs": "enum:GuildJoinSettings"
-      },
       "8": {
         "name": "",
         "note": "(inferred) Boolean; 1 distinct",
@@ -22120,11 +23258,6 @@
         "name": "",
         "note": "(inferred) String; 4 distinct; string value",
         "resolveAs": ""
-      },
-      "10": {
-        "name": "flags",
-        "note": "(inferred) Byte; 4 distinct; range [2..6]; small enum/flag byte",
-        "resolveAs": "enum:GuildRole"
       },
       "11": {
         "name": "",
@@ -22191,11 +23324,6 @@
         "note": "(inferred) Int32; 60% present; 3 distinct; range [67..9260]",
         "resolveAs": ""
       },
-      "25": {
-        "name": "",
-        "note": "(inferred) Int32; 80% present; 2 distinct; range [1..2]",
-        "resolveAs": "enum:GuildJoinSettings"
-      },
       "255": {
         "name": "",
         "note": "(inferred) Int32; 6 distinct; range [31..2034]",
@@ -22203,7 +23331,7 @@
       },
       "24": {
         "name": "",
-        "note": "(inferred) Int32; 9% present; 1 distinct; range [3..3]",
+        "note": "(inferred) Int32; 13% present; 1 distinct; range [3..3]",
         "resolveAs": ""
       }
     }
@@ -22255,6 +23383,16 @@
   "RESPONSE:197": {
     "name": "GetClusterMapInfo",
     "params": {
+      "60": {
+        "name": "",
+        "note": "(inferred) Int32; 46% present; 3 distinct; range [2..4]",
+        "resolveAs": "enum:ClusterValueFilterClusterTypes"
+      },
+      "61": {
+        "name": "flags",
+        "note": "(inferred) Byte; 4 distinct; range [0..4]; small enum/flag byte",
+        "resolveAs": "enum:ClusterTypes"
+      },
       "0": {
         "name": "",
         "note": "(inferred) String; 50 distinct; string value",
@@ -22554,16 +23692,6 @@
         "name": "",
         "note": "(inferred) Int64; 46% present; 34 distinct; range [1148050..310999000]",
         "resolveAs": ""
-      },
-      "60": {
-        "name": "",
-        "note": "(inferred) Int32; 46% present; 3 distinct; range [2..4]",
-        "resolveAs": "enum:ClusterValueFilterClusterTypes"
-      },
-      "61": {
-        "name": "flags",
-        "note": "(inferred) Byte; 4 distinct; range [0..4]; small enum/flag byte",
-        "resolveAs": "enum:ClusterTypes"
       },
       "62": {
         "name": "flags",
@@ -23229,15 +24357,15 @@
   "RESPONSE:227": {
     "name": "PartyAnswerInvitation",
     "params": {
-      "255": {
-        "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [3..3]",
-        "resolveAs": ""
-      },
       "2": {
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:PartyStartHuntAnswer"
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [3..3]",
+        "resolveAs": ""
       }
     }
   },
@@ -23757,7 +24885,18 @@
   },
   "RESPONSE:309": {
     "name": "QueryGuildPlayerStats",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64[]; 4 distinct; Int64[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:310": {
     "name": "QueryAllianceGuildStats",
@@ -24172,6 +25311,11 @@
   "RESPONSE:386": {
     "name": "GetGuildChallengePoints",
     "params": {
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [334486657..334486657]",
+        "resolveAs": "enum:GuildApplicationStatCategories"
+      },
       "0": {
         "name": "",
         "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
@@ -24181,11 +25325,6 @@
         "name": "timestamp",
         "note": "(inferred) Int64; 1 distinct; range [639164294141095714..639164294141095714]; likely .NET ticks (UTC)",
         "resolveAs": ""
-      },
-      "2": {
-        "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [334486657..334486657]",
-        "resolveAs": "enum:GuildApplicationStatCategories"
       },
       "3": {
         "name": "",
@@ -24543,6 +25682,11 @@
   "RESPONSE:430": {
     "name": "GetFactionWarfareWeeklyReport",
     "params": {
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 33% present; 1 distinct; range [4..4]",
+        "resolveAs": "enum:Faction"
+      },
       "0": {
         "name": "",
         "note": "(inferred) Int32; 2 distinct; range [105680..105681]",
@@ -24557,11 +25701,6 @@
         "name": "",
         "note": "(inferred) Int32; 33% present; 1 distinct; range [643..643]",
         "resolveAs": ""
-      },
-      "4": {
-        "name": "",
-        "note": "(inferred) Int32; 33% present; 1 distinct; range [4..4]",
-        "resolveAs": "enum:Faction"
       },
       "5": {
         "name": "",
