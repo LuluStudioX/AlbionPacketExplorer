@@ -544,4 +544,6 @@ public enum OperationCodes
     RetrieveCarriableObjectCancel,
     ForfeitCustomMatch,
     GetPartyMemberCluster,
+    SetPartyNavigation,
+    EndPartyNavigation,
 }
