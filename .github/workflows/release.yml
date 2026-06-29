@@ -19,9 +19,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Body is set from the git-log changelog in the final 'release' job; create it empty here.
           gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
             gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
-              --draft --generate-notes --title "$GITHUB_REF_NAME"
+              --draft --notes "" --title "$GITHUB_REF_NAME"
 
   build-windows:
     needs: create-release
@@ -292,6 +293,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # The draft was created with --generate-notes, which on a direct-push repo (no PRs) yields only
+      # a "Full Changelog" compare link. Replace the body with the same git-log changelog the Velopack
+      # in-app release notes use, so the GitHub release page actually lists what changed.
+      - name: Set release notes from git log
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PREV=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          RANGE=""; [ -n "$PREV" ] && RANGE="$PREV..${GITHUB_REF_NAME}"
+          { echo "## ${GITHUB_REF_NAME}"; echo; git log --no-merges --pretty='- %s' $RANGE; echo; \
+            [ -n "$PREV" ] && echo "**Full Changelog**: https://github.com/${GITHUB_REPOSITORY}/compare/${PREV}...${GITHUB_REF_NAME}"; } > notes.md
+          cat notes.md
+          gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --notes-file notes.md
+
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
