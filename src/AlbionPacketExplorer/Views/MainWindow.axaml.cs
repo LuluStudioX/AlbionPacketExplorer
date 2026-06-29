@@ -505,7 +505,8 @@ public partial class MainWindow : ApxWindow, IFilePicker
     private async void OnUpdateAvailableRequested(string version, string? notes)
     {
         if (DataContext is not MainViewModel vm) return;
-
+        try
+        {
         var dialogVm = new UpdateAvailableViewModel(version, notes);
         var win = new UpdateAvailableWindow(dialogVm);
         await win.ShowDialog(this);
@@ -524,6 +525,14 @@ public partial class MainWindow : ApxWindow, IFilePicker
             case UpdateChoice.Closed:
                 // Dialog closed via X: keep the toolbar badge so the update stays one click away.
                 break;
+        }
+        }
+        catch (Exception ex)
+        {
+            // A throw building/showing the update dialog would vanish (async void on the UI thread),
+            // leaving the Update button looking dead. Log it and surface a toast.
+            App.WriteCrash("OnUpdateAvailableRequested", ex);
+            vm.ToastManager?.Show("Update failed to open", ex.Message, ToastSeverity.Error);
         }
     }
 
