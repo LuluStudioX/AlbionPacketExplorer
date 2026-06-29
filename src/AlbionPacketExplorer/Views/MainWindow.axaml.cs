@@ -28,15 +28,29 @@ public partial class MainWindow : ApxWindow, IFilePicker
     {
         InitializeComponent();
         DataContext = new MainViewModel(this, toastManager);
-        Loaded += OnLoaded;
+        // Wiring runs from OnOpened (guarded), not Loaded: Loaded can fire before this ctor finishes
+        // subscribing on some machines, so the handler would never run. See OnOpened.
         Opened += OnOpened;
         Closing += OnClosing;
     }
 
     // Center using the real physical FrameSize, which is only known once the window has
     // opened — computing it from DIP * scale beforehand was always a few px off.
+    private bool _wired;
+
     private void OnOpened(object? sender, EventArgs e)
     {
+        // The Loaded event already fired by the time the ctor subscribed to it on some machines
+        // (IsLoaded is True here), so OnLoaded never ran - silently killing every feature wired in
+        // it (shortcuts, autostart, share handler) while manual button commands kept working.
+        // Opened reliably fires once after the visual tree + DataContext are ready, so drive the
+        // wiring from here instead, guarded to run exactly once.
+        if (!_wired)
+        {
+            _wired = true;
+            OnLoaded(this, EventArgs.Empty);
+        }
+
         if (WindowState != WindowState.Normal) return;
         var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
         if (screen is null) return;
@@ -130,6 +144,21 @@ public partial class MainWindow : ApxWindow, IFilePicker
     }
 
     private void OnLoaded(object? sender, EventArgs e)
+    {
+        try
+        {
+            OnLoadedCore();
+        }
+        catch (Exception ex)
+        {
+            // Loaded-handler exceptions are swallowed by Avalonia: a throw here silently aborts ALL
+            // the wiring below it (shortcuts, autostart, share handler), which is why those features
+            // "don't work" while manual button commands still do. Log it so the cause is visible.
+            App.WriteCrash("OnLoaded", ex);
+        }
+    }
+
+    private void OnLoadedCore()
     {
         _workspaceGrid = this.FindControl<Grid>("WorkspaceGrid");
         _contentGrid = this.FindControl<Grid>("ContentGrid");
@@ -451,17 +480,26 @@ public partial class MainWindow : ApxWindow, IFilePicker
     private void OnShareDigestRequested(System.Collections.Generic.List<Models.CodeStats> stats)
     {
         if (DataContext is not MainViewModel vm) return;
-
-        var appVersion = Assembly.GetExecutingAssembly()
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            ?.InformationalVersion ?? "unknown";
-
-        var dialogVm = new ShareDigestViewModel(stats, vm.Aggregator.Schema, appVersion)
+        try
         {
-            Clipboard = TopLevel.GetTopLevel(this)?.Clipboard,
-            RequestSavePath = suggested => vm.FilePicker.PickSaveJsonFileAsync(suggested),
-        };
-        new ShareDigestWindow(dialogVm).Show(this);
+            var appVersion = Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+
+            var dialogVm = new ShareDigestViewModel(stats, vm.Aggregator.Schema, appVersion)
+            {
+                Clipboard = TopLevel.GetTopLevel(this)?.Clipboard,
+                RequestSavePath = suggested => vm.FilePicker.PickSaveJsonFileAsync(suggested),
+            };
+            new ShareDigestWindow(dialogVm).Show(this);
+        }
+        catch (Exception ex)
+        {
+            // A throw here previously vanished (no global UI-exception handler): the window never
+            // opened and the user saw nothing. Log it and surface a toast instead of failing mute.
+            App.WriteCrash("OnShareDigestRequested", ex);
+            vm.ToastManager?.Show("Share failed", ex.Message, ToastSeverity.Error);
+        }
     }
 
     private async void OnUpdateAvailableRequested(string version, string? notes)

@@ -293,6 +293,9 @@
   "digest.status.uploading": "Uploading…",
   "digest.status.uploaded": "Uploaded. Thank you!",
   "digest.status.error": "Failed: {0}",
+  "digest.empty.title": "Nothing to share yet",
+  "digest.empty.noStats": "Nothing to share yet - capture live packets or load a capture file first. (Registering field annotations doesn't add shareable packet data.)",
+  "digest.empty.allKnown": "No unknown codes this session - every code seen is already annotated. Switch to \"All codes\" to share anyway.",
 
   "fullValue.title": "Full Value",
 

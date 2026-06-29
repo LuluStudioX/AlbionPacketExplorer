@@ -62,7 +62,11 @@ public partial class ShareDigestViewModel : ObservableObject
         var pretty = SchemaDigestBuilder.ToJson(_digest, indented: true);
         PreviewText = pretty.Length <= 60_000 ? pretty : pretty[..60_000] + "\n…";
 
-        StatusText = "";
+        // An empty digest disables every action button; without a word here the window just looks
+        // dead. Say why: nothing unknown left to share (offer the All-codes toggle) vs no packets.
+        StatusText = _digest.Codes.Count == 0
+            ? Loc.T(UnknownOnly ? "digest.empty.allKnown" : "digest.empty.noStats")
+            : "";
         UploadCommand.NotifyCanExecuteChanged();
         SaveCommand.NotifyCanExecuteChanged();
         CopyCommand.NotifyCanExecuteChanged();

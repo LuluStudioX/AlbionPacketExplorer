@@ -138,8 +138,19 @@ public partial class CodeAggregatorViewModel : ObservableObject
 
     public bool HasStats => Map.Count > 0;
 
-    [RelayCommand(CanExecute = nameof(HasStats))]
-    private void ShareDigest() => ShareDigestRequested?.Invoke(Map.Values.ToList());
+    // Always executable: a disabled button silently swallows the click, which read as "Share is
+    // broken" when really there was just nothing captured yet (registering field annotations does
+    // not populate packet stats - only live capture or a loaded file does). Tell the user instead.
+    [RelayCommand]
+    private void ShareDigest()
+    {
+        if (!HasStats)
+        {
+            Toasts?.Show(Loc.T("digest.empty.title"), Loc.T("digest.empty.noStats"), ToastSeverity.Info);
+            return;
+        }
+        ShareDigestRequested?.Invoke(Map.Values.ToList());
+    }
 
     // Schema-annotation coverage over every code seen: how many codes resolve to a name and how
     // many byte keys have a curated param name. Surfaces how much annotation work remains.

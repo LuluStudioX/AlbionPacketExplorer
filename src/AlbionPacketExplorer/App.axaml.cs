@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -26,6 +28,11 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        // Nothing logged unhandled exceptions, so a throw in a command handler (e.g. opening the
+        // Share window) was swallowed by the dispatcher and read to the user as "the button does
+        // nothing". Record them to a crash log so these failures are diagnosable.
+        InstallCrashLogging();
+
         // Apply persisted culture AND theme before any window renders, so the saved accent / dark
         // mode are in effect on the first paint (no flash of the XAML-default accent on startup).
         var saved = AppSettingsStore.Load();
@@ -43,6 +50,31 @@ public class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    // Last-resort exception sinks. Avalonia/dispatcher swallows exceptions thrown from UI event
+    // handlers; AppDomain + TaskScheduler catch the rest. All three append to a single crash log.
+    private static void InstallCrashLogging()
+    {
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            WriteCrash("AppDomain.UnhandledException", e.ExceptionObject as Exception);
+        System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            WriteCrash("UnobservedTaskException", e.Exception);
+            e.SetObserved();
+        };
+    }
+
+    /// <summary>Append one exception to <c>logs/crash.log</c>. Never throws.</summary>
+    public static void WriteCrash(string source, Exception? ex)
+    {
+        try
+        {
+            Directory.CreateDirectory(AppPaths.LogsDir);
+            var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{source}] {ex}\n\n";
+            File.AppendAllText(Path.Combine(AppPaths.LogsDir, "crash.log"), line);
+        }
+        catch { /* logging must never crash the crash logger */ }
     }
 
     private void OnTrayIconClicked(object? sender, EventArgs e) => ShowMainWindow();
