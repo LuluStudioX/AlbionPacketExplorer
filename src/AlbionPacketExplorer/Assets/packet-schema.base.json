@@ -1,7 +1,7 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "36448f4",
+    "sourceCommit": "713f6e8",
     "generatedAt": "2026-06-29"
   },
   "EVENT:1": {
@@ -352,7 +352,7 @@
       "3": {
         "name": "flags",
         "note": "(inferred) Byte; 3 distinct; range [1..4]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:AttackType"
       },
       "4": {
         "name": "",
@@ -367,7 +367,7 @@
       "6": {
         "name": "flags",
         "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:AttackType"
       }
     }
   },
@@ -2348,7 +2348,7 @@
       "2": {
         "name": "timestamp",
         "note": "(inferred) Int64; high-card; range [639156465617221627..639170663924043778]; likely .NET ticks (UTC)",
-        "resolveAs": ""
+        "resolveAs": "enum:ActionComponentType"
       },
       "3": {
         "name": "timestamp",
@@ -2363,7 +2363,17 @@
       "5": {
         "name": "",
         "note": "(inferred) Byte; 8 distinct; range [1..8]",
-        "resolveAs": ""
+        "resolveAs": "itemIndex"
+      },
+      "12": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
+      },
+      "14": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       }
     }
   },
@@ -2378,7 +2388,7 @@
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       }
     }
   },
@@ -3734,7 +3744,7 @@
       "7": {
         "name": "",
         "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildRole"
       },
       "8": {
         "name": "",
@@ -3744,7 +3754,7 @@
       "9": {
         "name": "flags",
         "note": "(inferred) Byte; 4 distinct; range [0..3]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildJoinSettings"
       }
     }
   },
@@ -4658,7 +4668,7 @@
       "29": {
         "name": "",
         "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": ""
+        "resolveAs": "enum:ClusterQualities"
       },
       "30": {
         "name": "",
@@ -4673,7 +4683,7 @@
       "32": {
         "name": "",
         "note": "(inferred) Byte; 7 distinct; range [0..6]",
-        "resolveAs": ""
+        "resolveAs": "enum:ClusterQualities"
       },
       "33": {
         "name": "",
@@ -4748,7 +4758,7 @@
       "48": {
         "name": "",
         "note": "(inferred) Int32; 5 distinct; range [0..5]",
-        "resolveAs": ""
+        "resolveAs": "enum:ClusterValueFilterClusterTypes"
       },
       "49": {
         "name": "",
@@ -5338,7 +5348,7 @@
       "8": {
         "name": "",
         "note": "(inferred) Int32; 26% present; 3 distinct; range [1..5]",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildRole"
       },
       "9": {
         "name": "",
@@ -6226,7 +6236,7 @@
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:MiniMapPingTypes"
       },
       "2": {
         "name": "",
@@ -6246,7 +6256,7 @@
       "1": {
         "name": "",
         "note": "(inferred) Int32; 6 distinct; range [1..6]",
-        "resolveAs": ""
+        "resolveAs": "enum:MarketPlaceView"
       }
     }
   },
@@ -6699,7 +6709,7 @@
       "1": {
         "name": "",
         "note": "(inferred) Int32; 4 distinct; range [0..3]",
-        "resolveAs": ""
+        "resolveAs": "enum:AccessRightsContainers"
       },
       "2": {
         "name": "",
@@ -6719,7 +6729,7 @@
       "5": {
         "name": "",
         "note": "(inferred) String[]; high-card; String[] array",
-        "resolveAs": ""
+        "resolveAs": "str:accessrights"
       },
       "6": {
         "name": "",
@@ -7384,7 +7394,7 @@
       "3": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [0..5]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:PartyStartHuntAnswer"
       }
     }
   },
@@ -11946,6 +11956,11 @@
         "name": "",
         "note": "(inferred) Int16[]; 6 distinct; Int16[] array",
         "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:MiniMapPingTypes"
       }
     }
   },
@@ -11986,6 +12001,11 @@
         "name": "",
         "note": "(inferred) String[]; 1 distinct; String[] array",
         "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:Faction"
       }
     }
   },
@@ -12262,7 +12282,7 @@
       "2": {
         "name": "",
         "note": "(inferred) Int64; 97% present; 17 distinct; range [1730..15160896]",
-        "resolveAs": ""
+        "resolveAs": "enum:LocalActionCancelReason"
       },
       "3": {
         "name": "",
@@ -12402,7 +12422,13 @@
   },
   "EVENT:500": {
     "name": "StaticDungeonDungeonValueUpdate",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:StaticDungeonValueInfo"
+      }
+    }
   },
   "EVENT:501": {
     "name": "StaticDungeonEntranceDungeonEventsAborted",
@@ -12612,7 +12638,13 @@
   },
   "EVENT:515": {
     "name": "TownPortalUpdateState",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:PortalExitType"
+      }
+    }
   },
   "EVENT:516": {
     "name": "TownPortalFailed",
@@ -12926,17 +12958,34 @@
       "1": {
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [2..2]",
-        "resolveAs": ""
+        "resolveAs": "enum:MistsStaticEntranceRegisterErrorCode"
       }
     }
   },
   "EVENT:532": {
     "name": "NewCagedObject",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:CagedObjectState"
+      },
+      "5": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:CagedObjectState"
+      }
+    }
   },
   "EVENT:533": {
     "name": "CagedObjectStateUpdated",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:CagedObjectState"
+      }
+    }
   },
   "EVENT:534": {
     "name": "EntrancePartyBindingCreated",
@@ -13643,6 +13692,11 @@
         "name": "timestamp",
         "note": "(inferred) Int64; 1 distinct; range [639168156004882569..639168156004882569]; likely .NET ticks (UTC)",
         "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:FortificationTileCategories"
       }
     }
   },
@@ -14365,6 +14419,21 @@
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [1..1]",
         "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:FactionFortressFightState"
+      },
+      "7": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:FactionFortressFightState"
+      },
+      "8": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:FactionFortressState"
       }
     }
   },
@@ -14533,6 +14602,11 @@
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [4..4]; small enum/flag byte",
         "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:Faction"
       }
     }
   },
@@ -14551,12 +14625,12 @@
       "1": {
         "name": "",
         "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
-        "resolveAs": ""
+        "resolveAs": "enum:FactionFortressFightState"
       },
       "2": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [3..3]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:FactionFortressFightState"
       },
       "3": {
         "name": "flags",
@@ -14974,7 +15048,7 @@
       "2": {
         "name": "flags",
         "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:AttackType"
       }
     }
   },
@@ -15259,7 +15333,7 @@
       "1": {
         "name": "",
         "note": "(inferred) Int64; 1 distinct; range [2..2]",
-        "resolveAs": ""
+        "resolveAs": "enum:ItemMoveType"
       },
       "3": {
         "name": "",
@@ -15482,12 +15556,12 @@
       "12": {
         "name": "",
         "note": "(inferred) Int16; 1 distinct; range [0..0]",
-        "resolveAs": ""
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       },
       "14": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       }
     }
   },
@@ -15498,6 +15572,11 @@
         "name": "timestamp",
         "note": "(inferred) Int64; 5 distinct; range [639159922446076948..639159966004316948]; likely .NET ticks (UTC)",
         "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       }
     }
   },
@@ -16803,7 +16882,7 @@
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:MiniMapPingTypes"
       }
     }
   },
@@ -16942,12 +17021,27 @@
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildJoinSettings"
       },
       "255": {
         "name": "",
         "note": "(inferred) Int32; 4 distinct; range [311..1811]",
         "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:GuildJoinSettings"
+      },
+      "10": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:GuildRole"
+      },
+      "25": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:GuildJoinSettings"
       }
     }
   },
@@ -17019,6 +17113,16 @@
         "name": "",
         "note": "(inferred) Int32; high-card; range [2..1583]",
         "resolveAs": ""
+      },
+      "60": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ClusterValueFilterClusterTypes"
+      },
+      "61": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ClusterTypes"
       }
     }
   },
@@ -17289,7 +17393,7 @@
       "2": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [5..5]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:PartyStartHuntAnswer"
       },
       "255": {
         "name": "",
@@ -18184,7 +18288,7 @@
       "0": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:TemporaryFlaggingStatus"
       },
       "255": {
         "name": "",
@@ -18364,7 +18468,7 @@
       "0": {
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [1..1]",
-        "resolveAs": ""
+        "resolveAs": "enum:UserGroup"
       },
       "1": {
         "name": "timestamp",
@@ -18438,7 +18542,7 @@
       "2": {
         "name": "",
         "note": "(inferred) Int32; 4 distinct; range [1..16]",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildApplicationStatCategories"
       },
       "3": {
         "name": "",
@@ -18667,7 +18771,7 @@
       "0": {
         "name": "",
         "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
-        "resolveAs": ""
+        "resolveAs": "enum:LoadoutResultCode"
       },
       "1": {
         "name": "",
@@ -18701,6 +18805,11 @@
         "name": "",
         "note": "(inferred) Int32; 2 distinct; range [37..48]",
         "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:Faction"
       }
     }
   },
@@ -20373,7 +20482,13 @@
   },
   "RESPONSE:23": {
     "name": "AttackStart",
-    "params": {}
+    "params": {
+      "2": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:AttackType"
+      }
+    }
   },
   "RESPONSE:24": {
     "name": "CastStart",
@@ -20499,7 +20614,13 @@
   },
   "RESPONSE:39": {
     "name": "InventoryMoveGivenItems",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ItemMoveType"
+      }
+    }
   },
   "RESPONSE:40": {
     "name": "GetClusterData",
@@ -20621,7 +20742,7 @@
       "2": {
         "name": "actionTypeNumber",
         "note": "Int64",
-        "resolveAs": ""
+        "resolveAs": "enum:ActionComponentType"
       },
       "4": {
         "name": "costs",
@@ -20637,12 +20758,33 @@
         "name": "quantity",
         "note": "Int32",
         "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "itemIndex"
+      },
+      "12": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
+      },
+      "14": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
       }
     }
   },
   "RESPONSE:56": {
     "name": "ActionOnBuildingCancel",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:ActionOnBuildingErrorCode"
+      }
+    }
   },
   "RESPONSE:57": {
     "name": "InstallResourceStart",
@@ -21714,7 +21856,13 @@
   },
   "RESPONSE:168": {
     "name": "SendMiniMapPing",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:MiniMapPingTypes"
+      }
+    }
   },
   "RESPONSE:169": {
     "name": "Stuck",
@@ -21931,7 +22079,7 @@
       "1": {
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildJoinSettings"
       },
       "2": {
         "name": "flags",
@@ -21961,7 +22109,7 @@
       "7": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildJoinSettings"
       },
       "8": {
         "name": "",
@@ -21976,7 +22124,7 @@
       "10": {
         "name": "flags",
         "note": "(inferred) Byte; 4 distinct; range [2..6]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildRole"
       },
       "11": {
         "name": "",
@@ -22046,7 +22194,7 @@
       "25": {
         "name": "",
         "note": "(inferred) Int32; 80% present; 2 distinct; range [1..2]",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildJoinSettings"
       },
       "255": {
         "name": "",
@@ -22410,12 +22558,12 @@
       "60": {
         "name": "",
         "note": "(inferred) Int32; 46% present; 3 distinct; range [2..4]",
-        "resolveAs": ""
+        "resolveAs": "enum:ClusterValueFilterClusterTypes"
       },
       "61": {
         "name": "flags",
         "note": "(inferred) Byte; 4 distinct; range [0..4]; small enum/flag byte",
-        "resolveAs": ""
+        "resolveAs": "enum:ClusterTypes"
       },
       "62": {
         "name": "flags",
@@ -23085,6 +23233,11 @@
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [3..3]",
         "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:PartyStartHuntAnswer"
       }
     }
   },
@@ -23793,7 +23946,13 @@
   },
   "RESPONSE:351": {
     "name": "ChangeFlaggingPrepare",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:TemporaryFlaggingStatus"
+      }
+    }
   },
   "RESPONSE:352": {
     "name": "OverCharge",
@@ -23963,7 +24122,13 @@
   },
   "RESPONSE:378": {
     "name": "ProductShopUserEvent",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(curated) resolver-only slot",
+        "resolveAs": "enum:UserGroup"
+      }
+    }
   },
   "RESPONSE:379": {
     "name": "GetVanityUnlocks",
@@ -24020,7 +24185,7 @@
       "2": {
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [334486657..334486657]",
-        "resolveAs": ""
+        "resolveAs": "enum:GuildApplicationStatCategories"
       },
       "3": {
         "name": "",
@@ -24353,7 +24518,7 @@
       "0": {
         "name": "",
         "note": "(inferred) Int16; 1 distinct; range [0..0]",
-        "resolveAs": ""
+        "resolveAs": "enum:LoadoutResultCode"
       },
       "1": {
         "name": "",
@@ -24396,7 +24561,7 @@
       "4": {
         "name": "",
         "note": "(inferred) Int32; 33% present; 1 distinct; range [4..4]",
-        "resolveAs": ""
+        "resolveAs": "enum:Faction"
       },
       "5": {
         "name": "",

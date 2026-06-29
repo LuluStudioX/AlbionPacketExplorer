@@ -491,6 +491,92 @@ WIRE_OVERRIDE.update({
 _DASHES = {"‒": "-", "–": "-", "—": "-", "―": "-"}
 
 
+# Curated value resolvers (box -> enum / typed lookup), keyed by (packet name, param key) so they
+# survive wire-code renumbering across game patches. resolveAs is hand curation that inference never
+# produces, so it lives here declaratively instead of only in the schema JSON - where a single regen
+# once silently wiped all 50+ of them (carry-forward dropped any inference-noted param). Applied as a
+# final pass that creates the param slot if the current captures have not populated it yet.
+RESOLVE_OVERRIDE = {
+    ("AccessStatus", "1"): "enum:AccessRightsContainers",
+    ("AccessStatus", "5"): "str:accessrights",
+    ("ActionOnBuildingCancel", "1"): "enum:ActionOnBuildingErrorCode",
+    ("ActionOnBuildingStart", "2"): "enum:ActionComponentType",
+    ("ActionOnBuildingStart", "5"): "itemIndex",
+    ("ActionOnBuildingStart", "12"): "enum:ActionOnBuildingErrorCode",
+    ("ActionOnBuildingStart", "14"): "enum:ActionOnBuildingErrorCode",
+    ("Attack", "3"): "enum:AttackType",
+    ("Attack", "6"): "enum:AttackType",
+    ("AttackStart", "2"): "enum:AttackType",
+    ("CagedObjectStateUpdated", "1"): "enum:CagedObjectState",
+    ("ChangeFlaggingPrepare", "0"): "enum:TemporaryFlaggingStatus",
+    ("ClusterInfoUpdate", "29"): "enum:ClusterQualities",
+    ("ClusterInfoUpdate", "32"): "enum:ClusterQualities",
+    ("ClusterInfoUpdate", "48"): "enum:ClusterValueFilterClusterTypes",
+    ("DoSimpleActionFinished", "2"): "enum:LocalActionCancelReason",
+    ("FactionEnlistmentChanged", "1"): "enum:Faction",
+    ("FactionFortressFightStartedInRemoteClusterEvent", "1"): "enum:FactionFortressFightState",
+    ("FactionFortressFightStartedInRemoteClusterEvent", "2"): "enum:FactionFortressFightState",
+    ("GetClusterMapInfo", "60"): "enum:ClusterValueFilterClusterTypes",
+    ("GetClusterMapInfo", "61"): "enum:ClusterTypes",
+    ("GetFactionWarfareWeeklyReport", "4"): "enum:Faction",
+    ("GetGuildChallengePoints", "2"): "enum:GuildApplicationStatCategories",
+    ("GuildPlayerUpdated", "7"): "enum:GuildRole",
+    ("GuildPlayerUpdated", "9"): "enum:GuildJoinSettings",
+    ("GuildStats", "8"): "enum:GuildRole",
+    ("InventoryMoveGivenItems", "1"): "enum:ItemMoveType",
+    ("LaborerObjectJobInfo", "2"): "itemIndex",
+    ("LoadoutEquip", "0"): "enum:LoadoutResultCode",
+    ("MarketPlaceNotification", "1"): "enum:MarketPlaceView",
+    ("MiniMapPing", "1"): "enum:MiniMapPingTypes",
+    ("MistsEntranceDataChanged", "1"): "enum:MistsStaticEntranceRegisterErrorCode",
+    ("Mob", "30"): "enum:ClusterValueFilterMobDangerTypes",
+    ("Mob", "33"): "enum:ClusterValueFilterMobDangerTypes",
+    ("NewCagedObject", "1"): "enum:CagedObjectState",
+    ("NewCagedObject", "5"): "enum:CagedObjectState",
+    ("NewFactionFortressObject", "4"): "enum:FactionFortressFightState",
+    ("NewFactionFortressObject", "7"): "enum:FactionFortressFightState",
+    ("NewFactionFortressObject", "8"): "enum:FactionFortressState",
+    ("NewFactionWarfarePortal", "4"): "enum:Faction",
+    ("NewFortificationBuilding", "10"): "enum:FortificationTileCategories",
+    ("NewJournalItem", "1"): "itemIndex",
+    ("NewLaborerItem", "1"): "itemIndex",
+    ("OtherGrabbedLoot", "4"): "itemIndex",
+    ("PartyAnswerInvitation", "2"): "enum:PartyStartHuntAnswer",
+    ("PartyInvitationAnswer", "3"): "enum:PartyStartHuntAnswer",
+    ("ProductShopUserEvent", "0"): "enum:UserGroup",
+    ("RedZoneWorldMapEvent", "1"): "enum:MiniMapPingTypes",
+    ("RequestGuildRecruitmentInfo", "1"): "enum:GuildJoinSettings",
+    ("RequestGuildRecruitmentInfo", "7"): "enum:GuildJoinSettings",
+    ("RequestGuildRecruitmentInfo", "10"): "enum:GuildRole",
+    ("RequestGuildRecruitmentInfo", "25"): "enum:GuildJoinSettings",
+    ("SendMiniMapPing", "1"): "enum:MiniMapPingTypes",
+    ("StaticDungeonDungeonValueUpdate", "1"): "enum:StaticDungeonValueInfo",
+    ("TownPortalUpdateState", "1"): "enum:PortalExitType",
+}
+
+
+def apply_resolve_overrides(out):
+    """Final pass: stamp curated resolveAs onto matching (name, paramKey) slots, creating the slot
+    when current captures have not populated it. Returns the count applied."""
+    by_name = {}
+    for key, entry in out.items():
+        if key.startswith("$"):
+            continue
+        by_name.setdefault(entry.get("name", ""), []).append(entry)
+    applied = 0
+    for (name, pk), resolve in RESOLVE_OVERRIDE.items():
+        for entry in by_name.get(name, ()):
+            params = entry.setdefault("params", {})
+            slot = params.get(pk)
+            if slot is None:
+                params[pk] = p("", "(curated) resolver-only slot", resolve)
+                applied += 1
+            elif slot.get("resolveAs", "") != resolve:
+                slot["resolveAs"] = resolve
+                applied += 1
+    return applied
+
+
 def sanitize(params):
     """Carried-forward notes: normalize en/em dashes to plain hyphen (standing no-dash rule)."""
     for entry in params.values():
@@ -503,8 +589,14 @@ def sanitize(params):
 
 def _curated_only(params):
     """Drop capture-inferred slots so carry-forward preserves hand curation only (keeps regen
-    idempotent: inference is re-applied solely from the overlay, never recycled through carry)."""
-    return {k: v for k, v in params.items() if not v.get("note", "").startswith("(inferred)")}
+    idempotent: inference is re-applied solely from the overlay, never recycled through carry).
+    A non-empty resolveAs is itself hand curation (inference never sets it), so keep any param
+    that carries one even when its note is inference-shaped - otherwise every regen wipes the
+    curated box->enum mappings, which is exactly what happened after they were applied."""
+    return {
+        k: v for k, v in params.items()
+        if not v.get("note", "").startswith("(inferred)") or v.get("resolveAs", "")
+    }
 
 
 def best_params_by_name(old, kind):
@@ -599,6 +691,9 @@ def main():
                     params[pk] = pv
                     inferred_added += 1
 
+    # Final pass: stamp curated value resolvers (box -> enum), creating slots not yet captured.
+    resolve_applied = apply_resolve_overrides(out)
+
     OUT.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     ev_names = {n for _, n in events}
@@ -609,6 +704,7 @@ def main():
     print(f"decoder param-sets: EVENT={len(dec_ev)} REQUEST={len(dec_req)} RESPONSE={len(dec_resp)}")
     print(f"applied: decoded EVENT={len(decoded_ev)}  carried EVENT={len(carried_ev)}")
     print(f"inferred key-slots filled from overlay: {inferred_added}")
+    print(f"curated resolveAs stamped: {resolve_applied}")
     if dropped_ev:
         print(f"DROPPED EVENT param-sets (name not in current enum): {dropped_ev}")
     if dropped_req:
