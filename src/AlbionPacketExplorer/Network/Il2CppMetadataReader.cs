@@ -8,10 +8,11 @@ namespace AlbionPacketExplorer.Network;
 /// the members of named enums (e.g. <c>Albion.Common.Photon.EventCodes</c>) straight from the
 /// metadata tables: no external dumper, no native code, fully cross-platform managed parsing.
 ///
-/// <para>Albion's protocol enums are dense and gapless (every ordinal present), so a member's wire
-/// value is <c>base + declarationIndex</c>. We read only the first member's literal from the
-/// default-value blob to pin <c>base</c>; the caller validates the result against known anchors,
-/// which also guards against an unexpected metadata layout.</para>
+/// <para>Each enum member's wire value is read straight from its own entry in the field
+/// default-value table (fieldIndex -> offset into the default-value data blob), so gaps and
+/// out-of-order declarations carry their real value - we do NOT assume a dense base+ordinal
+/// sequence. The caller still validates the result against known anchors, which guards against an
+/// unexpected metadata layout.</para>
 ///
 /// <para>Targets metadata version 31 (Unity 2022+, current Albion client). The header tables we
 /// read all precede the version-specific tail, so v29-v31 share this layout; any other version, a
@@ -106,7 +107,13 @@ public static class Il2CppMetadataReader
         }
         if (memberFields.Count == 0) return null;
 
-        // The literal value width = smallest gap between members' data offsets (1/2/4 bytes).
+        // Literal width = the stride at which members' default-value literals are packed in the blob.
+        // The exact underlying type lives in the fieldDefaultValue's typeIndex -> Il2CppType table, but
+        // resolving that means decoding the variable-length type table; every Albion protocol enum is a
+        // fixed-width integer, so the blob packs literals contiguously and the smallest gap between
+        // members' data offsets IS the type width (1/2/4/8). Default 4 (Int32) if it can't be inferred.
+        // ponytail: gap-stride heuristic, not type-table decode; revisit only if an enum's underlying
+        // type ever stops being a fixed-width int (it never has for these).
         var dataOffsets = memberFields
             .Where(m => fieldToData.ContainsKey(m.FieldIndex))
             .Select(m => fieldToData[m.FieldIndex])
@@ -117,23 +124,26 @@ public static class Il2CppMetadataReader
         for (int j = 1; j < dataOffsets.Count; j++)
         {
             int gap = dataOffsets[j] - dataOffsets[j - 1];
-            if (gap is 1 or 2 or 4) { width = gap; break; }
+            if (gap is 1 or 2 or 4 or 8) { width = gap; break; }
         }
 
-        // base = the first member's literal; remaining values follow from the gapless ordinal.
-        if (!fieldToData.TryGetValue(memberFields[0].FieldIndex, out int firstData)) return null;
-        int baseValue = ReadSigned(d, defaultDataOff + firstData, width);
-
+        // Read EACH member's ACTUAL literal from its OWN default-value offset. No base+ordinal
+        // extrapolation: gaps and out-of-order declarations now carry their real wire value. A member
+        // with no default-value entry (shouldn't happen for an enum) is skipped rather than mis-valued.
         var members = new List<EnumMember>(memberFields.Count);
-        for (int k = 0; k < memberFields.Count; k++)
-            members.Add(new EnumMember(memberFields[k].Name, baseValue + k));
-        return members;
+        foreach (var (fieldIndex, memberName) in memberFields)
+        {
+            if (!fieldToData.TryGetValue(fieldIndex, out int dataOff)) continue;
+            members.Add(new EnumMember(memberName, ReadSigned(d, defaultDataOff + dataOff, width)));
+        }
+        return members.Count == 0 ? null : members;
     }
 
     private static int ReadSigned(byte[] d, int off, int width) => width switch
     {
         1 => (sbyte) d[off],
         2 => BinaryPrimitives.ReadInt16LittleEndian(d.AsSpan(off, 2)),
+        8 => (int) BinaryPrimitives.ReadInt64LittleEndian(d.AsSpan(off, 8)),
         _ => BinaryPrimitives.ReadInt32LittleEndian(d.AsSpan(off, 4))
     };
 
