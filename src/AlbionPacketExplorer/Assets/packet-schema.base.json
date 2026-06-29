@@ -1,12 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "89b5070b",
-    "generatedAt": "2026-06-14"
-  },
-  "EVENT:0": {
-    "name": "Unused",
-    "params": {}
+    "sourceCommit": "36448f4",
+    "generatedAt": "2026-06-29"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -1387,18 +1383,18 @@
     "name": "NewLaborerItem",
     "params": {
       "0": {
-        "name": "_objectId",
-        "note": "Int64",
+        "name": "objectId",
+        "note": "",
         "resolveAs": ""
       },
       "1": {
-        "name": "_itemId",
-        "note": "Int32",
-        "resolveAs": ""
+        "name": "itemIndex",
+        "note": "Resource item id (e.g. T5 plank/metalbar/leather/cloth)",
+        "resolveAs": "itemIndex"
       },
       "2": {
-        "name": "_quantity",
-        "note": "Int32",
+        "name": "quantity",
+        "note": "",
         "resolveAs": ""
       },
       "3": {
@@ -1407,8 +1403,8 @@
         "resolveAs": ""
       },
       "4": {
-        "name": "_estimatedMarketValue",
-        "note": "Int64",
+        "name": "estimatedMarketValue",
+        "note": "FixPoint internal",
         "resolveAs": ""
       },
       "6": {
@@ -1418,7 +1414,7 @@
       },
       "7": {
         "name": "durability",
-        "note": "Int64",
+        "note": "FixPoint internal (when present)",
         "resolveAs": ""
       }
     }
@@ -1707,6 +1703,21 @@
         "name": "flags",
         "note": "(inferred) Byte; 4 distinct; range [0..3]; small enum/flag byte",
         "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Byte[]; 0% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]; 0% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Boolean; 0% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
@@ -1971,7 +1982,23 @@
   },
   "EVENT:52": {
     "name": "ConstructionSiteInfo",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [407..407]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int16[]; 1 distinct; Int16[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:53": {
     "name": "PlayerBuildingInfo",
@@ -2360,7 +2387,7 @@
     "params": {
       "0": {
         "name": "userObjectId",
-        "note": "Int64",
+        "note": "",
         "resolveAs": ""
       },
       "1": {
@@ -2370,12 +2397,12 @@
       },
       "2": {
         "name": "buildingObjectId",
-        "note": "Int64",
+        "note": "Often absent in captures (suspected model-index bug)",
         "resolveAs": ""
       },
       "4": {
-        "name": "actionTypeNumber",
-        "note": "Int64",
+        "name": "actionType",
+        "note": "ActionOnBuildingType enum; often absent in captures",
         "resolveAs": ""
       },
       "3": {
@@ -2859,6 +2886,11 @@
       "5": {
         "name": "",
         "note": "(inferred) Int16; 1 distinct; range [24..24]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Boolean; 18% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -4401,7 +4433,7 @@
     }
   },
   "EVENT:124": {
-    "name": "DebugAggroInfo",
+    "name": "DebugMobInfo",
     "params": {}
   },
   "EVENT:125": {
@@ -5407,12 +5439,38 @@
         "name": "",
         "note": "(inferred) Int64; 63% present; 4 distinct; range [500..10000]",
         "resolveAs": ""
+      },
+      "37": {
+        "name": "",
+        "note": "(inferred) Int32; 50% present; 1 distinct; range [1..1]",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:149": {
     "name": "KillHistoryDetails",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [24835..24835]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:150": {
     "name": "ItemKillHistoryDetails",
@@ -5566,7 +5624,18 @@
   },
   "EVENT:155": {
     "name": "FullTrackedAchievementInfo",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 12 distinct; range [2391..3070008]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int16[]; 29 distinct; Int16[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:156": {
     "name": "FullAutoLearnAchievementInfo",
@@ -5629,6 +5698,16 @@
       "7": {
         "name": "",
         "note": "(inferred) Int64; 1 distinct; range [-9223372036854775808..-9223372036854775808]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 23% present; 12 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int64; 14% present; 1 distinct; range [10000000..10000000]",
         "resolveAs": ""
       }
     }
@@ -5737,6 +5816,11 @@
       "2": {
         "name": "",
         "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 25% present; 1 distinct; range [411300512..411300512]",
         "resolveAs": ""
       }
     }
@@ -6716,6 +6800,11 @@
         "name": "",
         "note": "(inferred) Boolean; 4% present; 1 distinct",
         "resolveAs": ""
+      },
+      "14": {
+        "name": "",
+        "note": "(inferred) Boolean; 0% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
@@ -7023,6 +7112,16 @@
       "16": {
         "name": "",
         "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) Boolean; 25% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Boolean; 50% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -7434,7 +7533,7 @@
     "params": {}
   },
   "EVENT:248": {
-    "name": "SpellCooldownUpdate",
+    "name": "SetPartyNavigation",
     "params": {
       "0": {
         "name": "",
@@ -7464,19 +7563,19 @@
     }
   },
   "EVENT:249": {
-    "name": "NewHellgateExitPortal",
+    "name": "EndPartyNavigation",
     "params": {}
   },
   "EVENT:250": {
-    "name": "NewExpeditionExit",
+    "name": "SpellCooldownUpdate",
     "params": {}
   },
   "EVENT:251": {
-    "name": "NewExpeditionNarrator",
+    "name": "NewHellgateExitPortal",
     "params": {}
   },
   "EVENT:252": {
-    "name": "ExitEnterStart",
+    "name": "NewExpeditionExit",
     "params": {
       "0": {
         "name": "",
@@ -7501,11 +7600,11 @@
     }
   },
   "EVENT:253": {
-    "name": "ExitEnterCancel",
+    "name": "NewExpeditionNarrator",
     "params": {}
   },
   "EVENT:254": {
-    "name": "ExitEnterFinished",
+    "name": "ExitEnterStart",
     "params": {
       "0": {
         "name": "",
@@ -7515,7 +7614,7 @@
     }
   },
   "EVENT:255": {
-    "name": "NewQuestGiverObject",
+    "name": "ExitEnterCancel",
     "params": {
       "0": {
         "name": "",
@@ -7536,11 +7635,16 @@
         "name": "",
         "note": "(inferred) Int32; 3 distinct; range [13..16]",
         "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Single; 30% present; 3 distinct; range [113..350]",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:256": {
-    "name": "FullQuestInfo",
+    "name": "ExitEnterFinished",
     "params": {
       "0": {
         "name": "objectId",
@@ -7556,15 +7660,81 @@
         "name": "flags",
         "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
         "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 2% present; 14 distinct; range [1..24]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 2% present; 4 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 2% present; 4 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int64; 1% present; 1 distinct; range [10000000..10000000]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 2% present; 14 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 2% present; 14 distinct; range [639170784000000000..639170784000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) String; 2% present; 6 distinct; string value",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:257": {
-    "name": "QuestProgressInfo",
-    "params": {}
+    "name": "NewQuestGiverObject",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 13 distinct; range [67..191979]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 90% present; 8 distinct; range [1..8]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; 34 distinct; string value",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Boolean[]; 8 distinct; Boolean[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 95% present; 9 distinct; range [-1..8]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int32; 56% present; 4 distinct; range [-1..3]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:258": {
-    "name": "QuestGiverInfoForPlayer",
+    "name": "FullQuestInfo",
     "params": {
       "0": {
         "name": "",
@@ -7590,27 +7760,37 @@
         "name": "",
         "note": "(inferred) Boolean; 7% present; 1 distinct",
         "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 40% present; 1 distinct; range [10000000..10000000]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Boolean; 5% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:259": {
-    "name": "FullExpeditionInfo",
+    "name": "QuestProgressInfo",
     "params": {}
   },
   "EVENT:260": {
-    "name": "ExpeditionQuestProgressInfo",
+    "name": "QuestGiverInfoForPlayer",
     "params": {}
   },
   "EVENT:261": {
-    "name": "InvitedToExpedition",
+    "name": "FullExpeditionInfo",
     "params": {}
   },
   "EVENT:262": {
-    "name": "ExpeditionRegistrationInfo",
+    "name": "ExpeditionQuestProgressInfo",
     "params": {}
   },
   "EVENT:263": {
-    "name": "EnteringExpeditionStart",
+    "name": "InvitedToExpedition",
     "params": {
       "0": {
         "name": "",
@@ -7620,7 +7800,7 @@
     }
   },
   "EVENT:264": {
-    "name": "EnteringExpeditionCancel",
+    "name": "ExpeditionRegistrationInfo",
     "params": {
       "0": {
         "name": "",
@@ -7635,6 +7815,14 @@
     }
   },
   "EVENT:265": {
+    "name": "EnteringExpeditionStart",
+    "params": {}
+  },
+  "EVENT:266": {
+    "name": "EnteringExpeditionCancel",
+    "params": {}
+  },
+  "EVENT:267": {
     "name": "RewardGranted",
     "params": {
       "1": {
@@ -7646,16 +7834,7 @@
         "name": "quantity",
         "note": "Int32",
         "resolveAs": ""
-      }
-    }
-  },
-  "EVENT:266": {
-    "name": "ArenaRegistrationInfo",
-    "params": {}
-  },
-  "EVENT:267": {
-    "name": "EnteringArenaStart",
-    "params": {
+      },
       "0": {
         "name": "objectId",
         "note": "(inferred) Int64; high-card; range [839..2713924]; high-cardinality id at key 0",
@@ -7664,7 +7843,7 @@
     }
   },
   "EVENT:268": {
-    "name": "EnteringArenaCancel",
+    "name": "ArenaRegistrationInfo",
     "params": {
       "0": {
         "name": "objectId",
@@ -7679,7 +7858,7 @@
     }
   },
   "EVENT:269": {
-    "name": "EnteringArenaLockStart",
+    "name": "EnteringArenaStart",
     "params": {
       "0": {
         "name": "objectId",
@@ -7689,7 +7868,7 @@
     }
   },
   "EVENT:270": {
-    "name": "EnteringArenaLockCancel",
+    "name": "EnteringArenaCancel",
     "params": {
       "0": {
         "name": "objectId",
@@ -7699,11 +7878,11 @@
     }
   },
   "EVENT:271": {
-    "name": "InvitedToArenaMatch",
+    "name": "EnteringArenaLockStart",
     "params": {}
   },
   "EVENT:272": {
-    "name": "UsingHellgateShrine",
+    "name": "EnteringArenaLockCancel",
     "params": {
       "0": {
         "name": "objectId",
@@ -7723,7 +7902,7 @@
     }
   },
   "EVENT:273": {
-    "name": "EnteringHellgateLockStart",
+    "name": "InvitedToArenaMatch",
     "params": {
       "0": {
         "name": "objectId",
@@ -7733,7 +7912,7 @@
     }
   },
   "EVENT:274": {
-    "name": "EnteringHellgateLockCancel",
+    "name": "UsingHellgateShrine",
     "params": {
       "0": {
         "name": "objectId",
@@ -7743,7 +7922,7 @@
     }
   },
   "EVENT:275": {
-    "name": "PlayerCounts",
+    "name": "EnteringHellgateLockStart",
     "params": {
       "0": {
         "name": "",
@@ -7763,6 +7942,61 @@
     }
   },
   "EVENT:276": {
+    "name": "EnteringHellgateLockCancel",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [952..2657120]; high-cardinality id at key 0",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Boolean; 45% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Boolean; 58% present; 1 distinct",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:277": {
+    "name": "PlayerCounts",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [128..3043944]; high-cardinality id at key 0",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 0% present; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; high-card; string value",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 0% present; 10 distinct; range [54..1080]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int64; 99% present; high-card; range [1..9990000000]",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:278": {
     "name": "InCombatStateUpdate",
     "params": {
       "0": {
@@ -7782,7 +8016,7 @@
       }
     }
   },
-  "EVENT:277": {
+  "EVENT:279": {
     "name": "OtherGrabbedLoot",
     "params": {
       "0": {
@@ -7817,7 +8051,7 @@
       }
     }
   },
-  "EVENT:278": {
+  "EVENT:280": {
     "name": "TreasureChestUsingStart",
     "params": {
       "2": {
@@ -7827,24 +8061,16 @@
       }
     }
   },
-  "EVENT:279": {
+  "EVENT:281": {
     "name": "TreasureChestUsingFinished",
     "params": {}
   },
-  "EVENT:280": {
+  "EVENT:282": {
     "name": "TreasureChestUsingCancel",
     "params": {}
   },
-  "EVENT:281": {
-    "name": "TreasureChestUsingOpeningComplete",
-    "params": {}
-  },
-  "EVENT:282": {
-    "name": "TreasureChestForceCloseInventory",
-    "params": {}
-  },
   "EVENT:283": {
-    "name": "LocalTreasuresUpdate",
+    "name": "TreasureChestUsingOpeningComplete",
     "params": {
       "1": {
         "name": "",
@@ -7889,7 +8115,7 @@
     }
   },
   "EVENT:284": {
-    "name": "LootChestSpawnpointsUpdate",
+    "name": "TreasureChestForceCloseInventory",
     "params": {
       "1": {
         "name": "",
@@ -7919,23 +8145,23 @@
     }
   },
   "EVENT:285": {
-    "name": "PremiumChanged",
+    "name": "LocalTreasuresUpdate",
     "params": {}
   },
   "EVENT:286": {
-    "name": "PremiumExtended",
+    "name": "LootChestSpawnpointsUpdate",
     "params": {}
   },
   "EVENT:287": {
-    "name": "PremiumLifeTimeRewardGained",
+    "name": "PremiumChanged",
     "params": {}
   },
   "EVENT:288": {
-    "name": "GoldPurchased",
+    "name": "PremiumExtended",
     "params": {}
   },
   "EVENT:289": {
-    "name": "LaborerGotUpgraded",
+    "name": "PremiumLifeTimeRewardGained",
     "params": {
       "0": {
         "name": "objectId",
@@ -7945,19 +8171,19 @@
     }
   },
   "EVENT:290": {
-    "name": "JournalGotFull",
+    "name": "GoldPurchased",
     "params": {}
   },
   "EVENT:291": {
-    "name": "JournalFillError",
+    "name": "LaborerGotUpgraded",
     "params": {}
   },
   "EVENT:292": {
-    "name": "FriendRequest",
+    "name": "JournalGotFull",
     "params": {}
   },
   "EVENT:293": {
-    "name": "FriendRequestInfos",
+    "name": "JournalFillError",
     "params": {
       "0": {
         "name": "",
@@ -8002,7 +8228,7 @@
     }
   },
   "EVENT:294": {
-    "name": "FriendInfos",
+    "name": "FriendRequest",
     "params": {
       "0": {
         "name": "",
@@ -8057,11 +8283,67 @@
     }
   },
   "EVENT:295": {
-    "name": "FriendRequestAnswered",
-    "params": {}
+    "name": "FriendRequestInfos",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [33..33]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [56..56]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [3..3]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639161280000000000..639161280000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:296": {
-    "name": "FriendOnlineStatus",
+    "name": "FriendInfos",
     "params": {
       "0": {
         "name": "",
@@ -8081,15 +8363,15 @@
     }
   },
   "EVENT:297": {
-    "name": "FriendRequestCanceled",
+    "name": "FriendRequestAnswered",
     "params": {}
   },
   "EVENT:298": {
-    "name": "FriendRemoved",
+    "name": "FriendOnlineStatus",
     "params": {}
   },
   "EVENT:299": {
-    "name": "FriendUpdated",
+    "name": "FriendRequestCanceled",
     "params": {
       "0": {
         "name": "",
@@ -8144,7 +8426,7 @@
     }
   },
   "EVENT:300": {
-    "name": "PartyLootItems",
+    "name": "FriendRemoved",
     "params": {
       "0": {
         "name": "",
@@ -8209,11 +8491,11 @@
     }
   },
   "EVENT:301": {
-    "name": "PartyLootItemsRemoved",
+    "name": "FriendUpdated",
     "params": {}
   },
   "EVENT:302": {
-    "name": "PartyLootItemTypesRemoved",
+    "name": "PartyLootItems",
     "params": {
       "0": {
         "name": "",
@@ -8243,7 +8525,7 @@
     }
   },
   "EVENT:303": {
-    "name": "ReputationUpdate",
+    "name": "PartyLootItemsRemoved",
     "params": {
       "0": {
         "name": "objectId",
@@ -8284,23 +8566,33 @@
         "name": "",
         "note": "(inferred) Int16; 71 distinct; range [401..2316]",
         "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) String; 0% present; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) String; 0% present; 2 distinct; string value",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:304": {
-    "name": "DefenseUnitAttackBegin",
+    "name": "PartyLootItemTypesRemoved",
     "params": {}
   },
   "EVENT:305": {
-    "name": "DefenseUnitAttackEnd",
+    "name": "ReputationUpdate",
     "params": {}
   },
   "EVENT:306": {
-    "name": "DefenseUnitAttackDamage",
+    "name": "DefenseUnitAttackBegin",
     "params": {}
   },
   "EVENT:307": {
-    "name": "UnrestrictedPvpZoneUpdate",
+    "name": "DefenseUnitAttackEnd",
     "params": {
       "0": {
         "name": "objectId",
@@ -8315,11 +8607,11 @@
     }
   },
   "EVENT:308": {
-    "name": "UnrestrictedPvpZoneStatus",
+    "name": "DefenseUnitAttackDamage",
     "params": {}
   },
   "EVENT:309": {
-    "name": "ReputationImplicationUpdate",
+    "name": "UnrestrictedPvpZoneUpdate",
     "params": {
       "0": {
         "name": "",
@@ -8334,7 +8626,7 @@
     }
   },
   "EVENT:310": {
-    "name": "NewMountObject",
+    "name": "UnrestrictedPvpZoneStatus",
     "params": {
       "0": {
         "name": "objectId",
@@ -8429,7 +8721,7 @@
     }
   },
   "EVENT:311": {
-    "name": "MountHealthUpdate",
+    "name": "ReputationImplicationUpdate",
     "params": {
       "0": {
         "name": "objectId",
@@ -8474,7 +8766,7 @@
     }
   },
   "EVENT:312": {
-    "name": "MountCooldownUpdate",
+    "name": "NewMountObject",
     "params": {
       "0": {
         "name": "objectId",
@@ -8494,7 +8786,7 @@
     }
   },
   "EVENT:313": {
-    "name": "NewExpeditionAgent",
+    "name": "MountHealthUpdate",
     "params": {
       "0": {
         "name": "",
@@ -8524,6 +8816,14 @@
     }
   },
   "EVENT:314": {
+    "name": "MountCooldownUpdate",
+    "params": {}
+  },
+  "EVENT:315": {
+    "name": "NewExpeditionAgent",
+    "params": {}
+  },
+  "EVENT:316": {
     "name": "NewExpeditionCheckPoint",
     "params": {
       "2": {
@@ -8533,24 +8833,16 @@
       }
     }
   },
-  "EVENT:315": {
+  "EVENT:317": {
     "name": "ExpeditionStartEvent",
     "params": {}
   },
-  "EVENT:316": {
+  "EVENT:318": {
     "name": "VoteEvent",
     "params": {}
   },
-  "EVENT:317": {
-    "name": "RatingEvent",
-    "params": {}
-  },
-  "EVENT:318": {
-    "name": "NewArenaAgent",
-    "params": {}
-  },
   "EVENT:319": {
-    "name": "BoostFarmable",
+    "name": "RatingEvent",
     "params": {
       "0": {
         "name": "",
@@ -8585,38 +8877,55 @@
     }
   },
   "EVENT:320": {
-    "name": "UseFunction",
+    "name": "NewArenaAgent",
     "params": {}
   },
   "EVENT:321": {
-    "name": "NewPortalEntrance",
-    "params": {}
-  },
-  "EVENT:322": {
-    "name": "NewPortalExit",
-    "params": {}
-  },
-  "EVENT:323": {
-    "name": "NewRandomDungeonExit",
+    "name": "BoostFarmable",
     "params": {
       "0": {
-        "name": "objectId",
-        "note": "Int32",
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [7..7]",
         "resolveAs": ""
       },
       "1": {
-        "name": "sourceExitPosition",
-        "note": "",
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
         "resolveAs": ""
       },
-      "10": {
-        "name": "isAlreadyEntered",
-        "note": "Bool",
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:322": {
+    "name": "UseFunction",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [166..166]",
         "resolveAs": ""
       },
-      "8": {
-        "name": "level",
-        "note": "Int32",
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:323": {
+    "name": "NewPortalEntrance",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [4812..1093787]; high-cardinality id at key 0",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "position",
+        "note": "(inferred) Single[]; high-card; Single[2] world coords {x, y}?",
         "resolveAs": ""
       },
       "2": {
@@ -8642,6 +8951,16 @@
       "7": {
         "name": "",
         "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte; 5 distinct; range [0..4]",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Boolean; 0% present; 1 distinct",
         "resolveAs": ""
       },
       "11": {
@@ -8682,25 +9001,40 @@
     }
   },
   "EVENT:324": {
-    "name": "WaitingQueueUpdate",
+    "name": "NewPortalExit",
     "params": {}
   },
   "EVENT:325": {
-    "name": "PlayerMovementRateUpdate",
+    "name": "NewRandomDungeonExit",
     "params": {
       "0": {
-        "name": "",
-        "note": "(inferred) Int32; 2 distinct; range [100..200]",
+        "name": "objectId",
+        "note": "Int32",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "sourceExitPosition",
+        "note": "",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "isAlreadyEntered",
+        "note": "Bool",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "level",
+        "note": "Int32",
         "resolveAs": ""
       }
     }
   },
   "EVENT:326": {
-    "name": "ObserveStart",
+    "name": "WaitingQueueUpdate",
     "params": {}
   },
   "EVENT:327": {
-    "name": "MinimapZergs",
+    "name": "PlayerMovementRateUpdate",
     "params": {
       "0": {
         "name": "position",
@@ -8720,11 +9054,11 @@
     }
   },
   "EVENT:328": {
-    "name": "MinimapSmartClusterZergs",
+    "name": "ObserveStart",
     "params": {}
   },
   "EVENT:329": {
-    "name": "PaymentTransactions",
+    "name": "MinimapZergs",
     "params": {
       "0": {
         "name": "",
@@ -8759,27 +9093,27 @@
     }
   },
   "EVENT:330": {
-    "name": "PerformanceStatsUpdate",
+    "name": "MinimapSmartClusterZergs",
     "params": {}
   },
   "EVENT:331": {
-    "name": "OverloadModeUpdate",
+    "name": "PaymentTransactions",
     "params": {}
   },
   "EVENT:332": {
-    "name": "DebugDrawEvent",
+    "name": "PerformanceStatsUpdate",
     "params": {}
   },
   "EVENT:333": {
-    "name": "RecordCameraMove",
+    "name": "OverloadModeUpdate",
     "params": {}
   },
   "EVENT:334": {
-    "name": "RecordStart",
+    "name": "DebugDrawEvent",
     "params": {}
   },
   "EVENT:335": {
-    "name": "ClaimPowerCrystalStart",
+    "name": "RecordCameraMove",
     "params": {
       "0": {
         "name": "",
@@ -8814,7 +9148,7 @@
     }
   },
   "EVENT:336": {
-    "name": "ClaimPowerCrystalCancel",
+    "name": "RecordStart",
     "params": {
       "0": {
         "name": "",
@@ -8829,7 +9163,7 @@
     }
   },
   "EVENT:337": {
-    "name": "ClaimPowerCrystalReset",
+    "name": "DeliverCarriableObjectStart",
     "params": {
       "0": {
         "name": "",
@@ -8849,7 +9183,7 @@
     }
   },
   "EVENT:338": {
-    "name": "ClaimPowerCrystalFinished",
+    "name": "DeliverCarriableObjectCancel",
     "params": {
       "0": {
         "name": "",
@@ -8869,27 +9203,27 @@
     }
   },
   "EVENT:339": {
-    "name": "TerritoryClaimStart",
+    "name": "DeliverCarriableObjectReset",
     "params": {}
   },
   "EVENT:340": {
-    "name": "TerritoryClaimCancel",
+    "name": "DeliverCarriableObjectFinished",
     "params": {}
   },
   "EVENT:341": {
-    "name": "TerritoryClaimFinished",
+    "name": "TerritoryClaimStart",
     "params": {}
   },
   "EVENT:342": {
-    "name": "TerritoryScheduleResult",
+    "name": "TerritoryClaimCancel",
     "params": {}
   },
   "EVENT:343": {
-    "name": "TerritoryUpgradeWithPowerCrystalResult",
+    "name": "TerritoryClaimFinished",
     "params": {}
   },
   "EVENT:344": {
-    "name": "ReturningPowerCrystalStart",
+    "name": "TerritoryScheduleResult",
     "params": {
       "0": {
         "name": "",
@@ -8909,7 +9243,7 @@
     }
   },
   "EVENT:345": {
-    "name": "ReturningPowerCrystalFinished",
+    "name": "TerritoryUpgradeWithPowerCrystalResult",
     "params": {
       "0": {
         "name": "",
@@ -8934,15 +9268,15 @@
     }
   },
   "EVENT:346": {
-    "name": "UpdateAccountState",
+    "name": "ReceiveCarriableObjectStart",
     "params": {}
   },
   "EVENT:347": {
-    "name": "StartDeterministicRoam",
+    "name": "ReceiveCarriableObjectFinished",
     "params": {}
   },
   "EVENT:348": {
-    "name": "GuildFullAccessTagsUpdated",
+    "name": "UpdateAccountState",
     "params": {
       "0": {
         "name": "",
@@ -9007,7 +9341,7 @@
     }
   },
   "EVENT:349": {
-    "name": "GuildAccessTagUpdated",
+    "name": "StartDeterministicRoam",
     "params": {
       "0": {
         "name": "",
@@ -9052,7 +9386,7 @@
     }
   },
   "EVENT:350": {
-    "name": "GvgSeasonUpdate",
+    "name": "GuildFullAccessTagsUpdated",
     "params": {
       "0": {
         "name": "",
@@ -9137,15 +9471,15 @@
     }
   },
   "EVENT:351": {
-    "name": "GvgSeasonCheatCommand",
+    "name": "GuildAccessTagUpdated",
     "params": {}
   },
   "EVENT:352": {
-    "name": "SeasonPointsByKillingBooster",
+    "name": "GvgSeasonUpdate",
     "params": {}
   },
   "EVENT:353": {
-    "name": "FishingStart",
+    "name": "GvgSeasonCheatCommand",
     "params": {
       "0": {
         "name": "",
@@ -9175,19 +9509,19 @@
     }
   },
   "EVENT:354": {
-    "name": "FishingCast",
+    "name": "SeasonPointsByKillingBooster",
     "params": {}
   },
   "EVENT:355": {
-    "name": "FishingCatch",
+    "name": "FishingStart",
     "params": {}
   },
   "EVENT:356": {
-    "name": "FishingFinished",
+    "name": "FishingCast",
     "params": {}
   },
   "EVENT:357": {
-    "name": "FishingCancel",
+    "name": "FishingCatch",
     "params": {
       "0": {
         "name": "",
@@ -9202,7 +9536,7 @@
     }
   },
   "EVENT:358": {
-    "name": "NewFloatObject",
+    "name": "FishingFinished",
     "params": {
       "0": {
         "name": "",
@@ -9232,7 +9566,7 @@
     }
   },
   "EVENT:359": {
-    "name": "NewFishingZoneObject",
+    "name": "FishingCancel",
     "params": {
       "0": {
         "name": "objectId",
@@ -9262,7 +9596,7 @@
     }
   },
   "EVENT:360": {
-    "name": "FishingMiniGame",
+    "name": "NewFloatObject",
     "params": {
       "0": {
         "name": "",
@@ -9342,7 +9676,7 @@
     }
   },
   "EVENT:361": {
-    "name": "SteamAchievementCompleted",
+    "name": "NewFishingZoneObject",
     "params": {
       "0": {
         "name": "",
@@ -9353,15 +9687,25 @@
         "name": "",
         "note": "(inferred) String; 1 distinct; string value",
         "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Boolean; 20% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Boolean; 4% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:362": {
-    "name": "UpdatePuppet",
+    "name": "FishingMiniGame",
     "params": {}
   },
   "EVENT:363": {
-    "name": "ChangeFlaggingFinished",
+    "name": "AlbionJournalAchievementCompleted",
     "params": {
       "0": {
         "name": "objectId",
@@ -9376,7 +9720,7 @@
     }
   },
   "EVENT:364": {
-    "name": "NewOutpostObject",
+    "name": "UpdatePuppet",
     "params": {
       "0": {
         "name": "objectId",
@@ -9401,7 +9745,7 @@
     }
   },
   "EVENT:365": {
-    "name": "OutpostUpdate",
+    "name": "ChangeFlaggingFinished",
     "params": {
       "0": {
         "name": "objectId",
@@ -9456,7 +9800,7 @@
     }
   },
   "EVENT:366": {
-    "name": "OutpostClaimed",
+    "name": "NewOutpostObject",
     "params": {
       "0": {
         "name": "",
@@ -9481,7 +9825,7 @@
     }
   },
   "EVENT:367": {
-    "name": "OverChargeEnd",
+    "name": "OutpostUpdate",
     "params": {
       "0": {
         "name": "",
@@ -9501,7 +9845,7 @@
     }
   },
   "EVENT:368": {
-    "name": "OverChargeStatus",
+    "name": "OutpostClaimed",
     "params": {
       "0": {
         "name": "objectId",
@@ -9521,27 +9865,27 @@
     }
   },
   "EVENT:369": {
-    "name": "PartyFinderFullUpdate",
+    "name": "OverChargeEnd",
     "params": {}
   },
   "EVENT:370": {
-    "name": "PartyFinderUpdate",
+    "name": "OverChargeStatus",
     "params": {}
   },
   "EVENT:371": {
-    "name": "PartyFinderApplicantsUpdate",
+    "name": "PartyFinderFullUpdate",
     "params": {}
   },
   "EVENT:372": {
-    "name": "PartyFinderEquipmentSnapshot",
+    "name": "PartyFinderUpdate",
     "params": {}
   },
   "EVENT:373": {
-    "name": "PartyFinderJoinRequestDeclined",
+    "name": "PartyFinderApplicantsUpdate",
     "params": {}
   },
   "EVENT:374": {
-    "name": "NewUnlockedPersonalSeasonRewards",
+    "name": "PartyFinderEquipmentSnapshot",
     "params": {
       "0": {
         "name": "",
@@ -9556,7 +9900,7 @@
     }
   },
   "EVENT:375": {
-    "name": "PersonalSeasonPointsGained",
+    "name": "PartyFinderJoinRequestDeclined",
     "params": {
       "0": {
         "name": "",
@@ -9571,7 +9915,7 @@
     }
   },
   "EVENT:376": {
-    "name": "PersonalSeasonPastSeasonDataEvent",
+    "name": "NewUnlockedPersonalSeasonRewards",
     "params": {
       "0": {
         "name": "",
@@ -9621,27 +9965,27 @@
     }
   },
   "EVENT:377": {
-    "name": "MatchLootChestOpeningStart",
+    "name": "PersonalSeasonPointsGained",
     "params": {}
   },
   "EVENT:378": {
-    "name": "MatchLootChestOpeningFinished",
+    "name": "PersonalSeasonPastSeasonDataEvent",
     "params": {}
   },
   "EVENT:379": {
-    "name": "MatchLootChestOpeningCancel",
+    "name": "MatchLootChestOpeningStart",
     "params": {}
   },
   "EVENT:380": {
-    "name": "NotifyCrystalMatchReward",
+    "name": "MatchLootChestOpeningFinished",
     "params": {}
   },
   "EVENT:381": {
-    "name": "CrystalRealmFeedback",
+    "name": "MatchLootChestOpeningCancel",
     "params": {}
   },
   "EVENT:382": {
-    "name": "NewLocationMarker",
+    "name": "NotifyCrystalMatchReward",
     "params": {
       "0": {
         "name": "objectId",
@@ -9666,15 +10010,41 @@
     }
   },
   "EVENT:383": {
-    "name": "NewTutorialBlocker",
-    "params": {}
+    "name": "CrystalRealmFeedback",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; 52 distinct; range [7..623]; high-cardinality id at key 0",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 16 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 53 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Single; 96% present; 3 distinct; range [90..270]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Boolean; 50% present; 1 distinct",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:384": {
-    "name": "NewTileSwitch",
+    "name": "NewLocationMarker",
     "params": {}
   },
   "EVENT:385": {
-    "name": "NewInformationProvider",
+    "name": "NewTutorialBlocker",
     "params": {
       "0": {
         "name": "",
@@ -9720,11 +10090,16 @@
         "name": "",
         "note": "(inferred) String; 1 distinct; string value",
         "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int32; 11% present; 1 distinct; range [1..1]",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:386": {
-    "name": "NewDynamicGuildLogo",
+    "name": "NewTileSwitch",
     "params": {
       "0": {
         "name": "",
@@ -9774,37 +10149,60 @@
     }
   },
   "EVENT:387": {
-    "name": "NewDecoration",
-    "params": {}
-  },
-  "EVENT:388": {
-    "name": "TutorialUpdate",
-    "params": {}
-  },
-  "EVENT:389": {
-    "name": "TriggerHintBox",
-    "params": {}
-  },
-  "EVENT:390": {
-    "name": "RandomDungeonPositionInfo",
-    "params": {}
-  },
-  "EVENT:391": {
-    "name": "NewLootChest",
+    "name": "NewInformationProvider",
     "params": {
       "0": {
-        "name": "objectId",
-        "note": "",
+        "name": "",
+        "note": "(inferred) Int64; 4 distinct; range [56..59]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 4 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Single; 4 distinct; range [67..203]",
         "resolveAs": ""
       },
       "3": {
-        "name": "uniqueName",
-        "note": "",
+        "name": "",
+        "note": "(inferred) String; 4 distinct; string value",
         "resolveAs": ""
-      },
-      "4": {
-        "name": "uniqueNameWithLocation",
-        "note": "",
+      }
+    }
+  },
+  "EVENT:388": {
+    "name": "NewDynamicGuildLogo",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 22 distinct; range [-1..49]",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:389": {
+    "name": "NewDecoration",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 90% present; 8 distinct; range [8..82]",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:390": {
+    "name": "TutorialUpdate",
+    "params": {}
+  },
+  "EVENT:391": {
+    "name": "TriggerHintBox",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 18 distinct; range [5374..1100067]",
         "resolveAs": ""
       },
       "1": {
@@ -9815,6 +10213,16 @@
       "2": {
         "name": "",
         "note": "(inferred) Single; 68% present; 10 distinct; range [44..405]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 8 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 8 distinct; string value",
         "resolveAs": ""
       },
       "5": {
@@ -9930,26 +10338,11 @@
     }
   },
   "EVENT:392": {
-    "name": "UpdateLootChest",
+    "name": "RandomDungeonPositionInfo",
     "params": {
       "0": {
-        "name": "objectId",
-        "note": "",
-        "resolveAs": ""
-      },
-      "3": {
-        "name": "playerGuid",
-        "note": "",
-        "resolveAs": ""
-      },
-      "5": {
-        "name": "playerGuid2",
-        "note": "",
-        "resolveAs": ""
-      },
-      "4": {
-        "name": "legacyPlayerGuid2",
-        "note": "",
+        "name": "",
+        "note": "(inferred) Int64; 9 distinct; range [5374..927751]",
         "resolveAs": ""
       },
       "1": {
@@ -9960,6 +10353,16 @@
       "2": {
         "name": "timestamp",
         "note": "(inferred) Int64; 43 distinct; range [639158573432195276..639164263097675705]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Byte[]; 45% present; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 45% present; 38 distinct; Byte[] array",
         "resolveAs": ""
       },
       "6": {
@@ -10035,11 +10438,21 @@
     }
   },
   "EVENT:393": {
-    "name": "LootChestOpened",
+    "name": "NewLootChest",
     "params": {
       "0": {
-        "name": "id",
-        "note": "Int32",
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "uniqueName",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "uniqueNameWithLocation",
+        "note": "",
         "resolveAs": ""
       },
       "1": {
@@ -10050,10 +10463,75 @@
     }
   },
   "EVENT:394": {
+    "name": "UpdateLootChest",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "playerGuid",
+        "note": "",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "playerGuid2",
+        "note": "",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "legacyPlayerGuid2",
+        "note": "",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:395": {
+    "name": "LootChestOpened",
+    "params": {
+      "0": {
+        "name": "id",
+        "note": "Int32",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 14 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Single; 86% present; 7 distinct; range [45..315]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 96% present; 2 distinct; range [639169920000000000..639169920000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:396": {
     "name": "UpdateLootProtectedByMobsWithMinimapDisplay",
     "params": {}
   },
-  "EVENT:395": {
+  "EVENT:397": {
     "name": "NewShrine",
     "params": {
       "4": {
@@ -10068,20 +10546,12 @@
       }
     }
   },
-  "EVENT:396": {
+  "EVENT:398": {
     "name": "UpdateShrine",
     "params": {}
   },
-  "EVENT:397": {
-    "name": "UpdateRoom",
-    "params": {}
-  },
-  "EVENT:398": {
-    "name": "NewMobSoul",
-    "params": {}
-  },
   "EVENT:399": {
-    "name": "NewHellgateShrine",
+    "name": "UpdateRoom",
     "params": {
       "0": {
         "name": "",
@@ -10111,7 +10581,7 @@
     }
   },
   "EVENT:400": {
-    "name": "UpdateHellgateShrine",
+    "name": "NewMobSoul",
     "params": {
       "0": {
         "name": "",
@@ -10131,11 +10601,11 @@
     }
   },
   "EVENT:401": {
-    "name": "ActivateHellgateExit",
+    "name": "NewHellgateShrine",
     "params": {}
   },
   "EVENT:402": {
-    "name": "MutePlayerUpdate",
+    "name": "UpdateHellgateShrine",
     "params": {
       "1": {
         "name": "",
@@ -10165,7 +10635,7 @@
     }
   },
   "EVENT:403": {
-    "name": "ShopTileUpdate",
+    "name": "ActivateHellgateExit",
     "params": {
       "0": {
         "name": "",
@@ -10325,7 +10795,7 @@
     }
   },
   "EVENT:404": {
-    "name": "ShopUpdate",
+    "name": "MutePlayerUpdate",
     "params": {
       "0": {
         "name": "",
@@ -10410,7 +10880,7 @@
     }
   },
   "EVENT:405": {
-    "name": "EasyAntiCheatKick",
+    "name": "ShopTileUpdate",
     "params": {
       "0": {
         "name": "",
@@ -10425,7 +10895,7 @@
     }
   },
   "EVENT:406": {
-    "name": "BattlEyeServerMessage",
+    "name": "ShopUpdate",
     "params": {
       "0": {
         "name": "",
@@ -10435,15 +10905,15 @@
     }
   },
   "EVENT:407": {
-    "name": "UnlockVanityUnlock",
+    "name": "AntiCheatKick",
     "params": {}
   },
   "EVENT:408": {
-    "name": "AvatarUnlocked",
+    "name": "BattlEyeServerMessage",
     "params": {}
   },
   "EVENT:409": {
-    "name": "CustomizationChanged",
+    "name": "UnlockVanityUnlock",
     "params": {
       "0": {
         "name": "",
@@ -10468,10 +10938,80 @@
     }
   },
   "EVENT:410": {
-    "name": "BaseVaultInfo",
+    "name": "AvatarUnlocked",
     "params": {}
   },
   "EVENT:411": {
+    "name": "CustomizationChanged",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 4 distinct; range [60..417]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 4 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 7 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String[]; 5 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String[]; 4 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int32[]; 4 distinct; Int32[] array",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:412": {
+    "name": "BaseVaultInfo",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 20 distinct; range [6..501]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 13 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 11 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String[]; 10 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String[]; 9 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int32[]; 7 distinct; Int32[] array",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:413": {
     "name": "GuildVaultInfo",
     "params": {
       "0": {
@@ -10501,12 +11041,27 @@
       },
       "5": {
         "name": "",
-        "note": "(inferred) Int32[]; 4 distinct; Int32[] array",
+        "note": "(inferred) Byte[]/Int32[]; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) String[]; 2 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]/Int64[]; 3 distinct; Byte[] array",
         "resolveAs": ""
       }
     }
   },
-  "EVENT:412": {
+  "EVENT:414": {
     "name": "BankVaultInfo",
     "params": {
       "0": {
@@ -10538,91 +11093,6 @@
         "name": "vaultColors",
         "note": "",
         "resolveAs": ""
-      }
-    }
-  },
-  "EVENT:413": {
-    "name": "RecoveryVaultPlayerInfo",
-    "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Int64; 16 distinct; range [6..501]",
-        "resolveAs": ""
-      },
-      "1": {
-        "name": "",
-        "note": "(inferred) String; 9 distinct; string value",
-        "resolveAs": ""
-      },
-      "2": {
-        "name": "",
-        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
-        "resolveAs": ""
-      },
-      "3": {
-        "name": "",
-        "note": "(inferred) String[]; 2 distinct; String[] array",
-        "resolveAs": ""
-      },
-      "4": {
-        "name": "",
-        "note": "(inferred) String[]; 2 distinct; String[] array",
-        "resolveAs": ""
-      },
-      "5": {
-        "name": "",
-        "note": "(inferred) Byte[]/Int32[]; 3 distinct; Byte[] array",
-        "resolveAs": ""
-      },
-      "6": {
-        "name": "",
-        "note": "(inferred) String[]; 2 distinct; String[] array",
-        "resolveAs": ""
-      },
-      "7": {
-        "name": "",
-        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
-        "resolveAs": ""
-      },
-      "8": {
-        "name": "",
-        "note": "(inferred) Byte[]/Int64[]; 3 distinct; Byte[] array",
-        "resolveAs": ""
-      }
-    }
-  },
-  "EVENT:414": {
-    "name": "RecoveryVaultGuildInfo",
-    "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [245..417]",
-        "resolveAs": ""
-      },
-      "1": {
-        "name": "",
-        "note": "(inferred) String; 2 distinct; string value",
-        "resolveAs": ""
-      },
-      "2": {
-        "name": "",
-        "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
-        "resolveAs": ""
-      },
-      "3": {
-        "name": "",
-        "note": "(inferred) String[]; 1 distinct; String[] array",
-        "resolveAs": ""
-      },
-      "4": {
-        "name": "",
-        "note": "(inferred) String[]; 1 distinct; String[] array",
-        "resolveAs": ""
-      },
-      "5": {
-        "name": "",
-        "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
-        "resolveAs": ""
       },
       "6": {
         "name": "",
@@ -10642,7 +11112,7 @@
     }
   },
   "EVENT:415": {
-    "name": "UpdateWardrobe",
+    "name": "RecoveryVaultPlayerInfo",
     "params": {
       "0": {
         "name": "",
@@ -10657,7 +11127,7 @@
     }
   },
   "EVENT:416": {
-    "name": "CastlePhaseChanged",
+    "name": "RecoveryVaultGuildInfo",
     "params": {
       "0": {
         "name": "",
@@ -10677,11 +11147,11 @@
     }
   },
   "EVENT:417": {
-    "name": "GuildAccountLogEvent",
+    "name": "UpdateWardrobe",
     "params": {}
   },
   "EVENT:418": {
-    "name": "NewHideoutObject",
+    "name": "CastlePhaseChanged",
     "params": {
       "0": {
         "name": "",
@@ -10816,7 +11286,7 @@
     }
   },
   "EVENT:419": {
-    "name": "NewHideoutManagement",
+    "name": "GuildAccountLogEvent",
     "params": {
       "0": {
         "name": "",
@@ -10881,7 +11351,7 @@
     }
   },
   "EVENT:420": {
-    "name": "NewHideoutExit",
+    "name": "NewHideoutObject",
     "params": {
       "0": {
         "name": "",
@@ -10896,23 +11366,23 @@
     }
   },
   "EVENT:421": {
-    "name": "InitHideoutAttackStart",
+    "name": "NewHideoutManagement",
     "params": {}
   },
   "EVENT:422": {
-    "name": "InitHideoutAttackCancel",
+    "name": "NewHideoutExit",
     "params": {}
   },
   "EVENT:423": {
-    "name": "InitHideoutAttackFinished",
+    "name": "InitHideoutAttackStart",
     "params": {}
   },
   "EVENT:424": {
-    "name": "HideoutManagementUpdate",
+    "name": "InitHideoutAttackCancel",
     "params": {}
   },
   "EVENT:425": {
-    "name": "HideoutUpgradeWithPowerCrystalResult",
+    "name": "InitHideoutAttackFinished",
     "params": {
       "1": {
         "name": "",
@@ -10932,26 +11402,34 @@
     }
   },
   "EVENT:426": {
-    "name": "IpChanged",
+    "name": "HideoutManagementUpdate",
     "params": {}
   },
   "EVENT:427": {
-    "name": "SmartClusterQueueUpdateInfo",
+    "name": "HideoutUpgradeWithPowerCrystalResult",
     "params": {}
   },
   "EVENT:428": {
-    "name": "SmartClusterQueueActiveInfo",
+    "name": "IpChanged",
     "params": {}
   },
   "EVENT:429": {
-    "name": "SmartClusterQueueKickWarning",
+    "name": "SmartClusterQueueUpdateInfo",
     "params": {}
   },
   "EVENT:430": {
-    "name": "SmartClusterQueueInvite",
+    "name": "SmartClusterQueueActiveInfo",
     "params": {}
   },
   "EVENT:431": {
+    "name": "SmartClusterQueueKickWarning",
+    "params": {}
+  },
+  "EVENT:432": {
+    "name": "SmartClusterQueueInvite",
+    "params": {}
+  },
+  "EVENT:433": {
     "name": "ReceivedGvgSeasonPoints",
     "params": {
       "1": {
@@ -10961,48 +11439,40 @@
       }
     }
   },
-  "EVENT:432": {
+  "EVENT:434": {
     "name": "TowerPowerPointUpdate",
     "params": {}
   },
-  "EVENT:433": {
+  "EVENT:435": {
     "name": "OpenWorldAttackScheduleStart",
     "params": {}
   },
-  "EVENT:434": {
+  "EVENT:436": {
     "name": "OpenWorldAttackScheduleFinished",
     "params": {}
   },
-  "EVENT:435": {
+  "EVENT:437": {
     "name": "OpenWorldAttackScheduleCancel",
     "params": {}
   },
-  "EVENT:436": {
+  "EVENT:438": {
     "name": "OpenWorldAttackConquerStart",
     "params": {}
   },
-  "EVENT:437": {
+  "EVENT:439": {
     "name": "OpenWorldAttackConquerFinished",
     "params": {}
   },
-  "EVENT:438": {
+  "EVENT:440": {
     "name": "OpenWorldAttackConquerCancel",
     "params": {}
   },
-  "EVENT:439": {
+  "EVENT:441": {
     "name": "OpenWorldAttackConquerStatus",
     "params": {}
   },
-  "EVENT:440": {
-    "name": "OpenWorldAttackStart",
-    "params": {}
-  },
-  "EVENT:441": {
-    "name": "OpenWorldAttackEnd",
-    "params": {}
-  },
   "EVENT:442": {
-    "name": "NewRandomResourceBlocker",
+    "name": "OpenWorldAttackStart",
     "params": {
       "0": {
         "name": "",
@@ -11022,7 +11492,7 @@
     }
   },
   "EVENT:443": {
-    "name": "NewHomeObject",
+    "name": "OpenWorldAttackEnd",
     "params": {
       "0": {
         "name": "",
@@ -11042,15 +11512,15 @@
     }
   },
   "EVENT:444": {
-    "name": "HideoutObjectUpdate",
+    "name": "NewRandomResourceBlocker",
     "params": {}
   },
   "EVENT:445": {
-    "name": "UpdateInfamy",
+    "name": "NewHomeObject",
     "params": {}
   },
   "EVENT:446": {
-    "name": "MinimapPositionMarkers",
+    "name": "HideoutObjectUpdate",
     "params": {
       "0": {
         "name": "",
@@ -11075,43 +11545,43 @@
     }
   },
   "EVENT:447": {
-    "name": "NewTunnelExit",
+    "name": "UpdateInfamy",
     "params": {}
   },
   "EVENT:448": {
-    "name": "CorruptedDungeonUpdate",
+    "name": "MinimapPositionMarkers",
     "params": {}
   },
   "EVENT:449": {
-    "name": "CorruptedDungeonStatus",
+    "name": "NewTunnelExit",
     "params": {}
   },
   "EVENT:450": {
-    "name": "CorruptedDungeonInfamy",
+    "name": "CorruptedDungeonUpdate",
     "params": {}
   },
   "EVENT:451": {
-    "name": "HellgateRestrictedAreaUpdate",
+    "name": "CorruptedDungeonStatus",
     "params": {}
   },
   "EVENT:452": {
-    "name": "HellgateInfamy",
+    "name": "CorruptedDungeonInfamy",
     "params": {}
   },
   "EVENT:453": {
-    "name": "HellgateStatus",
+    "name": "HellgateRestrictedAreaUpdate",
     "params": {}
   },
   "EVENT:454": {
-    "name": "HellgateStatusUpdate",
+    "name": "HellgateInfamy",
     "params": {}
   },
   "EVENT:455": {
-    "name": "HellgateSuspense",
+    "name": "HellgateStatus",
     "params": {}
   },
   "EVENT:456": {
-    "name": "ReplaceSpellSlotWithMultiSpell",
+    "name": "HellgateStatusUpdate",
     "params": {
       "0": {
         "name": "",
@@ -11131,23 +11601,23 @@
     }
   },
   "EVENT:457": {
-    "name": "NewCorruptedShrine",
+    "name": "HellgateSuspense",
     "params": {}
   },
   "EVENT:458": {
-    "name": "UpdateCorruptedShrine",
+    "name": "ReplaceSpellSlotWithMultiSpell",
     "params": {}
   },
   "EVENT:459": {
-    "name": "CorruptedShrineUsageStart",
+    "name": "NewCorruptedShrine",
     "params": {}
   },
   "EVENT:460": {
-    "name": "CorruptedShrineUsageCancel",
+    "name": "UpdateCorruptedShrine",
     "params": {}
   },
   "EVENT:461": {
-    "name": "ExitUsed",
+    "name": "CorruptedShrineUsageStart",
     "params": {
       "0": {
         "name": "",
@@ -11162,7 +11632,7 @@
     }
   },
   "EVENT:462": {
-    "name": "LinkedToObject",
+    "name": "CorruptedShrineUsageCancel",
     "params": {
       "0": {
         "name": "",
@@ -11192,7 +11662,7 @@
     }
   },
   "EVENT:463": {
-    "name": "LinkToObjectBroken",
+    "name": "ExitUsed",
     "params": {
       "0": {
         "name": "",
@@ -11212,7 +11682,7 @@
     }
   },
   "EVENT:464": {
-    "name": "EstimatedMarketValueUpdate",
+    "name": "LinkedToObject",
     "params": {
       "0": {
         "name": "",
@@ -11242,15 +11712,15 @@
     }
   },
   "EVENT:465": {
-    "name": "StuckCancel",
+    "name": "LinkToObjectBroken",
     "params": {}
   },
   "EVENT:466": {
-    "name": "DungonEscapeReady",
+    "name": "EstimatedMarketValueUpdate",
     "params": {}
   },
   "EVENT:467": {
-    "name": "FactionWarfareClusterState",
+    "name": "StuckCancel",
     "params": {
       "0": {
         "name": "timestamp",
@@ -11320,7 +11790,7 @@
     }
   },
   "EVENT:468": {
-    "name": "FactionWarfareHasUnclaimedWeeklyReportsEvent",
+    "name": "DungonEscapeReady",
     "params": {
       "0": {
         "name": "",
@@ -11330,19 +11800,19 @@
     }
   },
   "EVENT:469": {
-    "name": "SimpleFeedback",
+    "name": "FactionWarfareClusterState",
     "params": {}
   },
   "EVENT:470": {
-    "name": "SmartClusterQueueSkipClusterError",
+    "name": "FactionWarfareHasUnclaimedWeeklyReportsEvent",
     "params": {}
   },
   "EVENT:471": {
-    "name": "XignCodeEvent",
+    "name": "SimpleFeedback",
     "params": {}
   },
   "EVENT:472": {
-    "name": "BatchUseItemStart",
+    "name": "SmartClusterQueueSkipClusterError",
     "params": {
       "0": {
         "name": "objectId",
@@ -11367,7 +11837,7 @@
     }
   },
   "EVENT:473": {
-    "name": "BatchUseItemEnd",
+    "name": "XignCodeEvent",
     "params": {
       "0": {
         "name": "objectId",
@@ -11377,7 +11847,7 @@
     }
   },
   "EVENT:474": {
-    "name": "RedZonePlayerNotification",
+    "name": "BatchUseItemStart",
     "params": {
       "0": {
         "name": "flags",
@@ -11397,15 +11867,15 @@
     }
   },
   "EVENT:475": {
-    "name": "RedZoneEventCheatCleanup",
+    "name": "BatchUseItemEnd",
     "params": {}
   },
   "EVENT:476": {
-    "name": "RedZoneFortressEventChestOpened",
+    "name": "RedZonePlayerNotification",
     "params": {}
   },
   "EVENT:477": {
-    "name": "RedZoneWorldEvent",
+    "name": "RedZoneEventCheatCleanup",
     "params": {
       "0": {
         "name": "timestamp",
@@ -11420,7 +11890,7 @@
     }
   },
   "EVENT:478": {
-    "name": "FactionWarfareStats",
+    "name": "RedZoneFortressEventChestOpened",
     "params": {
       "0": {
         "name": "",
@@ -11470,7 +11940,7 @@
     }
   },
   "EVENT:479": {
-    "name": "UpdateFactionBalanceFactors",
+    "name": "RedZoneWorldMapEvent",
     "params": {
       "0": {
         "name": "",
@@ -11480,7 +11950,7 @@
     }
   },
   "EVENT:480": {
-    "name": "FactionEnlistmentChanged",
+    "name": "FactionWarfareStats",
     "params": {
       "0": {
         "name": "",
@@ -11495,7 +11965,7 @@
     }
   },
   "EVENT:481": {
-    "name": "UpdateFactionRank",
+    "name": "UpdateFactionBalanceFactors",
     "params": {
       "0": {
         "name": "",
@@ -11510,7 +11980,7 @@
     }
   },
   "EVENT:482": {
-    "name": "FactionWarfareCampaignRewardsUnlocked",
+    "name": "FactionEnlistmentChanged",
     "params": {
       "0": {
         "name": "",
@@ -11520,11 +11990,11 @@
     }
   },
   "EVENT:483": {
-    "name": "FeaturedFeatureUpdate",
+    "name": "UpdateFactionRank",
     "params": {}
   },
   "EVENT:484": {
-    "name": "NewPowerCrystalObject",
+    "name": "FactionWarfareCampaignRewardsUnlocked",
     "params": {
       "0": {
         "name": "",
@@ -11584,7 +12054,7 @@
     }
   },
   "EVENT:485": {
-    "name": "MinimapCrystalPositionMarker",
+    "name": "FeaturedFeatureUpdate",
     "params": {
       "0": {
         "name": "",
@@ -11619,7 +12089,7 @@
     }
   },
   "EVENT:486": {
-    "name": "CarryPowerCrystalUpdate",
+    "name": "NewCarriableObject",
     "params": {
       "0": {
         "name": "",
@@ -11649,7 +12119,7 @@
     }
   },
   "EVENT:487": {
-    "name": "PickupPowerCrystalStart",
+    "name": "MinimapCrystalPositionMarker",
     "params": {
       "0": {
         "name": "",
@@ -11674,7 +12144,7 @@
     }
   },
   "EVENT:488": {
-    "name": "PickupPowerCrystalCancel",
+    "name": "CarriedObjectUpdate",
     "params": {
       "0": {
         "name": "",
@@ -11684,7 +12154,7 @@
     }
   },
   "EVENT:489": {
-    "name": "PickupPowerCrystalFinished",
+    "name": "PickupCarriableObjectStart",
     "params": {
       "0": {
         "name": "",
@@ -11704,15 +12174,46 @@
     }
   },
   "EVENT:490": {
-    "name": "DoSimpleActionStart",
-    "params": {}
+    "name": "PickupCarriableObjectCancel",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [24150..24150]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [11419196..11419196]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [11423196..11423196]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [5830..5830]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:491": {
-    "name": "DoSimpleActionCancel",
+    "name": "PickupCarriableObjectFinished",
     "params": {}
   },
   "EVENT:492": {
-    "name": "DoSimpleActionFinished",
+    "name": "DoSimpleActionStart",
     "params": {
       "0": {
         "name": "",
@@ -11742,10 +12243,80 @@
     }
   },
   "EVENT:493": {
-    "name": "NotifyGuestAccountVerified",
+    "name": "DoSimpleActionCancel",
     "params": {}
   },
   "EVENT:494": {
+    "name": "DoSimpleActionFinished",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int16; 6 distinct; range [-1..9]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 99% present; 20 distinct; range [9084..79594704]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 97% present; 17 distinct; range [1730..15160896]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 99% present; 20 distinct; range [3028..26531568]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int64; 98% present; 18 distinct; range [2049..36000000]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int64; 98% present; 18 distinct; range [227..4000000]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Int64; 98% present; 18 distinct; range [683..12000000]",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int64; high-card; range [9841889167..10036517768]",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [4..4]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) Dictionary`2; 1 distinct",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Dictionary`2; 1 distinct",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:495": {
+    "name": "NotifyGuestAccountVerified",
+    "params": {
+      "0": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
+  },
+  "EVENT:496": {
     "name": "MightAndFavorReceivedEvent",
     "params": {
       "0": {
@@ -11777,55 +12348,11 @@
         "name": "unknown8",
         "note": "",
         "resolveAs": ""
-      },
-      "1": {
-        "name": "",
-        "note": "(inferred) Int64; 99% present; 20 distinct; range [9084..79594704]",
-        "resolveAs": ""
-      },
-      "4": {
-        "name": "",
-        "note": "(inferred) Int64; 98% present; 18 distinct; range [2049..36000000]",
-        "resolveAs": ""
-      },
-      "7": {
-        "name": "",
-        "note": "(inferred) Int64; high-card; range [9841889167..10036517768]",
-        "resolveAs": ""
-      },
-      "9": {
-        "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [4..4]; small enum/flag byte",
-        "resolveAs": ""
-      },
-      "10": {
-        "name": "",
-        "note": "(inferred) Dictionary`2; 1 distinct",
-        "resolveAs": ""
-      },
-      "11": {
-        "name": "",
-        "note": "(inferred) Dictionary`2; 1 distinct",
-        "resolveAs": ""
       }
     }
-  },
-  "EVENT:495": {
-    "name": "WeeklyPvpChallengeRewardStateUpdate",
-    "params": {
-      "0": {
-        "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
-        "resolveAs": ""
-      }
-    }
-  },
-  "EVENT:496": {
-    "name": "NewUnlockedPvpSeasonChallengeRewards",
-    "params": {}
   },
   "EVENT:497": {
-    "name": "StaticDungeonEntrancesDungeonEventStatusUpdates",
+    "name": "WeeklyPvpChallengeRewardStateUpdate",
     "params": {
       "0": {
         "name": "",
@@ -11855,7 +12382,7 @@
     }
   },
   "EVENT:498": {
-    "name": "StaticDungeonDungeonValueUpdate",
+    "name": "NewUnlockedPvpSeasonChallengeRewards",
     "params": {
       "0": {
         "name": "",
@@ -11870,15 +12397,15 @@
     }
   },
   "EVENT:499": {
-    "name": "StaticDungeonEntranceDungeonEventsAborted",
+    "name": "StaticDungeonEntrancesDungeonEventStatusUpdates",
     "params": {}
   },
   "EVENT:500": {
-    "name": "InAppPurchaseConfirmedGooglePlay",
+    "name": "StaticDungeonDungeonValueUpdate",
     "params": {}
   },
   "EVENT:501": {
-    "name": "FeatureSwitchInfo",
+    "name": "StaticDungeonEntranceDungeonEventsAborted",
     "params": {
       "0": {
         "name": "",
@@ -11893,39 +12420,39 @@
     }
   },
   "EVENT:502": {
-    "name": "PartyJoinRequestAborted",
+    "name": "InAppPurchaseConfirmedGooglePlay",
     "params": {}
   },
   "EVENT:503": {
-    "name": "PartyInviteAborted",
+    "name": "FeatureSwitchInfo",
     "params": {}
   },
   "EVENT:504": {
-    "name": "PartyStartHuntRequest",
+    "name": "PartyJoinRequestAborted",
     "params": {}
   },
   "EVENT:505": {
-    "name": "PartyStartHuntRequested",
+    "name": "PartyInviteAborted",
     "params": {}
   },
   "EVENT:506": {
-    "name": "PartyStartHuntRequestAnswer",
+    "name": "PartyStartHuntRequest",
     "params": {}
   },
   "EVENT:507": {
-    "name": "PartyPlayerLeaveScheduled",
+    "name": "PartyStartHuntRequested",
     "params": {}
   },
   "EVENT:508": {
-    "name": "GuildInviteDeclined",
+    "name": "PartyStartHuntRequestAnswer",
     "params": {}
   },
   "EVENT:509": {
-    "name": "CancelMultiSpellSlots",
+    "name": "PartyPlayerLeaveScheduled",
     "params": {}
   },
   "EVENT:510": {
-    "name": "NewVisualEventObject",
+    "name": "GuildInviteDeclined",
     "params": {
       "0": {
         "name": "",
@@ -11975,7 +12502,7 @@
     }
   },
   "EVENT:511": {
-    "name": "CastleClaimProgress",
+    "name": "CancelMultiSpellSlots",
     "params": {
       "0": {
         "name": "",
@@ -12015,7 +12542,7 @@
     }
   },
   "EVENT:512": {
-    "name": "CastleClaimProgressLogo",
+    "name": "NewVisualEventObject",
     "params": {
       "0": {
         "name": "",
@@ -12065,7 +12592,7 @@
     }
   },
   "EVENT:513": {
-    "name": "TownPortalUpdateState",
+    "name": "CastleClaimProgress",
     "params": {
       "0": {
         "name": "",
@@ -12080,45 +12607,45 @@
     }
   },
   "EVENT:514": {
-    "name": "TownPortalFailed",
+    "name": "CastleClaimProgressLogo",
     "params": {}
   },
   "EVENT:515": {
-    "name": "ConsumableVanityChargesAdded",
+    "name": "TownPortalUpdateState",
     "params": {}
   },
   "EVENT:516": {
-    "name": "FestivitiesUpdate",
+    "name": "TownPortalFailed",
     "params": {
       "0": {
-        "name": "typeFlags",
-        "note": "Byte[]; per-entry flag (2 = daily)",
+        "name": "",
+        "note": "(inferred) Byte[]; 4 distinct; Byte[] array",
         "resolveAs": ""
       },
       "1": {
-        "name": "categories",
-        "note": "String[]; per-entry category",
+        "name": "",
+        "note": "(inferred) String[]; 4 distinct; String[] array",
         "resolveAs": ""
       },
       "2": {
-        "name": "uniqueNames",
-        "note": "String[]; festivity unique names",
+        "name": "",
+        "note": "(inferred) String[]; 8 distinct; String[] array",
         "resolveAs": ""
       },
       "3": {
-        "name": "startTicks",
-        "note": "Int64[]; per-entry start (.NET ticks UTC)",
+        "name": "",
+        "note": "(inferred) Int64[]; 8 distinct; Int64[] array",
         "resolveAs": ""
       },
       "4": {
-        "name": "endTicks",
-        "note": "Int64[]; per-entry end (.NET ticks UTC)",
+        "name": "",
+        "note": "(inferred) Int64[]; 8 distinct; Int64[] array",
         "resolveAs": ""
       }
     }
   },
   "EVENT:517": {
-    "name": "NewBannerObject",
+    "name": "ConsumableVanityChargesAdded",
     "params": {
       "0": {
         "name": "",
@@ -12148,43 +12675,38 @@
     }
   },
   "EVENT:518": {
-    "name": "NewMistsImmediateReturnExit",
+    "name": "FestivitiesUpdate",
     "params": {
       "0": {
-        "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [2207..2895]",
+        "name": "typeFlags",
+        "note": "Byte[]; per-entry flag (2 = daily)",
         "resolveAs": ""
       },
       "1": {
-        "name": "position",
-        "note": "(inferred) Single[]; 2 distinct; Single[2] world coords {x, y}?",
+        "name": "categories",
+        "note": "String[]; per-entry category",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "uniqueNames",
+        "note": "String[]; festivity unique names",
         "resolveAs": ""
       },
       "3": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; 2 distinct; range [639164263671742284..639164340490033659]; likely .NET ticks (UTC)",
+        "name": "startTicks",
+        "note": "Int64[]; per-entry start (.NET ticks UTC)",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "endTicks",
+        "note": "Int64[]; per-entry end (.NET ticks UTC)",
         "resolveAs": ""
       }
     }
   },
   "EVENT:519": {
-    "name": "MistsPlayerJoinedInfo",
+    "name": "NewBannerObject",
     "params": {
-      "2": {
-        "name": "mapId",
-        "note": "String; destination cluster for Mists or current cluster",
-        "resolveAs": ""
-      },
-      "4": {
-        "name": "originClusterId",
-        "note": "String; origin cluster player came from",
-        "resolveAs": ""
-      },
-      "3": {
-        "name": "isMistsEntry",
-        "note": "Boolean; true=entering Mists",
-        "resolveAs": ""
-      },
       "0": {
         "name": "",
         "note": "(inferred) Int64; 2 distinct; range [2207..2895]",
@@ -12193,6 +12715,16 @@
       "1": {
         "name": "timestamp",
         "note": "(inferred) Int64; 2 distinct; range [639164263671742284..639164340490033659]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
         "resolveAs": ""
       },
       "5": {
@@ -12203,7 +12735,7 @@
     }
   },
   "EVENT:520": {
-    "name": "NewMistsStaticEntrance",
+    "name": "NewMistsImmediateReturnExit",
     "params": {
       "0": {
         "name": "",
@@ -12223,15 +12755,51 @@
     }
   },
   "EVENT:521": {
-    "name": "NewMistsOpenWorldExit",
-    "params": {}
+    "name": "MistsPlayerJoinedInfo",
+    "params": {
+      "2": {
+        "name": "mapId",
+        "note": "String; destination cluster for Mists or current cluster",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "originClusterId",
+        "note": "String; origin cluster player came from",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "isMistsEntry",
+        "note": "Boolean; true=entering Mists",
+        "resolveAs": ""
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [518..518]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:522": {
-    "name": "NewTunnelExitTemp",
+    "name": "NewMistsStaticEntrance",
     "params": {}
   },
   "EVENT:523": {
-    "name": "NewMistsWispSpawn",
+    "name": "NewMistsOpenWorldExit",
     "params": {
       "0": {
         "name": "",
@@ -12256,7 +12824,7 @@
     }
   },
   "EVENT:524": {
-    "name": "MistsWispSpawnStateChange",
+    "name": "NewTunnelExitTemp",
     "params": {
       "0": {
         "name": "",
@@ -12266,7 +12834,7 @@
     }
   },
   "EVENT:525": {
-    "name": "NewMistsCityEntrance",
+    "name": "NewMistsWispSpawn",
     "params": {
       "0": {
         "name": "",
@@ -12286,19 +12854,19 @@
     }
   },
   "EVENT:526": {
-    "name": "NewMistsCityRoadsEntrance",
+    "name": "MistsWispSpawnStateChange",
     "params": {}
   },
   "EVENT:527": {
-    "name": "MistsCityRoadsEntrancePartyStateUpdate",
+    "name": "NewMistsCityEntrance",
     "params": {}
   },
   "EVENT:528": {
-    "name": "MistsCityRoadsEntranceClearStateForParty",
+    "name": "NewMistsCityRoadsEntrance",
     "params": {}
   },
   "EVENT:529": {
-    "name": "MistsEntranceDataChanged",
+    "name": "MistsCityRoadsEntrancePartyStateUpdate",
     "params": {
       "0": {
         "name": "",
@@ -12318,7 +12886,7 @@
     }
   },
   "EVENT:530": {
-    "name": "NewCagedObject",
+    "name": "MistsCityRoadsEntranceClearStateForParty",
     "params": {
       "0": {
         "name": "",
@@ -12348,7 +12916,7 @@
     }
   },
   "EVENT:531": {
-    "name": "CagedObjectStateUpdated",
+    "name": "MistsEntranceDataChanged",
     "params": {
       "0": {
         "name": "",
@@ -12363,19 +12931,19 @@
     }
   },
   "EVENT:532": {
-    "name": "EntrancePartyBindingCreated",
+    "name": "NewCagedObject",
     "params": {}
   },
   "EVENT:533": {
-    "name": "EntrancePartyBindingCleared",
+    "name": "CagedObjectStateUpdated",
     "params": {}
   },
   "EVENT:534": {
-    "name": "EntrancePartyBindingInfos",
+    "name": "EntrancePartyBindingCreated",
     "params": {}
   },
   "EVENT:535": {
-    "name": "NewMistsBorderExit",
+    "name": "EntrancePartyBindingCleared",
     "params": {
       "0": {
         "name": "",
@@ -12390,11 +12958,11 @@
     }
   },
   "EVENT:536": {
-    "name": "NewMistsDungeonExit",
+    "name": "EntrancePartyBindingInfos",
     "params": {}
   },
   "EVENT:537": {
-    "name": "LocalQuestInfos",
+    "name": "NewMistsBorderExit",
     "params": {
       "0": {
         "name": "",
@@ -12449,7 +13017,7 @@
     }
   },
   "EVENT:538": {
-    "name": "LocalQuestStarted",
+    "name": "NewMistsDungeonExit",
     "params": {
       "0": {
         "name": "",
@@ -12489,7 +13057,7 @@
     }
   },
   "EVENT:539": {
-    "name": "LocalQuestActive",
+    "name": "LocalQuestInfos",
     "params": {
       "0": {
         "name": "",
@@ -12499,7 +13067,7 @@
     }
   },
   "EVENT:540": {
-    "name": "LocalQuestInactive",
+    "name": "LocalQuestStarted",
     "params": {
       "0": {
         "name": "",
@@ -12509,7 +13077,7 @@
     }
   },
   "EVENT:541": {
-    "name": "LocalQuestProgressUpdate",
+    "name": "LocalQuestActive",
     "params": {
       "0": {
         "name": "",
@@ -12539,7 +13107,7 @@
     }
   },
   "EVENT:542": {
-    "name": "NewUnrestrictedPvpZone",
+    "name": "LocalQuestInactive",
     "params": {
       "0": {
         "name": "",
@@ -12564,15 +13132,31 @@
     }
   },
   "EVENT:543": {
-    "name": "TemporaryFlaggingStatusUpdate",
-    "params": {}
+    "name": "LocalQuestProgressUpdate",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [2854..2905]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:544": {
-    "name": "SpellTestPerformanceUpdate",
+    "name": "NewUnrestrictedPvpZone",
     "params": {}
   },
   "EVENT:545": {
-    "name": "Transformation",
+    "name": "TemporaryFlaggingStatusUpdate",
     "params": {
       "0": {
         "name": "objectId",
@@ -12607,7 +13191,7 @@
     }
   },
   "EVENT:546": {
-    "name": "TransformationEnd",
+    "name": "SpellTestPerformanceUpdate",
     "params": {
       "0": {
         "name": "objectId",
@@ -12622,11 +13206,11 @@
     }
   },
   "EVENT:547": {
-    "name": "UpdateTrustlevel",
+    "name": "Transformation",
     "params": {}
   },
   "EVENT:548": {
-    "name": "RevealHiddenTimeStamps",
+    "name": "TransformationEnd",
     "params": {
       "1": {
         "name": "",
@@ -12641,35 +13225,35 @@
     }
   },
   "EVENT:549": {
-    "name": "ModifyItemTraitFinished",
+    "name": "UpdateTrustlevel",
     "params": {}
   },
   "EVENT:550": {
-    "name": "RerollItemTraitValueFinished",
+    "name": "RevealHiddenTimeStamps",
     "params": {}
   },
   "EVENT:551": {
-    "name": "HuntQuestProgressInfo",
+    "name": "ModifyItemTraitFinished",
     "params": {}
   },
   "EVENT:552": {
-    "name": "HuntStarted",
+    "name": "RerollItemTraitValueFinished",
     "params": {}
   },
   "EVENT:553": {
-    "name": "HuntFinished",
+    "name": "HuntQuestProgressInfo",
     "params": {}
   },
   "EVENT:554": {
-    "name": "HuntAborted",
+    "name": "HuntStarted",
     "params": {}
   },
   "EVENT:555": {
-    "name": "HuntMissionStepStateUpdate",
+    "name": "HuntFinished",
     "params": {}
   },
   "EVENT:556": {
-    "name": "NewHuntTrack",
+    "name": "HuntAborted",
     "params": {
       "0": {
         "name": "objectId",
@@ -12714,15 +13298,15 @@
     }
   },
   "EVENT:557": {
-    "name": "HuntMissionUpdate",
+    "name": "HuntMissionStepStateUpdate",
     "params": {}
   },
   "EVENT:558": {
-    "name": "HuntQuestMissionProgressUpdate",
+    "name": "NewHuntTrack",
     "params": {}
   },
   "EVENT:559": {
-    "name": "HuntTrackUsed",
+    "name": "HuntMissionUpdate",
     "params": {
       "0": {
         "name": "",
@@ -12732,23 +13316,23 @@
     }
   },
   "EVENT:560": {
-    "name": "HuntTrackUseableAgain",
+    "name": "HuntQuestMissionProgressUpdate",
     "params": {}
   },
   "EVENT:561": {
-    "name": "MinimapHuntTrackMarkers",
+    "name": "HuntTrackUsed",
     "params": {}
   },
   "EVENT:562": {
-    "name": "NoTracksFound",
+    "name": "HuntTrackUseableAgain",
     "params": {}
   },
   "EVENT:563": {
-    "name": "HuntQuestAborted",
+    "name": "MinimapHuntTrackMarkers",
     "params": {}
   },
   "EVENT:564": {
-    "name": "InteractWithTrackStart",
+    "name": "NoTracksFound",
     "params": {
       "0": {
         "name": "",
@@ -12773,11 +13357,11 @@
     }
   },
   "EVENT:565": {
-    "name": "InteractWithTrackCancel",
+    "name": "HuntQuestAborted",
     "params": {}
   },
   "EVENT:566": {
-    "name": "InteractWithTrackFinished",
+    "name": "InteractWithTrackStart",
     "params": {
       "0": {
         "name": "",
@@ -12792,15 +13376,15 @@
     }
   },
   "EVENT:567": {
-    "name": "NewDynamicCompound",
+    "name": "InteractWithTrackCancel",
     "params": {}
   },
   "EVENT:568": {
-    "name": "LegendaryItemDestroyed",
+    "name": "InteractWithTrackFinished",
     "params": {}
   },
   "EVENT:569": {
-    "name": "AttunementInfo",
+    "name": "NewDynamicCompound",
     "params": {
       "0": {
         "name": "",
@@ -12825,51 +13409,51 @@
     }
   },
   "EVENT:570": {
-    "name": "TerritoryClaimRaidedRawEnergyCrystalResult",
+    "name": "LegendaryItemDestroyed",
     "params": {}
   },
   "EVENT:571": {
-    "name": "CarriedObjectExpiryWarning",
+    "name": "AttunementInfo",
     "params": {}
   },
   "EVENT:572": {
-    "name": "CarriedObjectExpired",
+    "name": "TerritoryClaimRaidedRawEnergyCrystalResult",
     "params": {}
   },
   "EVENT:573": {
-    "name": "TerritoryRaidStart",
+    "name": "CarriedObjectExpiryWarning",
     "params": {}
   },
   "EVENT:574": {
-    "name": "TerritoryRaidCancel",
+    "name": "CarriedObjectExpired",
     "params": {}
   },
   "EVENT:575": {
-    "name": "TerritoryRaidFinished",
+    "name": "TerritoryRaidStart",
     "params": {}
   },
   "EVENT:576": {
-    "name": "TerritoryRaidResult",
+    "name": "TerritoryRaidCancel",
     "params": {}
   },
   "EVENT:577": {
-    "name": "TerritoryMonolithActiveRaidStatus",
+    "name": "TerritoryRaidFinished",
     "params": {}
   },
   "EVENT:578": {
-    "name": "TerritoryMonolithActiveRaidCancelled",
+    "name": "TerritoryRaidResult",
     "params": {}
   },
   "EVENT:579": {
-    "name": "MonolithEnergyStorageUpdate",
+    "name": "TerritoryMonolithActiveRaidStatus",
     "params": {}
   },
   "EVENT:580": {
-    "name": "MonolithNextScheduledOpenWorldAttackUpdate",
+    "name": "TerritoryMonolithActiveRaidCancelled",
     "params": {}
   },
   "EVENT:581": {
-    "name": "MonolithProtectedBuildingsDamageReductionUpdate",
+    "name": "MonolithEnergyStorageUpdate",
     "params": {
       "0": {
         "name": "",
@@ -12894,11 +13478,11 @@
     }
   },
   "EVENT:582": {
-    "name": "NewBuildingBaseEvent",
+    "name": "MonolithNextScheduledOpenWorldAttackUpdate",
     "params": {}
   },
   "EVENT:583": {
-    "name": "NewFortificationBuilding",
+    "name": "MonolithProtectedBuildingsDamageReductionUpdate",
     "params": {
       "0": {
         "name": "objectId",
@@ -12968,7 +13552,7 @@
     }
   },
   "EVENT:584": {
-    "name": "NewCastleGateBuilding",
+    "name": "NewBuildingBaseEvent",
     "params": {
       "0": {
         "name": "",
@@ -13043,7 +13627,7 @@
     }
   },
   "EVENT:585": {
-    "name": "BuildingDurabilityUpdate",
+    "name": "NewFortificationBuilding",
     "params": {
       "0": {
         "name": "",
@@ -13063,47 +13647,47 @@
     }
   },
   "EVENT:586": {
-    "name": "MonolithFortificationPointsUpdate",
+    "name": "NewCastleGateBuilding",
     "params": {}
   },
   "EVENT:587": {
-    "name": "FortificationBuildingUpgradeInfo",
+    "name": "BuildingDurabilityUpdate",
     "params": {}
   },
   "EVENT:588": {
-    "name": "FortificationBuildingsDamageStateUpdate",
+    "name": "MonolithFortificationPointsUpdate",
     "params": {}
   },
   "EVENT:589": {
-    "name": "SiegeNotificationEvent",
+    "name": "FortificationBuildingUpgradeInfo",
     "params": {}
   },
   "EVENT:590": {
-    "name": "UpdateEnemyWarBannerActive",
+    "name": "FortificationBuildingsDamageStateUpdate",
     "params": {}
   },
   "EVENT:591": {
-    "name": "TerritoryAnnouncePlayerEjection",
+    "name": "SiegeNotificationEvent",
     "params": {}
   },
   "EVENT:592": {
-    "name": "CastleGateSwitchUseStarted",
+    "name": "UpdateEnemyWarBannerActive",
     "params": {}
   },
   "EVENT:593": {
-    "name": "CastleGateSwitchUseFinished",
+    "name": "TerritoryAnnouncePlayerEjection",
     "params": {}
   },
   "EVENT:594": {
-    "name": "FortificationBuildingWillDowngrade",
+    "name": "CastleGateSwitchUseStarted",
     "params": {}
   },
   "EVENT:595": {
-    "name": "BotCommand",
+    "name": "CastleGateSwitchUseFinished",
     "params": {}
   },
   "EVENT:596": {
-    "name": "JournalAchievementProgressUpdate",
+    "name": "FortificationBuildingWillDowngrade",
     "params": {
       "0": {
         "name": "",
@@ -13123,7 +13707,7 @@
     }
   },
   "EVENT:597": {
-    "name": "JournalClaimableRewardUpdate",
+    "name": "BotCommand",
     "params": {
       "0": {
         "name": "",
@@ -13133,11 +13717,11 @@
     }
   },
   "EVENT:598": {
-    "name": "KeySync",
+    "name": "JournalAchievementProgressUpdate",
     "params": {}
   },
   "EVENT:599": {
-    "name": "LocalQuestAreaGone",
+    "name": "JournalClaimableRewardUpdate",
     "params": {
       "0": {
         "name": "",
@@ -13147,7 +13731,7 @@
     }
   },
   "EVENT:600": {
-    "name": "DynamicTemplate",
+    "name": "KeySync",
     "params": {
       "0": {
         "name": "",
@@ -13172,43 +13756,137 @@
     }
   },
   "EVENT:601": {
-    "name": "DynamicTemplateForcedStateChange",
+    "name": "LocalQuestAreaGone",
     "params": {}
   },
   "EVENT:602": {
-    "name": "NewOutlandsTeleportationPortal",
-    "params": {}
+    "name": "DynamicTemplate",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [165..165]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:603": {
-    "name": "NewOutlandsTeleportationReturnPortal",
+    "name": "DynamicTemplateForcedStateChange",
     "params": {}
   },
   "EVENT:604": {
-    "name": "OutlandsTeleportationBindingCleared",
+    "name": "NewOutlandsTeleportationPortal",
     "params": {}
   },
   "EVENT:605": {
-    "name": "OutlandsTeleportationReturnPortalUpdateEvent",
+    "name": "NewOutlandsTeleportationReturnPortal",
     "params": {}
   },
   "EVENT:606": {
-    "name": "PlayerUsedOutlandsTeleportationPortal",
-    "params": {}
+    "name": "OutlandsTeleportationBindingCleared",
+    "params": {
+      "0": {
+        "name": "objectId",
+        "note": "(inferred) Int64; 69 distinct; range [3100757..3135893]; high-cardinality id at key 0",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:607": {
-    "name": "EncumberedRestricted",
+    "name": "OutlandsTeleportationReturnPortalUpdateEvent",
     "params": {}
   },
   "EVENT:608": {
-    "name": "NewPiledObject",
-    "params": {}
+    "name": "PlayerUsedOutlandsTeleportationPortal",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [23987..23987]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [12..12]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [5..5]",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639161280000000000..639161280000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639161280000000000..639161280000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:609": {
-    "name": "PiledObjectStateChanged",
-    "params": {}
+    "name": "EncumberedRestricted",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [23987..23987]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [4..5]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Int32; 50% present; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:610": {
-    "name": "NewSmugglerCrateDeliveryStation",
+    "name": "NewPiledObject",
     "params": {
       "0": {
         "name": "",
@@ -13223,7 +13901,7 @@
     }
   },
   "EVENT:611": {
-    "name": "KillRewardedNoFame",
+    "name": "PiledObjectStateChanged",
     "params": {
       "0": {
         "name": "",
@@ -13233,27 +13911,38 @@
     }
   },
   "EVENT:612": {
-    "name": "PickupFromPiledObjectStart",
+    "name": "NewSmugglerCrateDeliveryStation",
     "params": {}
   },
   "EVENT:613": {
-    "name": "PickupFromPiledObjectCancel",
+    "name": "KillRewardedNoFame",
     "params": {}
   },
   "EVENT:614": {
-    "name": "PickupFromPiledObjectReset",
+    "name": "PickupFromPiledObjectStart",
     "params": {}
   },
   "EVENT:615": {
-    "name": "PickupFromPiledObjectFinished",
-    "params": {}
+    "name": "PickupFromPiledObjectCancel",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [24835..24835]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:616": {
-    "name": "ArmoryActivityChange",
+    "name": "PickupFromPiledObjectReset",
     "params": {}
   },
   "EVENT:617": {
-    "name": "NewKillTrophyFurnitureBuilding",
+    "name": "PickupFromPiledObjectFinished",
     "params": {
       "0": {
         "name": "",
@@ -13343,67 +14032,67 @@
     }
   },
   "EVENT:618": {
-    "name": "HellDungeonsPlayerJoinedInfo",
+    "name": "ArmoryActivityChange",
     "params": {}
   },
   "EVENT:619": {
-    "name": "NewTileSwitchTrigger",
+    "name": "NewKillTrophyFurnitureBuilding",
     "params": {}
   },
   "EVENT:620": {
-    "name": "NewMultiRewardObject",
+    "name": "HellDungeonsPlayerJoinedInfo",
     "params": {}
   },
   "EVENT:621": {
-    "name": "NewHellDungeonSoulShrineObject",
+    "name": "NewTileSwitchTrigger",
     "params": {}
   },
   "EVENT:622": {
-    "name": "HellDungeonSoulShrineStateUpdate",
+    "name": "NewMultiRewardObject",
     "params": {}
   },
   "EVENT:623": {
-    "name": "NewResurrectionShrine",
+    "name": "NewHellDungeonSoulShrineObject",
     "params": {}
   },
   "EVENT:624": {
-    "name": "UpdateResurrectionShrine",
+    "name": "HellDungeonSoulShrineStateUpdate",
     "params": {}
   },
   "EVENT:625": {
-    "name": "StandTimeFinished",
+    "name": "NewResurrectionShrine",
     "params": {}
   },
   "EVENT:626": {
-    "name": "EpicAchievementAndStatsUpdate",
+    "name": "UpdateResurrectionShrine",
     "params": {}
   },
   "EVENT:627": {
-    "name": "SpectateTargetAfterDeathUpdate",
+    "name": "StandTimeFinished",
     "params": {}
   },
   "EVENT:628": {
-    "name": "SpectateTargetAfterDeathEnded",
+    "name": "EpicAchievementAndStatsUpdate",
     "params": {}
   },
   "EVENT:629": {
-    "name": "NewHellDungeonUpwardExit",
+    "name": "SpectateTargetAfterDeathUpdate",
     "params": {}
   },
   "EVENT:630": {
-    "name": "NewHellDungeonSoulExit",
+    "name": "SpectateTargetAfterDeathEnded",
     "params": {}
   },
   "EVENT:631": {
-    "name": "NewHellDungeonDownwardExit",
+    "name": "NewHellDungeonUpwardExit",
     "params": {}
   },
   "EVENT:632": {
-    "name": "NewHellDungeonChestExit",
+    "name": "NewHellDungeonSoulExit",
     "params": {}
   },
   "EVENT:633": {
-    "name": "NewCorruptedStaticEntrance",
+    "name": "NewHellDungeonDownwardExit",
     "params": {
       "0": {
         "name": "",
@@ -13428,7 +14117,7 @@
     }
   },
   "EVENT:634": {
-    "name": "NewHellDungeonStaticEntrance",
+    "name": "NewHellDungeonChestExit",
     "params": {
       "0": {
         "name": "",
@@ -13458,7 +14147,7 @@
     }
   },
   "EVENT:635": {
-    "name": "UpdateHellDungeonStaticEntranceState",
+    "name": "NewCorruptedStaticEntrance",
     "params": {
       "0": {
         "name": "",
@@ -13478,11 +14167,11 @@
     }
   },
   "EVENT:636": {
-    "name": "DebugTriggerHellDungeonShutdownStart",
+    "name": "NewHellDungeonStaticEntrance",
     "params": {}
   },
   "EVENT:637": {
-    "name": "FullJournalQuestInfo",
+    "name": "UpdateHellDungeonStaticEntranceState",
     "params": {
       "0": {
         "name": "objectId",
@@ -13492,35 +14181,46 @@
     }
   },
   "EVENT:638": {
-    "name": "JournalQuestProgressInfo",
+    "name": "DebugTriggerHellDungeonShutdownStart",
     "params": {}
   },
   "EVENT:639": {
-    "name": "NewHellDungeonRoomShrineObject",
+    "name": "FullJournalQuestInfo",
     "params": {}
   },
   "EVENT:640": {
-    "name": "HellDungeonRoomShrineStateUpdate",
+    "name": "JournalQuestProgressInfo",
     "params": {}
   },
   "EVENT:641": {
-    "name": "SimpleBehaviourBuildingStateUpdate",
-    "params": {}
+    "name": "NewHellDungeonRoomShrineObject",
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [217..217]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 3 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:642": {
-    "name": "SetTimeScaling",
+    "name": "HellDungeonRoomShrineStateUpdate",
     "params": {}
   },
   "EVENT:643": {
-    "name": "StopTimeScaling",
+    "name": "SimpleBehaviourBuildingStateUpdate",
     "params": {}
   },
   "EVENT:644": {
-    "name": "KeyValidation",
+    "name": "SetTimeScaling",
     "params": {}
   },
   "EVENT:645": {
-    "name": "PlayerJoinMapMarkerTimerStates",
+    "name": "StopTimeScaling",
     "params": {
       "0": {
         "name": "",
@@ -13545,7 +14245,7 @@
     }
   },
   "EVENT:646": {
-    "name": "NewMapMarkerTimer",
+    "name": "KeyValidation",
     "params": {
       "0": {
         "name": "",
@@ -13570,7 +14270,7 @@
     }
   },
   "EVENT:647": {
-    "name": "RemoveMapMarkerTimer",
+    "name": "PlayerJoinMapMarkerTimerStates",
     "params": {
       "0": {
         "name": "",
@@ -13580,7 +14280,7 @@
     }
   },
   "EVENT:648": {
-    "name": "NewFactionFortressObject",
+    "name": "NewMapMarkerTimer",
     "params": {
       "0": {
         "name": "",
@@ -13645,11 +14345,11 @@
     }
   },
   "EVENT:649": {
-    "name": "FactionFortressAnnouncePlayerEjection",
+    "name": "RemoveMapMarkerTimer",
     "params": {}
   },
   "EVENT:650": {
-    "name": "RewardFactionWarfareSupply",
+    "name": "NewFactionFortressObject",
     "params": {
       "0": {
         "name": "",
@@ -13669,35 +14369,35 @@
     }
   },
   "EVENT:651": {
-    "name": "FactionCaptureAreaProgressUpdate",
+    "name": "FactionFortressAnnouncePlayerEjection",
     "params": {}
   },
   "EVENT:652": {
-    "name": "FactionFortressClaimed",
+    "name": "RewardFactionWarfareSupply",
     "params": {}
   },
   "EVENT:653": {
-    "name": "FactionFortressWeaponCachesSpawned",
+    "name": "FactionCaptureAreaProgressUpdate",
     "params": {}
   },
   "EVENT:654": {
-    "name": "FactionFortressWeaponCacheClaimed",
+    "name": "FactionFortressClaimed",
     "params": {}
   },
   "EVENT:655": {
-    "name": "FactionFortressFightStateUpdate",
+    "name": "FactionFortressWeaponCachesSpawned",
     "params": {}
   },
   "EVENT:656": {
-    "name": "FactionFortressCutoffFightStateUpdate",
+    "name": "FactionFortressWeaponCacheClaimed",
     "params": {}
   },
   "EVENT:657": {
-    "name": "FactionFortressFightEnded",
+    "name": "FactionFortressFightStateUpdate",
     "params": {}
   },
   "EVENT:658": {
-    "name": "NewFactionWarfarePortal",
+    "name": "FactionFortressCutoffFightStateUpdate",
     "params": {
       "0": {
         "name": "",
@@ -13727,7 +14427,7 @@
     }
   },
   "EVENT:659": {
-    "name": "FactionPortalTargetUpdate",
+    "name": "FactionFortressFightEnded",
     "params": {
       "0": {
         "name": "",
@@ -13817,7 +14517,7 @@
     }
   },
   "EVENT:660": {
-    "name": "FactionFortressFightStartedInRemoteClusterEvent",
+    "name": "NewFactionWarfarePortal",
     "params": {
       "0": {
         "name": "",
@@ -13837,11 +14537,11 @@
     }
   },
   "EVENT:661": {
-    "name": "FactionFortressFightFinishedInRemoteClusterEvent",
+    "name": "FactionPortalTargetUpdate",
     "params": {}
   },
   "EVENT:662": {
-    "name": "FactionDuchySupplyWarDefensiveVictoryEvent",
+    "name": "FactionFortressFightStartedInRemoteClusterEvent",
     "params": {
       "0": {
         "name": "",
@@ -13866,19 +14566,19 @@
     }
   },
   "EVENT:663": {
-    "name": "FactionDuchyReconnectedFromCutoffEvent",
+    "name": "FactionFortressFightFinishedInRemoteClusterEvent",
     "params": {}
   },
   "EVENT:664": {
-    "name": "FactionFortressCutoffFightCancelledByClusterOwnerChangeEvent",
+    "name": "FactionDuchySupplyWarDefensiveVictoryEvent",
     "params": {}
   },
   "EVENT:665": {
-    "name": "FactionDuchyEnteredCutoffStateEvent",
+    "name": "FactionDuchyReconnectedFromCutoffEvent",
     "params": {}
   },
   "EVENT:666": {
-    "name": "LeaveProtectionStateUpdate",
+    "name": "FactionFortressCutoffFightCancelledByClusterOwnerChangeEvent",
     "params": {
       "0": {
         "name": "objectId",
@@ -13918,11 +14618,11 @@
     }
   },
   "EVENT:667": {
-    "name": "RedZoneEventStandings",
+    "name": "FactionDuchyEnteredCutoffStateEvent",
     "params": {}
   },
   "EVENT:668": {
-    "name": "NewFactionBattleStandardDeliveryStation",
+    "name": "LeaveProtectionStateUpdate",
     "params": {
       "0": {
         "name": "",
@@ -13952,59 +14652,71 @@
     }
   },
   "EVENT:669": {
-    "name": "NewLoreSnippetObject",
+    "name": "RedZoneEventStandings",
     "params": {}
   },
   "EVENT:670": {
-    "name": "LoreSnippetObjectStateUpdate",
+    "name": "NewFactionBattleStandardDeliveryStation",
     "params": {}
   },
   "EVENT:671": {
-    "name": "LoreSnippedClaimed",
+    "name": "NewLoreSnippetObject",
     "params": {}
   },
   "EVENT:672": {
-    "name": "LoreSnippetStatesChangedByCheat",
+    "name": "LoreSnippetObjectStateUpdate",
     "params": {}
   },
   "EVENT:673": {
-    "name": "NewTeleporterNode",
+    "name": "LoreSnippedClaimed",
     "params": {}
   },
   "EVENT:674": {
-    "name": "TeleporterNodeStateChanged",
+    "name": "LoreSnippetStatesChangedByCheat",
     "params": {}
   },
   "EVENT:675": {
-    "name": "TeleporterConnectionsFullStateUpdate",
+    "name": "NewTeleporterNode",
     "params": {}
   },
   "EVENT:676": {
-    "name": "TeleporterConnectionStateChanged",
+    "name": "TeleporterNodeStateChanged",
     "params": {}
   },
   "EVENT:677": {
-    "name": "RetrieveCarriableObjectStart",
+    "name": "TeleporterConnectionsFullStateUpdate",
     "params": {}
   },
   "EVENT:678": {
-    "name": "RetrieveCarriableObjectCancel",
+    "name": "TeleporterConnectionStateChanged",
     "params": {}
   },
   "EVENT:679": {
-    "name": "RetrieveCarriableObjectReset",
+    "name": "RetrieveCarriableObjectStart",
     "params": {}
   },
   "EVENT:680": {
-    "name": "RetrieveCarriableObjectFinished",
+    "name": "RetrieveCarriableObjectCancel",
     "params": {}
   },
   "EVENT:681": {
-    "name": "LosingCarriableObjectStart",
+    "name": "RetrieveCarriableObjectReset",
     "params": {}
   },
   "EVENT:682": {
+    "name": "RetrieveCarriableObjectFinished",
+    "params": {}
+  },
+  "EVENT:683": {
+    "name": "LosingCarriableObjectStart",
+    "params": {}
+  },
+  "EVENT:684": {
     "name": "LosingCarriableObjectFinished",
+    "params": {}
+  },
+  "EVENT:685": {
+    "name": "NotifyPlatformAccountConfirmed",
     "params": {}
   },
   "REQUEST:0": {
@@ -14336,7 +15048,18 @@
   },
   "REQUEST:29": {
     "name": "InventoryDestroyItem",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [3123007..3123007]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [9..9]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:30": {
     "name": "InventoryMoveItem",
@@ -14840,7 +15563,18 @@
   },
   "REQUEST:68": {
     "name": "ConstructionSiteCreate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [425..425]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:69": {
     "name": "PlaceableObjectPlace",
@@ -15790,7 +16524,18 @@
   },
   "REQUEST:144": {
     "name": "GetCharacterSteamAchievements",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 3 distinct; range [167..658]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:145": {
     "name": "GetCharacterStats",
@@ -15814,7 +16559,13 @@
   },
   "REQUEST:146": {
     "name": "GetKillHistoryDetails",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:147": {
     "name": "ReSpecAchievement",
@@ -16141,7 +16892,28 @@
   },
   "REQUEST:180": {
     "name": "ClaimAttachmentFromMail",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [1369132187..1369132187]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [-1..-1]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [657..657]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:181": {
     "name": "ApplyToGuild",
@@ -16594,7 +17366,33 @@
   },
   "REQUEST:239": {
     "name": "QuestGiverRequest",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 20 distinct; range [639170784000000000..639170784000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 4 distinct; range [119..711]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 3 distinct; range [1..3]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [0..2]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:240": {
     "name": "GoldMarketGetBuyOffer",
@@ -16654,7 +17452,28 @@
   },
   "REQUEST:254": {
     "name": "UseShrine",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639170784000000000..639170784000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [132..132]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [604..604]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:255": {
     "name": "UseHellgateShrine",
@@ -16736,7 +17555,13 @@
   },
   "REQUEST:266": {
     "name": "FriendInvite",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:267": {
     "name": "FriendAnswerInvitation",
@@ -16901,7 +17726,23 @@
   },
   "REQUEST:294": {
     "name": "UsePortalEntrance",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [7..7]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [600..600]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:295": {
     "name": "ResetPortalBinding",
@@ -16909,11 +17750,28 @@
   },
   "REQUEST:296": {
     "name": "QueryPortalBinding",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [599..599]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:297": {
     "name": "ClaimPaymentTransaction",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [656..656]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:298": {
     "name": "ChangeUseFlag",
@@ -17129,7 +17987,33 @@
   },
   "REQUEST:315": {
     "name": "AuctionSellSpecificItemRequest",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [8..8]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 3 distinct; range [3010959672..3081297479]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 3 distinct; range [4022..6848]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 33% present; 1 distinct; range [2..2]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [1..11]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:316": {
     "name": "FishingStart",
@@ -17822,7 +18706,13 @@
   },
   "REQUEST:431": {
     "name": "ClaimFactionWarfareWeeklyReport",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1500..1500]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:432": {
     "name": "GetFactionWarfareCampaignData",
@@ -18104,6 +18994,11 @@
         "name": "",
         "note": "(inferred) Int64; 2 distinct; range [1212..1244]",
         "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Boolean; 25% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
@@ -18225,11 +19120,53 @@
   },
   "REQUEST:484": {
     "name": "QuickSellAuctionQueryAction",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [8..183]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32[]; 4 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 4 distinct; range [590..649]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:485": {
     "name": "QuickSellAuctionSellAction",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [8..183]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32[]; 3 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64[]; 3 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 3 distinct; range [591..650]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:486": {
     "name": "FcmTokenToServer",
@@ -18443,11 +19380,28 @@
   },
   "REQUEST:513": {
     "name": "RequestOutlandsTeleportationUsage",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [603..603]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:514": {
     "name": "PickupFromPiledObjectStart",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639161280000000000..639161280000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [23987..23987]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:515": {
     "name": "PickupFromPiledObjectCancel",
@@ -18687,6 +19641,22 @@
   },
   "REQUEST:539": {
     "name": "RetrieveCarriableObjectCancel",
+    "params": {}
+  },
+  "REQUEST:540": {
+    "name": "ForfeitCustomMatch",
+    "params": {}
+  },
+  "REQUEST:541": {
+    "name": "GetPartyMemberCluster",
+    "params": {}
+  },
+  "REQUEST:542": {
+    "name": "SetPartyNavigation",
+    "params": {}
+  },
+  "REQUEST:543": {
+    "name": "EndPartyNavigation",
     "params": {}
   },
   "RESPONSE:0": {
@@ -19229,6 +20199,16 @@
         "name": "",
         "note": "(inferred) Boolean; 1 distinct",
         "resolveAs": ""
+      },
+      "122": {
+        "name": "",
+        "note": "(inferred) Boolean; 1% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "124": {
+        "name": "",
+        "note": "(inferred) Boolean; 1% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
@@ -19710,7 +20690,13 @@
   },
   "RESPONSE:68": {
     "name": "ConstructionSiteCreate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [407..407]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:69": {
     "name": "PlaceableObjectPlace",
@@ -20364,7 +21350,43 @@
   },
   "RESPONSE:144": {
     "name": "GetCharacterSteamAchievements",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int16[]/Int32[]; 3 distinct; Int16[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) String[]; 2 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 3 distinct; range [167..658]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:145": {
     "name": "GetCharacterStats",
@@ -20874,7 +21896,13 @@
   },
   "RESPONSE:180": {
     "name": "ClaimAttachmentFromMail",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [657..657]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:181": {
     "name": "ApplyToGuild",
@@ -21023,6 +22051,11 @@
       "255": {
         "name": "",
         "note": "(inferred) Int32; 6 distinct; range [31..2034]",
+        "resolveAs": ""
+      },
+      "24": {
+        "name": "",
+        "note": "(inferred) Int32; 9% present; 1 distinct; range [3..3]",
         "resolveAs": ""
       }
     }
@@ -22199,7 +23232,13 @@
   },
   "RESPONSE:254": {
     "name": "UseShrine",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [604..604]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:255": {
     "name": "UseHellgateShrine",
@@ -22268,7 +23307,48 @@
   },
   "RESPONSE:266": {
     "name": "FriendInvite",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [33..33]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [56..56]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [3..3]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:267": {
     "name": "FriendAnswerInvitation",
@@ -22431,7 +23511,13 @@
   },
   "RESPONSE:294": {
     "name": "UsePortalEntrance",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [600..600]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:295": {
     "name": "ResetPortalBinding",
@@ -22439,7 +23525,23 @@
   },
   "RESPONSE:296": {
     "name": "QueryPortalBinding",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [599..599]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:297": {
     "name": "ClaimPaymentTransaction",
@@ -22447,6 +23549,11 @@
       "1": {
         "name": "isReSpecBoostActive",
         "note": "Bool",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [656..656]",
         "resolveAs": ""
       }
     }
@@ -22792,6 +23899,26 @@
       "255": {
         "name": "",
         "note": "(inferred) Int32; high-card; range [0..1749]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String[]; 0% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) String[]; 0% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Byte[]; 0% present; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Boolean[]; 0% present; 1 distinct; Boolean[] array",
         "resolveAs": ""
       }
     }
@@ -23310,12 +24437,33 @@
         "name": "",
         "note": "(inferred) Int32; 2 distinct; range [37..48]",
         "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 14% present; 1 distinct; range [2..2]",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "",
+        "note": "(inferred) Int64; 29% present; 2 distinct; range [443973230..532037455]",
+        "resolveAs": ""
+      },
+      "15": {
+        "name": "",
+        "note": "(inferred) Int64; 14% present; 1 distinct; range [112472626..112472626]",
+        "resolveAs": ""
       }
     }
   },
   "RESPONSE:431": {
     "name": "ClaimFactionWarfareWeeklyReport",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1500..1500]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:432": {
     "name": "GetFactionWarfareCampaignData",
@@ -23845,11 +24993,43 @@
   },
   "RESPONSE:484": {
     "name": "QuickSellAuctionQueryAction",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32[]; 4 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String[]; 4 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 4 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 4 distinct; range [590..649]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:485": {
     "name": "QuickSellAuctionSellAction",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64[]; 3 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 3 distinct; range [591..650]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:486": {
     "name": "FcmTokenToServer",
@@ -24191,7 +25371,28 @@
   },
   "RESPONSE:513": {
     "name": "RequestOutlandsTeleportationUsage",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [100000000..100000000]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [100000000..100000000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [603..603]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:514": {
     "name": "PickupFromPiledObjectStart",
@@ -24648,6 +25849,22 @@
   },
   "RESPONSE:539": {
     "name": "RetrieveCarriableObjectCancel",
+    "params": {}
+  },
+  "RESPONSE:540": {
+    "name": "ForfeitCustomMatch",
+    "params": {}
+  },
+  "RESPONSE:541": {
+    "name": "GetPartyMemberCluster",
+    "params": {}
+  },
+  "RESPONSE:542": {
+    "name": "SetPartyNavigation",
+    "params": {}
+  },
+  "RESPONSE:543": {
+    "name": "EndPartyNavigation",
     "params": {}
   }
 }
