@@ -12,7 +12,11 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
+
+# Serialize runs so two crons never push to main at once (the rebase-retry below is the backstop).
+concurrency:
+  group: digest-sync
+  cancel-in-progress: false
 
 jobs:
   sync:
@@ -102,48 +106,31 @@ jobs:
         if: steps.archive.outputs.new != '0'
         run: dotnet build AlbionPacketExplorer.slnx -clp:ErrorsOnly
 
-      - name: Open PR
+      # The fold is machine-generated and build-gated above, so there is nothing for a human to
+      # review in the regenerated JSON. Commit straight to main. The Archive step only counts
+      # digests not already on the checked-out main tree, so a re-run never re-folds the same
+      # digest - which is why this no longer needs branches, PRs, or open-PR dedup (the old
+      # PR flow stalled on never-merged PRs and spawned a sibling branch every 2h).
+      - name: Commit fold to main
         if: steps.archive.outputs.new != '0'
         env:
-          # APX_PR_TOKEN is a fine-grained PAT with Pull requests: read/write and Contents: read.
-          # Falls back to the default GITHUB_TOKEN if unset (works on public repos).
-          # See tools/digest-worker/README.md for token setup.
-          GH_TOKEN: ${{ secrets.APX_PR_TOKEN || github.token }}
           NEW: ${{ steps.archive.outputs.new }}
         run: |
-          BRANCH="digest-sync/$(date -u +%Y%m%d-%H%M)"
           git config user.name "apx-digest-sync"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
           git add tools/digest-worker/digests tools/digest-overlay.json \
                   src/AlbionPacketExplorer/Assets/packet-schema.base.json
           if git diff --staged --quiet; then
-            echo "Nothing changed after fold; skipping PR."
+            echo "Nothing changed after fold; nothing to commit."
             exit 0
           fi
           git commit -m "packet(app): fold $NEW shared digest(s) into schema"
-          git push -u origin "$BRANCH"
-          # Collect digest basenames staged in this branch
-          STAGED_DIGESTS=$(git diff --name-only origin/main...HEAD -- tools/digest-worker/digests/ | xargs -I{} basename {})
-          # Check if any open digest-sync PR already covers the same files
-          SKIP_PR=false
-          for PR_NUM in $(gh pr list --base main --state open --json number,headRefName --jq '.[] | select(.headRefName | startswith("digest-sync/")) | .number'); do
-            PR_FILES=$(gh pr view "$PR_NUM" --json files --jq '[.files[].path | select(startswith("tools/digest-worker/digests/")) | split("/")[-1]] | join("\n")')
-            # If every staged digest basename appears in this PR's files, it's a duplicate
-            ALL_FOUND=true
-            while IFS= read -r f; do
-              if ! echo "$PR_FILES" | grep -qF "$f"; then
-                ALL_FOUND=false
-                break
-              fi
-            done <<< "$STAGED_DIGESTS"
-            if $ALL_FOUND; then
-              echo "Open PR #$PR_NUM already covers these digests; skipping duplicate PR."
-              SKIP_PR=true
-              break
-            fi
+          # Land on main even if another run pushed meanwhile; the fold is regenerable so a
+          # rebase-retry is always safe. ponytail: 3 tries covers concurrent 2h crons; if it
+          # ever races harder, serialize the workflow with concurrency: instead.
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main && git push origin HEAD:main && exit 0
+            echo "push race, retrying ($i)"
           done
-          if $SKIP_PR; then exit 0; fi
-          gh pr create --base main --head "$BRANCH" \
-            --title "packet(app): fold $NEW shared digest(s) into schema" \
-            --body "Automated digest sync from the apx-digest worker. Review the schema diff, then merge. Digest archive: tools/digest-worker/digests/."
+          echo "could not land fold on main after retries" >&2
+          exit 1
