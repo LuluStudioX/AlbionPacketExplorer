@@ -9,13 +9,13 @@ namespace AlbionPacketExplorer.Services;
 
 public sealed class UpdateService
 {
-    // The update feed is served from our own site (a static Velopack feed behind a Cloudflare
-    // tunnel), so the GitHub source repo can stay private and no token ever ships in the client.
-    // Override per machine with APX_UPDATE_URL; otherwise the baked-in default is used.
-    private const string DefaultFeedUrl = "https://projects.lulustudio.dk/apx/feed";
+    // The repo is public, so the updater reads releases straight from GitHub: no token ships in the
+    // client and there is no separate feed host to keep in sync. Override the repo per machine with
+    // APX_UPDATE_REPO (e.g. to test against a fork); otherwise the baked-in default is used.
+    private const string DefaultRepoUrl = "https://github.com/LuluStudioX/AlbionPacketExplorer";
 
-    private static string FeedUrl =>
-        Environment.GetEnvironmentVariable("APX_UPDATE_URL") is { Length: > 0 } u ? u : DefaultFeedUrl;
+    private static string RepoUrl =>
+        Environment.GetEnvironmentVariable("APX_UPDATE_REPO") is { Length: > 0 } r ? r : DefaultRepoUrl;
 
     private readonly UpdateManager _mgr;
 
@@ -24,7 +24,9 @@ public sealed class UpdateService
         // Each platform/arch is packed under its own Velopack channel (win-x64, linux-x64,
         // osx-x64, osx-arm64), so the updater asks for the channel matching the running RID.
         _mgr = new UpdateManager(
-            new SimpleWebSource(FeedUrl),
+            // Public repo -> no access token needed. Velopack reads releases.<channel>.json from the
+            // latest GitHub release's assets, which the release workflow uploads per channel.
+            new GithubSource(RepoUrl, accessToken: null, prerelease: false),
             new UpdateOptions { ExplicitChannel = CurrentChannel() });
     }
 
@@ -75,7 +77,8 @@ public sealed class UpdateService
             var target = ParseVersion(info.TargetFullRelease.Version.ToString());
             if (target == null) return null;
 
-            var url = $"{FeedUrl.TrimEnd('/')}/releases.{CurrentChannel()}.json";
+            // The cumulative feed rides on the latest release; latest/download always serves it.
+            var url = $"{RepoUrl.TrimEnd('/')}/releases/latest/download/releases.{CurrentChannel()}.json";
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
             await using var stream = await http.GetStreamAsync(url);
             var feed = await JsonSerializer.DeserializeAsync<FeedDocument>(stream, FeedJson);
