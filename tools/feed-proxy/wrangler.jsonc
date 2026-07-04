@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "apx-feed-proxy",
+  "main": "index.js",
+  "compatibility_date": "2026-06-01",
+  // Route lives on the project-page host; only the feed path is intercepted, the rest falls through
+  // to GitHub Pages. Requires the projects.lulustudio.dk DNS record to be proxied (orange cloud).
+  "routes": [
+    { "pattern": "projects.lulustudio.dk/apx/feed/*", "zone_name": "lulustudio.dk" }
+  ]
+}

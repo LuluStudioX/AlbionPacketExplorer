@@ -63,7 +63,7 @@ jobs:
       - name: Download existing feed for cumulative release
         shell: bash
         run: |
-          vpk download http --url https://projects.lulustudio.dk/apx/feed \
+          vpk download github --repoUrl https://github.com/LuluStudioX/AlbionPacketExplorer \
             --channel win-x64 --outputDir releases/win-x64 \
             || echo "no existing feed yet (first cumulative release or feed unreachable); packing fresh"
 
@@ -131,7 +131,7 @@ jobs:
       - name: Download existing feed for cumulative release
         shell: bash
         run: |
-          vpk download http --url https://projects.lulustudio.dk/apx/feed \
+          vpk download github --repoUrl https://github.com/LuluStudioX/AlbionPacketExplorer \
             --channel linux-x64 --outputDir releases/linux-x64 \
             || echo "no existing feed yet (first cumulative release or feed unreachable); packing fresh"
 
@@ -196,7 +196,7 @@ jobs:
       - name: Download existing feed for cumulative release
         shell: bash
         run: |
-          vpk download http --url https://projects.lulustudio.dk/apx/feed \
+          vpk download github --repoUrl https://github.com/LuluStudioX/AlbionPacketExplorer \
             --channel osx-x64 --outputDir releases/osx-x64 \
             || echo "no existing feed yet (first cumulative release or feed unreachable); packing fresh"
 
@@ -260,7 +260,7 @@ jobs:
       - name: Download existing feed for cumulative release
         shell: bash
         run: |
-          vpk download http --url https://projects.lulustudio.dk/apx/feed \
+          vpk download github --repoUrl https://github.com/LuluStudioX/AlbionPacketExplorer \
             --channel osx-arm64 --outputDir releases/osx-arm64 \
             || echo "no existing feed yet (first cumulative release or feed unreachable); packing fresh"
 
