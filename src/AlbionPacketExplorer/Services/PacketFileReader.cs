@@ -335,11 +335,30 @@ public class PacketFileReader
         var items = new List<(PacketEntry Entry, ParamSet Params)>(ArrayBatchSize);
 
         // Stream the array element-by-element so a giant array file is never fully materialized.
-        await foreach (var el in JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(stream, options))
+        // Enumerate manually so a malformed/truncated tail - a capture killed mid-write leaves the
+        // final element torn and the array unclosed - salvages every valid element before it instead
+        // of throwing the whole file away (the NDJSON path is already per-line resilient). Only a
+        // JSON error ends the stream early, and it is logged, not swallowed silently.
+        await using var e = JsonSerializer
+            .DeserializeAsyncEnumerable<JsonElement>(stream, options)
+            .GetAsyncEnumerator();
+        while (true)
         {
+            bool has;
+            try
+            {
+                has = await e.MoveNextAsync();
+            }
+            catch (JsonException ex)
+            {
+                AppDiagnostics.Log($"array read: truncated/corrupt tail; salvaged the valid prefix ({ex.Message})");
+                break;
+            }
+            if (!has) break;
+
             PacketEntry? entry = null;
             ParamSet ps = ParamSet.Empty;
-            try { entry = ParseElement(el, store, out ps); } catch { }
+            try { entry = ParseElement(e.Current, store, out ps); } catch { }
             if (entry == null) continue;
 
             items.Add((entry, ps));
