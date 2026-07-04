@@ -32,4 +32,16 @@ public static class PacketWire
             kv => (object)new { type = kv.Value.Type, value = kv.Value.Value });
         return wire;
     }
+
+    /// <summary>
+    /// Shape a packet with its opcode rewritten to a canonical value (era normalization for merge).
+    /// Only the top-level <c>code</c> changes; params - including the 253/252 wire-code mirror - stay
+    /// verbatim as the original raw payload, so the pre-normalization code is still recoverable.
+    /// </summary>
+    public static Dictionary<string, object?> ToJsonShape(PacketEntry p, ParamSet ps, int code)
+    {
+        var wire = ToJsonShape(p, ps);
+        wire["code"] = code;
+        return wire;
+    }
 }

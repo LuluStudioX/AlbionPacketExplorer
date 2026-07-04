@@ -108,6 +108,91 @@ public sealed class ProtocolSnapshotStore
     /// binding a previously opened capture left active.</summary>
     public void RestoreLive() => new ProtocolOverrideStore().Load();
 
+    // ---- normalization (cross-era merge) ----------------------------------
+
+    /// <summary>The era a capture was stamped with, or null when it has no sidecar.</summary>
+    public Snapshot? EraFromSidecar(string capturePath)
+    {
+        var meta = ReadSidecar(capturePath);
+        return meta is null ? null : TryLoad(meta.Fingerprint);
+    }
+
+    /// <summary>Best-effort era for an unstamped capture, from the codes it contains.</summary>
+    public Snapshot? DetectEra(IReadOnlyCollection<(string Kind, int Code)> observed)
+        => DetectEra(LoadAll(), AppBaseline(), observed);
+
+    /// <summary>
+    /// Picks the era a capture was recorded under from the distinct codes it uses. Conservative on
+    /// purpose: if the app's current enums already define every observed code it is treated as the
+    /// current era (returns null, no remap); a remap fires only when the current enums CANNOT explain
+    /// some code (a removed/shifted ordinal leaves a hole) and an older snapshot explains all of them.
+    /// A pure rename with no removed codes is indistinguishable from current and left as-is.
+    /// </summary>
+    public static Snapshot? DetectEra(
+        IReadOnlyList<Snapshot> candidates, Snapshot canonical,
+        IReadOnlyCollection<(string Kind, int Code)> observed)
+    {
+        if (observed.Count == 0) return null;
+        int Cover(Snapshot s) => observed.Count(o => Defines(s, o.Kind, o.Code));
+
+        // Current enums explain everything -> current era, nothing to normalize.
+        if (Cover(canonical) == observed.Count) return null;
+
+        Snapshot? best = null;
+        int bestCover = -1;
+        foreach (var s in candidates)
+        {
+            if (s.Fingerprint == canonical.Fingerprint) continue;
+            int c = Cover(s);
+            if (c > bestCover) { bestCover = c; best = s; }
+        }
+        // Only act on a confident hit: the era must explain every observed code.
+        return best is not null && bestCover == observed.Count ? best : null;
+    }
+
+    private static bool Defines(Snapshot s, string kind, int code)
+    {
+        var enumName = kind.Equals("EVENT", StringComparison.OrdinalIgnoreCase) ? "EventCodes" : "OperationCodes";
+        return s.Enums.TryGetValue(enumName, out var map) && map.ContainsValue(code);
+    }
+
+    /// <summary>The (kind, wireCode) -> canonical code map that normalizes an era to the app's current
+    /// enums. Empty when the era already matches the app baseline.</summary>
+    public static Dictionary<(string Kind, int Code), int> CanonicalRemap(Snapshot era)
+        => ProtocolRemap.Build(era.Enums, AppBaseline().Enums).Aliases;
+
+    /// <summary>Every stored era snapshot plus the app baseline (first, so detection ties keep it).</summary>
+    public IReadOnlyList<Snapshot> LoadAll()
+    {
+        var list = new List<Snapshot> { AppBaseline() };
+        try
+        {
+            if (Directory.Exists(Dir))
+                foreach (var f in Directory.EnumerateFiles(Dir, "*.json"))
+                {
+                    try
+                    {
+                        var s = JsonSerializer.Deserialize<Snapshot>(File.ReadAllText(f), JsonOpts);
+                        if (s is not null && list.All(x => x.Fingerprint != s.Fingerprint)) list.Add(s);
+                    }
+                    catch { /* skip a corrupt snapshot */ }
+                }
+        }
+        catch { }
+        return list;
+    }
+
+    /// <summary>Stamp a normalized output as the canonical (app baseline) era.</summary>
+    public void StampCanonical(string capturePath)
+    {
+        try
+        {
+            var meta = new CaptureMeta(AppBaseline().Fingerprint, null, DateTime.UtcNow.ToString("O"));
+            File.WriteAllText(SidecarOf(capturePath), JsonSerializer.Serialize(meta, JsonOpts));
+        }
+        catch { }
+    }
+
     // ---- snapshot persistence ---------------------------------------------
 
     public Snapshot? TryLoad(string fingerprint)

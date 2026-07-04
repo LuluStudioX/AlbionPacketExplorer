@@ -5,8 +5,9 @@ using AlbionPacketExplorer.Models;
 
 namespace AlbionPacketExplorer.Services;
 
-/// <summary>Per-input outcome of a merge: how many packets it contributed (or why it failed).</summary>
-public sealed record MergeFileResult(string Path, string Name, long Emitted, string? Error);
+/// <summary>Per-input outcome of a merge: how many packets it contributed (or why it failed), and
+/// how many of those had their opcode normalized from an older protocol era to the current one.</summary>
+public sealed record MergeFileResult(string Path, string Name, long Emitted, string? Error, long Remapped = 0);
 
 /// <summary>Aggregate result of a merge run.</summary>
 public sealed record MergeResult(
@@ -44,11 +45,16 @@ public sealed class PacketMergeService
     /// outputs that share an original capture cannot double its packets. The first occurrence in
     /// input order is kept; later identical lines are dropped and counted.
     /// </param>
+    // Codes are sampled from at most this many packets to detect an unstamped capture's era before
+    // normalizing; a stamped capture (sidecar) skips the sample entirely.
+    private const int EraSampleCap = 200_000;
+
     public async Task<MergeResult> MergeAsync(
         IReadOnlyList<string> inputs, string outputPath, bool dedupe = true,
-        IProgress<double>? progress = null, CancellationToken ct = default)
+        IProgress<double>? progress = null, CancellationToken ct = default, bool normalize = true)
     {
         var reader = new PacketFileReader();
+        var snapshots = new ProtocolSnapshotStore();
         var results = new List<MergeFileResult>(inputs.Count);
         long totalEmitted = 0;
         long duplicatesRemoved = 0;
@@ -76,11 +82,38 @@ public sealed class PacketMergeService
                 long start = doneBytes;
 
                 long emitted = 0;
+                long remapped = 0;
                 string? error = null;
                 try
                 {
                     var fileProgress = new Progress<double>(p =>
                         progress?.Report(Math.Min(1.0, (start + p * fileBytes) / (double)totalBytes)));
+
+                    // Detect the era this input was captured under and build its code-normalization
+                    // map (absent when it is already the current era). A stamped capture reads its
+                    // sidecar; an unstamped one samples its codes to detect the era.
+                    Dictionary<(string Kind, int Code), int>? codeMap = null;
+                    if (normalize)
+                    {
+                        var era = snapshots.EraFromSidecar(input);
+                        if (era is null)
+                        {
+                            var observed = new HashSet<(string, int)>();
+                            int sampled = 0;
+                            await foreach (var e in reader.ReadAsync(input))
+                            {
+                                observed.Add((e.Kind, e.Code));
+                                if (++sampled >= EraSampleCap) break;
+                                ct.ThrowIfCancellationRequested();
+                            }
+                            era = snapshots.DetectEra(observed);
+                        }
+                        if (era is not null)
+                        {
+                            var map = ProtocolSnapshotStore.CanonicalRemap(era);
+                            if (map.Count > 0) codeMap = map;
+                        }
+                    }
 
                     // Read the file as ordered batches (the reader parses in parallel). For each batch
                     // the CPU-heavy work - shaping every packet to its canonical UTF-8 JSON line and
@@ -97,8 +130,15 @@ public sealed class PacketMergeService
                         Parallel.For(0, n, i =>
                         {
                             var (entry, ps) = batch.Items[i];
+                            int code = entry.Code;
+                            if (codeMap is not null &&
+                                codeMap.TryGetValue((entry.Kind, entry.Code), out var nc) && nc != code)
+                            {
+                                code = nc;
+                                System.Threading.Interlocked.Increment(ref remapped);
+                            }
                             byte[] line = JsonSerializer.SerializeToUtf8Bytes(
-                                PacketWire.ToJsonShape(entry, ps), CompactJson);
+                                PacketWire.ToJsonShape(entry, ps, code), CompactJson);
                             lines[i] = line;
                             if (hashes is not null) hashes[i] = Hash(line);
                         });
@@ -125,11 +165,15 @@ public sealed class PacketMergeService
                 doneBytes += fileBytes;
                 progress?.Report(Math.Min(1.0, doneBytes / (double)totalBytes));
                 totalEmitted += emitted;
-                results.Add(new MergeFileResult(input, Path.GetFileName(input), emitted, error));
+                results.Add(new MergeFileResult(input, Path.GetFileName(input), emitted, error, remapped));
             }
 
             await outStream.FlushAsync(ct);
         }
+
+        // The merged output is now entirely in the app's current code space; stamp it canonical so
+        // reopening it needs no era remap.
+        if (normalize) snapshots.StampCanonical(outputPath);
 
         long outBytes = 0;
         try { outBytes = new FileInfo(outputPath).Length; } catch { /* report 0 */ }

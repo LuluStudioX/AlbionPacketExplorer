@@ -81,4 +81,40 @@ public class ProtocolRemapTests
         var after = new Dictionary<string, Dictionary<string, int>> { ["OperationCodes"] = new() { ["A"] = 2 } };
         Assert.NotEqual(ProtocolSnapshotStore.Fingerprint(before), ProtocolSnapshotStore.Fingerprint(after));
     }
+
+    // --- era detection (drives merge normalization) ---
+
+    private static ProtocolSnapshotStore.Snapshot Snap(string fp, Dictionary<string, int> events, Dictionary<string, int> ops)
+        => new(fp, null, new() { ["EventCodes"] = events, ["OperationCodes"] = ops });
+
+    [Fact]
+    public void DetectEra_is_null_when_current_enums_explain_every_code()
+    {
+        var current = Snap("cur", new() { ["Move"] = 3 }, new() { ["Bank"] = 516 });
+        var june = Snap("june", new() { ["Move"] = 3 }, new() { ["Bank"] = 520 });
+        var observed = new[] { ("RESPONSE", 516), ("EVENT", 3) };
+        // The log's codes all exist in current -> current era, nothing to normalize.
+        Assert.Null(ProtocolSnapshotStore.DetectEra(new[] { current, june }, current, observed));
+    }
+
+    [Fact]
+    public void DetectEra_picks_the_old_era_for_a_code_current_no_longer_defines()
+    {
+        var current = Snap("cur", new() { ["Move"] = 3 }, new() { ["Bank"] = 516 });
+        var june = Snap("june", new() { ["Move"] = 3 }, new() { ["Bank"] = 520 });
+        // Log uses op 520 (June bank), a hole in the current enums -> detect June and remap.
+        var observed = new[] { ("RESPONSE", 520), ("EVENT", 3) };
+        var era = ProtocolSnapshotStore.DetectEra(new[] { current, june }, current, observed);
+        Assert.Equal("june", era?.Fingerprint);
+    }
+
+    [Fact]
+    public void DetectEra_is_null_when_no_snapshot_covers_all_codes()
+    {
+        var current = Snap("cur", new() { ["Move"] = 3 }, new() { ["Bank"] = 516 });
+        var june = Snap("june", new() { ["Move"] = 3 }, new() { ["Bank"] = 520 });
+        // 999 exists in no snapshot -> too uncertain to remap, stay safe (null = canonical).
+        var observed = new[] { ("RESPONSE", 999) };
+        Assert.Null(ProtocolSnapshotStore.DetectEra(new[] { current, june }, current, observed));
+    }
 }
