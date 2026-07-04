@@ -19,7 +19,9 @@ public sealed record ProtocolScanResult(
     string? MetadataPath,
     string Fingerprint,
     bool LowConfidence,
-    IReadOnlyList<ProtocolChange> Changes)
+    IReadOnlyList<ProtocolChange> Changes,
+    // The live client's enum ordinals (name -> code) per enum, for snapshotting the era. Null on failure.
+    IReadOnlyDictionary<string, Dictionary<string, int>>? LiveEnums = null)
 {
     public bool HasChanges => Changes.Count > 0;
     public int AddedCount => Changes.Count(c => c.Type == ProtocolChangeType.Added);
@@ -109,7 +111,7 @@ public sealed class ProtocolScanService
 
         var fingerprint = Fingerprint(client.Version, live);
         return new ProtocolScanResult(true, null, client.Version, client.MetadataPath,
-            fingerprint, lowConfidence, changes);
+            fingerprint, lowConfidence, changes, live);
     }
 
     private static void Diff(string enumName,

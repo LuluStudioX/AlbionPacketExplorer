@@ -21,10 +21,11 @@ public static class AppPaths
     [
         "settings.json", "layout.json", "filter-presets.json", "filter-last.json",
         "row-hidden.json", "row-hide-presets.json", "items.json", "packet-schema.user.json",
-        "enum-labels.json", "code-notes.json", "protocol-scan.json", "protocol-overrides.json"
+        "enum-labels.json", "code-notes.json", "protocol-scan.json", "protocol-overrides.json",
+        "protocol-active.json"
     ];
 
-    private static readonly string[] DataSubDirs = ["icons", "logs", "lang"];
+    private static readonly string[] DataSubDirs = ["icons", "logs", "lang", "protocol-snapshots"];
 
     /// <summary>The fixed default base, used when no override is set. Always under LocalAppData.</summary>
     public static string DefaultBaseDir { get; } = Path.Combine(
@@ -60,6 +61,11 @@ public static class AppPaths
     public static string CodeNotes        => Path.Combine(BaseDir, "code-notes.json");
     public static string ProtocolState    => Path.Combine(BaseDir, "protocol-scan.json");
     public static string ProtocolOverrides => Path.Combine(BaseDir, "protocol-overrides.json");
+    /// <summary>Pointer to the protocol era fresh captures are stamped with (last scanned client).</summary>
+    public static string ProtocolActive   => Path.Combine(BaseDir, "protocol-active.json");
+    /// <summary>One JSON per client protocol revision (enum ordinals), keyed by fingerprint, so an old
+    /// capture stays readable after a patch renumbers codes.</summary>
+    public static string ProtocolSnapshotsDir => Path.Combine(BaseDir, "protocol-snapshots");
     public static string LangDir          => Path.Combine(BaseDir, "lang");
     public static string LogsDir          => Path.Combine(BaseDir, "logs");
 

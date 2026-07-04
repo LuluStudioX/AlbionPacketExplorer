@@ -21,6 +21,7 @@ public partial class ProtocolScanViewModel : ObservableObject
     private readonly ToastService _toasts;
     private readonly Action _save;
     private readonly ProtocolOverrideStore _overrides = new();
+    private readonly ProtocolSnapshotStore _snapshots = new();
 
     // Persisted settings (mirrored into AppSettings via the save callback).
     [ObservableProperty] private bool _enabled;
@@ -123,6 +124,9 @@ public partial class ProtocolScanViewModel : ObservableObject
             var result = await Task.Run(() => _scan.Scan(path));
             ApplyResult(result);
             ApplyLocally(result);
+            // Record this client's protocol era so captures taken now stay readable after a later
+            // patch renumbers codes. Runs on every successful scan, independent of the opt-in webhook.
+            if (result.Ok) _snapshots.SaveLive(result.ClientVersion, result.LiveEnums);
             if (notify) await MaybeNotifyAsync(result);
         }
         finally

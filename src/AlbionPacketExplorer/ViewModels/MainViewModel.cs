@@ -23,6 +23,9 @@ public partial class MainViewModel : ObservableObject
     private readonly DomainStringStore _domainStrings = new();
     private readonly UpdateService _updater = new();
     private readonly ProtocolScanService _protocolScanService = new();
+    // Binds an opened capture to the protocol era it was recorded under, so old files stay readable
+    // after a game patch renumbers codes (remap by name). Also stamps fresh captures with their era.
+    private readonly ProtocolSnapshotStore _snapshots = new();
 
     [ObservableProperty] private CodeAggregatorViewModel _aggregator = new();
     [ObservableProperty] private PacketListViewModel _packetList = new();
@@ -282,6 +285,9 @@ public partial class MainViewModel : ObservableObject
         var saved = AppSettingsStore.Load();
         // Built before any toggle assignment below so SaveSettings() can always read it.
         ProtocolScan = new ProtocolScanViewModel(_protocolScanService, _filePicker, _toasts, SaveSettings, saved);
+        // Persist the app's own compiled enums as a protocol era so captures made without ever running
+        // a client scan still bind to a known snapshot after a future app upgrade shifts the enums.
+        _snapshots.EnsureAppBaseline();
         _packetDetail.ResolveItemNames = saved.ResolveItemNames;
         PacketList.SetResolveItemNames(saved.ResolveItemNames);
         _packetDetail.IconMode = saved.IconMode;
@@ -502,6 +508,9 @@ public partial class MainViewModel : ObservableObject
     private void StartCapture()
     {
         ResetData();
+        // Live capture decodes with today's protocol: drop any era binding a previously opened
+        // capture left on the resolver/schema and restore the live overlay.
+        _snapshots.RestoreLive();
 
         _session = new CaptureSession(_paramStore, OnLivePacketBatch, msg => StatusText = msg, OnRawPacket);
 
@@ -614,8 +623,10 @@ public partial class MainViewModel : ObservableObject
         {
             var opts = new JsonSerializerOptions { WriteIndented = true };
             var payload = _allPackets.Select(PacketWire.ToJsonShape);
-            await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
-            await JsonSerializer.SerializeAsync(stream, payload, opts);
+            await using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+                await JsonSerializer.SerializeAsync(stream, payload, opts);
+            // Stamp the era so this capture stays readable after a future patch renumbers codes.
+            _snapshots.StampCapture(path);
             StatusText = Loc.Format("status.saved", _allPackets.Count.ToString("N0"), Path.GetFileName(path));
         }
         catch (Exception ex) { StatusText = Loc.Format("status.saveFailed", ex.Message); }
@@ -670,6 +681,7 @@ public partial class MainViewModel : ObservableObject
         LoadProgress = 0;
         StatusText = Loc.Format("status.loading", Path.GetFileName(path));
         ResetData();
+        _snapshots.BindCaptureEra(path);
 
         var loaded = new List<PacketEntry>();
         try
@@ -725,6 +737,9 @@ public partial class MainViewModel : ObservableObject
         LoadProgress = 0;
         StatusText = Loc.Format("status.loading", Path.GetFileName(path));
         ResetData();
+        // Resolve this file under the protocol era it was captured in (sidecar), remapping any
+        // renumbered codes by name; no sidecar restores the live overlay (unchanged behaviour).
+        _snapshots.BindCaptureEra(path);
 
         var reader = new PacketFileReader();
         var progress = new Progress<double>(p => LoadProgress = p);
@@ -906,9 +921,10 @@ public partial class MainViewModel : ObservableObject
             var path = Path.Combine(dir, $"packets_{DateTime.Now:yyyyMMdd_HHmmss}.json");
             var opts = new JsonSerializerOptions { WriteIndented = false };
             var payload = _allPackets.Select(PacketWire.ToJsonShape);
-            await using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None,
-                bufferSize: 65536, useAsync: true);
-            await JsonSerializer.SerializeAsync(stream, payload, opts);
+            await using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None,
+                bufferSize: 65536, useAsync: true))
+                await JsonSerializer.SerializeAsync(stream, payload, opts);
+            _snapshots.StampCapture(path);
         }
         catch { }
     }
