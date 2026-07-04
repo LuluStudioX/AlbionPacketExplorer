@@ -44,7 +44,7 @@
       "0": {
         "name": "objectId",
         "note": "(inferred) Int64; high-card; range [263..1926817]; high-cardinality id at key 0",
-        "resolveAs": ""
+        "resolveAs": "entity"
       },
       "1": {
         "name": "",
@@ -103,7 +103,7 @@
       "0": {
         "name": "affectedObjectId",
         "note": "Int64",
-        "resolveAs": ""
+        "resolveAs": "entity"
       },
       "1": {
         "name": "timeStamp",
@@ -866,7 +866,7 @@
       "0": {
         "name": "objectId",
         "note": "Int64",
-        "resolveAs": ""
+        "resolveAs": "entity"
       },
       "1": {
         "name": "name",

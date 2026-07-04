@@ -37,6 +37,12 @@ public partial class SettingsViewModel : ObservableObject
         set => _main.ResolveItemNames = value;
     }
 
+    public bool ResolveEntityNames
+    {
+        get => _main.ResolveEntityNames;
+        set => _main.ResolveEntityNames = value;
+    }
+
     public IReadOnlyList<IconCacheMode> IconModeOptions { get; } =
         [IconCacheMode.Off, IconCacheMode.Memory, IconCacheMode.Disk];
 
@@ -353,6 +359,9 @@ public partial class SettingsViewModel : ObservableObject
                     break;
                 case nameof(MainViewModel.ResolveItemNames):
                     OnPropertyChanged(nameof(ResolveItemNames));
+                    break;
+                case nameof(MainViewModel.ResolveEntityNames):
+                    OnPropertyChanged(nameof(ResolveEntityNames));
                     break;
                 case nameof(MainViewModel.IconMode):
                     OnPropertyChanged(nameof(IconMode));

@@ -157,6 +157,21 @@
                     <Border Classes="card" Padding="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="{loc:T settings.display.resolveEntities}" FontWeight="SemiBold" />
+                                <TextBlock Text="{loc:T settings.display.resolveEntities.desc}"
+                                           Foreground="Gray" FontSize="12" TextWrapping="Wrap" />
+                                <TextBlock Text="{loc:T settings.display.resolveEntities.note}"
+                                           Foreground="Gray" FontSize="11" TextWrapping="Wrap" Opacity="0.6" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding ResolveEntityNames}"
+                                         VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <Border Classes="card" Padding="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="3">
                                 <TextBlock Text="{loc:T settings.display.density}" FontWeight="SemiBold" />
                                 <TextBlock Text="{loc:T settings.display.density.desc}"
                                            Foreground="Gray" FontSize="12" TextWrapping="Wrap" />

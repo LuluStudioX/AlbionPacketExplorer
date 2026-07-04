@@ -31,6 +31,7 @@ public partial class EditParamViewModel : ObservableObject
 
     public EditParamViewModel(PacketSchemaService schema, ResolveEnumStore resolveEnums,
                                DomainStringStore domainStrings, GameRefStore gameRefs,
+                               EntityNameStore entities,
                                string kind, int code,
                                string key, string currentName, string currentNote,
                                string currentResolveAs, Action onSaved,
@@ -41,6 +42,7 @@ public partial class EditParamViewModel : ObservableObject
             .Concat(resolveEnums.ResolveAsOptions())
             .Concat(domainStrings.ResolveAsOptions())
             .Concat(gameRefs.ResolveAsOptions())
+            .Concat(entities.ResolveAsOptions())
             .ToList();
         _kind = kind;
         _code = code;

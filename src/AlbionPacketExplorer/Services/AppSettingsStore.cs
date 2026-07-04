@@ -41,7 +41,10 @@ public record AppSettings(
     bool ProtocolScanOnStartup = false,
     string? ProtocolWebhookUrl = null, // deprecated: migrated into ProtocolWebhooks on load
     string? AlbionClientPath = null,
-    string[]? ProtocolWebhooks = null)
+    string[]? ProtocolWebhooks = null,
+    // Appended (not inserted) so the positional call site in MainViewModel.SaveSettings stays valid;
+    // JSON round-trips by property name, so old settings files without this key default to false.
+    bool ResolveEntityNames = false)
 {
     public static readonly AppSettings Default = new();
 

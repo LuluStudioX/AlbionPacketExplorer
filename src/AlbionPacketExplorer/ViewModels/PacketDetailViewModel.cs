@@ -154,12 +154,14 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     private readonly LocStringStore _locStrings;
     private readonly DomainStringStore _domainStrings;
     private readonly GameRefStore _gameRefs;
+    private readonly EntityNameStore _entities;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
     [ObservableProperty] private ObservableCollection<ParamRow> _rows = [];
     [ObservableProperty] private ObservableCollection<ParamDiffRow> _diffRows = [];
     [ObservableProperty] private bool _resolveItemNames;
+    [ObservableProperty] private bool _resolveEntityNames;
     [ObservableProperty] private IconCacheMode _iconMode = IconCacheMode.Disk;
 
     private bool IconsEnabled => IconMode != IconCacheMode.Off;
@@ -293,7 +295,8 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema,
                                  RowHideStore hideStore, EnumLabelStore enumLabels,
                                  ResolveEnumStore resolveEnums, LocStringStore locStrings,
-                                 DomainStringStore domainStrings, GameRefStore gameRefs)
+                                 DomainStringStore domainStrings, GameRefStore gameRefs,
+                                 EntityNameStore entities)
     {
         _gameData = gameData;
         _icons = icons;
@@ -304,6 +307,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         _locStrings = locStrings;
         _domainStrings = domainStrings;
         _gameRefs = gameRefs;
+        _entities = entities;
         _hideStore.Load();
         _enumLabels.Load();
         _resolveEnums.Load();
@@ -359,6 +363,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
     public void ForceRebuild() => RebuildRows();
     partial void OnResolveItemNamesChanged(bool value) => RebuildRows();
+    partial void OnResolveEntityNamesChanged(bool value) => RebuildRows();
     partial void OnForceExpandRowsChanged(bool value)
     {
         if (_allRows.Count > 0)
@@ -441,6 +446,18 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
                     resolved = $"{hits[0].UniqueName} - {hits[0].DisplayName}";
                 else if (hits.Count > 1)
                     resolvedItems = hits;
+            }
+            // Entity ids (resolveAs "entity"/"player"): a transient wire id -> name learned from this
+            // capture's naming events. Gated by the toggle; only ever sets a resolved-name string (no
+            // uniqueName), so it never triggers an item-icon lookup for a player name that has none.
+            else if (ResolveEntityNames && _entities.IsEntityResolve(resolveAs))
+            {
+                var names = new List<string>();
+                foreach (var code in RefKeys(pv))
+                    if (_entities.TryResolve(resolveAs, code, out var entName))
+                        names.Add(entName);
+                if (names.Count > 0)
+                    resolved = string.Join(", ", names);
             }
             else if (ResolveItemNames && _gameData.IsLoaded)
             {
@@ -711,7 +728,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         var existing = _schema.GetParam(Packet.Kind, Packet.Code, SelectedRow.Key);
         var src = _schema.GetParamSource(Packet.Kind, Packet.Code, SelectedRow.Key);
         var vm = new EditParamViewModel(
-            _schema, _resolveEnums, _domainStrings, _gameRefs,
+            _schema, _resolveEnums, _domainStrings, _gameRefs, _entities,
             Packet.Kind, Packet.Code, SelectedRow.Key,
             existing?.Name ?? string.Empty,
             existing?.Note ?? string.Empty,

@@ -22,6 +22,9 @@ public partial class MainViewModel : ObservableObject
     private readonly LocStringStore _locStrings = new();
     private readonly DomainStringStore _domainStrings = new();
     private readonly GameRefStore _gameRefs = new();
+    // Learns entityId -> name from naming events in the loaded/streamed capture (session-scoped,
+    // reset per dataset), so "entity"/"player"-tagged params resolve raw ids to names.
+    private readonly EntityNameStore _entities = new();
     private readonly UpdateService _updater = new();
     private readonly ProtocolScanService _protocolScanService = new();
     // Binds an opened capture to the protocol era it was recorded under, so old files stay readable
@@ -95,6 +98,20 @@ public partial class MainViewModel : ObservableObject
         {
             _packetDetail.ResolveItemNames = value;
             PacketList.SetResolveItemNames(value);
+            OnPropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    /// <summary>Resolve numeric entityId params to the character name learned from this capture's
+    /// naming events. Independent of item-name resolution and needs no game data (it is learned from
+    /// the packets themselves); harvesting always runs, this only gates the display.</summary>
+    public bool ResolveEntityNames
+    {
+        get => _packetDetail.ResolveEntityNames;
+        set
+        {
+            _packetDetail.ResolveEntityNames = value;
             OnPropertyChanged();
             SaveSettings();
         }
@@ -270,13 +287,14 @@ public partial class MainViewModel : ObservableObject
             ProtocolScanOnStartup: ProtocolScan?.ScanOnStartup ?? false,
             ProtocolWebhookUrl: null,
             AlbionClientPath: string.IsNullOrWhiteSpace(ProtocolScan?.ClientPathOverride) ? null : ProtocolScan!.ClientPathOverride,
-            ProtocolWebhooks: ProtocolScan?.WebhookUrls is { Count: > 0 } w ? w.ToArray() : null));
+            ProtocolWebhooks: ProtocolScan?.WebhookUrls is { Count: > 0 } w ? w.ToArray() : null,
+            ResolveEntityNames: ResolveEntityNames));
 
     public MainViewModel(IFilePicker filePicker, ToastService toasts)
     {
         _filePicker = filePicker;
         _toasts = toasts;
-        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore, _enumLabels, _resolveEnums, _locStrings, _domainStrings, _gameRefs);
+        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore, _enumLabels, _resolveEnums, _locStrings, _domainStrings, _gameRefs, _entities);
         _packetDetail.CorrelatedPacketRequested += PacketList.SelectPacket;
         _packetDetail.FollowValueRequested += PacketList.FollowValue;
         Aggregator.Schema = _schema;
@@ -291,6 +309,7 @@ public partial class MainViewModel : ObservableObject
         _snapshots.EnsureAppBaseline();
         _packetDetail.ResolveItemNames = saved.ResolveItemNames;
         PacketList.SetResolveItemNames(saved.ResolveItemNames);
+        _packetDetail.ResolveEntityNames = saved.ResolveEntityNames;
         _packetDetail.IconMode = saved.IconMode;
         _packetDetail.ForceExpandRows = saved.ForceExpandRows;
         SidebarVisible = saved.SidebarVisible;
@@ -702,7 +721,7 @@ public partial class MainViewModel : ObservableObject
                     try { parser.ReceivePacket(payload); } catch { /* skip undecodable */ }
                 }
 
-                foreach (var pe in loaded) { Aggregator.Ingest(pe); _correlator.Observe(pe); }
+                foreach (var pe in loaded) { Aggregator.Ingest(pe); _correlator.Observe(pe); _entities.Observe(pe); }
             });
 
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
@@ -792,6 +811,7 @@ public partial class MainViewModel : ObservableObject
                             foreach (var (packet, _) in batch.Items)
                             {
                                 _correlator.Observe(packet);
+                                _entities.Observe(packet);
                                 loaded.Add(packet);
                             }
                             swConsume.Stop();
@@ -868,6 +888,7 @@ public partial class MainViewModel : ObservableObject
             _allPackets.Add(packet);
             Aggregator.Ingest(packet);
             _correlator.Observe(packet);
+            _entities.Observe(packet);
         }
 
         // One UI batch-append and one flush per timer tick; per-packet appends starve the UI
@@ -895,6 +916,7 @@ public partial class MainViewModel : ObservableObject
         _allPackets.Clear();
         _rawSpill.Clear();
         _correlator.Reset();
+        _entities.Reset();
         Aggregator.Reset();
         PacketList.SetSource([]);
         PacketDetail.Packet = null;
