@@ -28362,7 +28362,7 @@
       "2": {
         "name": "locationId",
         "note": "location short-id; first digit = city (0 Thetford, 1 Lymhurst, 2 Bridgewatch, 3 Caerleon, 4 Fort Sterling, 5 Brecilien)",
-        "resolveAs": ""
+        "resolveAs": "location"
       },
       "3": {
         "name": "locationType",
@@ -28462,7 +28462,7 @@
       "2": {
         "name": "itemType",
         "note": "item type id per stack",
-        "resolveAs": ""
+        "resolveAs": "itemIndex"
       },
       "3": {
         "name": "",
@@ -28539,9 +28539,9 @@
         "resolveAs": ""
       },
       "2": {
-        "name": "",
-        "note": "(inferred) String[]; 95% present; 14 distinct; String[] array",
-        "resolveAs": ""
+        "name": "locationId",
+        "note": "world cluster @Index; resolves to the map name",
+        "resolveAs": "location"
       },
       "3": {
         "name": "",

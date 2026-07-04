@@ -21,6 +21,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ResolveEnumStore _resolveEnums = new();
     private readonly LocStringStore _locStrings = new();
     private readonly DomainStringStore _domainStrings = new();
+    private readonly GameRefStore _gameRefs = new();
     private readonly UpdateService _updater = new();
     private readonly ProtocolScanService _protocolScanService = new();
     // Binds an opened capture to the protocol era it was recorded under, so old files stay readable
@@ -275,7 +276,7 @@ public partial class MainViewModel : ObservableObject
     {
         _filePicker = filePicker;
         _toasts = toasts;
-        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore, _enumLabels, _resolveEnums, _locStrings, _domainStrings);
+        _packetDetail = new PacketDetailViewModel(_gameData, _iconCache, _schema, _rowHideStore, _enumLabels, _resolveEnums, _locStrings, _domainStrings, _gameRefs);
         _packetDetail.CorrelatedPacketRequested += PacketList.SelectPacket;
         _packetDetail.FollowValueRequested += PacketList.FollowValue;
         Aggregator.Schema = _schema;

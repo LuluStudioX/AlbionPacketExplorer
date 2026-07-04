@@ -53,6 +53,10 @@
     <EmbeddedResource Include="Assets\resolve-enums.json" />
     <EmbeddedResource Include="Assets\loc-strings.json" />
     <EmbeddedResource Include="Assets\domain-strings.json" />
+    <EmbeddedResource Include="Assets\clusters.json" />
+    <EmbeddedResource Include="Assets\mob-names.json" />
+    <EmbeddedResource Include="Assets\spell-names.json" />
+    <EmbeddedResource Include="Assets\building-names.json" />
     <EmbeddedResource Include="lang\*.json" />
   </ItemGroup>
 

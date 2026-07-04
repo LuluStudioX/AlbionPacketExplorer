@@ -153,6 +153,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     private readonly ResolveEnumStore _resolveEnums;
     private readonly LocStringStore _locStrings;
     private readonly DomainStringStore _domainStrings;
+    private readonly GameRefStore _gameRefs;
     private CancellationTokenSource _iconCts = new();
 
     [ObservableProperty] private PacketEntry? _packet;
@@ -292,7 +293,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
     public PacketDetailViewModel(GameDataService gameData, IconCacheService icons, PacketSchemaService schema,
                                  RowHideStore hideStore, EnumLabelStore enumLabels,
                                  ResolveEnumStore resolveEnums, LocStringStore locStrings,
-                                 DomainStringStore domainStrings)
+                                 DomainStringStore domainStrings, GameRefStore gameRefs)
     {
         _gameData = gameData;
         _icons = icons;
@@ -302,11 +303,13 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         _resolveEnums = resolveEnums;
         _locStrings = locStrings;
         _domainStrings = domainStrings;
+        _gameRefs = gameRefs;
         _hideStore.Load();
         _enumLabels.Load();
         _resolveEnums.Load();
         _locStrings.Load();
         _domainStrings.Load();
+        _gameRefs.Load();
         RefreshHidePresets();
     }
 
@@ -426,6 +429,19 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
             {
                 (resolved, uniqueName) = (meaning, ds);
             }
+            // Reference data (resolveAs "location"/"mob"/"spell"/"building"): a wire code -> game name.
+            // Static like enums, so ungated by the item-name toggle; handles a scalar code or an array.
+            else if (_gameRefs.IsRefResolve(resolveAs))
+            {
+                var hits = new List<ResolvedItem>();
+                foreach (var code in RefKeys(pv))
+                    if (_gameRefs.TryResolve(resolveAs, code, out var refName))
+                        hits.Add(new ResolvedItem(code, refName));
+                if (hits.Count == 1)
+                    resolved = $"{hits[0].UniqueName} - {hits[0].DisplayName}";
+                else if (hits.Count > 1)
+                    resolvedItems = hits;
+            }
             else if (ResolveItemNames && _gameData.IsLoaded)
             {
                 if (resolveAs == "itemIndex" && IsIndexResolvable(pv.Type))
@@ -496,6 +512,31 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
 
         if (rowsToLoad.Count > 0)
             _ = LoadIconsAsync(rowsToLoad, cts.Token);
+    }
+
+    // The wire code(s) a reference resolveAs looks up: a scalar string/number, or each element of an
+    // array param (e.g. AssetOverview's String[] of location codes). Strings pass through as-is;
+    // numbers stringify so a future integer index resolves the same way as a string code.
+    private static IEnumerable<string> RefKeys(ParamValue pv)
+    {
+        var v = pv.Value;
+        if (v is string s)
+        {
+            if (s.Length > 0) yield return s;
+            yield break;
+        }
+        if (v is System.Collections.IEnumerable en)
+        {
+            foreach (var x in en)
+            {
+                var k = x?.ToString();
+                if (!string.IsNullOrEmpty(k)) yield return k;
+            }
+        }
+        else if (v != null)
+        {
+            yield return v.ToString()!;
+        }
     }
 
     private void ApplyHiddenState()
@@ -670,7 +711,7 @@ public partial class PacketDetailViewModel : ObservableObject, IDisposable
         var existing = _schema.GetParam(Packet.Kind, Packet.Code, SelectedRow.Key);
         var src = _schema.GetParamSource(Packet.Kind, Packet.Code, SelectedRow.Key);
         var vm = new EditParamViewModel(
-            _schema, _resolveEnums, _domainStrings,
+            _schema, _resolveEnums, _domainStrings, _gameRefs,
             Packet.Kind, Packet.Code, SelectedRow.Key,
             existing?.Name ?? string.Empty,
             existing?.Note ?? string.Empty,
