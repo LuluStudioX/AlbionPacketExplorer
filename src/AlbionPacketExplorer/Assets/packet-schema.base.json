@@ -28360,28 +28360,28 @@
         "resolveAs": ""
       },
       "2": {
-        "name": "",
-        "note": "(inferred) String[]; 4 distinct; String[] array",
+        "name": "locationId",
+        "note": "location short-id; first digit = city (0 Thetford, 1 Lymhurst, 2 Bridgewatch, 3 Caerleon, 4 Fort Sterling, 5 Brecilien)",
         "resolveAs": ""
       },
       "3": {
-        "name": "",
-        "note": "(inferred) Byte[]; 6 distinct; Byte[] array",
+        "name": "locationType",
+        "note": "per-row asset location kind: 1=city vault, 3=island, 4=blackbank/hideout, 5=other (verified per-row in a live capture)",
         "resolveAs": ""
       },
       "4": {
-        "name": "",
-        "note": "(inferred) Int32[]; 17 distinct; Int32[] array",
+        "name": "itemCount",
+        "note": "items stored at this location",
         "resolveAs": ""
       },
       "5": {
-        "name": "",
-        "note": "(inferred) Int64[]; 17 distinct; Int64[] array",
+        "name": "estimatedValue",
+        "note": "Int64 fixed-point; value / 10000 = displayed silver; sum across rows = the Asset/Bank Overview total",
         "resolveAs": ""
       },
       "6": {
-        "name": "",
-        "note": "(inferred) String[]; 4 distinct; String[] array",
+        "name": "ownerName",
+        "note": "island/hideout owner; empty for city banks",
         "resolveAs": ""
       },
       "7": {
@@ -28390,8 +28390,8 @@
         "resolveAs": ""
       },
       "8": {
-        "name": "",
-        "note": "(inferred) String[]; 4 distinct; String[] array",
+        "name": "tab",
+        "note": "parent location id, or BLACKBANK-<id> for blackzone deposits; empty for city banks",
         "resolveAs": ""
       },
       "255": {
@@ -28415,13 +28415,13 @@
         "resolveAs": ""
       },
       "2": {
-        "name": "",
-        "note": "(inferred) String[]; 2 distinct; String[] array",
+        "name": "tabName",
+        "note": "asset tab/category; @BUILDINGS_T1_BANK = the default bank tab",
         "resolveAs": ""
       },
       "3": {
-        "name": "",
-        "note": "(inferred) String[]; 2 distinct; String[] array",
+        "name": "tabIcon",
+        "note": "icon_tag_* shown for the tab",
         "resolveAs": ""
       },
       "4": {
@@ -28430,8 +28430,8 @@
         "resolveAs": ""
       },
       "5": {
-        "name": "",
-        "note": "(inferred) Int32[]; 4 distinct; Int32[] array",
+        "name": "itemCount",
+        "note": "items in each tab",
         "resolveAs": ""
       },
       "6": {
@@ -28460,8 +28460,8 @@
         "resolveAs": ""
       },
       "2": {
-        "name": "",
-        "note": "(inferred) Int16[]; 7 distinct; Int16[] array",
+        "name": "itemType",
+        "note": "item type id per stack",
         "resolveAs": ""
       },
       "3": {
@@ -28490,8 +28490,8 @@
         "resolveAs": ""
       },
       "8": {
-        "name": "",
-        "note": "(inferred) String[]; 7 distinct; String[] array",
+        "name": "ownerName",
+        "note": "depositor; empty for city-bank stacks",
         "resolveAs": ""
       },
       "9": {
