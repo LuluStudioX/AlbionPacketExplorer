@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "a842180",
-    "generatedAt": "2026-07-02"
+    "sourceCommit": "315b4b0",
+    "generatedAt": "2026-07-11"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -1706,12 +1706,12 @@
       },
       "7": {
         "name": "",
-        "note": "(inferred) Byte[]; 0% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 0% present; 3 distinct; Byte[] array",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Byte[]; 0% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 0% present; 3 distinct; Byte[] array",
         "resolveAs": ""
       },
       "10": {
@@ -2527,7 +2527,13 @@
   },
   "EVENT:72": {
     "name": "LogoutCancel",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [81250..81250]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:73": {
     "name": "ChatMessage",
@@ -2725,7 +2731,7 @@
       },
       "9": {
         "name": "",
-        "note": "(inferred) Int64; 1% present; 1 distinct; range [3000..3000]",
+        "note": "(inferred) Int64; 2% present; 2 distinct; range [1700..3000]",
         "resolveAs": ""
       }
     }
@@ -2905,7 +2911,7 @@
       },
       "4": {
         "name": "",
-        "note": "(inferred) Boolean; 18% present; 1 distinct",
+        "note": "(inferred) Boolean; 36% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -3971,6 +3977,11 @@
       "28": {
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [0..0]",
+        "resolveAs": ""
+      },
+      "18": {
+        "name": "",
+        "note": "(inferred) Int32; 6% present; 2 distinct; range [100439702..107639702]",
         "resolveAs": ""
       }
     }
@@ -5457,7 +5468,7 @@
       },
       "37": {
         "name": "",
-        "note": "(inferred) Int32; 8% present; 1 distinct; range [1..1]",
+        "note": "(inferred) Int32; 7% present; 1 distinct; range [1..1]",
         "resolveAs": ""
       }
     }
@@ -5467,7 +5478,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 1 distinct; range [24835..24835]",
+        "note": "(inferred) Int64; 2 distinct; range [24835..108283]",
         "resolveAs": ""
       },
       "1": {
@@ -5482,7 +5493,7 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Boolean; 1 distinct",
+        "note": "(inferred) Boolean; 67% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -7131,12 +7142,12 @@
       },
       "9": {
         "name": "",
-        "note": "(inferred) Boolean; 22% present; 1 distinct",
+        "note": "(inferred) Boolean; 36% present; 1 distinct",
         "resolveAs": ""
       },
       "10": {
         "name": "",
-        "note": "(inferred) Boolean; 44% present; 1 distinct",
+        "note": "(inferred) Boolean; 55% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -7210,17 +7221,17 @@
       },
       "14": {
         "name": "",
-        "note": "(inferred) Int16[]; 10% present; 1 distinct; Int16[] array",
+        "note": "(inferred) Int16[]; 25% present; 1 distinct; Int16[] array",
         "resolveAs": ""
       },
       "15": {
         "name": "",
-        "note": "(inferred) Int16[]; 10% present; 1 distinct; Int16[] array",
+        "note": "(inferred) Int16[]/Byte[]; 25% present; 2 distinct; Int16[] array",
         "resolveAs": ""
       },
       "16": {
         "name": "",
-        "note": "(inferred) Boolean[]; 10% present; 1 distinct; Boolean[] array",
+        "note": "(inferred) Boolean[]; 25% present; 1 distinct; Boolean[] array",
         "resolveAs": ""
       }
     }
@@ -7606,22 +7617,22 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32[]; 63 distinct; Int32[] array",
+        "note": "(inferred) Int32[]; high-card; Int32[] array",
         "resolveAs": ""
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int32[]; 34% present; 18 distinct; Int32[] array",
+        "note": "(inferred) Int32[]; 55% present; 74 distinct; Int32[] array",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int64[]; 34% present; 4 distinct; Int64[] array",
+        "note": "(inferred) Int64[]; 54% present; 9 distinct; Int64[] array",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) Byte[]; 34% present; 3 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 54% present; 8 distinct; Byte[] array",
         "resolveAs": ""
       }
     }
@@ -7819,17 +7830,17 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int64; 36% present; 1 distinct; range [10000000..10000000]",
+        "note": "(inferred) Int64; 33% present; 1 distinct; range [10000000..10000000]",
         "resolveAs": ""
       },
       "6": {
         "name": "flags",
-        "note": "(inferred) Byte/Boolean; 13% present; 2 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte/Boolean; 21% present; 2 distinct; range [0..0]; small enum/flag byte",
         "resolveAs": ""
       },
       "8": {
         "name": "flags",
-        "note": "(inferred) Byte; 8% present; 1 distinct; range [1..1]; small enum/flag byte",
+        "note": "(inferred) Byte; 17% present; 1 distinct; range [1..1]; small enum/flag byte",
         "resolveAs": ""
       }
     }
@@ -7974,7 +7985,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 43 distinct; range [860626..2090069]",
+        "note": "(inferred) Int64; 43 distinct; range [372..2090069]",
         "resolveAs": ""
       }
     }
@@ -8247,42 +8258,42 @@
     "params": {
       "1": {
         "name": "",
-        "note": "(inferred) Byte[]; 7 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 77 distinct; Byte[] array",
         "resolveAs": ""
       },
       "2": {
         "name": "",
-        "note": "(inferred) Byte[]; 6 distinct; Byte[] array",
+        "note": "(inferred) Byte[]/Int16[]; 71 distinct; Byte[] array",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 41 distinct; Byte[] array",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) Byte[]/Int32[]/Int16[]; 7 distinct; Byte[] array",
+        "note": "(inferred) Byte[]/Int32[]/Int16[]; 77 distinct; Byte[] array",
         "resolveAs": ""
       },
       "5": {
         "name": "vector",
-        "note": "(inferred) Single[]; 7 distinct; Single[]",
+        "note": "(inferred) Single[]; 77 distinct; Single[]",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Int64[]; 14 distinct; Int64[] array",
+        "note": "(inferred) Int64[]; high-card; Int64[] array",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Int64[]; 5 distinct; Int64[] array",
+        "note": "(inferred) Int64[]; 75 distinct; Int64[] array",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) String[]; 5 distinct; String[] array",
+        "note": "(inferred) String[]; 63 distinct; String[] array",
         "resolveAs": ""
       }
     }
@@ -8545,7 +8556,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Boolean; 58% present; 1 distinct",
+        "note": "(inferred) Boolean; 54% present; 1 distinct",
         "resolveAs": ""
       },
       "1": {
@@ -8765,37 +8776,37 @@
       },
       "5": {
         "name": "",
-        "note": "(inferred) Byte[]; 25% present; 4 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 36% present; 4 distinct; Byte[] array",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Byte[]; 25% present; 4 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 36% present; 4 distinct; Byte[] array",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Object[]; 25% present; 4 distinct; Object[] array",
+        "note": "(inferred) Object[]; 36% present; 4 distinct; Object[] array",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Object[]; 25% present; 4 distinct; Object[] array",
+        "note": "(inferred) Object[]; 36% present; 4 distinct; Object[] array",
         "resolveAs": ""
       },
       "9": {
         "name": "",
-        "note": "(inferred) Byte[]/Int16[]; 25% present; 5 distinct; Byte[] array",
+        "note": "(inferred) Byte[]/Int16[]; 36% present; 5 distinct; Byte[] array",
         "resolveAs": ""
       },
       "10": {
         "name": "",
-        "note": "(inferred) String[]; 25% present; 4 distinct; String[] array",
+        "note": "(inferred) String[]; 36% present; 4 distinct; String[] array",
         "resolveAs": ""
       },
       "11": {
         "name": "",
-        "note": "(inferred) Byte[]/Int32[]; 25% present; 4 distinct; Byte[] array",
+        "note": "(inferred) Byte[]/Int32[]; 36% present; 4 distinct; Byte[] array",
         "resolveAs": ""
       }
     }
@@ -9128,77 +9139,77 @@
       },
       "3": {
         "name": "vector",
-        "note": "(inferred) Single[]; 24% present; high-card; Single[]",
+        "note": "(inferred) Single[]; 26% present; high-card; Single[]",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) Single; 24% present; high-card; range [0.0528..360]",
+        "note": "(inferred) Single; 26% present; high-card; range [0.0528..360]",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Byte[]; 24% present; high-card; Byte[] array",
+        "note": "(inferred) Byte[]; 26% present; high-card; Byte[] array",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Byte; 24% present; 5 distinct; range [0..255]",
+        "note": "(inferred) Byte; 26% present; 5 distinct; range [0..255]",
         "resolveAs": ""
       },
       "7": {
         "name": "flags",
-        "note": "(inferred) Byte; 24% present; 3 distinct; range [0..3]; small enum/flag byte",
+        "note": "(inferred) Byte; 26% present; 3 distinct; range [0..3]; small enum/flag byte",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Int32; 14% present; high-card; range [153..83696]",
+        "note": "(inferred) Int32; 15% present; high-card; range [153..93116]",
         "resolveAs": ""
       },
       "9": {
         "name": "",
-        "note": "(inferred) Byte[]; 17% present; high-card; Byte[] array",
+        "note": "(inferred) Byte[]; 19% present; high-card; Byte[] array",
         "resolveAs": ""
       },
       "10": {
         "name": "",
-        "note": "(inferred) Byte[]; 10% present; high-card; Byte[] array",
+        "note": "(inferred) Byte[]; 12% present; high-card; Byte[] array",
         "resolveAs": ""
       },
       "11": {
         "name": "",
-        "note": "(inferred) Int32; 16% present; 10 distinct; range [-1..9]",
+        "note": "(inferred) Int32; 18% present; 10 distinct; range [-1..9]",
         "resolveAs": ""
       },
       "12": {
         "name": "",
-        "note": "(inferred) Int32; 21% present; 16 distinct; range [-1..15]",
+        "note": "(inferred) Int32; 22% present; 16 distinct; range [-1..15]",
         "resolveAs": ""
       },
       "13": {
         "name": "",
-        "note": "(inferred) Int32; 21% present; 16 distinct; range [-1..15]",
+        "note": "(inferred) Int32; 23% present; 16 distinct; range [-1..15]",
         "resolveAs": ""
       },
       "14": {
         "name": "",
-        "note": "(inferred) Int32; 24% present; high-card; range [-1..109]",
+        "note": "(inferred) Int32; 26% present; high-card; range [-1..109]",
         "resolveAs": ""
       },
       "15": {
         "name": "",
-        "note": "(inferred) Int32; 21% present; 14 distinct; range [-1..16777215]",
+        "note": "(inferred) Int32; 22% present; 14 distinct; range [-1..16777215]",
         "resolveAs": ""
       },
       "16": {
         "name": "",
-        "note": "(inferred) Single; 9% present; 16 distinct; range [-0.5..0.5]",
+        "note": "(inferred) Single; 11% present; 16 distinct; range [-0.5..0.5]",
         "resolveAs": ""
       },
       "17": {
         "name": "",
-        "note": "(inferred) Single; 24% present; 21 distinct; range [0.5..1.5]",
+        "note": "(inferred) Single; 26% present; 21 distinct; range [0.5..1.5]",
         "resolveAs": ""
       }
     }
@@ -9233,17 +9244,17 @@
       },
       "5": {
         "name": "",
-        "note": "(inferred) Byte; 95% present; 5 distinct; range [0..5]",
+        "note": "(inferred) Byte; 96% present; 5 distinct; range [0..5]",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Int64; 95% present; high-card; range [4886..416194]",
+        "note": "(inferred) Int64; 96% present; high-card; range [3966..416194]",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Int16; 95% present; high-card; range [-1..7327]",
+        "note": "(inferred) Int16; 96% present; high-card; range [-1..9072]",
         "resolveAs": ""
       }
     }
@@ -9252,18 +9263,18 @@
     "name": "MountCooldownUpdate",
     "params": {
       "0": {
-        "name": "",
-        "note": "(inferred) Int64; 34 distinct; range [97..2091575]",
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [6..2091575]; high-cardinality id at key 0",
         "resolveAs": ""
       },
       "1": {
         "name": "timestamp",
-        "note": "(inferred) Int64; high-card; range [639167328000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; high-card; range [639167328000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int64; 5 distinct; range [1046509..100000000]",
+        "note": "(inferred) Int64; 9 distinct; range [1046509..137030071]",
         "resolveAs": ""
       }
     }
@@ -9273,17 +9284,17 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [32..1225]",
+        "note": "(inferred) Int64; 3 distinct; range [32..1225]",
         "resolveAs": ""
       },
       "1": {
         "name": "vector",
-        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "note": "(inferred) Single[]; 2 distinct; Single[]",
         "resolveAs": ""
       },
       "2": {
         "name": "",
-        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 2 distinct; Byte[] array",
         "resolveAs": ""
       },
       "3": {
@@ -9293,7 +9304,7 @@
       },
       "4": {
         "name": "",
-        "note": "(inferred) String; 1 distinct; string value",
+        "note": "(inferred) String; 2 distinct; string value",
         "resolveAs": ""
       }
     }
@@ -9504,62 +9515,62 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Single; 10% present; 1 distinct; range [90..90]",
+        "note": "(inferred) Single; 19% present; 1 distinct; range [90..90]",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) String; 24% present; 17 distinct; string value",
+        "note": "(inferred) String; 39% present; 23 distinct; string value",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) String; 24% present; 37 distinct; string value",
+        "note": "(inferred) String; 39% present; 51 distinct; string value",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Int32; 24% present; 37 distinct; range [2..370]",
+        "note": "(inferred) Int32; 39% present; 56 distinct; range [2..417]",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Boolean; 24% present; 1 distinct",
+        "note": "(inferred) Boolean; 39% present; 1 distinct",
         "resolveAs": ""
       },
       "11": {
         "name": "",
-        "note": "(inferred) Boolean; 7% present; 1 distinct",
+        "note": "(inferred) Boolean; 14% present; 1 distinct",
         "resolveAs": ""
       },
       "14": {
         "name": "flags",
-        "note": "(inferred) Byte; 24% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 39% present; 1 distinct; range [0..0]; small enum/flag byte",
         "resolveAs": ""
       },
       "15": {
         "name": "",
-        "note": "(inferred) String; 2% present; 1 distinct; string value",
+        "note": "(inferred) String; 2% present; 3 distinct; string value",
         "resolveAs": ""
       },
       "16": {
         "name": "",
-        "note": "(inferred) Int64; 24% present; 26 distinct; range [-1..408060]",
+        "note": "(inferred) Int64; 39% present; 26 distinct; range [-1..408060]",
         "resolveAs": ""
       },
       "17": {
         "name": "",
-        "note": "(inferred) Int32; 24% present; 3 distinct; range [1..3]",
+        "note": "(inferred) Int32; 39% present; 3 distinct; range [1..3]",
         "resolveAs": ""
       },
       "18": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 2% present; 25 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 2% present; 25 distinct; range [639185472000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "19": {
         "name": "flags",
-        "note": "(inferred) Byte; 24% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 39% present; 1 distinct; range [0..0]; small enum/flag byte",
         "resolveAs": ""
       }
     }
@@ -9748,17 +9759,17 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int64; 50% present; 2 distinct; range [1567..5817]",
+        "note": "(inferred) Int64; 91% present; 6 distinct; range [1567..5941]",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) Int32; 50% present; 2 distinct; range [1..11]",
+        "note": "(inferred) Int32; 78% present; 3 distinct; range [1..11]",
         "resolveAs": ""
       },
       "5": {
         "name": "flags",
-        "note": "(inferred) Byte; 50% present; 2 distinct; range [0..1]; small enum/flag byte",
+        "note": "(inferred) Byte; 91% present; 2 distinct; range [0..1]; small enum/flag byte",
         "resolveAs": ""
       }
     }
@@ -9792,12 +9803,12 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [14221..142435]",
+        "note": "(inferred) Int64; 12 distinct; range [14221..142435]",
         "resolveAs": ""
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 2 distinct; range [1..11]",
+        "note": "(inferred) Int32; 84% present; 3 distinct; range [1..11]",
         "resolveAs": ""
       },
       "2": {
@@ -9861,6 +9872,11 @@
         "name": "",
         "note": "(inferred) Int32; 2 distinct; range [1..11]",
         "resolveAs": ""
+      },
+      "4": {
+        "name": "flags",
+        "note": "(inferred) Byte; 16% present; 2 distinct; range [0..1]; small enum/flag byte",
+        "resolveAs": ""
       }
     }
   },
@@ -9869,7 +9885,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [1567..5817]",
+        "note": "(inferred) Int64; 7 distinct; range [1567..5941]",
         "resolveAs": ""
       },
       "1": {
@@ -9879,7 +9895,7 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int32; 2 distinct; range [1..11]",
+        "note": "(inferred) Int32; 82% present; 3 distinct; range [1..11]",
         "resolveAs": ""
       }
     }
@@ -9889,12 +9905,12 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [1567..5817]",
+        "note": "(inferred) Int64; 7 distinct; range [1567..5941]",
         "resolveAs": ""
       },
       "1": {
         "name": "",
-        "note": "(inferred) Boolean; 1 distinct",
+        "note": "(inferred) Boolean; 67% present; 1 distinct",
         "resolveAs": ""
       },
       "2": {
@@ -9904,7 +9920,12 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int32; 2 distinct; range [1..11]",
+        "note": "(inferred) Int32; 86% present; 3 distinct; range [1..11]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Boolean; 14% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -10406,17 +10427,17 @@
       },
       "1": {
         "name": "vector",
-        "note": "(inferred) Single[]/Boolean; 93% present; high-card; Single[]",
+        "note": "(inferred) Single[]/Boolean; 96% present; high-card; Single[]",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int16/Boolean; 92% present; 13 distinct; range [0..12]",
+        "note": "(inferred) Int16/Boolean; 95% present; 13 distinct; range [0..12]",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) String; 92% present; 4 distinct; string value",
+        "note": "(inferred) String; 95% present; 4 distinct; string value",
         "resolveAs": ""
       }
     }
@@ -10708,14 +10729,30 @@
   },
   "EVENT:369": {
     "name": "OverChargeEnd",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [108311..108311]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [13..13]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [2..2]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:370": {
     "name": "OverChargeStatus",
     "params": {
       "0": {
-        "name": "",
-        "note": "(inferred) Int64; 34 distinct; range [97..2091575]",
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [6..2091575]; high-cardinality id at key 0",
         "resolveAs": ""
       },
       "2": {
@@ -10826,13 +10863,13 @@
     "name": "PersonalSeasonPointsGained",
     "params": {
       "0": {
-        "name": "objectId",
-        "note": "(inferred) Int64; 67 distinct; range [30718..2137502]; high-cardinality id at key 0",
+        "name": "",
+        "note": "(inferred) Int64; 67 distinct; range [30718..500000000]",
         "resolveAs": ""
       },
       "1": {
         "name": "timestamp",
-        "note": "(inferred) Int64; high-card; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; high-card; range [639185472000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -10913,7 +10950,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 16 distinct; range [1..1111]",
+        "note": "(inferred) Int64; 16 distinct; range [1..124631]",
         "resolveAs": ""
       },
       "1": {
@@ -10928,7 +10965,7 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Single; 3 distinct; range [7..10]",
+        "note": "(inferred) Single; 8 distinct; range [3..160]",
         "resolveAs": ""
       }
     }
@@ -11364,6 +11401,11 @@
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [0..2]; small enum/flag byte",
         "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 1% present; 2 distinct; string value",
+        "resolveAs": ""
       }
     }
   },
@@ -11392,107 +11434,117 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Single; 25% present; 4 distinct; range [147..495]",
+        "note": "(inferred) Single; 47% present; 7 distinct; range [1..495]",
         "resolveAs": ""
       },
       "5": {
-        "name": "flags",
-        "note": "(inferred) Byte; 29% present; 3 distinct; range [1..7]; small enum/flag byte",
+        "name": "",
+        "note": "(inferred) Byte; 68% present; 5 distinct; range [1..7]",
         "resolveAs": ""
       },
       "6": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 29% present; 7 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 68% present; 18 distinct; range [639185472000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "7": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 29% present; 7 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 68% present; 19 distinct; range [639185472000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Byte[]; 29% present; 3 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 36% present; 3 distinct; Byte[] array",
         "resolveAs": ""
       },
       "10": {
         "name": "",
-        "note": "(inferred) Byte[]; 29% present; 3 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 36% present; 3 distinct; Byte[] array",
         "resolveAs": ""
       },
       "11": {
         "name": "",
-        "note": "(inferred) Boolean; 8% present; 1 distinct",
+        "note": "(inferred) Boolean; 4% present; 1 distinct",
         "resolveAs": ""
       },
       "12": {
         "name": "",
-        "note": "(inferred) Boolean; 8% present; 1 distinct",
+        "note": "(inferred) Boolean; 4% present; 1 distinct",
         "resolveAs": ""
       },
       "13": {
         "name": "",
-        "note": "(inferred) Int64; 29% present; 3 distinct; range [-9223372036854776000..639186214333767600]",
+        "note": "(inferred) Int64; 36% present; 3 distinct; range [-9223372036854776000..639193241396341500]",
         "resolveAs": ""
       },
       "14": {
         "name": "",
-        "note": "(inferred) Boolean; 8% present; 1 distinct",
+        "note": "(inferred) Boolean; 6% present; 1 distinct",
         "resolveAs": ""
       },
       "15": {
         "name": "",
-        "note": "(inferred) Single; 8% present; 1 distinct; range [1.46..1.46]",
+        "note": "(inferred) Single; 38% present; 3 distinct; range [1..3.2]",
         "resolveAs": ""
       },
       "16": {
         "name": "",
-        "note": "(inferred) Int64; 29% present; 3 distinct; range [10000..410000]",
+        "note": "(inferred) Int64; 36% present; 4 distinct; range [10000..410000]",
         "resolveAs": ""
       },
       "17": {
         "name": "",
-        "note": "(inferred) Boolean; 21% present; 1 distinct",
+        "note": "(inferred) Boolean; 62% present; 1 distinct",
         "resolveAs": ""
       },
       "18": {
         "name": "",
-        "note": "(inferred) String; 29% present; 3 distinct; string value",
+        "note": "(inferred) String; 68% present; 9 distinct; string value",
         "resolveAs": ""
       },
       "20": {
         "name": "",
-        "note": "(inferred) String; 4% present; 1 distinct; string value",
+        "note": "(inferred) String; 21% present; 7 distinct; string value",
         "resolveAs": ""
       },
       "21": {
         "name": "",
-        "note": "(inferred) Int32; 25% present; 2 distinct; range [-1..2]",
+        "note": "(inferred) Int32; 62% present; 3 distinct; range [-1..2]",
+        "resolveAs": ""
+      },
+      "22": {
+        "name": "",
+        "note": "(inferred) Boolean; 32% present; 1 distinct",
         "resolveAs": ""
       },
       "23": {
-        "name": "flags",
-        "note": "(inferred) Byte; 29% present; 3 distinct; range [1..7]; small enum/flag byte",
+        "name": "",
+        "note": "(inferred) Byte; 68% present; 5 distinct; range [1..7]",
+        "resolveAs": ""
+      },
+      "24": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 32% present; 10 distinct; range [639192384000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "26": {
         "name": "",
-        "note": "(inferred) Boolean; 29% present; 1 distinct",
+        "note": "(inferred) Boolean; 36% present; 1 distinct",
         "resolveAs": ""
       },
       "28": {
         "name": "",
-        "note": "(inferred) Boolean; 29% present; 1 distinct",
+        "note": "(inferred) Boolean; 36% present; 1 distinct",
         "resolveAs": ""
       },
       "29": {
         "name": "",
-        "note": "(inferred) Int16; 29% present; 1 distinct; range [0..0]",
+        "note": "(inferred) Int16; 68% present; 1 distinct; range [0..0]",
         "resolveAs": ""
       },
       "31": {
         "name": "flags",
-        "note": "(inferred) Byte; 29% present; 2 distinct; range [0..3]; small enum/flag byte",
+        "note": "(inferred) Byte; 68% present; 2 distinct; range [0..3]; small enum/flag byte",
         "resolveAs": ""
       }
     }
@@ -11527,47 +11579,52 @@
       },
       "2": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 10 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 12 distinct; range [639185472000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Boolean; 96% present; 1 distinct",
+        "note": "(inferred) Boolean; 87% present; 1 distinct",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Boolean; 96% present; 1 distinct",
+        "note": "(inferred) Boolean; 91% present; 1 distinct",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Int64; 6 distinct; range [-9223372036854776000..639186271520409600]",
+        "note": "(inferred) Int64; 96% present; 6 distinct; range [-9223372036854776000..639193328861324300]",
         "resolveAs": ""
       },
       "9": {
         "name": "",
-        "note": "(inferred) Boolean; 96% present; 1 distinct",
+        "note": "(inferred) Boolean; 95% present; 1 distinct",
         "resolveAs": ""
       },
       "10": {
         "name": "",
-        "note": "(inferred) Single; 96% present; 3 distinct; range [1.44..1.53]",
+        "note": "(inferred) Single; 95% present; 7 distinct; range [1.44..8.4]",
         "resolveAs": ""
       },
       "11": {
         "name": "",
-        "note": "(inferred) Int64; 4 distinct; range [10000..410000]",
+        "note": "(inferred) Int64; 96% present; 4 distinct; range [10000..410000]",
         "resolveAs": ""
       },
       "12": {
         "name": "",
-        "note": "(inferred) Boolean; 4% present; 1 distinct",
+        "note": "(inferred) Boolean; 12% present; 1 distinct",
         "resolveAs": ""
       },
       "13": {
         "name": "",
-        "note": "(inferred) Int32; 60% present; 2 distinct; range [1..2]",
+        "note": "(inferred) Int32; 64% present; 2 distinct; range [1..2]",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "",
+        "note": "(inferred) Boolean; 4% present; 1 distinct",
         "resolveAs": ""
       },
       "15": {
@@ -11578,6 +11635,11 @@
       "16": {
         "name": "flags",
         "note": "(inferred) Byte; 3 distinct; range [6..8]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "17": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 4% present; 2 distinct; range [639193248000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "18": {
@@ -11607,27 +11669,27 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Single; 80% present; 7 distinct; range [45..315]",
+        "note": "(inferred) Single; 75% present; 7 distinct; range [45..315]",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) String; 93% present; 2 distinct; string value",
+        "note": "(inferred) String; 88% present; 2 distinct; string value",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) String; 93% present; 2 distinct; string value",
+        "note": "(inferred) String; 88% present; 2 distinct; string value",
         "resolveAs": ""
       },
       "5": {
         "name": "flags",
-        "note": "(inferred) Byte; 93% present; 2 distinct; range [0..1]; small enum/flag byte",
+        "note": "(inferred) Byte; 88% present; 2 distinct; range [0..1]; small enum/flag byte",
         "resolveAs": ""
       },
       "6": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 90% present; 2 distinct; range [639169920000000000..639169920000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 84% present; 2 distinct; range [639169920000000000..639169920000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -11648,12 +11710,53 @@
         "name": "uniqueName",
         "note": "",
         "resolveAs": ""
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 5 distinct; range [92..136033]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 5 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Single; 3 distinct; range [29..216]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 75% present; 2 distinct; range [639192384000000000..639192384000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:398": {
     "name": "UpdateShrine",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [86199..86199]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [1..2]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 2 distinct; range [639193248000000000..639193248000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:399": {
     "name": "UpdateRoom",
@@ -12372,37 +12475,37 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Byte[]; 8% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 15% present; 2 distinct; Byte[] array",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) String[]; 8% present; 1 distinct; String[] array",
+        "note": "(inferred) String[]; 15% present; 2 distinct; String[] array",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) String[]; 8% present; 1 distinct; String[] array",
+        "note": "(inferred) String[]; 15% present; 2 distinct; String[] array",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Byte[]; 8% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]/Int32[]; 15% present; 2 distinct; Byte[] array",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) String[]; 8% present; 1 distinct; String[] array",
+        "note": "(inferred) String[]; 15% present; 2 distinct; String[] array",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Byte[]; 8% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 15% present; 2 distinct; Byte[] array",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Byte[]; 8% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]/Int64[]; 15% present; 2 distinct; Byte[] array",
         "resolveAs": ""
       }
     }
@@ -12687,122 +12790,127 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int32; 20% present; 1 distinct; range [2..2]",
+        "note": "(inferred) Int32; 80% present; 1 distinct; range [2..2]",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) String; 20% present; 1 distinct; string value",
+        "note": "(inferred) String; 80% present; 9 distinct; string value",
         "resolveAs": ""
       },
       "4": {
         "name": "vector",
-        "note": "(inferred) Single[]; 20% present; 5 distinct; Single[]",
+        "note": "(inferred) Single[]; 80% present; 41 distinct; Single[]",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Single; 6% present; 1 distinct; range [270..270]",
+        "note": "(inferred) Single; 19% present; 1 distinct; range [270..270]",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Byte[]; 20% present; 4 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 80% present; 32 distinct; Byte[] array",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) String; 20% present; 4 distinct; string value",
+        "note": "(inferred) String; 80% present; 32 distinct; string value",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Byte[]; 16% present; 2 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 50% present; 17 distinct; Byte[] array",
         "resolveAs": ""
       },
       "9": {
         "name": "",
-        "note": "(inferred) String; 20% present; 3 distinct; string value",
+        "note": "(inferred) String; 80% present; 18 distinct; string value",
         "resolveAs": ""
       },
       "10": {
         "name": "",
-        "note": "(inferred) String; 20% present; 5 distinct; string value",
+        "note": "(inferred) String; 80% present; 37 distinct; string value",
         "resolveAs": ""
       },
       "11": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 20% present; 5 distinct; range [638943552000000000..639154368000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 80% present; 41 distinct; range [638510688000000000..639191520000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 0% present; 1 distinct; range [638656704000000000..638656704000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "13": {
         "name": "flags",
-        "note": "(inferred) Byte; 20% present; 3 distinct; range [0..2]; small enum/flag byte",
+        "note": "(inferred) Byte; 80% present; 3 distinct; range [0..2]; small enum/flag byte",
         "resolveAs": ""
       },
       "14": {
-        "name": "flags",
-        "note": "(inferred) Byte; 20% present; 4 distinct; range [1..5]; small enum/flag byte",
+        "name": "",
+        "note": "(inferred) Byte; 80% present; 5 distinct; range [1..5]",
         "resolveAs": ""
       },
       "15": {
         "name": "flags",
-        "note": "(inferred) Byte; 20% present; 1 distinct; range [2..2]; small enum/flag byte",
+        "note": "(inferred) Byte; 80% present; 1 distinct; range [2..2]; small enum/flag byte",
         "resolveAs": ""
       },
       "17": {
         "name": "flags",
-        "note": "(inferred) Byte; 20% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 80% present; 1 distinct; range [0..0]; small enum/flag byte",
         "resolveAs": ""
       },
       "18": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 20% present; 3 distinct; range [639182016000000000..639182016000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 80% present; 7 distinct; range [639182016000000000..639192384000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "20": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 18% present; 4 distinct; range [638967744000000000..639167328000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 76% present; 36 distinct; range [638516736000000000..639189792000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "21": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 20% present; 1 distinct; range [9223372036854776000..9223372036854776000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 80% present; 1 distinct; range [9223372036854776000..9223372036854776000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "22": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 20% present; 4 distinct; range [639182880000000000..639182880000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 80% present; 25 distinct; range [639182880000000000..639192384000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "23": {
         "name": "",
-        "note": "(inferred) Boolean; 16% present; 1 distinct",
+        "note": "(inferred) Boolean; 29% present; 1 distinct",
         "resolveAs": ""
       },
       "24": {
         "name": "",
-        "note": "(inferred) Int64; 18% present; 5 distinct; range [30087417..861088222]",
+        "note": "(inferred) Int64; 64% present; 40 distinct; range [3647417..1617990876]",
         "resolveAs": ""
       },
       "25": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 20% present; 6 distinct; range [639172512000000000..639182880000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 80% present; 51 distinct; range [639109440000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "26": {
         "name": "",
-        "note": "(inferred) Boolean; 8% present; 1 distinct",
+        "note": "(inferred) Boolean; 30% present; 1 distinct",
         "resolveAs": ""
       },
       "27": {
         "name": "",
-        "note": "(inferred) Boolean; 2% present; 1 distinct",
+        "note": "(inferred) Boolean; 22% present; 1 distinct",
         "resolveAs": ""
       },
       "28": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 16% present; 2 distinct; range [639121536000000000..639131040000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 72% present; 25 distinct; range [638571168000000000..639189792000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -12842,22 +12950,22 @@
       },
       "6": {
         "name": "",
-        "note": "(inferred) Int64; 3 distinct; range [443181259..861088222]",
+        "note": "(inferred) Int64; 7 distinct; range [220313178..1617990876]",
         "resolveAs": ""
       },
       "7": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 3 distinct; range [639182880000000000..639182880000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 4 distinct; range [639182880000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Boolean; 1 distinct",
+        "note": "(inferred) Boolean; 73% present; 1 distinct",
         "resolveAs": ""
       },
       "9": {
         "name": "",
-        "note": "(inferred) Boolean; 25% present; 1 distinct",
+        "note": "(inferred) Boolean; 45% present; 1 distinct",
         "resolveAs": ""
       },
       "11": {
@@ -12867,7 +12975,7 @@
       },
       "12": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 75% present; 1 distinct; range [639081792000000000..639081792000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 55% present; 1 distinct; range [639081792000000000..639081792000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -12921,7 +13029,28 @@
   },
   "EVENT:427": {
     "name": "HideoutUpgradeWithPowerCrystalResult",
-    "params": {}
+    "params": {
+      "1": {
+        "name": "",
+        "note": "(inferred) Int16; 1 distinct; range [0..0]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Boolean; 11% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 4 distinct; range [3647417..21884505]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "flags",
+        "note": "(inferred) Byte; 3 distinct; range [0..2]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:428": {
     "name": "IpChanged",
@@ -12955,7 +13084,18 @@
   },
   "EVENT:434": {
     "name": "TowerPowerPointUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 3 distinct; range [1715957100..1811163300]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 3 distinct; range [639193248000000000..639193248000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:435": {
     "name": "OpenWorldAttackScheduleStart",
@@ -13030,12 +13170,12 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [5714..5818]",
+        "note": "(inferred) Int64; 16 distinct; range [4677..6132]",
         "resolveAs": ""
       },
       "1": {
         "name": "vector",
-        "note": "(inferred) Single[]; 2 distinct; Single[]",
+        "note": "(inferred) Single[]; 16 distinct; Single[]",
         "resolveAs": ""
       },
       "2": {
@@ -13047,7 +13187,23 @@
   },
   "EVENT:445": {
     "name": "NewHomeObject",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [94..94]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:446": {
     "name": "HideoutObjectUpdate",
@@ -13080,7 +13236,28 @@
   },
   "EVENT:448": {
     "name": "MinimapPositionMarkers",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int16[]/Int32[]; 5 distinct; Int16[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; high-card; Single[]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]/Int16[]; 5 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Byte[]; 3 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:449": {
     "name": "NewTunnelExit",
@@ -13448,7 +13625,13 @@
   },
   "EVENT:471": {
     "name": "SimpleFeedback",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [9..10]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:472": {
     "name": "SmartClusterQueueSkipClusterError",
@@ -13625,7 +13808,7 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) String[]; 21% present; 1 distinct; String[] array",
+        "note": "(inferred) String[]; 34% present; 2 distinct; String[] array",
         "resolveAs": ""
       }
     }
@@ -13830,7 +14013,7 @@
       },
       "4": {
         "name": "flags",
-        "note": "(inferred) Byte; 2% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 16% present; 3 distinct; range [0..2]; small enum/flag byte",
         "resolveAs": ""
       },
       "6": {
@@ -13840,12 +14023,12 @@
       },
       "7": {
         "name": "",
-        "note": "(inferred) Boolean; 0% present; 1 distinct",
+        "note": "(inferred) Boolean; 2% present; 1 distinct",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Boolean; 1% present; 1 distinct",
+        "note": "(inferred) Boolean; 7% present; 1 distinct",
         "resolveAs": ""
       },
       "9": {
@@ -13855,7 +14038,7 @@
       },
       "10": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 2% present; 4 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 16% present; 53 distinct; range [639185472000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "11": {
@@ -13890,12 +14073,12 @@
       },
       "5": {
         "name": "",
-        "note": "(inferred) Dictionary`2; 98% present; high-card",
+        "note": "(inferred) Dictionary`2; 60% present; high-card",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Boolean; 0% present; 1 distinct",
+        "note": "(inferred) Boolean; 1% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -13910,22 +14093,22 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 94% present; 2 distinct; range [-1..11]",
+        "note": "(inferred) Int32; 91% present; 4 distinct; range [-1..11]",
         "resolveAs": ""
       },
       "2": {
         "name": "flags",
-        "note": "(inferred) Byte; 94% present; 4 distinct; range [0..3]; small enum/flag byte",
+        "note": "(inferred) Byte; 95% present; 4 distinct; range [0..3]; small enum/flag byte",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) Boolean; 1% present; 1 distinct",
+        "note": "(inferred) Boolean; 0% present; 1 distinct",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Dictionary`2; 90% present; high-card",
+        "note": "(inferred) Dictionary`2; 66% present; high-card",
         "resolveAs": ""
       }
     }
@@ -13950,7 +14133,7 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int64; 13% present; 3 distinct; range [142566..142912]",
+        "note": "(inferred) Int64; 53% present; 30 distinct; range [55229..142912]",
         "resolveAs": ""
       }
     }
@@ -13960,32 +14143,32 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 3 distinct; range [24150..142435]",
+        "note": "(inferred) Int64; 8 distinct; range [24150..142435]",
         "resolveAs": ""
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 50% present; 1 distinct; range [11419196..11419196]",
+        "note": "(inferred) Int32; 22% present; 1 distinct; range [11419196..11419196]",
         "resolveAs": ""
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int32; 50% present; 1 distinct; range [11423196..11423196]",
+        "note": "(inferred) Int32; 22% present; 1 distinct; range [11423196..11423196]",
         "resolveAs": ""
       },
       "3": {
         "name": "flags",
-        "note": "(inferred) Byte; 50% present; 1 distinct; range [1..1]; small enum/flag byte",
+        "note": "(inferred) Byte; 22% present; 1 distinct; range [1..1]; small enum/flag byte",
         "resolveAs": ""
       },
       "4": {
         "name": "flags",
-        "note": "(inferred) Byte; 50% present; 1 distinct; range [1..1]; small enum/flag byte",
+        "note": "(inferred) Byte; 22% present; 1 distinct; range [1..1]; small enum/flag byte",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Int64; 50% present; 1 distinct; range [5830..5830]",
+        "note": "(inferred) Int64; 22% present; 1 distinct; range [5830..5830]",
         "resolveAs": ""
       }
     }
@@ -13995,17 +14178,17 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 4 distinct; range [141852..142435]",
+        "note": "(inferred) Int64; 38 distinct; range [55165..142435]",
         "resolveAs": ""
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 4 distinct; range [39128542..39179218]",
+        "note": "(inferred) Int32; 50 distinct; range [39128542..57105052]",
         "resolveAs": ""
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int64; 4 distinct; range [142566..142912]",
+        "note": "(inferred) Int64; 50 distinct; range [55229..142912]",
         "resolveAs": ""
       }
     }
@@ -14154,32 +14337,32 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int16/Int64; 2 distinct; range [0..47377800]",
+        "note": "(inferred) Int64/Int16; 32 distinct; range [0..113424168]",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) Int32/Int64; 2 distinct; range [-1..24968106]",
+        "note": "(inferred) Int64/Int32; 97% present; 28 distinct; range [-1..52877476]",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Int64; 50% present; 1 distinct; range [10299021051..10299021051]",
+        "note": "(inferred) Int64; 99% present; high-card; range [10299021051..11230730041]",
         "resolveAs": ""
       },
       "9": {
         "name": "flags",
-        "note": "(inferred) Byte; 50% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 99% present; 2 distinct; range [0..3]; small enum/flag byte",
         "resolveAs": ""
       },
       "10": {
         "name": "",
-        "note": "(inferred) Dictionary`2; 50% present; 1 distinct",
+        "note": "(inferred) Dictionary`2; 99% present; 4 distinct",
         "resolveAs": ""
       },
       "11": {
         "name": "",
-        "note": "(inferred) Dictionary`2; 50% present; 1 distinct",
+        "note": "(inferred) Dictionary`2; 99% present; 4 distinct",
         "resolveAs": ""
       }
     }
@@ -14229,12 +14412,12 @@
       },
       "3": {
         "name": "flags",
-        "note": "(inferred) Byte; 25% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 40% present; 2 distinct; range [0..3]; small enum/flag byte",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) Int32; 25% present; 1 distinct; range [-1..-1]",
+        "note": "(inferred) Int32; 40% present; 2 distinct; range [-1..19]",
         "resolveAs": ""
       }
     }
@@ -14844,6 +15027,21 @@
         "name": "",
         "note": "(curated) resolver-only slot",
         "resolveAs": "enum:CagedObjectState"
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 7 distinct; range [79387..121241]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 7 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
       }
     }
   },
@@ -14985,47 +15183,47 @@
       },
       "1": {
         "name": "vector",
-        "note": "(inferred) Single[]; 61% present; 12 distinct; Single[]",
+        "note": "(inferred) Single[]; 80% present; 12 distinct; Single[]",
         "resolveAs": ""
       },
       "2": {
         "name": "vector",
-        "note": "(inferred) Single[]; 61% present; 6 distinct; Single[]",
+        "note": "(inferred) Single[]; 80% present; 6 distinct; Single[]",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) Byte[]; 61% present; 6 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 80% present; 7 distinct; Byte[] array",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) String[]; 61% present; 3 distinct; String[] array",
+        "note": "(inferred) String[]; 80% present; 3 distinct; String[] array",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Object[]; 61% present; 3 distinct; Object[] array",
+        "note": "(inferred) Object[]; 80% present; 3 distinct; Object[] array",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Byte[]; 61% present; 5 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 80% present; 5 distinct; Byte[] array",
         "resolveAs": ""
       },
       "7": {
         "name": "vector",
-        "note": "(inferred) Single[]; 61% present; 3 distinct; Single[]",
+        "note": "(inferred) Single[]; 80% present; 3 distinct; Single[]",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) String[]; 61% present; 6 distinct; String[] array",
+        "note": "(inferred) String[]; 80% present; 6 distinct; String[] array",
         "resolveAs": ""
       },
       "9": {
         "name": "",
-        "note": "(inferred) Boolean[]; 61% present; 3 distinct; Boolean[] array",
+        "note": "(inferred) Boolean[]; 80% present; 3 distinct; Boolean[] array",
         "resolveAs": ""
       }
     }
@@ -15040,32 +15238,32 @@
       },
       "1": {
         "name": "vector",
-        "note": "(inferred) Single[]; 29% present; 16 distinct; Single[]",
+        "note": "(inferred) Single[]; 42% present; 16 distinct; Single[]",
         "resolveAs": ""
       },
       "2": {
         "name": "",
-        "note": "(inferred) Single; 29% present; 2 distinct; range [35..80]",
+        "note": "(inferred) Single; 42% present; 3 distinct; range [35..80]",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int32; 29% present; 2 distinct; range [12..13]",
+        "note": "(inferred) Int32; 42% present; 7 distinct; range [6..13]",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) String; 29% present; 1 distinct; string value",
+        "note": "(inferred) String; 42% present; 1 distinct; string value",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Boolean[]; 29% present; 1 distinct; Boolean[] array",
+        "note": "(inferred) Boolean[]; 42% present; 1 distinct; Boolean[] array",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) String; 29% present; 2 distinct; string value",
+        "note": "(inferred) String; 24% present; 2 distinct; string value",
         "resolveAs": ""
       }
     }
@@ -15150,14 +15348,35 @@
       },
       "4": {
         "name": "",
-        "note": "(inferred) Boolean; 14% present; 1 distinct",
+        "note": "(inferred) Boolean; 13% present; 1 distinct",
         "resolveAs": ""
       }
     }
   },
   "EVENT:544": {
     "name": "NewUnrestrictedPvpZone",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 23 distinct; range [77331..149901]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 21 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Single; 4 distinct; range [35..80]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:545": {
     "name": "TemporaryFlaggingStatusUpdate",
@@ -15356,33 +15575,43 @@
     "name": "NewHuntTrack",
     "params": {
       "0": {
-        "name": "",
-        "note": "(inferred) Int64; 30 distinct; range [5521..380521]",
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [4731..380521]; high-cardinality id at key 0",
         "resolveAs": ""
       },
       "1": {
         "name": "vector",
-        "note": "(inferred) Single[]; 30 distinct; Single[]",
+        "note": "(inferred) Single[]; high-card; Single[]",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) String; 2 distinct; string value",
+        "note": "(inferred) String; 17 distinct; string value",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 0% present; 1 distinct; Byte[] array",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Int32; 3 distinct; range [9..42]",
+        "note": "(inferred) Int32; 37 distinct; range [9..68]",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Int32; 79% present; 23 distinct; range [-1..24]",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Int16; 1 distinct; range [1..1]",
+        "note": "(inferred) Int16; 2 distinct; range [1..4]",
         "resolveAs": ""
       },
       "9": {
         "name": "",
-        "note": "(inferred) Int16; 1 distinct; range [3..3]",
+        "note": "(inferred) Int16; 2 distinct; range [3..8]",
         "resolveAs": ""
       }
     }
@@ -15403,7 +15632,13 @@
   },
   "EVENT:561": {
     "name": "HuntTrackUsed",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [96545..96545]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:562": {
     "name": "HuntTrackUseableAgain",
@@ -15454,6 +15689,16 @@
         "name": "",
         "note": "(inferred) Int64; 2 distinct; range [335791..937370]",
         "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 33% present; 1 distinct; range [50854833..50854833]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 33% present; 1 distinct; range [96545..96545]",
+        "resolveAs": ""
       }
     }
   },
@@ -15463,7 +15708,18 @@
   },
   "EVENT:568": {
     "name": "InteractWithTrackFinished",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [95710..95710]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [96545..96545]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:569": {
     "name": "NewDynamicCompound",
@@ -15749,32 +16005,47 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) String; 87% present; 21 distinct; string value",
+        "note": "(inferred) String; 97% present; 34 distinct; string value",
         "resolveAs": ""
       },
       "4": {
         "name": "vector",
-        "note": "(inferred) Single[]; 87% present; 43 distinct; Single[]",
+        "note": "(inferred) Single[]; 97% present; high-card; Single[]",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Single; 67% present; 3 distinct; range [90..270]",
+        "note": "(inferred) Single; 72% present; 4 distinct; range [90..270]",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) Boolean; 87% present; 1 distinct",
+        "note": "(inferred) Boolean; 97% present; 1 distinct",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Int64; 87% present; 4 distinct; range [1000000..129600000]",
+        "note": "(inferred) Int64; 97% present; 5 distinct; range [1000000..129600000]",
         "resolveAs": ""
       },
       "8": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 87% present; 7 distinct; range [639182880000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 97% present; 21 distinct; range [639182880000000000..639192384000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 2% present; 2 distinct; range [639193248000000000..639193248000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Boolean; 72% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 72% present; 50 distinct; range [639192384000000000..639192384000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -15784,7 +16055,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 15 distinct; range [2143..2322]",
+        "note": "(inferred) Int64; 15 distinct; range [673..35057]",
         "resolveAs": ""
       },
       "1": {
@@ -15794,12 +16065,12 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int16; 3 distinct; range [636..651]",
+        "note": "(inferred) Int16; 4 distinct; range [636..651]",
         "resolveAs": ""
       },
       "3": {
         "name": "",
-        "note": "(inferred) String; 2 distinct; string value",
+        "note": "(inferred) String; 3 distinct; string value",
         "resolveAs": ""
       },
       "4": {
@@ -15809,7 +16080,7 @@
       },
       "5": {
         "name": "",
-        "note": "(inferred) Single; 84% present; 3 distinct; range [90..270]",
+        "note": "(inferred) Single; 82% present; 3 distinct; range [90..270]",
         "resolveAs": ""
       },
       "6": {
@@ -15819,22 +16090,37 @@
       },
       "7": {
         "name": "",
-        "note": "(inferred) Int64; 4 distinct; range [1000000..103680000]",
+        "note": "(inferred) Int64; 5 distinct; range [1000000..103680000]",
         "resolveAs": ""
       },
       "8": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 16 distinct; range [639182880000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 16 distinct; range [639182880000000000..639192384000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "9": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 93% present; 15 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 95% present; 15 distinct; range [639185472000000000..639192384000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 3% present; 1 distinct; range [639193248000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "11": {
         "name": "flags",
         "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "",
+        "note": "(inferred) Boolean; 65% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "13": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 65% present; 13 distinct; range [639192384000000000..639192384000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -15991,7 +16277,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) String/Int64; 12 distinct; range [165..165]; string value",
+        "note": "(inferred) String/Int64; 15 distinct; range [165..165]; string value",
         "resolveAs": ""
       },
       "1": {
@@ -16001,7 +16287,7 @@
       },
       "2": {
         "name": "flags",
-        "note": "(inferred) Byte/Single[]; 1 distinct; range [2..2]; small enum/flag byte",
+        "note": "(inferred) Byte/Single[]; 2 distinct; range [1..2]; small enum/flag byte",
         "resolveAs": ""
       }
     }
@@ -16016,7 +16302,28 @@
   },
   "EVENT:605": {
     "name": "NewOutlandsTeleportationReturnPortal",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [97729..97729]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:606": {
     "name": "OutlandsTeleportationBindingCleared",
@@ -16132,37 +16439,42 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) Int32; 5% present; 1 distinct; range [9..9]",
+        "note": "(inferred) Int32; 10% present; 2 distinct; range [5..9]",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) Int32; 5% present; 1 distinct; range [-1..-1]",
+        "note": "(inferred) Int32; 10% present; 2 distinct; range [-1..9]",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) String; 5% present; 1 distinct; string value",
+        "note": "(inferred) String; 10% present; 2 distinct; string value",
         "resolveAs": ""
       },
       "6": {
         "name": "flags",
-        "note": "(inferred) Byte; 5% present; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 10% present; 2 distinct; range [0..1]; small enum/flag byte",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Int32; 5% present; 1 distinct; range [1..1]",
+        "note": "(inferred) Int32; 10% present; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]; 5% present; 1 distinct; Byte[] array",
         "resolveAs": ""
       },
       "9": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 5% present; 1 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 10% present; 1 distinct; range [639185472000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "10": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 5% present; 1 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 10% present; 1 distinct; range [639185472000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -16177,7 +16489,7 @@
       },
       "1": {
         "name": "flags",
-        "note": "(inferred) Byte; 73% present; 2 distinct; range [1..2]; small enum/flag byte",
+        "note": "(inferred) Byte; 74% present; 2 distinct; range [1..2]; small enum/flag byte",
         "resolveAs": ""
       },
       "2": {
@@ -16185,9 +16497,14 @@
         "note": "(inferred) Int32; 52% present; 1 distinct; range [1..1]",
         "resolveAs": ""
       },
+      "4": {
+        "name": "",
+        "note": "(inferred) Byte[]; 4% present; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      },
       "6": {
         "name": "",
-        "note": "(inferred) Int32; 68% present; 16 distinct; range [1..16]",
+        "note": "(inferred) Int32; 67% present; 16 distinct; range [1..16]",
         "resolveAs": ""
       }
     }
@@ -16197,12 +16514,12 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 1 distinct; range [3878..3878]",
+        "note": "(inferred) Int64; 13 distinct; range [3030..3888]",
         "resolveAs": ""
       },
       "1": {
         "name": "vector",
-        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "note": "(inferred) Single[]; 13 distinct; Single[]",
         "resolveAs": ""
       }
     }
@@ -16213,7 +16530,33 @@
   },
   "EVENT:614": {
     "name": "PickupFromPiledObjectStart",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 2 distinct; range [86132..86202]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [57562030..57571529]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [57565030..57574529]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [86190..86190]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [5..5]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:615": {
     "name": "PickupFromPiledObjectCancel",
@@ -16358,7 +16701,7 @@
       },
       "5": {
         "name": "",
-        "note": "(inferred) Single; 6% present; 1 distinct; range [90..90]",
+        "note": "(inferred) Single; 5% present; 1 distinct; range [90..90]",
         "resolveAs": ""
       },
       "7": {
@@ -16368,7 +16711,7 @@
       },
       "8": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 11 distinct; range [638990208000000000..639185472000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 11 distinct; range [638990208000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "9": {
@@ -16567,8 +16910,8 @@
     "name": "FullJournalQuestInfo",
     "params": {
       "0": {
-        "name": "",
-        "note": "(inferred) Int64; 34 distinct; range [97..2091575]",
+        "name": "objectId",
+        "note": "(inferred) Int64; high-card; range [6..2091575]; high-cardinality id at key 0",
         "resolveAs": ""
       }
     }
@@ -17348,11 +17691,43 @@
   },
   "EVENT:671": {
     "name": "NewLoreSnippetObject",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [4344..4344]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 1 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [270..270]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [9..9]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:672": {
     "name": "LoreSnippetObjectStateUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [4344..4344]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:673": {
     "name": "LoreSnippedClaimed",
@@ -17980,6 +18355,11 @@
       "255": {
         "name": "",
         "note": "(inferred) Int32; high-card; range [6..1748]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Boolean; 0% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -20198,22 +20578,22 @@
     "params": {
       "0": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 1 distinct; range [639170784000000000..639170784000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 7 distinct; range [639170784000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int64; 1 distinct; range [132..132]",
+        "note": "(inferred) Int64; 4 distinct; range [92..86199]",
         "resolveAs": ""
       },
       "2": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
         "resolveAs": ""
       },
       "255": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [604..604]",
+        "note": "(inferred) Int32; 7 distinct; range [604..2148]",
         "resolveAs": ""
       }
     }
@@ -21421,7 +21801,98 @@
   },
   "REQUEST:424": {
     "name": "LoadoutUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [13..13]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "10": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "12": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "13": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "14": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "15": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "16": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "17": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1943..1943]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:425": {
     "name": "LoadoutDelete",
@@ -22168,12 +22639,12 @@
     "params": {
       "0": {
         "name": "timestamp",
-        "note": "(inferred) Int64; 1 distinct; range [639161280000000000..639161280000000000]; likely .NET ticks (UTC)",
+        "note": "(inferred) Int64; 1 distinct; range [639161280000000000..639193248000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int64; 1 distinct; range [23987..23987]",
+        "note": "(inferred) Int64; 2 distinct; range [23987..86190]",
         "resolveAs": ""
       }
     }
@@ -22977,12 +23448,12 @@
       },
       "122": {
         "name": "",
-        "note": "(inferred) Boolean; 1% present; 1 distinct",
+        "note": "(inferred) Int32/Boolean; 5% present; 2 distinct; range [5..5]",
         "resolveAs": ""
       },
       "124": {
         "name": "",
-        "note": "(inferred) Boolean; 4% present; 1 distinct",
+        "note": "(inferred) Boolean; 8% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -26156,7 +26627,7 @@
     "params": {
       "255": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [604..604]",
+        "note": "(inferred) Int32; 7 distinct; range [604..2148]",
         "resolveAs": ""
       }
     }
@@ -27281,7 +27752,18 @@
   },
   "RESPONSE:424": {
     "name": "LoadoutUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1943..1943]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:425": {
     "name": "LoadoutDelete",
@@ -28349,16 +28831,6 @@
   "RESPONSE:516": {
     "name": "AssetOverview",
     "params": {
-      "0": {
-        "name": "timestamp",
-        "note": "(inferred) Int64; 17 distinct; range [639156349635297963..639164302543039172]; likely .NET ticks (UTC)",
-        "resolveAs": ""
-      },
-      "1": {
-        "name": "",
-        "note": "(inferred) Byte[]; 22 distinct; Byte[] array",
-        "resolveAs": ""
-      },
       "2": {
         "name": "locationId",
         "note": "location short-id; first digit = city (0 Thetford, 1 Lymhurst, 2 Bridgewatch, 3 Caerleon, 4 Fort Sterling, 5 Brecilien)",
@@ -28384,14 +28856,24 @@
         "note": "island/hideout owner; empty for city banks",
         "resolveAs": ""
       },
-      "7": {
-        "name": "vector",
-        "note": "(inferred) Single[]; 3 distinct; Single[]",
-        "resolveAs": ""
-      },
       "8": {
         "name": "tab",
         "note": "parent location id, or BLACKBANK-<id> for blackzone deposits; empty for city banks",
+        "resolveAs": ""
+      },
+      "0": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 17 distinct; range [639156349635297963..639164302543039172]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 22 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 3 distinct; Single[]",
         "resolveAs": ""
       },
       "255": {
@@ -28404,16 +28886,6 @@
   "RESPONSE:517": {
     "name": "AssetOverviewTabs",
     "params": {
-      "0": {
-        "name": "",
-        "note": "(inferred) Byte[]; 23 distinct; Byte[] array",
-        "resolveAs": ""
-      },
-      "1": {
-        "name": "",
-        "note": "(inferred) Byte[]; 23 distinct; Byte[] array",
-        "resolveAs": ""
-      },
       "2": {
         "name": "tabName",
         "note": "asset tab/category; @BUILDINGS_T1_BANK = the default bank tab",
@@ -28424,14 +28896,24 @@
         "note": "icon_tag_* shown for the tab",
         "resolveAs": ""
       },
-      "4": {
-        "name": "",
-        "note": "(inferred) Int32[]; 2 distinct; Int32[] array",
-        "resolveAs": ""
-      },
       "5": {
         "name": "itemCount",
         "note": "items in each tab",
+        "resolveAs": ""
+      },
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 23 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Byte[]; 23 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Int32[]; 2 distinct; Int32[] array",
         "resolveAs": ""
       },
       "6": {
@@ -28449,6 +28931,16 @@
   "RESPONSE:518": {
     "name": "AssetOverviewTabContent",
     "params": {
+      "2": {
+        "name": "itemType",
+        "note": "item type id per stack",
+        "resolveAs": "itemIndex"
+      },
+      "8": {
+        "name": "ownerName",
+        "note": "depositor; empty for city-bank stacks",
+        "resolveAs": ""
+      },
       "0": {
         "name": "",
         "note": "(inferred) Byte[]; 26 distinct; Byte[] array",
@@ -28458,11 +28950,6 @@
         "name": "",
         "note": "(inferred) Int32; 1 distinct; range [4..4]",
         "resolveAs": ""
-      },
-      "2": {
-        "name": "itemType",
-        "note": "item type id per stack",
-        "resolveAs": "itemIndex"
       },
       "3": {
         "name": "",
@@ -28487,11 +28974,6 @@
       "7": {
         "name": "",
         "note": "(inferred) Byte[]; 9 distinct; Byte[] array",
-        "resolveAs": ""
-      },
-      "8": {
-        "name": "ownerName",
-        "note": "depositor; empty for city-bank stacks",
         "resolveAs": ""
       },
       "9": {
@@ -28528,6 +29010,11 @@
   "RESPONSE:520": {
     "name": "AssetOverviewSearch",
     "params": {
+      "2": {
+        "name": "locationId",
+        "note": "world cluster @Index; resolves to the map name",
+        "resolveAs": "location"
+      },
       "0": {
         "name": "timestamp",
         "note": "(inferred) Int64; 11 distinct; range [639156464923177341..639160135253858427]; likely .NET ticks (UTC)",
@@ -28537,11 +29024,6 @@
         "name": "",
         "note": "(inferred) Byte[]; 95% present; 20 distinct; Byte[] array",
         "resolveAs": ""
-      },
-      "2": {
-        "name": "locationId",
-        "note": "world cluster @Index; resolves to the map name",
-        "resolveAs": "location"
       },
       "3": {
         "name": "",
