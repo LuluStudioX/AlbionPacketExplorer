@@ -10,6 +10,7 @@
    "721c500-unknown-eb2d4a40c254.json",
    "89b5070b-unknown-e1bf760391e2.json",
    "89b5070b-unknown-e9b5ef5d1599.json",
+   "a842180-all-861ae7bd67ea.json",
    "a842180-all-b7bd229cf577.json",
    "a842180-all-d7cfce6d3712.json",
    "a842180-unknown-1996eaacb2dc.json",
@@ -18,7 +19,7 @@
   "note": "Lowest-precedence fill. Every param is (inferred) from wire shape."
  },
  "EVENT:1": {
-  "count": 611246,
+  "count": 613388,
   "params": {
    "0": {
     "name": "objectId",
@@ -48,11 +49,11 @@
   }
  },
  "EVENT:2": {
-  "count": 1313,
+  "count": 1318,
   "params": {}
  },
  "EVENT:3": {
-  "count": 4209704,
+  "count": 4258402,
   "params": {
    "0": {
     "name": "objectId",
@@ -107,7 +108,7 @@
   }
  },
  "EVENT:6": {
-  "count": 377390,
+  "count": 377489,
   "params": {
    "0": {
     "name": "objectId",
@@ -152,7 +153,7 @@
   }
  },
  "EVENT:7": {
-  "count": 123233,
+  "count": 123246,
   "params": {
    "0": {
     "name": "objectId",
@@ -186,7 +187,7 @@
    },
    "6": {
     "name": "",
-    "note": "(inferred) Byte[]/Int32[]/Int16[]; high-card; Byte[] array",
+    "note": "(inferred) Int32[]/Byte[]/Int16[]; high-card; Int32[] array",
     "resolveAs": ""
    },
    "7": {
@@ -197,7 +198,7 @@
   }
  },
  "EVENT:8": {
-  "count": 136754,
+  "count": 136893,
   "params": {
    "0": {
     "name": "objectId",
@@ -237,7 +238,7 @@
   }
  },
  "EVENT:9": {
-  "count": 28568,
+  "count": 28580,
   "params": {
    "0": {
     "name": "objectId",
@@ -252,11 +253,11 @@
   }
  },
  "EVENT:10": {
-  "count": 876,
+  "count": 1209,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int64; 18 distinct; range [404..405693]",
+    "note": "(inferred) Int64; 18 distinct; range [404..831961]",
     "resolveAs": ""
    },
    "1": {
@@ -266,7 +267,7 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Single; 47% present; 37 distinct; range [-3.45e+03..-1]",
+    "note": "(inferred) Single; 34% present; 37 distinct; range [-3.45e+03..-1]",
     "resolveAs": ""
    },
    "3": {
@@ -277,7 +278,7 @@
   }
  },
  "EVENT:11": {
-  "count": 741956,
+  "count": 745598,
   "params": {
    "0": {
     "name": "objectId",
@@ -321,7 +322,7 @@
    },
    "8": {
     "name": "",
-    "note": "(inferred) Byte[]/Int16[]/Int32[]; 95% present; high-card; Byte[] array",
+    "note": "(inferred) Byte[]/Int32[]/Int16[]; 95% present; high-card; Byte[] array",
     "resolveAs": ""
    },
    "9": {
@@ -337,7 +338,7 @@
   }
  },
  "EVENT:13": {
-  "count": 42098,
+  "count": 42124,
   "params": {
    "0": {
     "name": "objectId",
@@ -377,7 +378,7 @@
   }
  },
  "EVENT:14": {
-  "count": 97489,
+  "count": 97614,
   "params": {
    "0": {
     "name": "objectId",
@@ -467,7 +468,7 @@
   }
  },
  "EVENT:16": {
-  "count": 1694,
+  "count": 1702,
   "params": {
    "0": {
     "name": "objectId",
@@ -522,7 +523,7 @@
   }
  },
  "EVENT:17": {
-  "count": 7382,
+  "count": 7392,
   "params": {
    "0": {
     "name": "objectId",
@@ -531,7 +532,7 @@
    },
    "1": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "2": {
@@ -547,7 +548,7 @@
   }
  },
  "EVENT:18": {
-  "count": 99181,
+  "count": 99298,
   "params": {
    "0": {
     "name": "objectId",
@@ -576,7 +577,7 @@
    },
    "5": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "6": {
@@ -587,7 +588,7 @@
   }
  },
  "EVENT:19": {
-  "count": 206399,
+  "count": 207522,
   "params": {
    "0": {
     "name": "objectId",
@@ -632,7 +633,7 @@
   }
  },
  "EVENT:20": {
-  "count": 22795,
+  "count": 22802,
   "params": {
    "0": {
     "name": "objectId",
@@ -677,7 +678,7 @@
   }
  },
  "EVENT:21": {
-  "count": 243202,
+  "count": 243888,
   "params": {
    "0": {
     "name": "objectId",
@@ -707,7 +708,7 @@
   }
  },
  "EVENT:22": {
-  "count": 119271,
+  "count": 119319,
   "params": {
    "0": {
     "name": "objectId",
@@ -737,7 +738,7 @@
   }
  },
  "EVENT:24": {
-  "count": 9646,
+  "count": 9657,
   "params": {
    "0": {
     "name": "objectId",
@@ -797,7 +798,7 @@
   }
  },
  "EVENT:26": {
-  "count": 5159,
+  "count": 5259,
   "params": {
    "0": {
     "name": "objectId",
@@ -816,13 +817,13 @@
    },
    "3": {
     "name": "",
-    "note": "(inferred) Int64; 84% present; high-card; range [2..130]",
+    "note": "(inferred) Int64; 82% present; high-card; range [2..130]",
     "resolveAs": ""
    }
   }
  },
  "EVENT:27": {
-  "count": 89527,
+  "count": 89692,
   "params": {
    "0": {
     "name": "objectId",
@@ -837,11 +838,11 @@
   }
  },
  "EVENT:28": {
-  "count": 41175,
+  "count": 41180,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Byte[]/Int16[]/Int32[]; high-card; Byte[] array",
+    "note": "(inferred) Int16[]/Int32[]/Byte[]; high-card; Int16[] array",
     "resolveAs": ""
    },
    "1": {
@@ -857,7 +858,7 @@
   }
  },
  "EVENT:29": {
-  "count": 68069,
+  "count": 69473,
   "params": {
    "0": {
     "name": "objectId",
@@ -1026,7 +1027,7 @@
    },
    "38": {
     "name": "",
-    "note": "(inferred) Int32/Int64; high-card; range [115984..639198400623827300]",
+    "note": "(inferred) Int32/Int64; high-card; range [115984..639198536575921000]",
     "resolveAs": ""
    },
    "39": {
@@ -1157,7 +1158,7 @@
   }
  },
  "EVENT:30": {
-  "count": 27657,
+  "count": 27953,
   "params": {
    "0": {
     "name": "objectId",
@@ -1222,7 +1223,7 @@
   }
  },
  "EVENT:32": {
-  "count": 214335,
+  "count": 217334,
   "params": {
    "0": {
     "name": "objectId",
@@ -1252,7 +1253,7 @@
   }
  },
  "EVENT:33": {
-  "count": 3188,
+  "count": 3192,
   "params": {
    "0": {
     "name": "objectId",
@@ -1287,7 +1288,7 @@
   }
  },
  "EVENT:35": {
-  "count": 68793,
+  "count": 69343,
   "params": {
    "0": {
     "name": "objectId",
@@ -1296,7 +1297,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int16; high-card; range [6036..12058]",
+    "note": "(inferred) Int16; high-card; range [6034..12058]",
     "resolveAs": ""
    },
    "2": {
@@ -1321,13 +1322,13 @@
    },
    "7": {
     "name": "",
-    "note": "(inferred) Int64; 36% present; 35 distinct; range [552000..144000000]",
+    "note": "(inferred) Int64; 37% present; high-card; range [400000..144000000]",
     "resolveAs": ""
    }
   }
  },
  "EVENT:37": {
-  "count": 761,
+  "count": 762,
   "params": {
    "0": {
     "name": "objectId",
@@ -1397,7 +1398,7 @@
   }
  },
  "EVENT:39": {
-  "count": 72915,
+  "count": 72971,
   "params": {
    "0": {
     "name": "",
@@ -1587,7 +1588,7 @@
   }
  },
  "EVENT:45": {
-  "count": 333462,
+  "count": 336195,
   "params": {
    "0": {
     "name": "objectId",
@@ -1631,7 +1632,7 @@
    },
    "8": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [638503776000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [638503776000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "9": {
@@ -1686,32 +1687,32 @@
    },
    "20": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [638539200000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [638539200000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "21": {
     "name": "",
-    "note": "(inferred) Int64; 8% present; high-card; range [23300..44410770000]",
+    "note": "(inferred) Int64; 9% present; high-card; range [23300..44410770000]",
     "resolveAs": ""
    },
    "22": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [638540064000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [638540064000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "23": {
     "name": "",
-    "note": "(inferred) Int64; 3% present; high-card; range [2000..448784093000]",
+    "note": "(inferred) Int64; 3% present; high-card; range [2000..500000003610]",
     "resolveAs": ""
    },
    "24": {
     "name": "",
-    "note": "(inferred) Int64; 4% present; 17 distinct; range [15000..51000]",
+    "note": "(inferred) Int64; 4% present; 17 distinct; range [15000..99900]",
     "resolveAs": ""
    },
    "25": {
     "name": "",
-    "note": "(inferred) Boolean; 61% present; 1 distinct",
+    "note": "(inferred) Boolean; 60% present; 1 distinct",
     "resolveAs": ""
    },
    "26": {
@@ -1721,7 +1722,7 @@
    },
    "27": {
     "name": "",
-    "note": "(inferred) Boolean; 11% present; 1 distinct",
+    "note": "(inferred) Boolean; 10% present; 1 distinct",
     "resolveAs": ""
    },
    "28": {
@@ -1737,7 +1738,7 @@
   }
  },
  "EVENT:46": {
-  "count": 11389,
+  "count": 11395,
   "params": {
    "0": {
     "name": "objectId",
@@ -1782,11 +1783,11 @@
   }
  },
  "EVENT:49": {
-  "count": 3216,
+  "count": 3661,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int64; 23 distinct; range [117..787]",
+    "note": "(inferred) Int64; 23 distinct; range [117..1408]",
     "resolveAs": ""
    },
    "1": {
@@ -1801,7 +1802,7 @@
    },
    "3": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 5% present; 7 distinct; range [639159552000000000..639159552000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 17% present; 7 distinct; range [639159552000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "4": {
@@ -1902,7 +1903,7 @@
   }
  },
  "EVENT:56": {
-  "count": 80936,
+  "count": 80938,
   "params": {
    "0": {
     "name": "objectId",
@@ -1921,7 +1922,7 @@
    },
    "3": {
     "name": "",
-    "note": "(inferred) Int64; 46% present; high-card; range [199860000..364800000]",
+    "note": "(inferred) Int64; 46% present; high-card; range [36010000..364800000]",
     "resolveAs": ""
    },
    "4": {
@@ -1962,7 +1963,7 @@
   }
  },
  "EVENT:57": {
-  "count": 40852,
+  "count": 40853,
   "params": {
    "0": {
     "name": "objectId",
@@ -1981,12 +1982,12 @@
    },
    "3": {
     "name": "",
-    "note": "(inferred) Int64; 50% present; 3 distinct; range [3600000..7200000]",
+    "note": "(inferred) Int64; 50% present; 4 distinct; range [2400000..7200000]",
     "resolveAs": ""
    },
    "5": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 50% present; high-card; range [639156096000000000..639182016000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 50% present; high-card; range [639156096000000000..639195840000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
@@ -2112,7 +2113,7 @@
   }
  },
  "EVENT:62": {
-  "count": 6120,
+  "count": 6130,
   "params": {
    "0": {
     "name": "objectId",
@@ -2157,7 +2158,7 @@
   }
  },
  "EVENT:64": {
-  "count": 11195,
+  "count": 11574,
   "params": {
    "0": {
     "name": "objectId",
@@ -2166,17 +2167,17 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int64; high-card; range [6..381073]",
+    "note": "(inferred) Int64; high-card; range [6..448706]",
     "resolveAs": ""
    },
    "2": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639193248000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "3": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639193248000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "4": {
@@ -2192,7 +2193,7 @@
   }
  },
  "EVENT:65": {
-  "count": 171,
+  "count": 187,
   "params": {
    "0": {
     "name": "objectId",
@@ -2201,13 +2202,13 @@
    },
    "1": {
     "name": "flags",
-    "note": "(inferred) Byte; 3 distinct; range [1..7]; small enum/flag byte",
+    "note": "(inferred) Byte; 4 distinct; range [1..7]; small enum/flag byte",
     "resolveAs": ""
    }
   }
  },
  "EVENT:66": {
-  "count": 10792,
+  "count": 11287,
   "params": {
    "0": {
     "name": "objectId",
@@ -2216,12 +2217,12 @@
    },
    "1": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639193248000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int64; high-card; range [6..347137]",
+    "note": "(inferred) Int64; high-card; range [6..448706]",
     "resolveAs": ""
    },
    "3": {
@@ -2297,7 +2298,7 @@
   }
  },
  "EVENT:71": {
-  "count": 11300,
+  "count": 12535,
   "params": {
    "0": {
     "name": "objectId",
@@ -2306,7 +2307,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int64; high-card; range [6..381073]",
+    "note": "(inferred) Int64; high-card; range [6..448706]",
     "resolveAs": ""
    },
    "2": {
@@ -2342,7 +2343,7 @@
   }
  },
  "EVENT:74": {
-  "count": 819,
+  "count": 823,
   "params": {
    "0": {
     "name": "",
@@ -2377,7 +2378,7 @@
   }
  },
  "EVENT:77": {
-  "count": 76,
+  "count": 79,
   "params": {
    "0": {
     "name": "",
@@ -2391,7 +2392,7 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int64; 20% present; 9 distinct; range [6788..2379726]",
+    "note": "(inferred) Int64; 19% present; 9 distinct; range [6788..2379726]",
     "resolveAs": ""
    },
    "3": {
@@ -2427,7 +2428,7 @@
   }
  },
  "EVENT:81": {
-  "count": 2490,
+  "count": 2837,
   "params": {
    "0": {
     "name": "objectId",
@@ -2442,7 +2443,7 @@
   }
  },
  "EVENT:82": {
-  "count": 11140,
+  "count": 11473,
   "params": {
    "0": {
     "name": "objectId",
@@ -2451,7 +2452,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int64; high-card; range [64500..3126435635728]",
+    "note": "(inferred) Int64; high-card; range [64500..3130578835728]",
     "resolveAs": ""
    },
    "2": {
@@ -2506,12 +2507,12 @@
    },
    "15": {
     "name": "",
-    "note": "(inferred) Boolean; 34% present; 1 distinct",
+    "note": "(inferred) Boolean; 36% present; 1 distinct",
     "resolveAs": ""
    },
    "17": {
     "name": "",
-    "note": "(inferred) Single; 0% present; 1 distinct; range [0.15..0.15]",
+    "note": "(inferred) Single; 3% present; 1 distinct; range [0.15..0.15]",
     "resolveAs": ""
    }
   }
@@ -2692,7 +2693,7 @@
   }
  },
  "EVENT:88": {
-  "count": 474,
+  "count": 475,
   "params": {
    "0": {
     "name": "objectId",
@@ -2767,7 +2768,7 @@
   }
  },
  "EVENT:90": {
-  "count": 32261,
+  "count": 32575,
   "params": {
    "0": {
     "name": "objectId",
@@ -2816,13 +2817,13 @@
    },
    "9": {
     "name": "",
-    "note": "(inferred) Boolean; 28% present; 1 distinct",
+    "note": "(inferred) Boolean; 27% present; 1 distinct",
     "resolveAs": ""
    }
   }
  },
  "EVENT:91": {
-  "count": 50373,
+  "count": 50423,
   "params": {
    "0": {
     "name": "objectId",
@@ -2851,13 +2852,13 @@
    },
    "6": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
  },
  "EVENT:92": {
-  "count": 2427,
+  "count": 2453,
   "params": {
    "0": {
     "name": "objectId",
@@ -2886,13 +2887,13 @@
    },
    "6": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
  },
  "EVENT:93": {
-  "count": 2124,
+  "count": 2141,
   "params": {
    "0": {
     "name": "objectId",
@@ -2921,13 +2922,13 @@
    },
    "6": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
  },
  "EVENT:94": {
-  "count": 1279,
+  "count": 1284,
   "params": {
    "0": {
     "name": "objectId",
@@ -2956,7 +2957,7 @@
    },
    "6": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
@@ -3017,7 +3018,7 @@
   }
  },
  "EVENT:96": {
-  "count": 16247,
+  "count": 16335,
   "params": {
    "0": {
     "name": "objectId",
@@ -3046,7 +3047,7 @@
    },
    "6": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 90% present; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 90% present; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "7": {
@@ -3066,7 +3067,7 @@
    },
    "11": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 90% present; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 90% present; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "12": {
@@ -3086,7 +3087,7 @@
    },
    "16": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
@@ -3107,7 +3108,7 @@
   }
  },
  "EVENT:98": {
-  "count": 894,
+  "count": 910,
   "params": {
    "0": {
     "name": "objectId",
@@ -3171,7 +3172,7 @@
    },
    "12": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "13": {
@@ -3247,7 +3248,7 @@
   }
  },
  "EVENT:99": {
-  "count": 21619,
+  "count": 21628,
   "params": {
    "0": {
     "name": "objectId",
@@ -3277,7 +3278,7 @@
   }
  },
  "EVENT:100": {
-  "count": 21607,
+  "count": 21616,
   "params": {
    "0": {
     "name": "",
@@ -3307,7 +3308,7 @@
   }
  },
  "EVENT:103": {
-  "count": 54701,
+  "count": 55731,
   "params": {
    "0": {
     "name": "",
@@ -3441,7 +3442,7 @@
    },
    "29": {
     "name": "",
-    "note": "(inferred) Int64; 78% present; 39 distinct; range [29324..180162]",
+    "note": "(inferred) Int64; 79% present; 39 distinct; range [29324..180162]",
     "resolveAs": ""
    },
    "31": {
@@ -3482,7 +3483,7 @@
   }
  },
  "EVENT:104": {
-  "count": 34988,
+  "count": 35693,
   "params": {
    "0": {
     "name": "",
@@ -3501,7 +3502,7 @@
    },
    "3": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639148320000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639148320000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "4": {
@@ -3537,11 +3538,11 @@
   }
  },
  "EVENT:106": {
-  "count": 31,
+  "count": 32,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Byte[]; 68% present; 19 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 66% present; 19 distinct; Byte[] array",
     "resolveAs": ""
    },
    "1": {
@@ -3556,12 +3557,12 @@
    },
    "3": {
     "name": "",
-    "note": "(inferred) String; 68% present; 15 distinct; string value",
+    "note": "(inferred) String; 66% present; 15 distinct; string value",
     "resolveAs": ""
    },
    "4": {
     "name": "",
-    "note": "(inferred) Int32; 87% present; 9 distinct; range [-1..9]",
+    "note": "(inferred) Int32; 88% present; 9 distinct; range [-1..9]",
     "resolveAs": ""
    },
    "5": {
@@ -3571,27 +3572,27 @@
    },
    "6": {
     "name": "",
-    "note": "(inferred) Int32; 65% present; 10 distinct; range [1..14]",
+    "note": "(inferred) Int32; 62% present; 10 distinct; range [1..14]",
     "resolveAs": ""
    },
    "7": {
     "name": "",
-    "note": "(inferred) Int32; 58% present; 8 distinct; range [2..13]",
+    "note": "(inferred) Int32; 56% present; 8 distinct; range [2..13]",
     "resolveAs": ""
    },
    "8": {
     "name": "",
-    "note": "(inferred) Int32; 55% present; 7 distinct; range [4335890..16777215]",
+    "note": "(inferred) Int32; 53% present; 7 distinct; range [4335890..16777215]",
     "resolveAs": ""
    },
    "9": {
     "name": "",
-    "note": "(inferred) Single; 68% present; 12 distinct; range [0.6..1.25]",
+    "note": "(inferred) Single; 66% present; 12 distinct; range [0.6..1.25]",
     "resolveAs": ""
    },
    "10": {
     "name": "",
-    "note": "(inferred) Single; 35% present; 5 distinct; range [-0.2..-0.05]",
+    "note": "(inferred) Single; 34% present; 5 distinct; range [-0.2..-0.05]",
     "resolveAs": ""
    },
    "12": {
@@ -3847,7 +3848,7 @@
   }
  },
  "EVENT:113": {
-  "count": 52987,
+  "count": 53008,
   "params": {
    "0": {
     "name": "objectId",
@@ -3952,7 +3953,7 @@
   }
  },
  "EVENT:115": {
-  "count": 1359,
+  "count": 1360,
   "params": {
    "0": {
     "name": "objectId",
@@ -4012,7 +4013,7 @@
   }
  },
  "EVENT:123": {
-  "count": 62270,
+  "count": 62276,
   "params": {
    "0": {
     "name": "objectId",
@@ -4182,7 +4183,7 @@
   }
  },
  "EVENT:138": {
-  "count": 44,
+  "count": 46,
   "params": {
    "0": {
     "name": "",
@@ -4191,7 +4192,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Boolean; 48% present; 1 distinct",
+    "note": "(inferred) Boolean; 50% present; 1 distinct",
     "resolveAs": ""
    }
   }
@@ -4542,7 +4543,7 @@
   }
  },
  "EVENT:141": {
-  "count": 22354,
+  "count": 22381,
   "params": {
    "0": {
     "name": "objectId",
@@ -4556,7 +4557,7 @@
    },
    "2": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "3": {
@@ -5197,7 +5198,7 @@
   }
  },
  "EVENT:151": {
-  "count": 1310,
+  "count": 1315,
   "params": {
    "0": {
     "name": "objectId",
@@ -5232,7 +5233,7 @@
   }
  },
  "EVENT:152": {
-  "count": 115,
+  "count": 131,
   "params": {
    "0": {
     "name": "",
@@ -5246,13 +5247,13 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int32; 79% present; 43 distinct; range [1..99]",
+    "note": "(inferred) Int32; 82% present; 43 distinct; range [1..99]",
     "resolveAs": ""
    }
   }
  },
  "EVENT:153": {
-  "count": 5754,
+  "count": 6103,
   "params": {
    "0": {
     "name": "",
@@ -5266,7 +5267,7 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int32; 92% present; 61 distinct; range [1..99]",
+    "note": "(inferred) Int32; 93% present; 61 distinct; range [1..99]",
     "resolveAs": ""
    },
    "3": {
@@ -5282,7 +5283,7 @@
   }
  },
  "EVENT:154": {
-  "count": 6400,
+  "count": 6425,
   "params": {
    "0": {
     "name": "objectId",
@@ -5327,7 +5328,7 @@
   }
  },
  "EVENT:156": {
-  "count": 1313,
+  "count": 1318,
   "params": {
    "0": {
     "name": "objectId",
@@ -5402,7 +5403,7 @@
   }
  },
  "EVENT:160": {
-  "count": 27874,
+  "count": 28271,
   "params": {
    "0": {
     "name": "",
@@ -5457,7 +5458,7 @@
   }
  },
  "EVENT:163": {
-  "count": 1267,
+  "count": 1308,
   "params": {
    "0": {
     "name": "",
@@ -5476,7 +5477,7 @@
    },
    "3": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
@@ -5507,7 +5508,7 @@
   }
  },
  "EVENT:165": {
-  "count": 66,
+  "count": 67,
   "params": {
    "0": {
     "name": "vector",
@@ -5531,7 +5532,7 @@
    },
    "4": {
     "name": "",
-    "note": "(inferred) Byte[]; 74% present; 29 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 75% present; 29 distinct; Byte[] array",
     "resolveAs": ""
    },
    "5": {
@@ -5541,7 +5542,7 @@
    },
    "6": {
     "name": "",
-    "note": "(inferred) Boolean; 35% present; 1 distinct",
+    "note": "(inferred) Boolean; 34% present; 1 distinct",
     "resolveAs": ""
    },
    "7": {
@@ -5581,7 +5582,7 @@
    },
    "14": {
     "name": "",
-    "note": "(inferred) Boolean; 35% present; 1 distinct",
+    "note": "(inferred) Boolean; 34% present; 1 distinct",
     "resolveAs": ""
    },
    "15": {
@@ -5602,7 +5603,7 @@
   }
  },
  "EVENT:166": {
-  "count": 1767,
+  "count": 1770,
   "params": {
    "0": {
     "name": "objectId",
@@ -5862,7 +5863,7 @@
   }
  },
  "EVENT:183": {
-  "count": 290,
+  "count": 292,
   "params": {
    "0": {
     "name": "",
@@ -5877,7 +5878,7 @@
   }
  },
  "EVENT:185": {
-  "count": 168,
+  "count": 170,
   "params": {
    "0": {
     "name": "objectId",
@@ -5892,7 +5893,7 @@
   }
  },
  "EVENT:186": {
-  "count": 480,
+  "count": 486,
   "params": {
    "0": {
     "name": "objectId",
@@ -5911,18 +5912,18 @@
    },
    "3": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 92% present; high-card; range [639156960000000000..639185472000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 92% present; high-card; range [639156960000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "4": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 92% present; high-card; range [639156960000000000..639185472000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 92% present; high-card; range [639156960000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
  },
  "EVENT:187": {
-  "count": 237,
+  "count": 241,
   "params": {
    "0": {
     "name": "objectId",
@@ -5977,11 +5978,11 @@
   }
  },
  "EVENT:192": {
-  "count": 1002,
+  "count": 1029,
   "params": {
    "0": {
     "name": "objectId",
-    "note": "(inferred) Int64; high-card; range [216..1267]; high-cardinality id at key 0",
+    "note": "(inferred) Int64; high-card; range [216..1271]; high-cardinality id at key 0",
     "resolveAs": ""
    },
    "1": {
@@ -6011,7 +6012,7 @@
    },
    "6": {
     "name": "",
-    "note": "(inferred) Byte[]; 74% present; 62 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 73% present; 62 distinct; Byte[] array",
     "resolveAs": ""
    },
    "7": {
@@ -6042,7 +6043,7 @@
   }
  },
  "EVENT:193": {
-  "count": 92,
+  "count": 93,
   "params": {
    "0": {
     "name": "vector",
@@ -6177,7 +6178,7 @@
   }
  },
  "EVENT:202": {
-  "count": 2427,
+  "count": 2437,
   "params": {
    "1": {
     "name": "",
@@ -6207,7 +6208,7 @@
   }
  },
  "EVENT:204": {
-  "count": 1266,
+  "count": 1268,
   "params": {
    "0": {
     "name": "objectId",
@@ -6267,7 +6268,7 @@
   }
  },
  "EVENT:210": {
-  "count": 282976,
+  "count": 283527,
   "params": {
    "0": {
     "name": "objectId",
@@ -6307,7 +6308,7 @@
   }
  },
  "EVENT:211": {
-  "count": 112918,
+  "count": 114273,
   "params": {
    "0": {
     "name": "objectId",
@@ -6321,7 +6322,7 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int32; 85% present; 74 distinct; range [2971..3073]",
+    "note": "(inferred) Int32; 85% present; 74 distinct; range [2971..3075]",
     "resolveAs": ""
    },
    "3": {
@@ -6341,7 +6342,7 @@
    },
    "6": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "7": {
@@ -6387,7 +6388,7 @@
   }
  },
  "EVENT:212": {
-  "count": 12467,
+  "count": 12650,
   "params": {
    "0": {
     "name": "objectId",
@@ -6412,7 +6413,7 @@
   }
  },
  "EVENT:213": {
-  "count": 764,
+  "count": 767,
   "params": {
    "0": {
     "name": "objectId",
@@ -6422,7 +6423,7 @@
   }
  },
  "EVENT:214": {
-  "count": 1601,
+  "count": 1605,
   "params": {
    "0": {
     "name": "",
@@ -6447,7 +6448,7 @@
   }
  },
  "EVENT:215": {
-  "count": 97,
+  "count": 100,
   "params": {
    "0": {
     "name": "",
@@ -6461,7 +6462,7 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Single; 67% present; 2 distinct; range [90..123]",
+    "note": "(inferred) Single; 68% present; 2 distinct; range [90..123]",
     "resolveAs": ""
    },
    "3": {
@@ -6472,7 +6473,7 @@
   }
  },
  "EVENT:216": {
-  "count": 1283,
+  "count": 1295,
   "params": {
    "0": {
     "name": "objectId",
@@ -6492,7 +6493,7 @@
   }
  },
  "EVENT:218": {
-  "count": 1315,
+  "count": 1320,
   "params": {
    "0": {
     "name": "",
@@ -6522,11 +6523,11 @@
   }
  },
  "EVENT:221": {
-  "count": 66,
+  "count": 69,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int64; 11 distinct; range [2673..180542]",
+    "note": "(inferred) Int64; 12 distinct; range [2673..766022]",
     "resolveAs": ""
    },
    "1": {
@@ -6537,7 +6538,7 @@
   }
  },
  "EVENT:223": {
-  "count": 1278,
+  "count": 1283,
   "params": {
    "0": {
     "name": "",
@@ -6547,7 +6548,7 @@
   }
  },
  "EVENT:224": {
-  "count": 1278,
+  "count": 1283,
   "params": {
    "0": {
     "name": "",
@@ -6557,7 +6558,7 @@
   }
  },
  "EVENT:226": {
-  "count": 699,
+  "count": 700,
   "params": {
    "0": {
     "name": "",
@@ -6587,7 +6588,7 @@
   }
  },
  "EVENT:229": {
-  "count": 11,
+  "count": 12,
   "params": {
    "0": {
     "name": "",
@@ -6601,12 +6602,12 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int16; 5 distinct; range [17..105]",
+    "note": "(inferred) Int16; 6 distinct; range [17..122]",
     "resolveAs": ""
    },
    "3": {
     "name": "",
-    "note": "(inferred) Int16; 3 distinct; range [12..55]",
+    "note": "(inferred) Int16; 4 distinct; range [12..55]",
     "resolveAs": ""
    },
    "4": {
@@ -6626,27 +6627,27 @@
    },
    "7": {
     "name": "",
-    "note": "(inferred) Int32; 7 distinct; range [5681..93116]",
+    "note": "(inferred) Int32; 8 distinct; range [5681..93116]",
     "resolveAs": ""
    },
    "8": {
     "name": "",
-    "note": "(inferred) Boolean; 45% present; 1 distinct",
+    "note": "(inferred) Boolean; 50% present; 1 distinct",
     "resolveAs": ""
    },
    "9": {
     "name": "",
-    "note": "(inferred) Boolean; 36% present; 1 distinct",
+    "note": "(inferred) Boolean; 33% present; 1 distinct",
     "resolveAs": ""
    },
    "10": {
     "name": "",
-    "note": "(inferred) Boolean; 55% present; 1 distinct",
+    "note": "(inferred) Boolean; 50% present; 1 distinct",
     "resolveAs": ""
    },
    "11": {
     "name": "",
-    "note": "(inferred) Boolean; 18% present; 1 distinct",
+    "note": "(inferred) Boolean; 17% present; 1 distinct",
     "resolveAs": ""
    },
    "12": {
@@ -7022,7 +7023,7 @@
   }
  },
  "EVENT:245": {
-  "count": 33,
+  "count": 34,
   "params": {
    "0": {
     "name": "",
@@ -7302,7 +7303,7 @@
   }
  },
  "EVENT:258": {
-  "count": 939,
+  "count": 944,
   "params": {
    "0": {
     "name": "objectId",
@@ -7347,11 +7348,11 @@
   }
  },
  "EVENT:260": {
-  "count": 11,
+  "count": 13,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int64; 2 distinct; range [1499..2244]",
+    "note": "(inferred) Int64; 3 distinct; range [1491..2244]",
     "resolveAs": ""
    },
    "1": {
@@ -7366,12 +7367,12 @@
    },
    "4": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 2 distinct; range [639185472000000000..639185472000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 2 distinct; range [639185472000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "5": {
     "name": "",
-    "note": "(inferred) Boolean; 64% present; 1 distinct",
+    "note": "(inferred) Boolean; 54% present; 1 distinct",
     "resolveAs": ""
    }
   }
@@ -7397,6 +7398,31 @@
    "1": {
     "name": "",
     "note": "(inferred) Boolean; 60% present; 1 distinct",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:265": {
+  "count": 4,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 2 distinct; range [807343..816303]",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:266": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [807343..807343]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Boolean; 1 distinct",
     "resolveAs": ""
    }
   }
@@ -7427,7 +7453,7 @@
   }
  },
  "EVENT:269": {
-  "count": 575,
+  "count": 583,
   "params": {
    "0": {
     "name": "objectId",
@@ -7437,7 +7463,7 @@
   }
  },
  "EVENT:270": {
-  "count": 469,
+  "count": 472,
   "params": {
    "0": {
     "name": "objectId",
@@ -7446,13 +7472,13 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Boolean; 7% present; 1 distinct",
+    "note": "(inferred) Boolean; 8% present; 1 distinct",
     "resolveAs": ""
    }
   }
  },
  "EVENT:271": {
-  "count": 51,
+  "count": 58,
   "params": {
    "0": {
     "name": "",
@@ -7462,7 +7488,7 @@
   }
  },
  "EVENT:272": {
-  "count": 829,
+  "count": 833,
   "params": {
    "0": {
     "name": "objectId",
@@ -7542,7 +7568,7 @@
   }
  },
  "EVENT:277": {
-  "count": 18904,
+  "count": 19306,
   "params": {
    "0": {
     "name": "",
@@ -7551,17 +7577,17 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int16/String; 21% present; 7 distinct; range [-1..3]",
+    "note": "(inferred) Int16/String; 23% present; 7 distinct; range [-1..3]",
     "resolveAs": ""
    },
    "2": {
     "name": "",
-    "note": "(inferred) Boolean/String; 86% present; high-card",
+    "note": "(inferred) Boolean/String; 84% present; high-card",
     "resolveAs": ""
    },
    "3": {
     "name": "",
-    "note": "(inferred) Boolean; 79% present; 1 distinct",
+    "note": "(inferred) Boolean; 77% present; 1 distinct",
     "resolveAs": ""
    },
    "4": {
@@ -7571,13 +7597,13 @@
    },
    "5": {
     "name": "",
-    "note": "(inferred) Int64; 79% present; high-card; range [1..16400000000]",
+    "note": "(inferred) Int64; 77% present; high-card; range [1..16400000000]",
     "resolveAs": ""
    }
   }
  },
  "EVENT:278": {
-  "count": 10950,
+  "count": 10962,
   "params": {
    "0": {
     "name": "objectId",
@@ -7597,7 +7623,7 @@
   }
  },
  "EVENT:279": {
-  "count": 2956,
+  "count": 2966,
   "params": {
    "0": {
     "name": "objectId",
@@ -7707,7 +7733,7 @@
   }
  },
  "EVENT:285": {
-  "count": 538,
+  "count": 543,
   "params": {
    "1": {
     "name": "",
@@ -7757,6 +7783,26 @@
    "0": {
     "name": "objectId",
     "note": "(inferred) Int64; high-card; range [461..739]; high-cardinality id at key 0",
+    "resolveAs": ""
+   }
+  }
+ },
+ "EVENT:292": {
+  "count": 76,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [831961..831961]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [11947..11947]",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [1..1]",
     "resolveAs": ""
    }
   }
@@ -7977,11 +8023,11 @@
   }
  },
  "EVENT:298": {
-  "count": 210,
+  "count": 229,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Boolean; 52% present; 1 distinct",
+    "note": "(inferred) Boolean; 54% present; 1 distinct",
     "resolveAs": ""
    },
    "1": {
@@ -8537,7 +8583,7 @@
   }
  },
  "EVENT:312": {
-  "count": 7613,
+  "count": 7771,
   "params": {
    "0": {
     "name": "objectId",
@@ -8556,27 +8602,27 @@
    },
    "3": {
     "name": "vector",
-    "note": "(inferred) Single[]; 26% present; high-card; Single[]",
+    "note": "(inferred) Single[]; 28% present; high-card; Single[]",
     "resolveAs": ""
    },
    "4": {
     "name": "",
-    "note": "(inferred) Single; 26% present; high-card; range [0.0528..360]",
+    "note": "(inferred) Single; 28% present; high-card; range [0.0528..360]",
     "resolveAs": ""
    },
    "5": {
     "name": "",
-    "note": "(inferred) Byte[]; 26% present; high-card; Byte[] array",
+    "note": "(inferred) Byte[]; 28% present; high-card; Byte[] array",
     "resolveAs": ""
    },
    "6": {
     "name": "",
-    "note": "(inferred) Byte; 26% present; 5 distinct; range [0..255]",
+    "note": "(inferred) Byte; 28% present; 5 distinct; range [0..255]",
     "resolveAs": ""
    },
    "7": {
     "name": "flags",
-    "note": "(inferred) Byte; 26% present; 3 distinct; range [0..3]; small enum/flag byte",
+    "note": "(inferred) Byte; 28% present; 3 distinct; range [0..3]; small enum/flag byte",
     "resolveAs": ""
    },
    "8": {
@@ -8586,37 +8632,37 @@
    },
    "9": {
     "name": "",
-    "note": "(inferred) Byte[]; 20% present; high-card; Byte[] array",
+    "note": "(inferred) Byte[]; 21% present; high-card; Byte[] array",
     "resolveAs": ""
    },
    "10": {
     "name": "",
-    "note": "(inferred) Byte[]; 12% present; high-card; Byte[] array",
+    "note": "(inferred) Byte[]; 13% present; high-card; Byte[] array",
     "resolveAs": ""
    },
    "11": {
     "name": "",
-    "note": "(inferred) Int32; 18% present; 10 distinct; range [-1..9]",
+    "note": "(inferred) Int32; 19% present; 10 distinct; range [-1..9]",
     "resolveAs": ""
    },
    "12": {
     "name": "",
-    "note": "(inferred) Int32; 23% present; 16 distinct; range [-1..15]",
+    "note": "(inferred) Int32; 24% present; 16 distinct; range [-1..15]",
     "resolveAs": ""
    },
    "13": {
     "name": "",
-    "note": "(inferred) Int32; 23% present; 16 distinct; range [-1..15]",
+    "note": "(inferred) Int32; 25% present; 16 distinct; range [-1..15]",
     "resolveAs": ""
    },
    "14": {
     "name": "",
-    "note": "(inferred) Int32; 26% present; high-card; range [-1..109]",
+    "note": "(inferred) Int32; 28% present; high-card; range [-1..109]",
     "resolveAs": ""
    },
    "15": {
     "name": "",
-    "note": "(inferred) Int32; 23% present; 14 distinct; range [-1..16777215]",
+    "note": "(inferred) Int32; 25% present; 14 distinct; range [-1..16777215]",
     "resolveAs": ""
    },
    "16": {
@@ -8626,7 +8672,7 @@
    },
    "17": {
     "name": "",
-    "note": "(inferred) Single; 26% present; 21 distinct; range [0.5..1.5]",
+    "note": "(inferred) Single; 28% present; 21 distinct; range [0.5..1.5]",
     "resolveAs": ""
    }
   }
@@ -8677,7 +8723,7 @@
   }
  },
  "EVENT:314": {
-  "count": 1520,
+  "count": 1525,
   "params": {
    "0": {
     "name": "objectId",
@@ -8686,18 +8732,18 @@
    },
    "1": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639167328000000000..639196704000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639167328000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int64; 11 distinct; range [1046509..300000000]",
+    "note": "(inferred) Int64; 12 distinct; range [1046509..300000000]",
     "resolveAs": ""
    }
   }
  },
  "EVENT:315": {
-  "count": 28,
+  "count": 29,
   "params": {
    "0": {
     "name": "",
@@ -8962,7 +9008,7 @@
   }
  },
  "EVENT:327": {
-  "count": 1278,
+  "count": 1287,
   "params": {
    "0": {
     "name": "objectId",
@@ -8971,12 +9017,12 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Byte[]; 86% present; high-card; Byte[] array",
+    "note": "(inferred) Byte[]; 85% present; high-card; Byte[] array",
     "resolveAs": ""
    },
    "2": {
     "name": "",
-    "note": "(inferred) Byte[]; 86% present; high-card; Byte[] array",
+    "note": "(inferred) Byte[]; 85% present; high-card; Byte[] array",
     "resolveAs": ""
    }
   }
@@ -9767,7 +9813,7 @@
   }
  },
  "EVENT:361": {
-  "count": 1762,
+  "count": 1764,
   "params": {
    "0": {
     "name": "objectId",
@@ -9922,7 +9968,7 @@
   }
  },
  "EVENT:365": {
-  "count": 795,
+  "count": 798,
   "params": {
    "0": {
     "name": "objectId",
@@ -10102,7 +10148,7 @@
   }
  },
  "EVENT:370": {
-  "count": 176,
+  "count": 181,
   "params": {
    "0": {
     "name": "objectId",
@@ -10272,7 +10318,7 @@
   }
  },
  "EVENT:384": {
-  "count": 111,
+  "count": 143,
   "params": {
    "0": {
     "name": "",
@@ -11557,7 +11603,7 @@
   }
  },
  "EVENT:408": {
-  "count": 3053,
+  "count": 3318,
   "params": {
    "0": {
     "name": "",
@@ -11662,7 +11708,7 @@
   }
  },
  "EVENT:413": {
-  "count": 297,
+  "count": 298,
   "params": {
    "0": {
     "name": "",
@@ -11696,23 +11742,23 @@
    },
    "6": {
     "name": "",
-    "note": "(inferred) String[]; 92% present; 2 distinct; String[] array",
+    "note": "(inferred) String[]; 91% present; 2 distinct; String[] array",
     "resolveAs": ""
    },
    "7": {
     "name": "",
-    "note": "(inferred) Byte[]; 92% present; 4 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 91% present; 4 distinct; Byte[] array",
     "resolveAs": ""
    },
    "8": {
     "name": "",
-    "note": "(inferred) Byte[]/Int64[]; 92% present; 3 distinct; Byte[] array",
+    "note": "(inferred) Byte[]/Int64[]; 91% present; 3 distinct; Byte[] array",
     "resolveAs": ""
    }
   }
  },
  "EVENT:414": {
-  "count": 123,
+  "count": 125,
   "params": {
    "0": {
     "name": "",
@@ -11746,23 +11792,23 @@
    },
    "6": {
     "name": "",
-    "note": "(inferred) String[]; 63% present; 1 distinct; String[] array",
+    "note": "(inferred) String[]; 62% present; 1 distinct; String[] array",
     "resolveAs": ""
    },
    "7": {
     "name": "",
-    "note": "(inferred) Byte[]; 63% present; 2 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 62% present; 2 distinct; Byte[] array",
     "resolveAs": ""
    },
    "8": {
     "name": "",
-    "note": "(inferred) Byte[]; 63% present; 2 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 62% present; 2 distinct; Byte[] array",
     "resolveAs": ""
    }
   }
  },
  "EVENT:415": {
-  "count": 136,
+  "count": 137,
   "params": {
    "0": {
     "name": "",
@@ -11776,52 +11822,52 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Byte[]; 15% present; 2 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 16% present; 2 distinct; Byte[] array",
     "resolveAs": ""
    },
    "3": {
     "name": "",
-    "note": "(inferred) String[]; 15% present; 2 distinct; String[] array",
+    "note": "(inferred) String[]; 16% present; 2 distinct; String[] array",
     "resolveAs": ""
    },
    "4": {
     "name": "",
-    "note": "(inferred) String[]; 15% present; 2 distinct; String[] array",
+    "note": "(inferred) String[]; 16% present; 2 distinct; String[] array",
     "resolveAs": ""
    },
    "5": {
     "name": "",
-    "note": "(inferred) Byte[]/Int32[]; 15% present; 2 distinct; Byte[] array",
+    "note": "(inferred) Byte[]/Int32[]; 16% present; 2 distinct; Byte[] array",
     "resolveAs": ""
    },
    "6": {
     "name": "",
-    "note": "(inferred) String[]; 15% present; 2 distinct; String[] array",
+    "note": "(inferred) String[]; 16% present; 2 distinct; String[] array",
     "resolveAs": ""
    },
    "7": {
     "name": "",
-    "note": "(inferred) Byte[]; 15% present; 2 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 16% present; 2 distinct; Byte[] array",
     "resolveAs": ""
    },
    "8": {
     "name": "",
-    "note": "(inferred) Byte[]/Int64[]; 15% present; 2 distinct; Byte[] array",
+    "note": "(inferred) Byte[]/Int64[]; 16% present; 2 distinct; Byte[] array",
     "resolveAs": ""
    }
   }
  },
  "EVENT:416": {
-  "count": 11,
+  "count": 12,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int64; 4 distinct; range [245..2412]",
+    "note": "(inferred) Int64; 5 distinct; range [245..2412]",
     "resolveAs": ""
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int32/String; 6 distinct; range [2..7]",
+    "note": "(inferred) String/Int32; 6 distinct; range [2..7]; string value",
     "resolveAs": ""
    },
    "2": {
@@ -11831,42 +11877,42 @@
    },
    "3": {
     "name": "",
-    "note": "(inferred) String[]; 18% present; 1 distinct; String[] array",
+    "note": "(inferred) String[]; 25% present; 1 distinct; String[] array",
     "resolveAs": ""
    },
    "4": {
     "name": "",
-    "note": "(inferred) String[]; 18% present; 1 distinct; String[] array",
+    "note": "(inferred) String[]; 25% present; 1 distinct; String[] array",
     "resolveAs": ""
    },
    "5": {
     "name": "",
-    "note": "(inferred) Byte[]; 18% present; 1 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 25% present; 1 distinct; Byte[] array",
     "resolveAs": ""
    },
    "6": {
     "name": "",
-    "note": "(inferred) String[]; 18% present; 1 distinct; String[] array",
+    "note": "(inferred) String[]; 25% present; 1 distinct; String[] array",
     "resolveAs": ""
    },
    "7": {
     "name": "",
-    "note": "(inferred) Byte[]; 18% present; 1 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 25% present; 1 distinct; Byte[] array",
     "resolveAs": ""
    },
    "8": {
     "name": "",
-    "note": "(inferred) Byte[]; 18% present; 1 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 25% present; 1 distinct; Byte[] array",
     "resolveAs": ""
    }
   }
  },
  "EVENT:417": {
-  "count": 14,
+  "count": 23,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int64; 4 distinct; range [1654285..1964165]",
+    "note": "(inferred) Int64; 6 distinct; range [815948..1964165]",
     "resolveAs": ""
    },
    "1": {
@@ -12642,7 +12688,7 @@
   }
  },
  "EVENT:466": {
-  "count": 2,
+  "count": 4,
   "params": {
    "0": {
     "name": "",
@@ -12651,7 +12697,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int64[]; 2 distinct; Int64[] array",
+    "note": "(inferred) Int64[]/Int32[]; 2 distinct; Int64[] array",
     "resolveAs": ""
    }
   }
@@ -12852,7 +12898,7 @@
   }
  },
  "EVENT:474": {
-  "count": 147,
+  "count": 161,
   "params": {
    "0": {
     "name": "objectId",
@@ -12861,12 +12907,12 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int64/Byte; high-card; range [0..639197568000000000]",
+    "note": "(inferred) Int64/Byte; high-card; range [0..639198432000000000]",
     "resolveAs": ""
    },
    "2": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 66% present; high-card; range [639185472000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 69% present; high-card; range [639185472000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "3": {
@@ -12877,7 +12923,7 @@
   }
  },
  "EVENT:475": {
-  "count": 95,
+  "count": 109,
   "params": {
    "0": {
     "name": "objectId",
@@ -12887,7 +12933,7 @@
   }
  },
  "EVENT:476": {
-  "count": 10,
+  "count": 13,
   "params": {
    "0": {
     "name": "flags",
@@ -13657,7 +13703,7 @@
   }
  },
  "EVENT:503": {
-  "count": 176,
+  "count": 181,
   "params": {
    "0": {
     "name": "",
@@ -14537,7 +14583,7 @@
   }
  },
  "EVENT:547": {
-  "count": 124,
+  "count": 125,
   "params": {
    "0": {
     "name": "",
@@ -14551,7 +14597,7 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Single; 21 distinct; range [1.08e+03..1.33e+03]",
+    "note": "(inferred) Single; 21 distinct; range [620..1.33e+03]",
     "resolveAs": ""
    },
    "3": {
@@ -15192,7 +15238,7 @@
   }
  },
  "EVENT:598": {
-  "count": 178,
+  "count": 183,
   "params": {
    "0": {
     "name": "",
@@ -15807,7 +15853,7 @@
   }
  },
  "EVENT:639": {
-  "count": 198,
+  "count": 203,
   "params": {
    "0": {
     "name": "objectId",
@@ -16731,7 +16777,7 @@
   }
  },
  "REQUEST:17": {
-  "count": 1308,
+  "count": 1313,
   "params": {
    "0": {
     "name": "",
@@ -16766,11 +16812,11 @@
   }
  },
  "REQUEST:22": {
-  "count": 993961,
+  "count": 997379,
   "params": {
    "0": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "1": {
@@ -16790,7 +16836,7 @@
    },
    "4": {
     "name": "",
-    "note": "(inferred) Single; high-card; range [0.704..17.7]",
+    "note": "(inferred) Single; high-card; range [0.44..17.7]",
     "resolveAs": ""
    },
    "5": {
@@ -16936,11 +16982,11 @@
   }
  },
  "REQUEST:33": {
-  "count": 113,
+  "count": 114,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int32; 81% present; 23 distinct; range [1..105]",
+    "note": "(inferred) Int32; 82% present; 23 distinct; range [1..105]",
     "resolveAs": ""
    },
    "1": {
@@ -17001,7 +17047,7 @@
   }
  },
  "REQUEST:35": {
-  "count": 19,
+  "count": 20,
   "params": {
    "0": {
     "name": "",
@@ -17016,7 +17062,7 @@
   }
  },
  "REQUEST:36": {
-  "count": 164,
+  "count": 169,
   "params": {
    "0": {
     "name": "",
@@ -17025,7 +17071,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int16[]/Byte[]/Int32[]; high-card; Int16[] array",
+    "note": "(inferred) Int16[]/Int32[]/Byte[]; high-card; Int16[] array",
     "resolveAs": ""
    },
    "2": {
@@ -17096,7 +17142,7 @@
   }
  },
  "REQUEST:41": {
-  "count": 505,
+  "count": 508,
   "params": {
    "0": {
     "name": "objectId",
@@ -17156,7 +17202,7 @@
   }
  },
  "REQUEST:45": {
-  "count": 39153,
+  "count": 39173,
   "params": {
    "0": {
     "name": "objectId",
@@ -17166,7 +17212,7 @@
   }
  },
  "REQUEST:46": {
-  "count": 39067,
+  "count": 39087,
   "params": {
    "0": {
     "name": "objectId",
@@ -17241,11 +17287,11 @@
   }
  },
  "REQUEST:55": {
-  "count": 294,
+  "count": 466,
   "params": {
    "0": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639157824000000000..639185472000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639157824000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "1": {
@@ -17260,27 +17306,27 @@
    },
    "3": {
     "name": "",
-    "note": "(inferred) Byte; 65 distinct; range [1..65]",
+    "note": "(inferred) Byte; high-card; range [1..171]",
     "resolveAs": ""
    },
    "4": {
     "name": "",
-    "note": "(inferred) Int64; 96% present; high-card; range [35460..1550016000]",
+    "note": "(inferred) Int64; 97% present; high-card; range [35460..1550016000]",
     "resolveAs": ""
    },
    "5": {
     "name": "",
-    "note": "(inferred) Int32[]/Int16[]; 10% present; 14 distinct; Int32[] array",
+    "note": "(inferred) Int32[]/Int16[]; 6% present; 14 distinct; Int32[] array",
     "resolveAs": ""
    },
    "7": {
     "name": "",
-    "note": "(inferred) Int32; 90% present; 20 distinct; range [700..6847]",
+    "note": "(inferred) Int32; 94% present; 20 distinct; range [700..6847]",
     "resolveAs": ""
    },
    "9": {
     "name": "",
-    "note": "(inferred) Int32; 90% present; high-card; range [1..4538]",
+    "note": "(inferred) Int32; 94% present; high-card; range [1..4538]",
     "resolveAs": ""
    },
    "12": {
@@ -17296,11 +17342,11 @@
   }
  },
  "REQUEST:56": {
-  "count": 10,
+  "count": 38,
   "params": {
    "0": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 8 distinct; range [639159552000000000..639177696000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 28 distinct; range [639159552000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
@@ -17530,7 +17576,7 @@
   }
  },
  "REQUEST:81": {
-  "count": 985,
+  "count": 1012,
   "params": {
    "0": {
     "name": "",
@@ -17620,7 +17666,7 @@
   }
  },
  "REQUEST:82": {
-  "count": 532,
+  "count": 553,
   "params": {
    "0": {
     "name": "",
@@ -17689,7 +17735,7 @@
    },
    "14": {
     "name": "",
-    "note": "(inferred) Boolean; 84% present; 1 distinct",
+    "note": "(inferred) Boolean; 83% present; 1 distinct",
     "resolveAs": ""
    },
    "255": {
@@ -17700,7 +17746,7 @@
   }
  },
  "REQUEST:83": {
-  "count": 43,
+  "count": 48,
   "params": {
    "0": {
     "name": "",
@@ -17714,7 +17760,7 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int64; 38 distinct; range [23889209..3152446949]",
+    "note": "(inferred) Int64; 38 distinct; range [23889209..3209713078]",
     "resolveAs": ""
    },
    "3": {
@@ -17755,7 +17801,7 @@
   }
  },
  "REQUEST:89": {
-  "count": 475,
+  "count": 487,
   "params": {
    "0": {
     "name": "",
@@ -17799,7 +17845,7 @@
    },
    "8": {
     "name": "",
-    "note": "(inferred) Byte[]/Int16[]; 20% present; 22 distinct; Byte[] array",
+    "note": "(inferred) Int16[]/Byte[]; 21% present; 22 distinct; Int16[] array",
     "resolveAs": ""
    },
    "9": {
@@ -17815,7 +17861,7 @@
   }
  },
  "REQUEST:90": {
-  "count": 475,
+  "count": 487,
   "params": {
    "0": {
     "name": "",
@@ -17915,7 +17961,7 @@
   }
  },
  "REQUEST:95": {
-  "count": 457,
+  "count": 470,
   "params": {
    "0": {
     "name": "",
@@ -17924,7 +17970,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int16; high-card; range [8..11906]",
+    "note": "(inferred) Int16; high-card; range [8..11947]",
     "resolveAs": ""
    },
    "2": {
@@ -17975,7 +18021,7 @@
   }
  },
  "REQUEST:98": {
-  "count": 280,
+  "count": 285,
   "params": {
    "0": {
     "name": "",
@@ -17984,7 +18030,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int32; 30% present; 1 distinct; range [1..1]",
+    "note": "(inferred) Int32; 31% present; 1 distinct; range [1..1]",
     "resolveAs": ""
    },
    "2": {
@@ -17995,7 +18041,7 @@
   }
  },
  "REQUEST:99": {
-  "count": 226,
+  "count": 230,
   "params": {
    "0": {
     "name": "",
@@ -18004,7 +18050,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Int32; 17% present; 1 distinct; range [1..1]",
+    "note": "(inferred) Int32; 18% present; 1 distinct; range [1..1]",
     "resolveAs": ""
    },
    "2": {
@@ -18087,7 +18133,7 @@
   }
  },
  "REQUEST:143": {
-  "count": 865,
+  "count": 874,
   "params": {
    "0": {
     "name": "",
@@ -18342,7 +18388,7 @@
   }
  },
  "REQUEST:174": {
-  "count": 504,
+  "count": 505,
   "params": {
    "1": {
     "name": "flags",
@@ -18352,7 +18398,7 @@
   }
  },
  "REQUEST:175": {
-  "count": 80,
+  "count": 81,
   "params": {
    "1": {
     "name": "flags",
@@ -18367,11 +18413,11 @@
   }
  },
  "REQUEST:176": {
-  "count": 539,
+  "count": 542,
   "params": {
    "1": {
     "name": "",
-    "note": "(inferred) Int64; high-card; range [1178038409..1424142920]",
+    "note": "(inferred) Int64; high-card; range [1178038409..1424183576]",
     "resolveAs": ""
    }
   }
@@ -18496,7 +18542,7 @@
   "params": {}
  },
  "REQUEST:197": {
-  "count": 1047,
+  "count": 1052,
   "params": {
    "0": {
     "name": "",
@@ -18511,11 +18557,11 @@
   }
  },
  "REQUEST:199": {
-  "count": 2209,
+  "count": 2213,
   "params": {
    "0": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "1": {
@@ -18536,17 +18582,17 @@
   }
  },
  "REQUEST:200": {
-  "count": 22,
+  "count": 23,
   "params": {
    "0": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 15 distinct; range [639156096000000000..639193248000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 15 distinct; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    }
   }
  },
  "REQUEST:201": {
-  "count": 741,
+  "count": 743,
   "params": {
    "0": {
     "name": "",
@@ -18636,7 +18682,7 @@
   }
  },
  "REQUEST:218": {
-  "count": 764,
+  "count": 766,
   "params": {
    "255": {
     "name": "",
@@ -18691,21 +18737,26 @@
   }
  },
  "REQUEST:227": {
-  "count": 7,
+  "count": 8,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Boolean; 1 distinct",
+    "note": "(inferred) Boolean; 88% present; 1 distinct",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Boolean; 12% present; 1 distinct",
     "resolveAs": ""
    },
    "2": {
     "name": "flags",
-    "note": "(inferred) Byte; 1 distinct; range [5..5]; small enum/flag byte",
+    "note": "(inferred) Byte; 2 distinct; range [1..5]; small enum/flag byte",
     "resolveAs": ""
    },
    "255": {
     "name": "",
-    "note": "(inferred) Int32; 6 distinct; range [3..2123]",
+    "note": "(inferred) Int32; 7 distinct; range [3..2123]",
     "resolveAs": ""
    }
   }
@@ -18816,6 +18867,31 @@
    "0": {
     "name": "objectId",
     "note": "(inferred) Int64; 55 distinct; range [382..531]; high-cardinality id at key 0",
+    "resolveAs": ""
+   }
+  }
+ },
+ "REQUEST:261": {
+  "count": 1,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [426..426]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "",
+    "note": "(inferred) Int32; 1 distinct; range [11946..11946]",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "",
+    "note": "(inferred) Int16; 1 distinct; range [8058..8058]",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [93150480000..93150480000]",
     "resolveAs": ""
    }
   }
@@ -18966,7 +19042,7 @@
   }
  },
  "REQUEST:298": {
-  "count": 52,
+  "count": 56,
   "params": {
    "0": {
     "name": "",
@@ -18981,7 +19057,7 @@
   }
  },
  "REQUEST:299": {
-  "count": 815,
+  "count": 820,
   "params": {
    "0": {
     "name": "",
@@ -19051,7 +19127,7 @@
   }
  },
  "REQUEST:300": {
-  "count": 1318,
+  "count": 1323,
   "params": {
    "0": {
     "name": "",
@@ -19100,7 +19176,7 @@
    },
    "9": {
     "name": "",
-    "note": "(inferred) Int32; 74% present; high-card; range [1987..6652]",
+    "note": "(inferred) Int32; 73% present; high-card; range [1987..6652]",
     "resolveAs": ""
    },
    "11": {
@@ -19200,7 +19276,7 @@
   }
  },
  "REQUEST:369": {
-  "count": 1413,
+  "count": 1418,
   "params": {
    "0": {
     "name": "",
@@ -19225,11 +19301,11 @@
   }
  },
  "REQUEST:371": {
-  "count": 19,
+  "count": 21,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int64; 13 distinct; range [406..3070017]",
+    "note": "(inferred) Int64; 15 distinct; range [406..3070017]",
     "resolveAs": ""
    },
    "1": {
@@ -19239,7 +19315,7 @@
    },
    "255": {
     "name": "",
-    "note": "(inferred) Int32; 13 distinct; range [37..2181]",
+    "note": "(inferred) Int32; 15 distinct; range [37..2181]",
     "resolveAs": ""
    }
   }
@@ -19260,7 +19336,7 @@
   }
  },
  "REQUEST:374": {
-  "count": 19486,
+  "count": 19751,
   "params": {
    "0": {
     "name": "",
@@ -19355,7 +19431,7 @@
   }
  },
  "REQUEST:395": {
-  "count": 729,
+  "count": 731,
   "params": {
    "0": {
     "name": "",
@@ -19370,11 +19446,11 @@
   }
  },
  "REQUEST:413": {
-  "count": 90,
+  "count": 92,
   "params": {
    "0": {
     "name": "objectId",
-    "note": "(inferred) Int32; 62 distinct; range [9..11905]; high-cardinality id at key 0",
+    "note": "(inferred) Int32; 62 distinct; range [9..11946]; high-cardinality id at key 0",
     "resolveAs": ""
    },
    "1": {
@@ -19425,7 +19501,7 @@
   }
  },
  "REQUEST:423": {
-  "count": 1461,
+  "count": 1473,
   "params": {
    "0": {
     "name": "",
@@ -19920,7 +19996,7 @@
   }
  },
  "REQUEST:489": {
-  "count": 45,
+  "count": 46,
   "params": {
    "0": {
     "name": "",
@@ -19954,7 +20030,7 @@
    },
    "8": {
     "name": "",
-    "note": "(inferred) Byte[]/Int16[]; 10 distinct; Byte[] array",
+    "note": "(inferred) Int16[]/Byte[]; 10 distinct; Int16[] array",
     "resolveAs": ""
    },
    "10": {
@@ -19964,7 +20040,7 @@
    },
    "255": {
     "name": "",
-    "note": "(inferred) Int32; 36 distinct; range [64..1259]",
+    "note": "(inferred) Int32; 36 distinct; range [64..1678]",
     "resolveAs": ""
    }
   }
@@ -20025,7 +20101,7 @@
   }
  },
  "REQUEST:511": {
-  "count": 1318,
+  "count": 1323,
   "params": {
    "0": {
     "name": "",
@@ -20240,7 +20316,7 @@
   }
  },
  "RESPONSE:2": {
-  "count": 2304,
+  "count": 2309,
   "params": {
    "0": {
     "name": "objectId",
@@ -20314,7 +20390,7 @@
    },
    "15": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "16": {
@@ -20334,7 +20410,7 @@
    },
    "20": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "21": {
@@ -20354,7 +20430,7 @@
    },
    "25": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "27": {
@@ -20374,7 +20450,7 @@
    },
    "31": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [638893440000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [638893440000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "33": {
@@ -20384,7 +20460,7 @@
    },
    "35": {
     "name": "",
-    "note": "(inferred) Int64; high-card; range [623500..3126435635728]",
+    "note": "(inferred) Int64; high-card; range [623500..3127832035728]",
     "resolveAs": ""
    },
    "36": {
@@ -20394,12 +20470,12 @@
    },
    "37": {
     "name": "",
-    "note": "(inferred) Int64; 99% present; 28 distinct; range [1000000..92159649]",
+    "note": "(inferred) Int64; 99% present; 28 distinct; range [1000000..92363333]",
     "resolveAs": ""
    },
    "38": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 25 distinct; range [639155232000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 25 distinct; range [639155232000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "39": {
@@ -20469,7 +20545,7 @@
    },
    "52": {
     "name": "",
-    "note": "(inferred) Byte[]/Int16[]/Int32[]; high-card; Byte[] array",
+    "note": "(inferred) Int16[]/Int32[]/Byte[]; high-card; Int16[] array",
     "resolveAs": ""
    },
    "54": {
@@ -20479,7 +20555,7 @@
    },
    "55": {
     "name": "",
-    "note": "(inferred) Byte[]/Int32[]/Int16[]; high-card; Byte[] array",
+    "note": "(inferred) Int32[]/Byte[]/Int16[]; high-card; Int32[] array",
     "resolveAs": ""
    },
    "56": {
@@ -20544,7 +20620,7 @@
    },
    "68": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "69": {
@@ -20609,7 +20685,7 @@
    },
    "82": {
     "name": "",
-    "note": "(inferred) Byte[]; 59% present; 70 distinct; Byte[] array",
+    "note": "(inferred) Byte[]; 58% present; 70 distinct; Byte[] array",
     "resolveAs": ""
    },
    "83": {
@@ -20684,12 +20760,12 @@
    },
    "100": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "101": {
     "name": "timestamp",
-    "note": "(inferred) Int64; 66 distinct; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; 66 distinct; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "102": {
@@ -20729,7 +20805,7 @@
    },
    "109": {
     "name": "",
-    "note": "(inferred) Int64; 8% present; 13 distinct; range [96130000..4033432900]",
+    "note": "(inferred) Int64; 7% present; 13 distinct; range [96130000..4033432900]",
     "resolveAs": ""
    },
    "110": {
@@ -20780,7 +20856,7 @@
   }
  },
  "RESPONSE:17": {
-  "count": 1299,
+  "count": 1304,
   "params": {
    "0": {
     "name": "",
@@ -20924,7 +21000,7 @@
   }
  },
  "RESPONSE:41": {
-  "count": 1611,
+  "count": 1616,
   "params": {
    "0": {
     "name": "",
@@ -20979,6 +21055,31 @@
  "RESPONSE:54": {
   "count": 3,
   "params": {}
+ },
+ "RESPONSE:55": {
+  "count": 3,
+  "params": {
+   "0": {
+    "name": "",
+    "note": "(inferred) Int64; 1 distinct; range [1408..1408]",
+    "resolveAs": ""
+   },
+   "1": {
+    "name": "flags",
+    "note": "(inferred) Byte; 1 distinct; range [1..1]; small enum/flag byte",
+    "resolveAs": ""
+   },
+   "2": {
+    "name": "flags",
+    "note": "(inferred) Byte; 3 distinct; range [78..80]; small enum/flag byte",
+    "resolveAs": ""
+   },
+   "3": {
+    "name": "flags",
+    "note": "(inferred) Byte; 1 distinct; range [22..22]; small enum/flag byte",
+    "resolveAs": ""
+   }
+  }
  },
  "RESPONSE:68": {
   "count": 4,
@@ -21099,7 +21200,7 @@
   "params": {}
  },
  "RESPONSE:81": {
-  "count": 857,
+  "count": 884,
   "params": {
    "0": {
     "name": "",
@@ -21108,7 +21209,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Boolean; 42% present; 1 distinct",
+    "note": "(inferred) Boolean; 41% present; 1 distinct",
     "resolveAs": ""
    },
    "255": {
@@ -21119,7 +21220,7 @@
   }
  },
  "RESPONSE:82": {
-  "count": 455,
+  "count": 476,
   "params": {
    "0": {
     "name": "",
@@ -21139,7 +21240,7 @@
   }
  },
  "RESPONSE:83": {
-  "count": 43,
+  "count": 48,
   "params": {
    "0": {
     "name": "",
@@ -21148,7 +21249,7 @@
    },
    "1": {
     "name": "",
-    "note": "(inferred) Boolean; 5% present; 1 distinct",
+    "note": "(inferred) Boolean; 15% present; 1 distinct",
     "resolveAs": ""
    }
   }
@@ -21158,7 +21259,7 @@
   "params": {}
  },
  "RESPONSE:89": {
-  "count": 473,
+  "count": 485,
   "params": {
    "0": {
     "name": "",
@@ -21173,11 +21274,11 @@
   }
  },
  "RESPONSE:90": {
-  "count": 473,
+  "count": 485,
   "params": {
    "0": {
     "name": "objectId",
-    "note": "(inferred) Int32; 93% present; high-card; range [1..1055]; high-cardinality id at key 0",
+    "note": "(inferred) Int32; 93% present; high-card; range [1..1174]; high-cardinality id at key 0",
     "resolveAs": ""
    },
    "1": {
@@ -21213,11 +21314,11 @@
   }
  },
  "RESPONSE:95": {
-  "count": 457,
+  "count": 470,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Byte[]/Int16[]/Int32[]; high-card; Byte[] array",
+    "note": "(inferred) Int16[]/Byte[]/Int32[]; high-card; Int16[] array",
     "resolveAs": ""
    },
    "1": {
@@ -21493,7 +21594,7 @@
   }
  },
  "RESPONSE:143": {
-  "count": 862,
+  "count": 871,
   "params": {
    "0": {
     "name": "",
@@ -21512,7 +21613,7 @@
    },
    "3": {
     "name": "",
-    "note": "(inferred) Single; 64% present; 64 distinct; range [76.7..1.85e+03]",
+    "note": "(inferred) Single; 65% present; 64 distinct; range [76.7..1.85e+03]",
     "resolveAs": ""
    },
    "255": {
@@ -21803,7 +21904,7 @@
   }
  },
  "RESPONSE:174": {
-  "count": 504,
+  "count": 505,
   "params": {
    "0": {
     "name": "",
@@ -21873,7 +21974,7 @@
   }
  },
  "RESPONSE:175": {
-  "count": 79,
+  "count": 80,
   "params": {
    "0": {
     "name": "",
@@ -21887,7 +21988,7 @@
    },
    "2": {
     "name": "",
-    "note": "(inferred) Int64; 21 distinct; range [50..284]",
+    "note": "(inferred) Int64; 21 distinct; range [50..286]",
     "resolveAs": ""
    },
    "255": {
@@ -21898,11 +21999,11 @@
   }
  },
  "RESPONSE:176": {
-  "count": 539,
+  "count": 542,
   "params": {
    "0": {
     "name": "",
-    "note": "(inferred) Int64; high-card; range [1178038409..1424142920]",
+    "note": "(inferred) Int64; high-card; range [1178038409..1424183576]",
     "resolveAs": ""
    },
    "1": {
@@ -22117,7 +22218,7 @@
   "params": {}
  },
  "RESPONSE:197": {
-  "count": 1043,
+  "count": 1048,
   "params": {
    "0": {
     "name": "",
@@ -22286,12 +22387,12 @@
    },
    "33": {
     "name": "",
-    "note": "(inferred) Byte[]/Int32[]; 43 distinct; Byte[] array",
+    "note": "(inferred) Int32[]/Byte[]; 43 distinct; Int32[] array",
     "resolveAs": ""
    },
    "34": {
     "name": "",
-    "note": "(inferred) Byte[]/Int32[]; 42 distinct; Byte[] array",
+    "note": "(inferred) Int32[]/Byte[]; 42 distinct; Int32[] array",
     "resolveAs": ""
    },
    "35": {
@@ -22586,7 +22687,7 @@
   "params": {}
  },
  "RESPONSE:201": {
-  "count": 740,
+  "count": 742,
   "params": {
    "255": {
     "name": "",
@@ -22856,7 +22957,7 @@
   }
  },
  "RESPONSE:218": {
-  "count": 751,
+  "count": 753,
   "params": {
    "0": {
     "name": "",
@@ -23011,11 +23112,11 @@
   }
  },
  "RESPONSE:227": {
-  "count": 7,
+  "count": 8,
   "params": {
    "255": {
     "name": "",
-    "note": "(inferred) Int32; 6 distinct; range [3..2123]",
+    "note": "(inferred) Int32; 7 distinct; range [3..2123]",
     "resolveAs": ""
    }
   }
@@ -23250,7 +23351,7 @@
   }
  },
  "RESPONSE:369": {
-  "count": 4462,
+  "count": 4471,
   "params": {
    "0": {
     "name": "",
@@ -23259,7 +23360,7 @@
    },
    "1": {
     "name": "timestamp",
-    "note": "(inferred) Int64; high-card; range [639156096000000000..639197568000000000]; likely .NET ticks (UTC)",
+    "note": "(inferred) Int64; high-card; range [639156096000000000..639198432000000000]; likely .NET ticks (UTC)",
     "resolveAs": ""
    },
    "2": {
@@ -23310,11 +23411,11 @@
   }
  },
  "RESPONSE:371": {
-  "count": 19,
+  "count": 21,
   "params": {
    "255": {
     "name": "",
-    "note": "(inferred) Int32; 13 distinct; range [37..2181]",
+    "note": "(inferred) Int32; 15 distinct; range [37..2181]",
     "resolveAs": ""
    }
   }
@@ -23384,7 +23485,7 @@
   }
  },
  "RESPONSE:395": {
-  "count": 727,
+  "count": 729,
   "params": {
    "0": {
     "name": "",
@@ -23494,7 +23595,7 @@
   }
  },
  "RESPONSE:423": {
-  "count": 1463,
+  "count": 1475,
   "params": {
    "0": {
     "name": "",
@@ -24154,7 +24255,7 @@
   }
  },
  "RESPONSE:489": {
-  "count": 45,
+  "count": 46,
   "params": {
    "0": {
     "name": "flags",
@@ -24163,7 +24264,7 @@
    },
    "255": {
     "name": "",
-    "note": "(inferred) Int32; 36 distinct; range [64..1259]",
+    "note": "(inferred) Int32; 36 distinct; range [64..1678]",
     "resolveAs": ""
    }
   }
