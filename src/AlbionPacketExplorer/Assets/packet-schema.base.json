@@ -1,7 +1,7 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "c1e5f51",
+    "sourceCommit": "8134651",
     "generatedAt": "2026-07-18"
   },
   "EVENT:1": {
@@ -7850,12 +7850,12 @@
       },
       "6": {
         "name": "flags",
-        "note": "(inferred) Byte/Boolean; 41% present; 2 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte/Boolean; 42% present; 2 distinct; range [0..0]; small enum/flag byte",
         "resolveAs": ""
       },
       "8": {
         "name": "flags",
-        "note": "(inferred) Byte; 38% present; 1 distinct; range [1..1]; small enum/flag byte",
+        "note": "(inferred) Byte; 39% present; 1 distinct; range [1..1]; small enum/flag byte",
         "resolveAs": ""
       }
     }
@@ -8361,7 +8361,7 @@
     "params": {
       "0": {
         "name": "objectId",
-        "note": "(inferred) Int64; 57 distinct; range [469..683]; high-cardinality id at key 0",
+        "note": "(inferred) Int64; 57 distinct; range [469..700]; high-cardinality id at key 0",
         "resolveAs": ""
       }
     }
@@ -8610,7 +8610,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Boolean; 51% present; 1 distinct",
+        "note": "(inferred) Boolean; 50% present; 1 distinct",
         "resolveAs": ""
       },
       "1": {
@@ -12803,32 +12803,32 @@
       },
       "3": {
         "name": "",
-        "note": "(inferred) String[]; 72% present; 1 distinct; String[] array",
+        "note": "(inferred) String[]; 73% present; 1 distinct; String[] array",
         "resolveAs": ""
       },
       "4": {
         "name": "",
-        "note": "(inferred) String[]; 72% present; 1 distinct; String[] array",
+        "note": "(inferred) String[]; 73% present; 1 distinct; String[] array",
         "resolveAs": ""
       },
       "5": {
         "name": "",
-        "note": "(inferred) Byte[]; 72% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 73% present; 1 distinct; Byte[] array",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) String[]; 72% present; 1 distinct; String[] array",
+        "note": "(inferred) String[]; 73% present; 1 distinct; String[] array",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Byte[]; 72% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 73% present; 1 distinct; Byte[] array",
         "resolveAs": ""
       },
       "8": {
         "name": "",
-        "note": "(inferred) Byte[]; 72% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 73% present; 1 distinct; Byte[] array",
         "resolveAs": ""
       }
     }
@@ -18842,7 +18842,23 @@
   },
   "REQUEST:47": {
     "name": "CraftBuildingChangeSettings",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [222..222]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 3 distinct; range [3000000..5000000]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 3 distinct; range [3000000..8570000]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:48": {
     "name": "CraftBuildingTakeMoney",
@@ -19058,7 +19074,18 @@
   },
   "REQUEST:67": {
     "name": "BuildingNutritionSilverRewardSet",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [222..222]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [45000..45000]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:68": {
     "name": "ConstructionSiteCreate",
@@ -24046,7 +24073,7 @@
       },
       "122": {
         "name": "",
-        "note": "(inferred) Int32/Boolean; 16% present; 5 distinct; range [1..5]",
+        "note": "(inferred) Int32/Boolean; 17% present; 5 distinct; range [1..5]",
         "resolveAs": ""
       },
       "124": {
