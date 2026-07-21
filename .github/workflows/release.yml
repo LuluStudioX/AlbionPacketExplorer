@@ -316,26 +316,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false
-
-      # Nudge the update-feed hub to mirror this release immediately instead of waiting for its
-      # poll. No-ops until HUB_DISPATCH_TOKEN (a PAT with access to the hub repo) is configured.
-      - name: Notify update-feed hub
-        # Best-effort: the hub mirrors on its own schedule, so a missing OR invalid token must not
-        # fail an already-published release. We swallow the curl error (e.g. 401 from an expired
-        # token) and just log a warning - a real shell/YAML error in this step still surfaces.
-        env:
-          HUB_DISPATCH_TOKEN: ${{ secrets.HUB_DISPATCH_TOKEN }}
-        run: |
-          if [ -z "$HUB_DISPATCH_TOKEN" ]; then
-            echo "HUB_DISPATCH_TOKEN not set; skipping (hub mirrors on its own schedule)."
-            exit 0
-          fi
-          if curl -fsS -X POST \
-            -H "Authorization: Bearer $HUB_DISPATCH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/LuluStudioX/lulustudio-hub/dispatches \
-            -d '{"event_type":"apx-release"}'; then
-            echo "dispatched apx-release to the hub"
-          else
-            echo "::warning::hub notify failed (token invalid/expired?); release already published, hub mirrors on schedule."
-          fi
+        # No hub-notify step: the update feed is served live by the apx-feed-proxy Cloudflare Worker
+        # (rewrites /apx/feed/* -> GitHub releases/latest) and the project page reads that feed
+        # client-side, so a release is visible instantly with no dispatch. HUB_DISPATCH_TOKEN is
+        # obsolete and can be deleted from repo secrets.
