@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "8134651",
-    "generatedAt": "2026-07-18"
+    "sourceCommit": "80d0676",
+    "generatedAt": "2026-07-21"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -1375,6 +1375,11 @@
       "7": {
         "name": "durability",
         "note": "FixPoint internal",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Int64; 0% present; 1 distinct; range [72000000..72000000]",
         "resolveAs": ""
       }
     }
@@ -16665,7 +16670,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 2 distinct; range [75686..97729]",
+        "note": "(inferred) Int64; 3 distinct; range [14533..97729]",
         "resolveAs": ""
       },
       "1": {
@@ -18110,7 +18115,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 7 distinct; range [2704..688449]",
+        "note": "(inferred) Int64; 8 distinct; range [2704..688449]",
         "resolveAs": ""
       },
       "1": {
@@ -18120,7 +18125,7 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Single; 69% present; 2 distinct; range [180..270]",
+        "note": "(inferred) Single; 71% present; 2 distinct; range [180..270]",
         "resolveAs": ""
       },
       "3": {
@@ -18201,6 +18206,14 @@
   },
   "EVENT:685": {
     "name": "NotifyPlatformAccountConfirmed",
+    "params": {}
+  },
+  "EVENT:686": {
+    "name": "FactionTraderZoneBuffFailure",
+    "params": {}
+  },
+  "EVENT:687": {
+    "name": "SmartClusterQueueContingentEntered",
     "params": {}
   },
   "REQUEST:0": {
@@ -23514,6 +23527,10 @@
     "name": "EndPartyNavigation",
     "params": {}
   },
+  "REQUEST:544": {
+    "name": "SmartQueueRegionQueueInfo",
+    "params": {}
+  },
   "RESPONSE:0": {
     "name": "Unused",
     "params": {}
@@ -27541,6 +27558,11 @@
         "name": "",
         "note": "(inferred) Boolean; 1 distinct",
         "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Boolean; 33% present; 1 distinct",
+        "resolveAs": ""
       }
     }
   },
@@ -30093,6 +30115,10 @@
   },
   "RESPONSE:543": {
     "name": "EndPartyNavigation",
+    "params": {}
+  },
+  "RESPONSE:544": {
+    "name": "SmartQueueRegionQueueInfo",
     "params": {}
   }
 }
