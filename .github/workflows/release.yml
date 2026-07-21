@@ -320,6 +320,9 @@ jobs:
       # Nudge the update-feed hub to mirror this release immediately instead of waiting for its
       # poll. No-ops until HUB_DISPATCH_TOKEN (a PAT with access to the hub repo) is configured.
       - name: Notify update-feed hub
+        # Best-effort: the hub mirrors on its own schedule, so a missing OR invalid token must not
+        # fail an already-published release. We swallow the curl error (e.g. 401 from an expired
+        # token) and just log a warning - a real shell/YAML error in this step still surfaces.
         env:
           HUB_DISPATCH_TOKEN: ${{ secrets.HUB_DISPATCH_TOKEN }}
         run: |
@@ -327,9 +330,12 @@ jobs:
             echo "HUB_DISPATCH_TOKEN not set; skipping (hub mirrors on its own schedule)."
             exit 0
           fi
-          curl -fsS -X POST \
+          if curl -fsS -X POST \
             -H "Authorization: Bearer $HUB_DISPATCH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/LuluStudioX/lulustudio-hub/dispatches \
-            -d '{"event_type":"apx-release"}'
-          echo "dispatched apx-release to the hub"
+            -d '{"event_type":"apx-release"}'; then
+            echo "dispatched apx-release to the hub"
+          else
+            echo "::warning::hub notify failed (token invalid/expired?); release already published, hub mirrors on schedule."
+          fi
