@@ -65,17 +65,6 @@ public sealed record ProtocolScanState(string? LastNotifiedFingerprint = null, s
 /// </summary>
 public sealed class ProtocolScanService
 {
-    // Stable members that have never moved; if any of these mismatch, the parse/layout is wrong
-    // (a real game patch only ever shifts higher codes), so we flag the result as low-confidence.
-    private static readonly (string Enum, string Name, int Code)[] Anchors =
-    [
-        ("EventCodes", "Leave", 1),
-        ("EventCodes", "Move", 3),
-        ("EventCodes", "NewSimpleItem", 32),
-        ("EventCodes", "NewBuilding", 45),
-        ("OperationCodes", "Move", 22),
-    ];
-
     public ProtocolScanResult Scan(string? clientPathOverride)
     {
         var client = AlbionClientLocator.Locate(clientPathOverride);
@@ -87,9 +76,7 @@ public sealed class ProtocolScanService
             ("Albion.Common.Photon", "EventCodes"),
             ("Albion.Common.Photon", "OperationCodes"),
         ],
-        // Known-stable members that pin the value blob (the reader is content-adaptive but the
-        // literal base can't be located structurally alone). Same set as Anchors below.
-        [.. Anchors.Select(a => new Il2CppMetadataReader.Anchor(a.Enum, a.Name, a.Code))]);
+        ProtocolAnchors.All); // pins the value blob; see ProtocolAnchors for the pin + audit roles
         if (dumps is null || !dumps.ContainsKey("EventCodes") || !dumps.ContainsKey("OperationCodes"))
             return ProtocolScanResult.Fail("Could not read protocol enums from the client metadata.");
 
@@ -99,8 +86,8 @@ public sealed class ProtocolScanService
             ["OperationCodes"] = dumps["OperationCodes"].Members.ToDictionary(m => m.Name, m => m.Value),
         };
 
-        bool lowConfidence = Anchors.Any(a =>
-            !live[a.Enum].TryGetValue(a.Name, out var v) || v != a.Code);
+        bool lowConfidence = ProtocolAnchors.All.Any(a =>
+            !live[a.Enum].TryGetValue(a.Member, out var v) || v != a.Value);
 
         var app = new Dictionary<string, Dictionary<string, int>>
         {
