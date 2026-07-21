@@ -546,4 +546,6 @@ public enum OperationCodes
     GetPartyMemberCluster,
     SetPartyNavigation,
     EndPartyNavigation,
+    // Radiant Wilds Patch 4 (client 2026-07-21): appended (= 544), nothing shifted.
+    SmartQueueRegionQueueInfo,
 }

@@ -86,7 +86,10 @@ public sealed class ProtocolScanService
         [
             ("Albion.Common.Photon", "EventCodes"),
             ("Albion.Common.Photon", "OperationCodes"),
-        ]);
+        ],
+        // Known-stable members that pin the value blob (the reader is content-adaptive but the
+        // literal base can't be located structurally alone). Same set as Anchors below.
+        [.. Anchors.Select(a => new Il2CppMetadataReader.Anchor(a.Enum, a.Name, a.Code))]);
         if (dumps is null || !dumps.ContainsKey("EventCodes") || !dumps.ContainsKey("OperationCodes"))
             return ProtocolScanResult.Fail("Could not read protocol enums from the client metadata.");
 

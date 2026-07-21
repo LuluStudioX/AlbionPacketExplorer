@@ -687,4 +687,7 @@ public enum EventCodes
     LosingCarriableObjectStart = 683,
     LosingCarriableObjectFinished = 684,
     NotifyPlatformAccountConfirmed = 685,
+    // Radiant Wilds Patch 4 (client 2026-07-21): appended, nothing shifted.
+    FactionTraderZoneBuffFailure = 686,
+    SmartClusterQueueContingentEntered = 687,
 }

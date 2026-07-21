@@ -26,6 +26,14 @@ public class Il2CppMetadataReaderTests
         [
             ("Albion.Common.Photon", "EventCodes"),
             ("Albion.Common.Photon", "OperationCodes"),
+        ],
+        // Anchors pin the value blob for the content-adaptive reader (stable across client versions).
+        [
+            new Il2CppMetadataReader.Anchor("EventCodes", "Leave", 1),
+            new Il2CppMetadataReader.Anchor("EventCodes", "Move", 3),
+            new Il2CppMetadataReader.Anchor("EventCodes", "NewSimpleItem", 32),
+            new Il2CppMetadataReader.Anchor("EventCodes", "NewBuilding", 45),
+            new Il2CppMetadataReader.Anchor("OperationCodes", "Move", 22),
         ]);
 
     [Fact]
