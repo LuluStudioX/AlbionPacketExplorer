@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "2b37c04",
-    "generatedAt": "2026-07-31"
+    "sourceCommit": "31fb2e5",
+    "generatedAt": "2026-08-05"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -1384,7 +1384,7 @@
       },
       "8": {
         "name": "",
-        "note": "(inferred) Int64; 3% present; high-card; range [655800..86400000]",
+        "note": "(inferred) Int64; 3% present; high-card; range [655800..144000000]",
         "resolveAs": ""
       }
     }
@@ -8473,7 +8473,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 13 distinct; range [57893..2724090]",
+        "note": "(inferred) Int64; 15 distinct; range [559..2724090]",
         "resolveAs": ""
       },
       "1": {
@@ -16980,7 +16980,18 @@
   },
   "EVENT:603": {
     "name": "DynamicTemplateForcedStateChange",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639213984000000000..639213984000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:604": {
     "name": "NewOutlandsTeleportationPortal",
@@ -18731,7 +18742,7 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Single; 70% present; 2 distinct; range [180..270]",
+        "note": "(inferred) Single; 67% present; 2 distinct; range [180..270]",
         "resolveAs": ""
       },
       "3": {
