@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "31fb2e5",
-    "generatedAt": "2026-08-05"
+    "sourceCommit": "f7e5712",
+    "generatedAt": "2026-08-07"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -2688,6 +2688,11 @@
       "0": {
         "name": "objectId",
         "note": "(inferred) Int64; 75 distinct; range [276..1186323]; high-cardinality id at key 0",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 0% present; 1 distinct; range [10000..10000]",
         "resolveAs": ""
       }
     }
@@ -21666,7 +21671,18 @@
   },
   "REQUEST:240": {
     "name": "GoldMarketGetBuyOffer",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [10000..10000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 4 distinct; range [3..16]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:241": {
     "name": "GoldMarketGetBuyOfferFromSilver",
@@ -21674,7 +21690,18 @@
   },
   "REQUEST:242": {
     "name": "GoldMarketGetSellOffer",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [10000..10000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 4 distinct; range [4..18]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:243": {
     "name": "GoldMarketGetSellOfferFromSilver",
@@ -21682,11 +21709,43 @@
   },
   "REQUEST:244": {
     "name": "GoldMarketBuyGold",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [10000..10000]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [75210000..75210000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [9..9]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:245": {
     "name": "GoldMarketSellGold",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [10000..10000]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [74840000..74840000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [19..19]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:246": {
     "name": "GoldMarketCreateSellOrder",
@@ -21698,7 +21757,13 @@
   },
   "REQUEST:248": {
     "name": "GoldMarketGetInfos",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 5 distinct; range [1..20]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:249": {
     "name": "GoldMarketCancelOrder",
@@ -21706,7 +21771,18 @@
   },
   "REQUEST:250": {
     "name": "GoldMarketGetAverageInfo",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [2..15]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:251": {
     "name": "TreasureChestUsingStart",
@@ -27954,7 +28030,23 @@
   },
   "RESPONSE:240": {
     "name": "GoldMarketGetBuyOffer",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [75210000..75210000]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [75210000..75210000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 4 distinct; range [3..16]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:241": {
     "name": "GoldMarketGetBuyOfferFromSilver",
@@ -27962,7 +28054,23 @@
   },
   "RESPONSE:242": {
     "name": "GoldMarketGetSellOffer",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [74840000..74840000]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [74840000..74840000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 4 distinct; range [4..18]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:243": {
     "name": "GoldMarketGetSellOfferFromSilver",
@@ -27970,11 +28078,53 @@
   },
   "RESPONSE:244": {
     "name": "GoldMarketBuyGold",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [10000..10000]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [75210000..75210000]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [75210000..75210000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [9..9]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:245": {
     "name": "GoldMarketSellGold",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [10000..10000]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [74840000..74840000]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [74840000..74840000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [19..19]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:246": {
     "name": "GoldMarketCreateSellOrder",
@@ -27986,7 +28136,33 @@
   },
   "RESPONSE:248": {
     "name": "GoldMarketGetInfos",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [75210000..75210000]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 3 distinct; range [47130000..52730000]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [74840000..74840000]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int64; 3 distinct; range [15930000..50940000]",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 5 distinct; range [1..20]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:249": {
     "name": "GoldMarketCancelOrder",
@@ -27994,7 +28170,23 @@
   },
   "RESPONSE:250": {
     "name": "GoldMarketGetAverageInfo",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int32[]; 1 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64[]; 1 distinct; Int64[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [2..15]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:251": {
     "name": "TreasureChestUsingStart",
