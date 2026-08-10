@@ -11,7 +11,7 @@
          WriteArray/ReadArray marshal element-by-element and dominate big loads; a span copy through
          the view's base pointer is ~10x faster. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AvaloniaVersion>12.1.0</AvaloniaVersion>
+    <AvaloniaVersion>12.1.1</AvaloniaVersion>
     <NoWarn>$(NoWarn);AVLN3001</NoWarn>
     <Win32Resource Condition="'$(OS)'=='Windows_NT'">app.res</Win32Resource>
     <UseAppHost>true</UseAppHost>
