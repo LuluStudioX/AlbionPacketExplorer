@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "f7e5712",
-    "generatedAt": "2026-08-07"
+    "sourceCommit": "25df221",
+    "generatedAt": "2026-08-10"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -1384,7 +1384,7 @@
       },
       "8": {
         "name": "",
-        "note": "(inferred) Int64; 3% present; high-card; range [655800..144000000]",
+        "note": "(inferred) Int64; 4% present; high-card; range [13807..144000000]",
         "resolveAs": ""
       }
     }
@@ -3894,7 +3894,7 @@
       },
       "11": {
         "name": "",
-        "note": "(inferred) Byte[]; 3% present; 1 distinct; Byte[] array",
+        "note": "(inferred) Byte[]; 5% present; 1 distinct; Byte[] array",
         "resolveAs": ""
       }
     }
@@ -7233,7 +7233,7 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Int16; 1 distinct; range [0..0]",
+        "note": "(inferred) Int16; 2 distinct; range [0..2]",
         "resolveAs": ""
       },
       "3": {
@@ -7243,22 +7243,27 @@
       },
       "4": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 2 distinct; range [0..2]; small enum/flag byte",
         "resolveAs": ""
       },
       "5": {
         "name": "flags",
-        "note": "(inferred) Byte; 1 distinct; range [0..0]; small enum/flag byte",
+        "note": "(inferred) Byte; 2 distinct; range [0..1]; small enum/flag byte",
         "resolveAs": ""
       },
       "6": {
         "name": "",
-        "note": "(inferred) String; 1 distinct; string value",
+        "note": "(inferred) String; 50% present; 1 distinct; string value",
         "resolveAs": ""
       },
       "7": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [11202..11202]",
+        "note": "(inferred) Int32; 3 distinct; range [11202..40563]",
+        "resolveAs": ""
+      },
+      "11": {
+        "name": "",
+        "note": "(inferred) Boolean; 50% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -7537,6 +7542,11 @@
       "1": {
         "name": "",
         "note": "(inferred) Boolean; 67% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Boolean; 8% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -8447,7 +8457,18 @@
   },
   "EVENT:288": {
     "name": "PremiumExtended",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [1615900..1615900]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [7..7]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:289": {
     "name": "PremiumLifeTimeRewardGained",
@@ -8478,7 +8499,7 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 15 distinct; range [559..2724090]",
+        "note": "(inferred) Int64; 20 distinct; range [559..2724090]",
         "resolveAs": ""
       },
       "1": {
@@ -18747,7 +18768,7 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Single; 67% present; 2 distinct; range [180..270]",
+        "note": "(inferred) Single; 61% present; 2 distinct; range [180..270]",
         "resolveAs": ""
       },
       "3": {
@@ -19768,6 +19789,11 @@
       "3": {
         "name": "position",
         "note": "(inferred) Single[]; high-card; Single[2] world coords {x, y}?",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Single; 0% present; 1 distinct; range [90..90]",
         "resolveAs": ""
       }
     }
@@ -21006,7 +21032,7 @@
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int64; 11% present; 5 distinct; range [10000..150000000]",
+        "note": "(inferred) Int64; 46% present; 10 distinct; range [10000..150000000]",
         "resolveAs": ""
       }
     }
@@ -21294,7 +21320,33 @@
   },
   "REQUEST:198": {
     "name": "AccessRightsChangeSettings",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [943..943]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [3..3]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [53..53]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:199": {
     "name": "Mount",
@@ -21381,6 +21433,11 @@
       "255": {
         "name": "",
         "note": "(inferred) Int32; 11 distinct; range [104..1601]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String[]; 1% present; 1 distinct; String[] array",
         "resolveAs": ""
       }
     }
@@ -21575,7 +21632,28 @@
   },
   "REQUEST:228": {
     "name": "PartyAnswerJoinRequest",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Boolean; 50% present; 1 distinct",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "flags",
+        "note": "(inferred) Byte; 2 distinct; range [0..5]; small enum/flag byte",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [238..282]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:229": {
     "name": "PartyLeave",
@@ -21593,7 +21671,23 @@
   },
   "REQUEST:231": {
     "name": "PartyMakeLeader",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [352..352]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:232": {
     "name": "PartyChangeLootSetting",
@@ -22472,7 +22566,18 @@
   },
   "REQUEST:331": {
     "name": "RequestPublicAccessTags",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [52..52]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:332": {
     "name": "ChangeAccessTagPublicFlag",
@@ -27970,7 +28075,13 @@
   },
   "RESPONSE:228": {
     "name": "PartyAnswerJoinRequest",
-    "params": {}
+    "params": {
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 2 distinct; range [238..282]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:229": {
     "name": "PartyLeave",
@@ -27992,6 +28103,11 @@
       "0": {
         "name": "username",
         "note": "",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [352..352]",
         "resolveAs": ""
       }
     }
@@ -28704,7 +28820,33 @@
   },
   "RESPONSE:331": {
     "name": "RequestPublicAccessTags",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String[]; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32[]; 1 distinct; Int32[] array",
+        "resolveAs": ""
+      },
+      "255": {
+        "name": "",
+        "note": "(inferred) Int32; 1 distinct; range [52..52]",
+        "resolveAs": ""
+      }
+    }
   },
   "RESPONSE:332": {
     "name": "ChangeAccessTagPublicFlag",
