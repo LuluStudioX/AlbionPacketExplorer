@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "25df221",
-    "generatedAt": "2026-08-10"
+    "sourceCommit": "e55342c",
+    "generatedAt": "2026-08-15"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -2026,6 +2026,11 @@
       "4": {
         "name": "",
         "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 64% present; 28 distinct; range [639223488000000000..639223488000000000]; likely .NET ticks (UTC)",
         "resolveAs": ""
       }
     }
@@ -8499,12 +8504,12 @@
     "params": {
       "0": {
         "name": "",
-        "note": "(inferred) Int64; 20 distinct; range [559..2724090]",
+        "note": "(inferred) Int64; 22 distinct; range [361..2724090]",
         "resolveAs": ""
       },
       "1": {
         "name": "",
-        "note": "(inferred) Int32; 6 distinct; range [11895..11949]",
+        "note": "(inferred) Int32; 8 distinct; range [11895..11953]",
         "resolveAs": ""
       },
       "2": {
@@ -19684,7 +19689,28 @@
   },
   "REQUEST:57": {
     "name": "InstallResourceStart",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; high-card; range [639223488000000000..639223488000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 35 distinct; range [332..615]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 7 distinct; range [914..1078]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 12 distinct; range [3..480]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:58": {
     "name": "InstallResourceCancel",
@@ -19716,7 +19742,18 @@
   },
   "REQUEST:61": {
     "name": "BuildingChangeRenovationState",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 28 distinct; range [332..615]",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "flags",
+        "note": "(inferred) Byte; 1 distinct; range [2..2]; small enum/flag byte",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:62": {
     "name": "BuildingBuySkin",
