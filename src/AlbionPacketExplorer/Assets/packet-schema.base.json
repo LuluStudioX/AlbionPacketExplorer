@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "e55342c",
-    "generatedAt": "2026-08-15"
+    "sourceCommit": "901adcd",
+    "generatedAt": "2026-08-18"
   },
   "EVENT:1": {
     "name": "Leave",
