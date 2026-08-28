@@ -1,8 +1,8 @@
 {
   "$schemaMeta": {
     "schemaVersion": "1",
-    "sourceCommit": "925b0f0",
-    "generatedAt": "2026-08-20"
+    "sourceCommit": "a354f22",
+    "generatedAt": "2026-08-28"
   },
   "EVENT:1": {
     "name": "Leave",
@@ -3201,6 +3201,11 @@
       "6": {
         "name": "timestamp",
         "note": "(inferred) Int64; high-card; range [639156465594644707..639170663750850528]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Single; 0% present; 1 distinct; range [0.395..0.395]",
         "resolveAs": ""
       }
     }
@@ -7646,7 +7651,7 @@
       },
       "2": {
         "name": "",
-        "note": "(inferred) Boolean; 13% present; 1 distinct",
+        "note": "(inferred) Boolean; 18% present; 1 distinct",
         "resolveAs": ""
       }
     }
@@ -15203,6 +15208,11 @@
         "note": "(inferred) Boolean[]; 2 distinct; Boolean[] array",
         "resolveAs": ""
       },
+      "1": {
+        "name": "",
+        "note": "(inferred) String[]; 0% present; 1 distinct; String[] array",
+        "resolveAs": ""
+      },
       "4": {
         "name": "",
         "note": "(inferred) String; 1 distinct; string value",
@@ -16340,15 +16350,73 @@
   },
   "EVENT:553": {
     "name": "HuntQuestProgressInfo",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 50% present; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 50% present; 1 distinct; range [22..22]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 67% present; 2 distinct; range [1..2]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "",
+        "note": "(inferred) Byte[]; 33% present; 2 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) Byte[]; 6 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:554": {
     "name": "HuntStarted",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:555": {
     "name": "HuntFinished",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:556": {
     "name": "HuntAborted",
@@ -16397,7 +16465,58 @@
   },
   "EVENT:557": {
     "name": "HuntMissionStepStateUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 1 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 50% present; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 50% present; 1 distinct; range [22..22]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "",
+        "note": "(inferred) Int32; 67% present; 2 distinct; range [1..2]",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "5": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 2 distinct; range [639234720000000000..639234720000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "",
+        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "",
+        "note": "(inferred) String[]; 3 distinct; String[] array",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Byte[]; 6 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "9": {
+        "name": "",
+        "note": "(inferred) Boolean[]; 3 distinct; Boolean[] array",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:558": {
     "name": "NewHuntTrack",
@@ -16456,12 +16575,48 @@
         "name": "",
         "note": "(inferred) Int64; 2 distinct; range [335791..937370]",
         "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int32; 17% present; 1 distinct; range [1..1]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int32; 67% present; 2 distinct; range [1..2]",
+        "resolveAs": ""
+      },
+      "3": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 67% present; 2 distinct; range [639234720000000000..639234720000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "4": {
+        "name": "",
+        "note": "(inferred) Byte[]; 67% present; 4 distinct; Byte[] array",
+        "resolveAs": ""
       }
     }
   },
   "EVENT:560": {
     "name": "HuntQuestMissionProgressUpdate",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Byte[]; 7 distinct; Byte[] array",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) String; 2 distinct; string value",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Boolean; 1 distinct",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:561": {
     "name": "HuntTrackUsed",
@@ -16479,7 +16634,33 @@
   },
   "EVENT:563": {
     "name": "MinimapHuntTrackMarkers",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) String; 1 distinct; string value",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [1619037..1619037]",
+        "resolveAs": ""
+      },
+      "6": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 4 distinct; range [639234720000000000..639234720000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "7": {
+        "name": "vector",
+        "note": "(inferred) Single[]; 4 distinct; Single[]",
+        "resolveAs": ""
+      },
+      "8": {
+        "name": "",
+        "note": "(inferred) Single; 1 distinct; range [225..225]",
+        "resolveAs": ""
+      }
+    }
   },
   "EVENT:564": {
     "name": "NoTracksFound",
@@ -21909,7 +22090,7 @@
       },
       "255": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [352..352]",
+        "note": "(inferred) Int32; 2 distinct; range [352..857]",
         "resolveAs": ""
       }
     }
@@ -24206,11 +24387,33 @@
   },
   "REQUEST:494": {
     "name": "UseFindTrackSpellFromItemPrepare",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [1619050..1619050]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:495": {
     "name": "InteractWithTrackStart",
-    "params": {}
+    "params": {
+      "0": {
+        "name": "timestamp",
+        "note": "(inferred) Int64; 1 distinct; range [639234720000000000..639234720000000000]; likely .NET ticks (UTC)",
+        "resolveAs": ""
+      },
+      "1": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [1619640..1619640]",
+        "resolveAs": ""
+      },
+      "2": {
+        "name": "",
+        "note": "(inferred) Int64; 1 distinct; range [1619050..1619050]",
+        "resolveAs": ""
+      }
+    }
   },
   "REQUEST:496": {
     "name": "InteractWithTrackCancel",
@@ -28442,7 +28645,7 @@
       },
       "255": {
         "name": "",
-        "note": "(inferred) Int32; 1 distinct; range [352..352]",
+        "note": "(inferred) Int32; 2 distinct; range [352..857]",
         "resolveAs": ""
       }
     }
