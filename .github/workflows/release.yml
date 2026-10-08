@@ -316,7 +316,3 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false
-        # No hub-notify step: the update feed is served live by the apx-feed-proxy Cloudflare Worker
-        # (rewrites /apx/feed/* -> GitHub releases/latest) and the project page reads that feed
-        # client-side, so a release is visible instantly with no dispatch. HUB_DISPATCH_TOKEN is
-        # obsolete and can be deleted from repo secrets.
