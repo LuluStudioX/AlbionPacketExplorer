@@ -35,7 +35,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Labs.Gif" Version="12.0.2" />
+    <PackageReference Include="Avalonia.Labs.Gif" Version="12.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
     <PackageReference Include="Velopack" Version="1.2.0" />
     <PackageReference Include="SharpPcap" Version="6.3.1" />
